@@ -1,0 +1,24 @@
+{
+  "name": "meoluna",
+  "version": "1.0.0",
+  "description": "KI-Lernwelt Generator - Transform Klassenarbeiten into magical learning worlds",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/@meoluna/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "lint": "turbo run lint",
+    "type-check": "turbo run type-check",
+    "clean": "turbo run clean"
+  },
+  "devDependencies": {
+    "turbo": "^1.10.16",
+    "typescript": "^5.2.2",
+    "@types/node": "^20.8.0"
+  },
+  "packageManager": "npm@9.8.1"
+}
