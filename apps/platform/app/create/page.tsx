@@ -241,18 +241,34 @@ export default function CreatePage() {
               🎉 Lernwelt erfolgreich erstellt!
             </h2>
             
-            <div style={{ marginBottom: '1rem' }}>
+            <div style={{ marginBottom: '1.5rem' }}>
               <h3 style={{ color: '#374151', marginBottom: '0.5rem' }}>
                 {result.title}
               </h3>
-              <p style={{ color: '#6b7280', marginBottom: '0.5rem' }}>
+              <p style={{ color: '#6b7280', marginBottom: '1rem' }}>
                 {result.description}
               </p>
-              <p style={{ color: '#9ca3af', fontSize: '0.9rem' }}>
-                📍 Subdomain: {result.subdomain} • 
-                ⏱️ Geschätzte Dauer: {result.metadata?.estimatedDuration} Min • 
-                📚 {result.metadata?.contentCount} Lerninhalte
-              </p>
+              
+              <a 
+                href={`https://${result.subdomain}.meoluna.com`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-block',
+                  padding: '0.75rem 1.5rem',
+                  backgroundColor: '#8b5cf6',
+                  color: 'white',
+                  textDecoration: 'none',
+                  borderRadius: '0.5rem',
+                  fontWeight: 'bold',
+                  fontSize: '1rem',
+                  transition: 'background-color 0.2s'
+                }}
+                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#7c3aed'}
+                onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#8b5cf6'}
+              >
+                🌙 Lernwelt besuchen
+              </a>
             </div>
 
             <div style={{ marginBottom: '1rem' }}>
@@ -262,29 +278,6 @@ export default function CreatePage() {
                   <li key={index}>{objective}</li>
                 ))}
               </ul>
-            </div>
-
-            <div style={{ marginBottom: '1rem' }}>
-              <h4 style={{ color: '#374151', marginBottom: '0.5rem' }}>🎨 Theme: {result.theme?.name}</h4>
-              <p style={{ color: '#6b7280' }}>{result.theme?.mood}</p>
-            </div>
-
-            <div>
-              <h4 style={{ color: '#374151', marginBottom: '0.5rem' }}>📚 Generierte Inhalte:</h4>
-              {result.content?.map((item: any, index: number) => (
-                <div key={index} style={{
-                  padding: '0.75rem',
-                  backgroundColor: 'white',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '0.5rem',
-                  marginBottom: '0.5rem'
-                }}>
-                  <strong>{item.title}</strong> ({item.type})
-                  {item.description && <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.9rem', color: '#6b7280' }}>
-                    {item.description}
-                  </p>}
-                </div>
-              ))}
             </div>
           </div>
         )}
