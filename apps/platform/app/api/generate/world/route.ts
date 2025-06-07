@@ -34,13 +34,10 @@ export async function POST(request: NextRequest) {
     let worldContent: any[] = []
     let themeConfig: any = null
     
-    try {
-      worldContent = await aiProvider.generateContent(worldConcept)
-      console.log('🎯 Generated', worldContent.length, 'content items')
-    } catch (contentError) {
-      console.error('❌ Content generation failed:', contentError)
-      // Continue without content for now
-    }
+    // Don't silently fail content generation - this is critical for the learning experience
+    console.log('🔍 Attempting content generation with world concept:', JSON.stringify(worldConcept, null, 2))
+    worldContent = await aiProvider.generateContent(worldConcept)
+    console.log('🎯 Generated', worldContent.length, 'content items:', worldContent.map(item => ({ type: item.content_type, title: item.title })))
 
     // Generate theme configuration
     console.log('🌈 Generating theme configuration...')
