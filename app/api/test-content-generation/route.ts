@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     })))
 
     // Validate content structure
-    const validationErrors = []
+    const validationErrors: string[] = []
     content.forEach((item, index) => {
       if (!item.type) validationErrors.push(`Item ${index}: Missing type`)
       if (!item.title) validationErrors.push(`Item ${index}: Missing title`)
