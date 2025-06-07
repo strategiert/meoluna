@@ -29,8 +29,8 @@ export async function POST(request: NextRequest) {
 
     // Generate content for the world
     console.log('🎨 Generating interactive content...')
-    let worldContent = []
-    let themeConfig = null
+    let worldContent: any[] = []
+    let themeConfig: any = null
     
     try {
       worldContent = await aiProvider.generateContent(worldConcept)
