@@ -10,14 +10,14 @@ interface WorldPageProps {
 
 async function getWorldData(slug: string) {
   try {
-    // Use API call instead of direct DB access for better reliability
-    // If we're on production domain, use production URL. Otherwise use current deployment URL.
-    const currentHost = process.env.VERCEL_URL || 'meoluna.com'
-    const baseUrl = currentHost.includes('meoluna.com') 
-      ? 'https://meoluna.com' 
-      : `https://${currentHost}`
+    // Always use production URL for API calls from production domain
+    // Check if we're in production by looking for production environment variable
+    const isProduction = process.env.VERCEL_ENV === 'production' || process.env.NODE_ENV === 'production'
+    const baseUrl = isProduction ? 'https://meoluna.com' : `https://${process.env.VERCEL_URL}`
     
     console.log('🔍 Fetching world data for slug:', slug)
+    console.log('🔍 Environment:', process.env.VERCEL_ENV, 'NODE_ENV:', process.env.NODE_ENV)
+    console.log('🔍 Is Production:', isProduction)
     console.log('🔍 Using base URL:', baseUrl)
     
     const response = await fetch(`${baseUrl}/api/worlds`, {
