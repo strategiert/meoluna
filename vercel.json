@@ -3,7 +3,16 @@
   "builds": [
     {
       "src": "apps/platform/package.json",
-      "use": "@vercel/next"
+      "use": "@vercel/next",
+      "config": {
+        "outputDirectory": "apps/platform/.next"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "apps/platform"
     }
   ],
   "installCommand": "npm install",
