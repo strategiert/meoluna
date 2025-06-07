@@ -97,9 +97,13 @@ export async function GET() {
   try {
     const supabase = createAdminClient()
     
+    // Fetch worlds with their content
     const { data: worlds, error } = await supabase
       .from('meoluna_worlds')
-      .select('*')
+      .select(`
+        *,
+        content:meoluna_content(*)
+      `)
       .eq('is_public', true)
       .order('created_at', { ascending: false })
       .limit(20)
@@ -107,6 +111,8 @@ export async function GET() {
     if (error) {
       throw new Error(`Database error: ${error.message}`)
     }
+
+    console.log('🔍 Fetched worlds with content. First world content items:', worlds?.[0]?.content?.length || 0)
 
     return NextResponse.json({
       success: true,
