@@ -27,6 +27,8 @@ export async function GET() {
       hasOpenAIKey: hasKey,
       keyPrefix: hasKey ? keyPrefix : 'No key',
       connectionTest,
+      keyHasNewlines: rawOpenaiKey?.includes('\n') || false,
+      keyLength: cleanedKey?.length || 0,
       timestamp: new Date().toISOString()
     })
   } catch (error) {
