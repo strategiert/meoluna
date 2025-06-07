@@ -6,6 +6,8 @@ interface WorldPageProps {
   }
 }
 
+// Force rebuild for Vercel deployment
+
 async function getWorldData(slug: string) {
   try {
     // Use internal API call since we're in the same app now
