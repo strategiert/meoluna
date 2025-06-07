@@ -3,16 +3,14 @@ import { MeolunaAI } from '@meoluna/ai-core'
 import { z } from 'zod'
 
 const RequestSchema = z.object({
-  content: z.string().min(10, 'Klassenarbeit-Inhalt muss mindestens 10 Zeichen haben'),
-  subject: z.string().min(1, 'Fach ist erforderlich'),
-  gradeLevel: z.number().min(1).max(13).optional(),
+  content: z.string().min(10, 'Klassenarbeit-Inhalt muss mindestens 10 Zeichen haben')
 })
 
 export async function POST(request: NextRequest) {
   try {
     // Parse and validate request
     const body = await request.json()
-    const { content, subject, gradeLevel } = RequestSchema.parse(body)
+    const { content } = RequestSchema.parse(body)
 
     // Check if OpenAI key exists
     if (!process.env.OPENAI_API_KEY) {
@@ -25,13 +23,9 @@ export async function POST(request: NextRequest) {
     // Initialize AI provider
     const aiProvider = MeolunaAI.fromEnv('openai')
 
-    // Generate world concept
-    console.log('🌙 Generating Meoluna world for subject:', subject)
-    const worldConcept = await aiProvider.generateWorldConcept(
-      content, 
-      subject, 
-      gradeLevel
-    )
+    // Generate world concept (AI will auto-detect subject and grade level)
+    console.log('🌙 Generating Meoluna world with auto-detection...')
+    const worldConcept = await aiProvider.generateWorldConcept(content)
 
     console.log('✨ Generated world:', worldConcept.title)
 

@@ -4,9 +4,7 @@ import { useState } from 'react'
 
 export default function CreatePage() {
   const [formData, setFormData] = useState({
-    content: '',
-    subject: 'mathematics',
-    gradeLevel: 8
+    content: ''
   })
   const [isLoading, setIsLoading] = useState(false)
   const [result, setResult] = useState<any>(null)
@@ -130,67 +128,6 @@ export default function CreatePage() {
             />
           </div>
 
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: '1fr 1fr', 
-            gap: '1rem',
-            marginBottom: '1.5rem'
-          }}>
-            <div>
-              <label style={{
-                display: 'block',
-                marginBottom: '0.5rem',
-                fontWeight: 'bold',
-                color: '#374151'
-              }}>
-                Fach:
-              </label>
-              <select
-                value={formData.subject}
-                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '1rem',
-                  border: '2px solid #e5e7eb',
-                  borderRadius: '0.5rem',
-                  fontSize: '1rem',
-                  fontFamily: 'inherit'
-                }}
-              >
-                {subjects.map(subject => (
-                  <option key={subject.value} value={subject.value}>
-                    {subject.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label style={{
-                display: 'block',
-                marginBottom: '0.5rem',
-                fontWeight: 'bold',
-                color: '#374151'
-              }}>
-                Klassenstufe:
-              </label>
-              <input
-                type="number"
-                min="1"
-                max="13"
-                value={formData.gradeLevel}
-                onChange={(e) => setFormData({ ...formData, gradeLevel: parseInt(e.target.value) })}
-                style={{
-                  width: '100%',
-                  padding: '1rem',
-                  border: '2px solid #e5e7eb',
-                  borderRadius: '0.5rem',
-                  fontSize: '1rem',
-                  fontFamily: 'inherit'
-                }}
-              />
-            </div>
-          </div>
 
           <button
             type="submit"
@@ -250,7 +187,7 @@ export default function CreatePage() {
               </p>
               
               <a 
-                href={`https://${result.subdomain}.meoluna.com`}
+                href={`/world/${result.subdomain}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{

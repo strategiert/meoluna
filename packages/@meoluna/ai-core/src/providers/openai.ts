@@ -30,19 +30,16 @@ export class MeolunaOpenAI extends BaseMeolunaProvider {
 
   async generateWorldConcept(
     input: string, 
-    subject: string, 
+    subject?: string, 
     gradeLevel?: number
   ): Promise<MeolunaWorldConcept> {
     try {
       const systemPrompt = this.getSystemPrompt('world')
       const userPrompt = `
-Fach: ${subject}
-${gradeLevel ? `Klassenstufe: ${gradeLevel}` : ''}
-
 Klassenarbeit/Inhalt:
 ${input}
 
-Erstelle eine Meoluna-Lernwelt, die diesen Inhalt in eine magische, interaktive Erfahrung verwandelt.
+Analysiere den Inhalt und erkenne automatisch das Fach und die Klassenstufe. Erstelle dann eine Meoluna-Lernwelt, die diesen Inhalt in eine magische, interaktive Erfahrung verwandelt.
 
 Antworte ausschließlich mit einem JSON-Objekt in folgendem Format:
 {
