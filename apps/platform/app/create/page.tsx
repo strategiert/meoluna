@@ -188,17 +188,28 @@ export default function CreatePage() {
               overflow: 'hidden',
               boxShadow: '0 0 30px rgba(96, 165, 250, 0.3)'
             }}>
-              {/* Moon Fill */}
+              {/* Moon Base (always visible) */}
               <div style={{
                 position: 'absolute',
-                bottom: 0,
+                top: 0,
                 left: 0,
                 right: 0,
-                backgroundColor: '#60a5fa',
-                background: 'linear-gradient(to top, #3b82f6, #60a5fa, #dbeafe)',
-                height: '0%',
-                animation: 'moonFill 8s ease-in-out infinite',
-                borderRadius: '0 0 50% 50%'
+                bottom: 0,
+                backgroundColor: '#2563eb',
+                borderRadius: '50%'
+              }} />
+              
+              {/* Shadow overlay for phases */}
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: '#1e1b4b',
+                borderRadius: '50%',
+                animation: 'moonPhases 8s ease-in-out infinite',
+                transformOrigin: 'center'
               }} />
               
               {/* Moon Craters */}
@@ -209,9 +220,9 @@ export default function CreatePage() {
                 width: '15px',
                 height: '15px',
                 borderRadius: '50%',
-                backgroundColor: 'rgba(59, 130, 246, 0.3)',
+                backgroundColor: 'rgba(30, 27, 75, 0.4)',
                 opacity: 0,
-                animation: 'fadeInOut 8s ease-in-out infinite 2s'
+                animation: 'craterFade 8s ease-in-out infinite 2s'
               }} />
               <div style={{
                 position: 'absolute',
@@ -220,9 +231,20 @@ export default function CreatePage() {
                 width: '10px',
                 height: '10px',
                 borderRadius: '50%',
-                backgroundColor: 'rgba(59, 130, 246, 0.3)',
+                backgroundColor: 'rgba(30, 27, 75, 0.4)',
                 opacity: 0,
-                animation: 'fadeInOut 8s ease-in-out infinite 4s'
+                animation: 'craterFade 8s ease-in-out infinite 4s'
+              }} />
+              <div style={{
+                position: 'absolute',
+                top: '45%',
+                left: '20%',
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                backgroundColor: 'rgba(30, 27, 75, 0.3)',
+                opacity: 0,
+                animation: 'craterFade 8s ease-in-out infinite 6s'
               }} />
             </div>
 
@@ -230,7 +252,8 @@ export default function CreatePage() {
               color: '#dbeafe',
               fontSize: '1.3rem',
               marginBottom: '1rem',
-              fontWeight: 'normal'
+              fontWeight: 'normal',
+              animation: 'phaseText 8s ease-in-out infinite'
             }}>
               🌙 Der Mond sammelt Wissen...
             </h3>
@@ -243,12 +266,55 @@ export default function CreatePage() {
             }}>
               Deine magische Lernwelt wird erschaffen
             </p>
+            
+            <div style={{
+              marginTop: '1rem',
+              fontSize: '0.9rem',
+              color: '#7dd3fc',
+              animation: 'phaseLabels 8s ease-in-out infinite',
+              minHeight: '20px'
+            }}>
+              ✨ Durchläuft alle Mondphasen
+            </div>
 
             <style jsx>{`
-              @keyframes moonFill {
-                0% { height: 0%; }
-                50% { height: 60%; }
-                100% { height: 100%; }
+              @keyframes moonPhases {
+                /* Neumond - komplett verdeckt */
+                0% { 
+                  transform: translateX(0%) scaleX(1);
+                }
+                /* Zunehmende Sichel */
+                12.5% {
+                  transform: translateX(-40%) scaleX(0.3);
+                }
+                /* Erstes Viertel */
+                25% {
+                  transform: translateX(-50%) scaleX(0);
+                }
+                /* Zunehmender Dreiviertelmond */
+                37.5% {
+                  transform: translateX(-40%) scaleX(-0.3);
+                }
+                /* Vollmond - nicht verdeckt */
+                50% {
+                  transform: translateX(-100%) scaleX(1);
+                }
+                /* Abnehmender Dreiviertelmond */
+                62.5% {
+                  transform: translateX(40%) scaleX(-0.3);
+                }
+                /* Letztes Viertel */
+                75% {
+                  transform: translateX(50%) scaleX(0);
+                }
+                /* Abnehmende Sichel */
+                87.5% {
+                  transform: translateX(40%) scaleX(0.3);
+                }
+                /* Zurück zu Neumond */
+                100% {
+                  transform: translateX(0%) scaleX(1);
+                }
               }
               
               @keyframes twinkle {
@@ -256,14 +322,39 @@ export default function CreatePage() {
                 100% { opacity: 1; }
               }
               
-              @keyframes fadeInOut {
-                0%, 80% { opacity: 0; }
-                40% { opacity: 1; }
+              @keyframes craterFade {
+                0%, 20% { opacity: 0; }
+                50%, 70% { opacity: 1; }
+                100% { opacity: 0; }
               }
               
               @keyframes pulse {
                 0%, 100% { opacity: 0.6; }
                 50% { opacity: 1; }
+              }
+              
+              @keyframes phaseText {
+                0% { content: "🌑 Neumond - Sammelt Ideen..."; }
+                12.5% { content: "🌒 Zunehmende Sichel - Erste Inspiration..."; }
+                25% { content: "🌓 Erstes Viertel - Konzepte entstehen..."; }
+                37.5% { content: "🌔 Zunehmender Mond - Wissen wächst..."; }
+                50% { content: "🌕 Vollmond - Vollständige Weisheit!"; }
+                62.5% { content: "🌖 Abnehmender Mond - Verfeinert Details..."; }
+                75% { content: "🌗 Letztes Viertel - Fast vollendet..."; }
+                87.5% { content: "🌘 Abnehmende Sichel - Letzte Magie..."; }
+                100% { content: "🌑 Neumond - Bereit für neue Welten!"; }
+              }
+              
+              @keyframes phaseLabels {
+                0%, 12.4% { opacity: 1; }
+                12.5%, 24.9% { opacity: 0.8; }
+                25%, 37.4% { opacity: 1; }
+                37.5%, 49.9% { opacity: 0.8; }
+                50%, 62.4% { opacity: 1; }
+                62.5%, 74.9% { opacity: 0.8; }
+                75%, 87.4% { opacity: 1; }
+                87.5%, 99.9% { opacity: 0.8; }
+                100% { opacity: 1; }
               }
             `}</style>
           </div>
