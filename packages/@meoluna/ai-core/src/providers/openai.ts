@@ -167,7 +167,7 @@ Antworte mit einem JSON-Array von Inhalten:
       const parsedData = JSON.parse(content)
       console.log('🔍 Parsed data type:', typeof parsedData, 'isArray:', Array.isArray(parsedData))
       
-      const contentArray = Array.isArray(parsedData) ? parsedData : parsedData.content || []
+      const contentArray = Array.isArray(parsedData) ? parsedData : parsedData.content || parsedData.contents || []
       console.log('🔍 Content array length:', contentArray.length, 'items:', contentArray.map((item: any) => item.type))
 
       const validatedItems = contentArray.map((item: any, index: number) => {
