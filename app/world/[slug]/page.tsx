@@ -48,9 +48,11 @@ async function getWorldData(slug: string) {
 }
 
 function ContentRenderer({ item }: { item: any }) {
-  const data = item.content_data || {}
+  // Handle both content_data (from DB) and data (from direct content)
+  const data = item.content_data?.data || item.data || {}
+  const actualItem = item.content_data || item
   
-  if (item.content_type === 'info') {
+  if (actualItem.type === 'info') {
     return (
       <div style={{
         background: 'white',
@@ -70,14 +72,14 @@ function ContentRenderer({ item }: { item: any }) {
           fontWeight: 'bold',
           marginBottom: '1rem'
         }}>
-          Info
+          📚 Info
         </span>
         <h3 style={{ color: '#059669', marginTop: 0, marginBottom: '1rem' }}>
-          {item.title}
+          {actualItem.title}
         </h3>
-        <div dangerouslySetInnerHTML={{ __html: data.content || item.description || '' }} />
+        <div dangerouslySetInnerHTML={{ __html: data.content || actualItem.description || '' }} />
         {data.keyPoints && (
-          <ul style={{ marginTop: '1rem' }}>
+          <ul style={{ marginTop: '1rem', color: '#374151' }}>
             {data.keyPoints.map((point: string, i: number) => (
               <li key={i}>{point}</li>
             ))}
@@ -87,7 +89,7 @@ function ContentRenderer({ item }: { item: any }) {
     )
   }
   
-  if (item.content_type === 'quiz') {
+  if (actualItem.type === 'quiz') {
     return (
       <div style={{
         background: 'white',
@@ -107,35 +109,36 @@ function ContentRenderer({ item }: { item: any }) {
           fontWeight: 'bold',
           marginBottom: '1rem'
         }}>
-          Quiz
+          🧠 Quiz
         </span>
         <h3 style={{ color: '#7c3aed', marginTop: 0, marginBottom: '1rem' }}>
-          {item.title}
+          {actualItem.title}
         </h3>
         {data.questions && data.questions.map((q: any, i: number) => (
-          <div key={i} style={{ marginBottom: '1.5rem' }}>
-            <p><strong>{q.question}</strong></p>
+          <div key={i} style={{ marginBottom: '1.5rem', padding: '1rem', background: '#f8fafc', borderRadius: '0.5rem' }}>
+            <p style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>{q.question}</p>
             {q.options && q.options.map((option: string, optIndex: number) => (
               <button 
                 key={optIndex}
                 style={{
                   display: 'block',
-                  margin: '0.5rem 0',
+                  margin: '0.25rem 0',
                   padding: '0.5rem 1rem',
-                  background: optIndex === q.correct ? '#dcfce7' : '#f3f4f6',
-                  border: `1px solid ${optIndex === q.correct ? '#10b981' : '#d1d5db'}`,
+                  background: optIndex === q.correct ? '#dcfce7' : '#f1f5f9',
+                  border: `1px solid ${optIndex === q.correct ? '#10b981' : '#cbd5e1'}`,
                   borderRadius: '0.5rem',
                   cursor: 'pointer',
                   width: '100%',
-                  textAlign: 'left'
+                  textAlign: 'left',
+                  fontSize: '0.9rem'
                 }}
               >
-                {option} {optIndex === q.correct ? '✓' : ''}
+                {option} {optIndex === q.correct ? '✅' : ''}
               </button>
             ))}
             {q.explanation && (
-              <p style={{ fontSize: '0.9rem', color: '#6b7280', marginTop: '0.5rem' }}>
-                <strong>Erklärung:</strong> {q.explanation}
+              <p style={{ fontSize: '0.85rem', color: '#6b7280', marginTop: '0.5rem', fontStyle: 'italic' }}>
+                💡 {q.explanation}
               </p>
             )}
           </div>
@@ -143,33 +146,100 @@ function ContentRenderer({ item }: { item: any }) {
       </div>
     )
   }
+
+  if (actualItem.type === 'interactive') {
+    return (
+      <div style={{
+        background: 'white',
+        padding: '1.5rem',
+        borderRadius: '1rem',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+        borderLeft: '4px solid #f59e0b',
+        marginBottom: '1.5rem'
+      }}>
+        <span style={{
+          display: 'inline-block',
+          background: '#f59e0b',
+          color: 'white',
+          padding: '0.25rem 0.75rem',
+          borderRadius: '9999px',
+          fontSize: '0.75rem',
+          fontWeight: 'bold',
+          marginBottom: '1rem'
+        }}>
+          🎮 Interaktiv
+        </span>
+        <h3 style={{ color: '#d97706', marginTop: 0, marginBottom: '1rem' }}>
+          {actualItem.title}
+        </h3>
+        <p style={{ marginBottom: '1rem' }}>{actualItem.description}</p>
+        <div dangerouslySetInnerHTML={{ __html: data.content || '' }} />
+        <div style={{ 
+          background: '#fef3c7', 
+          padding: '1rem', 
+          borderRadius: '0.5rem',
+          border: '1px solid #fed7aa',
+          marginTop: '1rem'
+        }}>
+          🚧 Interaktive Komponente wird hier angezeigt
+        </div>
+      </div>
+    )
+  }
+
+  if (actualItem.type === 'drag_drop') {
+    return (
+      <div style={{
+        background: 'white',
+        padding: '1.5rem',
+        borderRadius: '1rem',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+        borderLeft: '4px solid #06b6d4',
+        marginBottom: '1.5rem'
+      }}>
+        <span style={{
+          display: 'inline-block',
+          background: '#06b6d4',
+          color: 'white',
+          padding: '0.25rem 0.75rem',
+          borderRadius: '9999px',
+          fontSize: '0.75rem',
+          fontWeight: 'bold',
+          marginBottom: '1rem'
+        }}>
+          🎯 Drag & Drop
+        </span>
+        <h3 style={{ color: '#0891b2', marginTop: 0, marginBottom: '1rem' }}>
+          {actualItem.title}
+        </h3>
+        <p style={{ marginBottom: '1rem' }}>{actualItem.description}</p>
+        <div style={{ 
+          background: '#cffafe', 
+          padding: '1rem', 
+          borderRadius: '0.5rem',
+          border: '1px solid #67e8f9'
+        }}>
+          🎯 Drag & Drop Aktivität wird hier angezeigt
+        </div>
+      </div>
+    )
+  }
   
-  // Default renderer for other types
+  // Default renderer
   return (
     <div style={{
       background: 'white',
       padding: '1.5rem',
       borderRadius: '1rem',
       boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-      borderLeft: '4px solid #f59e0b',
+      border: '2px solid #6b7280',
       marginBottom: '1.5rem'
     }}>
-      <span style={{
-        display: 'inline-block',
-        background: '#f59e0b',
-        color: 'white',
-        padding: '0.25rem 0.75rem',
-        borderRadius: '9999px',
-        fontSize: '0.75rem',
-        fontWeight: 'bold',
-        marginBottom: '1rem'
-      }}>
-        {item.content_type}
-      </span>
-      <h3 style={{ color: '#d97706', marginTop: 0, marginBottom: '1rem' }}>
-        {item.title}
-      </h3>
-      <p>{item.description}</p>
+      <h3 style={{ marginTop: 0 }}>{actualItem.title}</h3>
+      <p>Type: {actualItem.type}</p>
+      <pre style={{ fontSize: '0.8rem', background: '#f1f5f9', padding: '0.5rem', borderRadius: '0.25rem' }}>
+        {JSON.stringify(actualItem, null, 2)}
+      </pre>
     </div>
   )
 }
