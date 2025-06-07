@@ -1,6 +1,27 @@
 import { Box, Text, HStack, VStack } from '@chakra-ui/react'
 import { motion } from 'framer-motion'
-import { MeolunaThemeConfig } from '@meoluna/ai-core'
+// import { MeolunaThemeConfig } from '@meoluna/ai-core'
+
+// Temporary inline type to avoid cross-package imports during build
+interface MeolunaThemeConfig {
+  colors: {
+    primary: string
+    secondary: string
+    accent: string
+    background: string
+    surface: string
+  }
+  patterns: {
+    hero: string
+    background: string
+    decorative: string
+  }
+  animations: {
+    entrance: string
+    interaction: string
+    success: string
+  }
+}
 
 const MotionBox = motion(Box)
 

@@ -1,6 +1,18 @@
 import { Box, Heading, Text, Badge, HStack, VStack, Button } from '@chakra-ui/react'
 import { motion } from 'framer-motion'
-import { MeolunaWorld } from '@meoluna/database'
+// import { MeolunaWorld } from '@meoluna/database'
+
+// Temporary inline type to avoid cross-package imports during build
+interface MeolunaWorld {
+  id: string
+  subdomain: string
+  title: string
+  subject: string
+  grade_level?: number
+  theme_config: any
+  play_count?: number
+  avg_rating?: number
+}
 
 const MotionBox = motion(Box)
 
