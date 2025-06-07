@@ -16,8 +16,14 @@ export class MeolunaOpenAI extends BaseMeolunaProvider {
 
   constructor(config: ProviderConfig) {
     super(config)
+    
+    // Validate API key format
+    if (!config.apiKey || !config.apiKey.startsWith('sk-')) {
+      throw new Error(`Invalid OpenAI API key format: ${config.apiKey?.substring(0, 10)}...`)
+    }
+    
     this.client = new OpenAI({
-      apiKey: config.apiKey,
+      apiKey: config.apiKey.trim(),
       baseURL: config.baseUrl
     })
   }

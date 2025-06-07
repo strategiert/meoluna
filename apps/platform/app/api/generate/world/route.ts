@@ -14,6 +14,14 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { content, subject, gradeLevel } = RequestSchema.parse(body)
 
+    // Check if OpenAI key exists
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error('OpenAI API key not configured')
+    }
+
+    console.log('🔑 OpenAI key present:', !!process.env.OPENAI_API_KEY)
+    console.log('🔑 Key prefix:', process.env.OPENAI_API_KEY?.substring(0, 7))
+
     // Initialize AI provider
     const aiProvider = MeolunaAI.fromEnv('openai')
 
