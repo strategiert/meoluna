@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     // Generate theme configuration
     console.log('🌈 Generating theme configuration...')
     try {
-      themeConfig = await aiProvider.generateThemeConfig(subject)
+      themeConfig = await aiProvider.generateThemeConfig(worldConcept.subject)
       console.log('✨ Generated theme config')
     } catch (themeError) {
       console.error('❌ Theme generation failed:', themeError)
