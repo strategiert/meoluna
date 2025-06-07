@@ -82,7 +82,7 @@ Antworte ausschließlich mit einem JSON-Objekt in folgendem Format:
       
       // Generate subdomain if not provided
       if (!parsedData.subdomain) {
-        parsedData.subdomain = this.generateSubdomain(parsedData.title, subject)
+        parsedData.subdomain = this.generateSubdomain(parsedData.title, subject || parsedData.subject || 'general')
       }
 
       return this.validateResponse<MeolunaWorldConcept>(parsedData, MeolunaWorldConceptSchema)
