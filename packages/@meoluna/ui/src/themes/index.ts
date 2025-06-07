@@ -1,6 +1,6 @@
 import { extendTheme } from '@chakra-ui/react'
 
-// Meoluna base theme
+// Simple theme without complex config for now
 export const meolunaTheme = extendTheme({
   fonts: {
     heading: `'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif`,

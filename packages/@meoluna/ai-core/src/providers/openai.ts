@@ -60,7 +60,7 @@ Antworte ausschließlich mit einem JSON-Objekt in folgendem Format:
 }`
 
       const response = await this.client.chat.completions.create({
-        model: this.config.model || 'gpt-4-turbo-preview',
+        model: this.config.model || 'gpt-4o',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt }

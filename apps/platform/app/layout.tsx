@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { ChakraProvider } from '@chakra-ui/react'
-import { meolunaTheme } from '@meoluna/ui'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -19,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="de">
       <body className={inter.className}>
-        <ChakraProvider theme={meolunaTheme}>
+        <ChakraProvider>
           {children}
         </ChakraProvider>
       </body>

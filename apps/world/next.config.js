@@ -1,10 +1,6 @@
-import type { NextConfig } from 'next'
-
-const nextConfig: NextConfig = {
-  experimental: {
-    appDir: true,
-  },
-  transpilePackages: ['@meoluna/database', '@meoluna/ai-core', '@meoluna/ui'],
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  transpilePackages: ['@meoluna/database', '@meoluna/ui'],
   images: {
     domains: ['images.unsplash.com', 'cdn.meoluna.com'],
   },
@@ -22,4 +18,4 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default nextConfig
+module.exports = nextConfig

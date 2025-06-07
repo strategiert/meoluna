@@ -30,7 +30,7 @@ export class MeolunaAI {
 
     return this.createProvider(type, {
       apiKey,
-      model: type === 'openai' ? 'gpt-4-turbo-preview' : 'deepseek-chat'
+      model: type === 'openai' ? 'gpt-4o' : 'deepseek-chat'
     })
   }
 }
