@@ -11,9 +11,11 @@ interface WorldPageProps {
 async function getWorldData(slug: string) {
   try {
     // Use API call instead of direct DB access for better reliability
-    const baseUrl = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}`
-      : 'https://meoluna.com'
+    // If we're on production domain, use production URL. Otherwise use current deployment URL.
+    const currentHost = process.env.VERCEL_URL || 'meoluna.com'
+    const baseUrl = currentHost.includes('meoluna.com') 
+      ? 'https://meoluna.com' 
+      : `https://${currentHost}`
     
     console.log('🔍 Fetching world data for slug:', slug)
     console.log('🔍 Using base URL:', baseUrl)
