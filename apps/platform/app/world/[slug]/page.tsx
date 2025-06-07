@@ -10,39 +10,37 @@ interface WorldPageProps {
 
 async function getWorldData(slug: string) {
   try {
-    const { createAdminClient } = await import('@meoluna/database')
-    const supabase = createAdminClient()
+    // Use API call instead of direct DB access for better reliability
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}`
+      : 'https://meoluna.com'
     
-    // Get world by subdomain
-    const { data: world, error: worldError } = await supabase
-      .from('meoluna_worlds')
-      .select('*')
-      .eq('subdomain', slug)
-      .single()
+    console.log('🔍 Fetching world data for slug:', slug)
+    console.log('🔍 Using base URL:', baseUrl)
     
-    if (worldError || !world) {
-      console.error('World not found:', worldError)
+    const response = await fetch(`${baseUrl}/api/worlds`, {
+      cache: 'no-store'
+    })
+    
+    if (!response.ok) {
+      console.error('❌ API call failed:', response.status, response.statusText)
       return null
     }
     
-    // Get content for this world
-    const { data: content, error: contentError } = await supabase
-      .from('meoluna_content')
-      .select('*')
-      .eq('world_id', world.id)
-      .order('order_index')
+    const data = await response.json()
+    console.log('🔍 API response:', data)
     
-    if (contentError) {
-      console.error('Error fetching content:', contentError)
-      // Don't fail completely, just return world without content
+    if (!data.success || !data.worlds) {
+      console.error('❌ Invalid API response:', data)
+      return null
     }
     
-    return {
-      ...world,
-      content: content || []
-    }
+    const world = data.worlds.find((w: any) => w.subdomain === slug)
+    console.log('🔍 Found world:', world ? 'YES' : 'NO')
+    
+    return world
   } catch (error) {
-    console.error('Error fetching world:', error)
+    console.error('❌ Error fetching world:', error)
     return null
   }
 }
