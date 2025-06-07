@@ -162,12 +162,27 @@ Antworte mit einem JSON-Array von Inhalten:
         throw new MeolunaAIError('No response from OpenAI', 'NO_RESPONSE', 'openai')
       }
 
+      console.log('🔍 Raw OpenAI response for content:', content)
+      
       const parsedData = JSON.parse(content)
+      console.log('🔍 Parsed data type:', typeof parsedData, 'isArray:', Array.isArray(parsedData))
+      
       const contentArray = Array.isArray(parsedData) ? parsedData : parsedData.content || []
+      console.log('🔍 Content array length:', contentArray.length, 'items:', contentArray.map(item => item.type))
 
-      return contentArray.map((item: any) => 
-        this.validateResponse<MeolunaContentItem>(item, MeolunaContentItemSchema)
-      )
+      const validatedItems = contentArray.map((item: any, index: number) => {
+        try {
+          console.log(`🔍 Validating item ${index}:`, JSON.stringify(item, null, 2))
+          return this.validateResponse<MeolunaContentItem>(item, MeolunaContentItemSchema)
+        } catch (validationError) {
+          console.error(`❌ Validation failed for item ${index}:`, validationError)
+          console.error(`❌ Item data:`, JSON.stringify(item, null, 2))
+          throw new MeolunaAIError(`Content item ${index} validation failed: ${validationError}`, 'VALIDATION_FAILED', 'openai')
+        }
+      })
+      
+      console.log('✅ All content items validated successfully:', validatedItems.length)
+      return validatedItems
     } catch (error) {
       if (error instanceof MeolunaAIError) throw error
       throw new MeolunaAIError(`OpenAI content generation failed: ${error}`, 'GENERATION_FAILED', 'openai')
