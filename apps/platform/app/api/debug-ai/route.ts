@@ -3,16 +3,17 @@ import { NextRequest, NextResponse } from 'next/server'
 export async function GET() {
   try {
     // Check environment variables
-    const openaiKey = process.env.OPENAI_API_KEY
-    const hasKey = !!openaiKey
-    const keyPrefix = openaiKey?.substring(0, 10) + '...'
+    const rawOpenaiKey = process.env.OPENAI_API_KEY
+    const cleanedKey = rawOpenaiKey?.replace(/\s+/g, '').trim()
+    const hasKey = !!cleanedKey
+    const keyPrefix = cleanedKey?.substring(0, 10) + '...'
     
     // Test OpenAI connection
     let connectionTest = 'Not tested'
     try {
       const response = await fetch('https://api.openai.com/v1/models', {
         headers: {
-          'Authorization': `Bearer ${openaiKey}`,
+          'Authorization': `Bearer ${cleanedKey}`,
           'Content-Type': 'application/json'
         }
       })
