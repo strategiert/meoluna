@@ -21,7 +21,7 @@ export default function HomePage() {
         </p>
         
         <div style={{ marginBottom: '2rem' }}>
-          <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>
+         {/* <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>
             Transformiere Klassenarbeiten in magische Lernwelten
           </h2>
           <p style={{ opacity: 0.8 }}>
@@ -30,7 +30,7 @@ export default function HomePage() {
           </p>
         </div>
 
-        '<div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
           <a 
             href="/create"
             style={{
@@ -69,12 +69,13 @@ export default function HomePage() {
           >
             Galerie entdecken
           </a>
-        </div>'
+        </div>
 
         <div style={{ marginTop: '2rem', fontSize: '0.9rem', opacity: 0.7 }}>
           ✨ KI-generierte Inhalte • 🎨 Thematische Welten • 📊 Analytics Dashboard
         </div>
       </div>
+       */}
     </div>
   )
 }
