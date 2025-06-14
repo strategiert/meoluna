@@ -13,18 +13,17 @@ export default function HomePage() {
       textAlign: 'center'
     }}>
       <div style={{ maxWidth: '600px' }}>
-        <h1 style={{ fontSize: '3rem', marginBottom: '1rem' }}>
-          🌙 Meoluna
-        </h1>
+        <h1 style={{ fontSize: '2.5rem' }}>🚧 Under Construction 🚧</h1>
+      {/* 
+      <div style={{ maxWidth: '600px' }}>
         <p style={{ fontSize: '1.2rem', marginBottom: '2rem' }}>
           Wo Lernen zu Entdecken wird
         </p>
-        
-        <div style={{ marginBottom: '2rem' }}>
+         <div style={{ marginBottom: '2rem' }}>
           <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>
             Nothing to see here. Go Away!
           </h2>
-         {/* <p style={{ opacity: 0.8 }}>
+          <p style={{ opacity: 0.8 }}>
             Jede Lernwelt ist ein einzigartiges Universum, thematisch perfekt abgestimmt 
             und als eigenständige Web-App erreichbar.
           </p>
@@ -75,7 +74,7 @@ export default function HomePage() {
           ✨ KI-generierte Inhalte • 🎨 Thematische Welten • 📊 Analytics Dashboard
         </div>
       </div>
-       */}
+      */}
     </div>
   )
 }
