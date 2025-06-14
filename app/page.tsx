@@ -21,10 +21,10 @@ export default function HomePage() {
         </p>
         
         <div style={{ marginBottom: '2rem' }}>
-         {/* <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>
-            Transformiere Klassenarbeiten in magische Lernwelten
+          <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>
+            Nothing to see here. Go Away!
           </h2>
-          <p style={{ opacity: 0.8 }}>
+         {/* <p style={{ opacity: 0.8 }}>
             Jede Lernwelt ist ein einzigartiges Universum, thematisch perfekt abgestimmt 
             und als eigenständige Web-App erreichbar.
           </p>
