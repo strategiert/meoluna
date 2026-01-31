@@ -120,7 +120,7 @@ export const generateWorld = action({
     style: v.optional(v.string()),
   },
   handler: async (_ctx, args) => {
-    const apiKey = (process as any).env.ANTHROPIC_API_KEY;
+    const apiKey = process.env.ANTHROPIC_API_KEY;
 
     if (!apiKey) {
       throw new Error("ANTHROPIC_API_KEY nicht konfiguriert");
@@ -192,7 +192,7 @@ export const autoFixCode = action({
     code: v.string(),
   },
   handler: async (_ctx, args) => {
-    const apiKey = (process as any).env.ANTHROPIC_API_KEY;
+    const apiKey = process.env.ANTHROPIC_API_KEY;
 
     if (!apiKey) {
       throw new Error("ANTHROPIC_API_KEY nicht konfiguriert");
