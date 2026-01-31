@@ -310,7 +310,13 @@ export const Sandbox: React.FC<SandboxProps> = ({
           });
         }
 
-        // 3. Wrap in async function für top-level await
+        // 3. Remove export statements (can't be inside async function)
+        processedCode = processedCode
+          .replace(/export\\s+default\\s+App\\s*;?/g, '')
+          .replace(/export\\s+default\\s+function\\s+App/g, 'function App')
+          .replace(/export\\s+\\{[^}]*\\}\\s*;?/g, '');
+
+        // 4. Wrap in async function für top-level await
         const wrappedCode = \`
           (async () => {
             \${processedCode}
