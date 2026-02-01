@@ -38,11 +38,10 @@ app.add_middleware(
 
 # Initialize PaddleOCR with language support
 # Models are downloaded on first use or during Docker build
+# Note: PaddleOCR v3+ removed use_gpu and show_log parameters
 ocr = PaddleOCR(
     use_angle_cls=True,
-    lang=OCR_LANGUAGE,
-    show_log=False,
-    use_gpu=False  # Set to True if GPU available
+    lang=OCR_LANGUAGE
 )
 
 

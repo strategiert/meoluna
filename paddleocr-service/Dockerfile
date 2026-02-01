@@ -1,5 +1,9 @@
 FROM python:3.10-slim-bookworm
 
+# Disable PaddlePaddle connectivity checks and reduce log noise
+ENV PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK=True
+ENV PYTHONUNBUFFERED=1
+
 WORKDIR /app
 
 # Install system dependencies for OpenCV, PDF processing, PaddlePaddle
@@ -21,7 +25,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Download PaddleOCR models on build (German + English)
-RUN python -c "from paddleocr import PaddleOCR; PaddleOCR(use_angle_cls=True, lang='german')"
+# Note: PaddleOCR v3+ removed use_gpu and show_log parameters
+RUN python -c "from paddleocr import PaddleOCR; PaddleOCR(use_angle_cls=True, lang='german')" 2>/dev/null || true
 
 EXPOSE 8000
 
