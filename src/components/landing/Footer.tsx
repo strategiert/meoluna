@@ -29,7 +29,7 @@ export function Footer() {
               to="/explore"
               className="hover:text-foreground transition-colors"
             >
-              Lernwelten
+              Entdecken
             </Link>
             <Link
               to="/blog"

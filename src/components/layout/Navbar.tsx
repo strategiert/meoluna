@@ -74,7 +74,7 @@ export function Navbar() {
               to="/explore"
               className={`text-sm font-medium transition-colors ${textColor}`}
             >
-              Lernwelten
+              Entdecken
             </Link>
             <Link
               to="/about"
@@ -88,7 +88,7 @@ export function Navbar() {
                 to="/dashboard"
                 className={`text-sm font-medium transition-colors ${textColor}`}
               >
-                Dashboard
+                Meine Welten
               </Link>
             </SignedIn>
 
@@ -167,7 +167,7 @@ export function Navbar() {
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="py-2 text-muted-foreground hover:text-foreground transition-colors"
               >
-                Lernwelten
+                Entdecken
               </Link>
               <Link
                 to="/about"
@@ -183,7 +183,7 @@ export function Navbar() {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="py-2 text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  Dashboard
+                  Meine Welten
                 </Link>
                 <Link
                   to="/teacher"
