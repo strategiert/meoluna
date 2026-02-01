@@ -38,10 +38,11 @@ app.add_middleware(
 
 # Initialize PaddleOCR with language support
 # Models are downloaded on first use or during Docker build
-# Note: PaddleOCR v3+ removed use_gpu and show_log parameters
 ocr = PaddleOCR(
     use_angle_cls=True,
-    lang=OCR_LANGUAGE
+    lang=OCR_LANGUAGE,
+    show_log=False,
+    use_gpu=False
 )
 
 
@@ -67,32 +68,20 @@ def extract_text_from_image(image: Image.Image) -> list[str]:
             image = image.convert('RGB')
         img_array = np.array(image)
 
-        # Run OCR - PaddleOCR v3+ may have different API
-        result = ocr.ocr(img_array)
+        # Run OCR with angle classification
+        result = ocr.ocr(img_array, cls=True)
 
-        # Extract text lines - handle various result formats
+        # Extract text lines
         lines = []
-        if result is None:
+        if result is None or not result[0]:
             return lines
 
-        # PaddleOCR can return different formats depending on version
-        for page_result in result:
-            if page_result is None:
-                continue
-            for line in page_result:
-                try:
-                    if line and len(line) >= 2:
-                        # Format: [bbox, (text, confidence)]
-                        text_info = line[1]
-                        if isinstance(text_info, tuple) and len(text_info) >= 2:
-                            text = text_info[0]
-                            confidence = text_info[1]
-                            if confidence > 0.5:
-                                lines.append(str(text))
-                        elif isinstance(text_info, str):
-                            lines.append(text_info)
-                except (IndexError, TypeError):
-                    continue
+        for line in result[0]:
+            if line and len(line) > 1:
+                text = line[1][0]  # Get the text content
+                confidence = line[1][1]  # Get confidence score
+                if confidence > 0.5:  # Filter low-confidence results
+                    lines.append(text)
 
         return lines
     except Exception as e:

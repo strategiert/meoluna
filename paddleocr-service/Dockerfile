@@ -25,8 +25,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Download PaddleOCR models on build (German + English)
-# Note: PaddleOCR v3+ removed use_gpu and show_log parameters
-RUN python -c "from paddleocr import PaddleOCR; PaddleOCR(use_angle_cls=True, lang='german')" 2>/dev/null || true
+RUN python -c "from paddleocr import PaddleOCR; PaddleOCR(use_angle_cls=True, lang='german', show_log=False)"
 
 EXPOSE 8000
 
