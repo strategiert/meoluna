@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as documents from "../documents.js";
 import type * as generate from "../generate.js";
 import type * as worlds from "../worlds.js";
 
@@ -18,6 +19,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  documents: typeof documents;
   generate: typeof generate;
   worlds: typeof worlds;
 }>;
