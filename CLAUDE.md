@@ -29,6 +29,25 @@
 - [ ] Progress System testen + deployen (Claude Code)
 - [ ] Crawler-Ergebnisse parsen (Claw)
 
+### 🎯 Mission Control API (für Task-Tracking)
+
+**URL:** `https://mission-control-etj.pages.dev`  
+**Auth:** `Authorization: Bearer a8c0ea72755c4fe081c5156a03060695`
+
+```bash
+# Tasks abrufen
+curl -H "Authorization: Bearer a8c0ea72755c4fe081c5156a03060695" \
+  "https://mission-control-etj.pages.dev/api/tasks?project=meoluna"
+
+# Task erstellen
+curl -X POST -H "Authorization: Bearer a8c0ea72755c4fe081c5156a03060695" \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Neuer Task", "status": "In Progress"}' \
+  "https://mission-control-etj.pages.dev/api/tasks?project=meoluna"
+```
+
+**Regel:** Vor größerer Arbeit Task erstellen, danach Status updaten!
+
 ---
 
 ## Was ist Meoluna?
