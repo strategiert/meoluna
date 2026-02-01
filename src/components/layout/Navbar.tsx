@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, GraduationCap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { MoonLogo } from '@/components/icons/MoonLogo';
 import {
@@ -76,6 +76,12 @@ export function Navbar() {
             <Link to="/dashboard">
               <Button variant="ghost" size="sm">
                 Dashboard
+              </Button>
+            </Link>
+            <Link to="/teacher">
+              <Button variant="ghost" size="sm" className="gap-1.5">
+                <GraduationCap className="w-4 h-4" />
+                Lehrer
               </Button>
             </Link>
             <Link to="/create">
@@ -155,6 +161,12 @@ export function Navbar() {
                   <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
                     <Button variant="ghost" className="w-full justify-start">
                       Dashboard
+                    </Button>
+                  </Link>
+                  <Link to="/teacher" onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="ghost" className="w-full justify-start gap-2">
+                      <GraduationCap className="w-4 h-4" />
+                      Lehrer-Bereich
                     </Button>
                   </Link>
                   <Link to="/create" onClick={() => setMobileMenuOpen(false)}>
