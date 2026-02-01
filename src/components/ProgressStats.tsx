@@ -43,7 +43,8 @@ function getLevelColor(level: number): string {
 }
 
 export function ProgressStats({ userId, variant = 'full', className = '' }: ProgressStatsProps) {
-  const stats = useQuery(api.progress.getStats, { userId });
+  // Nutze getUserStats für schnellere, denormalisierte Daten
+  const stats = useQuery(api.progress.getUserStats, { userId });
 
   if (stats === undefined) {
     return <ProgressStatsSkeleton variant={variant} />;

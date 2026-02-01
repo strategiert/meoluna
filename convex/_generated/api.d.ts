@@ -8,8 +8,12 @@
  * @module
  */
 
+import type * as blog from "../blog.js";
+import type * as classrooms from "../classrooms.js";
 import type * as documents from "../documents.js";
 import type * as generate from "../generate.js";
+import type * as progress from "../progress.js";
+import type * as worldConfig from "../worldConfig.js";
 import type * as worlds from "../worlds.js";
 
 import type {
@@ -19,8 +23,12 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  blog: typeof blog;
+  classrooms: typeof classrooms;
   documents: typeof documents;
   generate: typeof generate;
+  progress: typeof progress;
+  worldConfig: typeof worldConfig;
   worlds: typeof worlds;
 }>;
 

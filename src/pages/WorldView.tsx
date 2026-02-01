@@ -11,10 +11,23 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { WorldPreview } from '@/components/WorldPreview';
 import { useAction } from 'convex/react';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useUser } from '@clerk/clerk-react';
 import { XPPopup } from '@/components/XPPopup';
 import { ProgressStats } from '@/components/ProgressStats';
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+interface MeolunaProgressPayload {
+  event: 'score' | 'module' | 'complete';
+  amount: number;
+  context?: {
+    action?: string;
+    moduleIndex?: number;
+  };
+}
 
 export default function WorldView() {
   const { worldId } = useParams<{ worldId: string }>();
@@ -24,20 +37,65 @@ export default function WorldView() {
     api.progress.getByWorld,
     user?.id && worldId ? { userId: user.id, worldId: worldId as Id<"worlds"> } : 'skip'
   );
-  // userStats für zukünftige Level-Up Detection
-  const _userStats = useQuery(api.progress.getStats, user?.id ? { userId: user.id } : 'skip');
-  void _userStats; // Suppress unused warning
+  // userStats für Level-Up Detection
+  const userStats = useQuery(api.progress.getUserStats, user?.id ? { userId: user.id } : 'skip');
 
   const autoFixCode = useAction(api.generate.autoFixCode);
+  const reportScore = useMutation(api.progress.reportScore);
   const addXP = useMutation(api.progress.addXP);
-  const completeWorld = useMutation(api.progress.completeWorld);
+  const completeWorldMutation = useMutation(api.progress.completeWorld);
 
   const [currentCode, setCurrentCode] = useState<string | null>(null);
   const [isFixing, setIsFixing] = useState(false);
   const [showXPPopup, setShowXPPopup] = useState(false);
   const [earnedXP, setEarnedXP] = useState(0);
-  const [levelUp] = useState(false);
-  const [newLevel] = useState(1);
+  const [levelUp, setLevelUp] = useState(false);
+  const [newLevel, setNewLevel] = useState(1);
+
+  // Track previous level for level-up detection
+  const prevLevelRef = useRef<number | null>(null);
+
+  // Level-Up Detection
+  useEffect(() => {
+    if (userStats?.level !== undefined) {
+      if (prevLevelRef.current !== null && userStats.level > prevLevelRef.current) {
+        setLevelUp(true);
+        setNewLevel(userStats.level);
+      }
+      prevLevelRef.current = userStats.level;
+    }
+  }, [userStats?.level]);
+
+  // Helper für XP-Anzeige mit Level-Up Check
+  const showXPWithLevelCheck = (amount: number, didLevelUp?: boolean, level?: number) => {
+    setEarnedXP(amount);
+    if (didLevelUp && level) {
+      setLevelUp(true);
+      setNewLevel(level);
+    }
+    setShowXPPopup(true);
+  };
+
+  // Handler für neue meoluna:progress Events
+  const handleProgressEvent = useCallback(async (payload: MeolunaProgressPayload) => {
+    if (!user?.id || !worldId) return;
+
+    const { event, amount, context } = payload;
+
+    try {
+      const result = await reportScore({
+        userId: user.id,
+        worldId: worldId as Id<"worlds">,
+        worldScore: amount,
+        eventType: event,
+        moduleIndex: context?.moduleIndex,
+      });
+
+      showXPWithLevelCheck(result.xpAwarded, result.leveledUp, result.newLevel);
+    } catch (error) {
+      console.error('Progress tracking error:', error);
+    }
+  }, [user?.id, worldId, reportScore]);
 
   // Handler für XP Events aus der Lernwelt
   const handleWorldMessage = useCallback(async (event: MessageEvent) => {
@@ -46,55 +104,64 @@ export default function WorldView() {
     const data = event.data;
     if (typeof data !== 'object' || !data.type) return;
 
-    const showXP = (amount: number) => {
-      setEarnedXP(amount);
-      setShowXPPopup(true);
-    };
-
     try {
+      // ========================================
+      // NEUES PROTOKOLL: meoluna:progress
+      // ========================================
+      if (data.type === 'meoluna:progress' && data.payload) {
+        const payload = data.payload as MeolunaProgressPayload;
+        if (payload.event && typeof payload.amount === 'number') {
+          await handleProgressEvent(payload);
+        }
+        return;
+      }
+
+      // ========================================
+      // LEGACY PROTOKOLL (für Abwärtskompatibilität)
+      // ========================================
       switch (data.type) {
         case 'xp':
-          // XP verdient
+          // XP verdient (Legacy: amount wird als worldScore behandelt)
           if (typeof data.amount === 'number' && data.amount > 0) {
-            await addXP({
+            const result = await addXP({
               userId: user.id,
               worldId: worldId as Id<"worlds">,
               xpEarned: data.amount,
               moduleIndex: data.moduleIndex,
             });
-            showXP(data.amount);
+            showXPWithLevelCheck(data.amount, result.leveledUp, result.newLevel);
           }
           break;
 
         case 'module':
-          // Modul abgeschlossen (gibt 20 XP)
+          // Modul abgeschlossen
           if (typeof data.index === 'number') {
-            await addXP({
+            const result = await reportScore({
               userId: user.id,
               worldId: worldId as Id<"worlds">,
-              xpEarned: 20,
+              worldScore: 0, // Kein Score, nur Modul-Event
+              eventType: 'module',
               moduleIndex: data.index,
             });
-            showXP(20);
+            showXPWithLevelCheck(result.xpAwarded, result.leveledUp, result.newLevel);
           }
           break;
 
         case 'complete':
-          // Welt abgeschlossen (gibt 50 Bonus XP)
-          const result = await completeWorld({
+          // Welt abgeschlossen
+          const result = await completeWorldMutation({
             userId: user.id,
             worldId: worldId as Id<"worlds">,
-            bonusXP: 50,
           });
           if (!result.alreadyCompleted) {
-            showXP(50);
+            showXPWithLevelCheck(result.xpAwarded, result.leveledUp, result.newLevel);
           }
           break;
       }
     } catch (error) {
       console.error('XP tracking error:', error);
     }
-  }, [user?.id, worldId, addXP, completeWorld]);
+  }, [user?.id, worldId, addXP, reportScore, completeWorldMutation, handleProgressEvent]);
 
   // Event Listener für postMessage
   useEffect(() => {
@@ -176,10 +243,11 @@ export default function WorldView() {
             {user?.id && (
               <ProgressStats userId={user.id} variant="minimal" className="mr-2" />
             )}
-            {progress?.xp !== undefined && (
-              <div className="flex items-center gap-1 text-sm text-muted-foreground mr-2">
+            {/* Welt-spezifische Punkte */}
+            {progress && (progress.worldScore ?? progress.xp) > 0 && (
+              <div className="flex items-center gap-1 text-sm text-muted-foreground mr-2 border-l border-border pl-2">
                 <Star className="w-4 h-4 text-moon" />
-                <span>{progress.xp} XP</span>
+                <span>{progress.worldScore ?? progress.xp} Punkte</span>
               </div>
             )}
             <Button variant="ghost" size="icon">
@@ -211,7 +279,10 @@ export default function WorldView() {
       <XPPopup
         xp={earnedXP}
         show={showXPPopup}
-        onComplete={() => setShowXPPopup(false)}
+        onComplete={() => {
+          setShowXPPopup(false);
+          setLevelUp(false);
+        }}
         levelUp={levelUp}
         newLevel={newLevel}
       />

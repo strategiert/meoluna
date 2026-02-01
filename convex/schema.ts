@@ -2,6 +2,38 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  // ============================================================================
+  // USER STATS (Denormalisierte User-Level Statistiken)
+  // ============================================================================
+  userStats: defineTable({
+    userId: v.string(),           // Clerk User ID
+    totalXP: v.number(),          // Aggregiertes XP (denormalisiert für schnellen Zugriff)
+    level: v.number(),            // Aktuelles Level
+    lifetimeXP: v.number(),       // Gesamt-XP (nie verringert, auch wenn totalXP reset)
+    lastActivityAt: v.number(),   // Letzter Fortschritt
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_level", ["level"]),   // Für Leaderboards
+
+  // ============================================================================
+  // WORLD CONFIG (XP-Konvertierung pro Welt)
+  // ============================================================================
+  worldConfig: defineTable({
+    worldId: v.id("worlds"),
+    xpConversionRate: v.number(),    // z.B. 0.5 = 100 Punkte → 50 XP
+    xpPerModule: v.optional(v.number()),      // XP für Modul-Abschluss
+    xpForCompletion: v.optional(v.number()),  // XP für Welt-Abschluss
+    scoreType: v.optional(v.string()),        // "points", "stars", "percentage"
+    scoreLabel: v.optional(v.string()),       // "Punkte", "Sterne", etc.
+    maxScore: v.optional(v.number()),         // Maximale Punktzahl
+    createdAt: v.number(),
+  })
+    .index("by_world", ["worldId"]),
+
+  // ============================================================================
+  // LERNWELTEN
+  // ============================================================================
   // Lernwelten
   worlds: defineTable({
     title: v.string(),
@@ -43,16 +75,34 @@ export default defineSchema({
   })
     .index("by_clerk_id", ["clerkId"]),
 
-  // World Progress (Lernfortschritt)
+  // ============================================================================
+  // WORLD PROGRESS (Lernfortschritt pro User pro Welt)
+  // ============================================================================
   progress: defineTable({
     userId: v.string(),
     worldId: v.id("worlds"),
+
+    // Modul-Tracking
     moduleIndex: v.number(),
+
+    // Legacy: Wird für Abwärtskompatibilität behalten
     xp: v.number(),
+
+    // NEU: Welt-spezifische Punkte (Rohpunkte der Welt)
+    worldScore: v.optional(v.number()),
+
+    // NEU: XP-Beitrag zum User-Account (konvertierte XP)
+    xpEarned: v.optional(v.number()),
+
+    // NEU: Erweitertes Tracking
+    bestScore: v.optional(v.number()),        // Beste erreichte Punktzahl
+    attempts: v.optional(v.number()),         // Anzahl der Versuche
+
     completedAt: v.optional(v.number()),
     updatedAt: v.number(),
   })
-    .index("by_user_world", ["userId", "worldId"]),
+    .index("by_user_world", ["userId", "worldId"])
+    .index("by_user", ["userId"]),
 
   // Classrooms (Teacher-managed groups)
   classrooms: defineTable({

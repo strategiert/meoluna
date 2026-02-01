@@ -1,185 +1,223 @@
 /**
- * Navbar - Main navigation with Clerk authentication
+ * Navbar - Main navigation with Clerk authentication (Original Design)
  */
 
-import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, GraduationCap } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { MoonLogo } from '@/components/icons/MoonLogo';
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X, LogIn, LogOut, GraduationCap, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { MoonLogo } from "@/components/icons/MoonLogo";
 import {
   SignedIn,
   SignedOut,
   SignInButton,
   UserButton,
-  useUser,
-} from '@clerk/clerk-react';
-
-const navLinks = [
-  { label: 'Lernwelten', href: '/explore' },
-  { label: 'Über uns', href: '/about' },
-];
+  useClerk,
+} from "@clerk/clerk-react";
 
 export function Navbar() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const { user } = useUser();
+  const { signOut } = useClerk();
+
+  const isLandingPage = location.pathname === "/";
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const handleLogout = async () => {
+    await signOut();
+    window.location.href = "/";
+  };
+
+  // Determine navbar style based on page and scroll
+  const navbarBg = isLandingPage && !isScrolled
+    ? "bg-transparent"
+    : "bg-background/80 backdrop-blur-xl border-b border-border/40";
+
+  const textColor = isLandingPage && !isScrolled
+    ? "text-white/70 hover:text-white"
+    : "text-muted-foreground hover:text-foreground";
+
+  const logoTextColor = isLandingPage && !isScrolled
+    ? "text-white"
+    : "text-foreground";
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 group">
-          <MoonLogo size={32} className="transition-transform group-hover:scale-110" />
-          <span className="font-bold text-xl bg-gradient-to-r from-moon to-foreground bg-clip-text text-transparent">
-            Meoluna
-          </span>
-        </Link>
+    <motion.header
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ duration: 0.5 }}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${navbarBg}`}
+    >
+      <div className="container px-4">
+        <nav className="flex items-center justify-between h-16 md:h-20">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2">
+            <MoonLogo size="sm" animate={false} />
+            <span className="text-xl font-bold">
+              <span className={logoTextColor}>Meo</span>
+              <span className="text-moon">luna</span>
+            </span>
+          </Link>
 
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-6">
-          {navLinks.map((link) => (
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-6">
             <Link
-              key={link.href}
-              to={link.href}
-              className={`text-sm font-medium transition-colors hover:text-moon ${
-                location.pathname === link.href
-                  ? 'text-moon'
-                  : 'text-muted-foreground'
-              }`}
+              to="/explore"
+              className={`text-sm font-medium transition-colors ${textColor}`}
             >
-              {link.label}
+              Lernwelten
             </Link>
-          ))}
-        </div>
+            <Link
+              to="/about"
+              className={`text-sm font-medium transition-colors ${textColor}`}
+            >
+              Über uns
+            </Link>
 
-        {/* Auth Area */}
-        <div className="hidden md:flex items-center gap-3">
-          <SignedOut>
-            <SignInButton mode="modal">
-              <Button variant="ghost" size="sm">
-                Anmelden
-              </Button>
-            </SignInButton>
-            <SignInButton mode="modal">
-              <Button
-                size="sm"
-                className="bg-gradient-to-r from-moon to-aurora hover:opacity-90 text-background font-medium"
+            <SignedIn>
+              <Link
+                to="/dashboard"
+                className={`text-sm font-medium transition-colors ${textColor}`}
               >
-                Kostenlos starten
-              </Button>
-            </SignInButton>
-          </SignedOut>
-
-          <SignedIn>
-            <Link to="/dashboard">
-              <Button variant="ghost" size="sm">
                 Dashboard
-              </Button>
-            </Link>
-            <Link to="/teacher">
-              <Button variant="ghost" size="sm" className="gap-1.5">
-                <GraduationCap className="w-4 h-4" />
-                Lehrer
-              </Button>
-            </Link>
-            <Link to="/create">
-              <Button
-                size="sm"
-                className="bg-gradient-to-r from-moon to-aurora hover:opacity-90 text-background font-medium"
-              >
-                Neue Welt
-              </Button>
-            </Link>
-            <UserButton
-              afterSignOutUrl="/"
-              appearance={{
-                elements: {
-                  avatarBox: 'w-8 h-8',
-                },
-              }}
-            />
-          </SignedIn>
-        </div>
+              </Link>
+            </SignedIn>
 
-        {/* Mobile Menu Button */}
-        <button
-          className="md:hidden p-2 text-muted-foreground hover:text-foreground"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={isLandingPage && !isScrolled ? "text-white hover:bg-white/10" : ""}
+                >
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Anmelden
+                </Button>
+              </SignInButton>
+            </SignedOut>
+
+            <SignedIn>
+              <div className="flex items-center gap-3">
+                <Link to="/teacher">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={isLandingPage && !isScrolled ? "text-white hover:bg-white/10" : ""}
+                  >
+                    <GraduationCap className="w-4 h-4 mr-2" />
+                    Lehrer
+                  </Button>
+                </Link>
+                <Link to="/create">
+                  <Button
+                    size="sm"
+                    className="bg-moon text-night-sky hover:bg-moon-glow"
+                  >
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Neue Welt
+                  </Button>
+                </Link>
+                <UserButton
+                  afterSignOutUrl="/"
+                  appearance={{
+                    elements: {
+                      avatarBox: "w-8 h-8",
+                    },
+                  }}
+                />
+              </div>
+            </SignedIn>
+          </div>
+
+          {/* Mobile menu button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden p-2"
+          >
+            {isMobileMenuOpen ? (
+              <X className={`w-6 h-6 ${isLandingPage && !isScrolled ? "text-white" : ""}`} />
+            ) : (
+              <Menu className={`w-6 h-6 ${isLandingPage && !isScrolled ? "text-white" : ""}`} />
+            )}
+          </button>
+        </nav>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile menu */}
       <AnimatePresence>
-        {mobileMenuOpen && (
+        {isMobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-background/95 backdrop-blur-xl border-b border-border"
+            className="md:hidden bg-background/95 backdrop-blur-lg border-b border-border"
           >
-            <div className="container mx-auto px-4 py-4 space-y-4">
-              {navLinks.map((link) => (
+            <div className="container px-4 py-4 flex flex-col gap-4">
+              <Link
+                to="/explore"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="py-2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Lernwelten
+              </Link>
+              <Link
+                to="/about"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="py-2 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Über uns
+              </Link>
+
+              <SignedIn>
                 <Link
-                  key={link.href}
-                  to={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`block text-sm font-medium py-2 ${
-                    location.pathname === link.href
-                      ? 'text-moon'
-                      : 'text-muted-foreground'
-                  }`}
+                  to="/dashboard"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="py-2 text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {link.label}
+                  Dashboard
                 </Link>
-              ))}
+                <Link
+                  to="/teacher"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="py-2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Lehrer-Bereich
+                </Link>
+                <Link to="/create" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button className="w-full bg-moon text-night-sky hover:bg-moon-glow">
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Neue Welt erstellen
+                  </Button>
+                </Link>
+                <Button onClick={handleLogout} variant="outline" className="w-full">
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Abmelden
+                </Button>
+              </SignedIn>
 
-              <div className="pt-4 border-t border-border space-y-2">
-                <SignedOut>
-                  <SignInButton mode="modal">
-                    <Button variant="ghost" className="w-full justify-start">
-                      Anmelden
-                    </Button>
-                  </SignInButton>
-                  <SignInButton mode="modal">
-                    <Button className="w-full bg-gradient-to-r from-moon to-aurora text-background">
-                      Kostenlos starten
-                    </Button>
-                  </SignInButton>
-                </SignedOut>
-
-                <SignedIn>
-                  <div className="flex items-center gap-3 py-2">
-                    <UserButton afterSignOutUrl="/" />
-                    <span className="text-sm text-muted-foreground">
-                      {user?.firstName || 'Benutzer'}
-                    </span>
-                  </div>
-                  <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                    <Button variant="ghost" className="w-full justify-start">
-                      Dashboard
-                    </Button>
-                  </Link>
-                  <Link to="/teacher" onClick={() => setMobileMenuOpen(false)}>
-                    <Button variant="ghost" className="w-full justify-start gap-2">
-                      <GraduationCap className="w-4 h-4" />
-                      Lehrer-Bereich
-                    </Button>
-                  </Link>
-                  <Link to="/create" onClick={() => setMobileMenuOpen(false)}>
-                    <Button className="w-full bg-gradient-to-r from-moon to-aurora text-background">
-                      Neue Welt erstellen
-                    </Button>
-                  </Link>
-                </SignedIn>
-              </div>
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <Button className="w-full bg-moon text-night-sky hover:bg-moon-glow">
+                    <LogIn className="w-4 h-4 mr-2" />
+                    Anmelden
+                  </Button>
+                </SignInButton>
+              </SignedOut>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-    </nav>
+    </motion.header>
   );
 }
+
+export default Navbar;

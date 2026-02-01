@@ -32,7 +32,7 @@ export default function About() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <MoonLogo size={80} className="mx-auto mb-6" />
+          <MoonLogo size="xl" className="mx-auto mb-6" />
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Über Meoluna
           </h1>

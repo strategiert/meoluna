@@ -51,7 +51,6 @@ import {
 } from '@/components/ui/select';
 import { StarField } from '@/components/landing/StarField';
 import { Navbar } from '@/components/layout/Navbar';
-import { MoonLogo } from '@/components/icons/MoonLogo';
 import { useToast } from '@/hooks/use-toast';
 import {
   SignedIn,

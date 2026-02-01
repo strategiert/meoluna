@@ -14,7 +14,6 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { StarField } from '@/components/landing/StarField';
 import { Navbar } from '@/components/layout/Navbar';
-import { MoonLogo } from '@/components/icons/MoonLogo';
 import { useToast } from '@/hooks/use-toast';
 import {
   SignedIn,

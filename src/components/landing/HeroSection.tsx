@@ -1,103 +1,142 @@
 /**
- * HeroSection - Main hero with aurora effects and CTA
+ * HeroSection - Landing page hero (Original Design)
  */
 
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Sparkles, ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { SignedIn, SignedOut, SignInButton } from '@clerk/clerk-react';
-import { MoonLogo } from '@/components/icons/MoonLogo';
+import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
+import { ArrowRight, Sparkles, BookOpen, Users } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { MoonLogo } from "@/components/icons/MoonLogo";
+import { StarField } from "./StarField";
 
 export function HeroSection() {
   return (
-    <section className="relative pt-32 pb-20 px-4 overflow-hidden">
-      {/* Aurora effect blobs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div
-          className="absolute -top-40 -left-40 w-80 h-80 bg-aurora/20 rounded-full blur-3xl animate-pulse-soft"
-          style={{ animationDelay: '0s' }}
-        />
-        <div
-          className="absolute top-20 -right-20 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse-soft"
-          style={{ animationDelay: '2s' }}
-        />
-        <div
-          className="absolute -bottom-20 left-1/3 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-pulse-soft"
-          style={{ animationDelay: '4s' }}
-        />
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-hero">
+      <StarField />
+
+      {/* Aurora effect */}
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-aurora blur-[120px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-accent blur-[100px]" />
       </div>
 
-      <div className="container mx-auto text-center relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-moon/10 text-moon border border-moon/20 mb-6">
-            <Sparkles className="w-4 h-4" />
-            <span className="text-sm font-medium">Wo Wissen zum Abenteuer wird</span>
-          </div>
+      <div className="container relative z-10 px-4 py-20">
+        <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
+          {/* Logo */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <MoonLogo size="xl" />
+          </motion.div>
 
-          {/* Headline */}
-          <h1 className="text-5xl md:text-7xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-moon via-white to-aurora bg-clip-text text-transparent">
-              Erschaffe magische
-            </span>
-            <br />
-            <span className="text-foreground">Lernwelten mit KI</span>
-          </h1>
+          {/* Title */}
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="mt-8 text-5xl md:text-7xl font-bold tracking-tight"
+          >
+            <span className="text-white">Meo</span>
+            <span className="text-gradient-moon">luna</span>
+          </motion.h1>
+
+          {/* Tagline */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="mt-4 text-xl md:text-2xl text-white/80 font-light"
+          >
+            Wo Wissen zum Abenteuer wird
+          </motion.p>
 
           {/* Description */}
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-            Tauche ein in interaktive Lernwelten, die sich an dich anpassen.
-            Von Vulkanen bis Bruchrechnung - jedes Thema wird zur
-            spannenden Entdeckungsreise unter dem Mondlicht.
-          </p>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="mt-6 text-lg text-white/60 max-w-2xl"
+          >
+            Erschaffe magische Lernwelten mit KI. Verwandle Klassenarbeiten und
+            Lernmaterialien in interaktive, spielerische Erlebnisse für deine
+            Schüler.
+          </motion.p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <SignedOut>
-              <SignInButton mode="modal">
-                <Button
-                  size="lg"
-                  className="gap-2 bg-gradient-to-r from-moon to-aurora hover:opacity-90 text-background font-semibold"
-                >
-                  Jetzt starten <ArrowRight className="w-4 h-4" />
-                </Button>
-              </SignInButton>
-            </SignedOut>
-            <SignedIn>
-              <Link to="/create">
-                <Button
-                  size="lg"
-                  className="gap-2 bg-gradient-to-r from-moon to-aurora hover:opacity-90 text-background font-semibold"
-                >
-                  Welt erstellen <ArrowRight className="w-4 h-4" />
-                </Button>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="mt-10 flex flex-col sm:flex-row gap-4"
+          >
+            <Button
+              asChild
+              size="lg"
+              className="bg-moon text-night-sky hover:bg-moon-glow shadow-moon transition-all duration-300 text-lg px-8"
+            >
+              <Link to="/dashboard">
+                <Sparkles className="w-5 h-5 mr-2" />
+                Jetzt starten
+                <ArrowRight className="w-5 h-5 ml-2" />
               </Link>
-            </SignedIn>
-            <Link to="/explore">
-              <Button size="lg" variant="outline" className="border-moon/30 hover:bg-moon/10">
-                Welten entdecken
-              </Button>
-            </Link>
-          </div>
-        </motion.div>
+            </Button>
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="bg-white/10 border-white/30 text-white hover:bg-white/20 text-lg px-8"
+            >
+              <Link to="/explore">
+                <BookOpen className="w-5 h-5 mr-2" />
+                Lernwelten entdecken
+              </Link>
+            </Button>
+          </motion.div>
 
-        {/* Floating Moon */}
-        <motion.div
-          className="mt-16 flex justify-center"
-          animate={{ y: [0, -20, 0] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <div className="relative">
-            <div className="absolute inset-0 bg-moon/30 rounded-full blur-2xl scale-150" />
-            <MoonLogo size={120} className="relative z-10" />
-          </div>
-        </motion.div>
+          {/* Stats */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
+            className="mt-16 grid grid-cols-3 gap-8 md:gap-16"
+          >
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-moon">∞</div>
+              <div className="mt-1 text-sm text-white/50">Lernwelten</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-moon">KI</div>
+              <div className="mt-1 text-sm text-white/50">Generiert</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-moon">
+                <Users className="w-8 h-8 md:w-10 md:h-10 mx-auto" />
+              </div>
+              <div className="mt-1 text-sm text-white/50">Für Lehrer</div>
+            </div>
+          </motion.div>
+        </div>
       </div>
+
+      {/* Scroll indicator */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1, duration: 1 }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+      >
+        <motion.div
+          animate={{ y: [0, 10, 0] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className="w-6 h-10 rounded-full border-2 border-white/30 flex justify-center pt-2"
+        >
+          <div className="w-1.5 h-1.5 rounded-full bg-white/50" />
+        </motion.div>
+      </motion.div>
     </section>
   );
 }
+
+export default HeroSection;

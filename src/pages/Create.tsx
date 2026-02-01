@@ -24,6 +24,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { WorldPreview } from '@/components/WorldPreview';
 import { PdfUpload } from '@/components/PdfUpload';
+import { GenerationProgress } from '@/components/GenerationProgress';
 import { SignedIn, SignedOut, SignInButton, useUser } from '@clerk/clerk-react';
 
 interface Message {
@@ -354,16 +355,10 @@ export default function Create() {
           </AnimatePresence>
 
           {isGenerating && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex items-center gap-3 text-muted-foreground"
-            >
-              <div className="w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
-                <Loader2 className="w-4 h-4 animate-spin" />
-              </div>
-              <span>Erschaffe deine Lernwelt...</span>
-            </motion.div>
+            <GenerationProgress
+              isGenerating={isGenerating}
+              isPdfBased={!!pdfText}
+            />
           )}
 
           <div ref={messagesEndRef} />
@@ -475,6 +470,15 @@ export default function Create() {
                 onCodeUpdate={setCurrentCode}
                 onError={handleAutoFix}
               />
+            ) : isGenerating ? (
+              <div className="h-full flex flex-col items-center justify-center p-8">
+                <div className="max-w-md w-full">
+                  <GenerationProgress
+                    isGenerating={isGenerating}
+                    isPdfBased={!!pdfText}
+                  />
+                </div>
+              </div>
             ) : (
               <div className="h-full flex flex-col items-center justify-center text-muted-foreground">
                 <Moon className="w-16 h-16 mb-4 opacity-30" />

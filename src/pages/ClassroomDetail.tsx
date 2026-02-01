@@ -3,7 +3,7 @@
  */
 
 import { useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Id } from '../../convex/_generated/dataModel';
@@ -270,7 +270,6 @@ function AssignWorldDialog({
 
 export default function ClassroomDetail() {
   const { classroomId } = useParams<{ classroomId: string }>();
-  const navigate = useNavigate();
   const { user } = useUser();
   const { toast } = useToast();
 

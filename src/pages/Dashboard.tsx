@@ -63,23 +63,14 @@ export default function Dashboard() {
   }, [worlds, searchQuery, filterPublic]);
 
   return (
-    <div className="min-h-screen bg-background relative">
+    <div className="min-h-screen bg-hero relative">
       {/* Star background */}
       <StarField />
 
       {/* Aurora effects */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div
-          className="absolute -top-40 -right-40 w-96 h-96 bg-aurora/10 rounded-full blur-3xl animate-pulse-soft"
-          style={{ animationDelay: '0s' }}
-        />
-        <div
-          className="absolute -bottom-40 -left-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-pulse-soft"
-          style={{ animationDelay: '3s' }}
-        />
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-moon/5 rounded-full blur-3xl"
-        />
+      <div className="absolute inset-0 opacity-10 pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-aurora blur-[150px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-accent blur-[120px]" />
       </div>
 
       {/* Navigation */}
@@ -95,7 +86,7 @@ export default function Dashboard() {
           >
             <div className="relative inline-block mb-6">
               <div className="absolute inset-0 bg-moon/20 rounded-full blur-2xl scale-150" />
-              <MoonLogo size={80} className="relative z-10" />
+              <MoonLogo size="xl" className="relative z-10" />
             </div>
             <h1 className="text-3xl font-bold mb-3">
               Willkommen bei <span className="text-moon">Meoluna</span>
@@ -201,43 +192,55 @@ export default function Dashboard() {
               ))}
             </div>
           ) : filteredWorlds.length === 0 ? (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="text-center py-20 bg-card/30 rounded-2xl border border-border/50 backdrop-blur-sm"
-            >
-              <div className="relative inline-block mb-4">
-                <div className="absolute inset-0 bg-moon/20 rounded-full blur-xl scale-150" />
-                <MoonLogo size={64} className="relative z-10 opacity-50" />
-              </div>
-              {worlds.length === 0 ? (
-                <>
-                  <h2 className="text-xl font-semibold mb-2">Noch keine Lernwelten</h2>
-                  <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                    Erstelle deine erste magische Lernwelt und beginne dein Abenteuer unter dem Mondlicht.
-                  </p>
-                  <Link to="/create">
-                    <Button className="gap-2 bg-gradient-to-r from-moon to-aurora hover:opacity-90 text-background font-medium">
-                      <Plus className="w-4 h-4" />
-                      Erste Welt erstellen
-                    </Button>
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <h2 className="text-xl font-semibold mb-2">Keine Ergebnisse</h2>
-                  <p className="text-muted-foreground mb-4">
-                    Keine Welten gefunden für "{searchQuery}"
-                  </p>
-                  <Button variant="outline" onClick={() => {
-                    setSearchQuery('');
-                    setFilterPublic(null);
-                  }}>
-                    Filter zurücksetzen
+            worlds.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col items-center justify-center py-20 px-4 text-center"
+              >
+                <div className="relative mb-6">
+                  <div className="w-24 h-24 rounded-full bg-gradient-to-br from-moon/20 to-aurora/20 flex items-center justify-center">
+                    <MoonLogo size="lg" animate={false} className="opacity-70" />
+                  </div>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                    className="absolute -inset-2 rounded-full border border-dashed border-moon/30"
+                  />
+                </div>
+
+                <h3 className="text-xl font-semibold text-foreground mb-2">
+                  Noch keine Lernwelten
+                </h3>
+                <p className="text-muted-foreground mb-6 max-w-md">
+                  Erstelle deine erste Lernwelt und verwandle Unterrichtsmaterial in
+                  interaktive Lernabenteuer für deine Schüler.
+                </p>
+
+                <Link to="/create">
+                  <Button className="bg-gradient-to-r from-moon to-aurora text-night-sky hover:opacity-90">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Erste Lernwelt erstellen
                   </Button>
-                </>
-              )}
-            </motion.div>
+                </Link>
+              </motion.div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-20"
+              >
+                <p className="text-muted-foreground mb-4">
+                  Keine Lernwelten gefunden für "{searchQuery}"
+                </p>
+                <Button variant="outline" onClick={() => {
+                  setSearchQuery('');
+                  setFilterPublic(null);
+                }}>
+                  Filter zurücksetzen
+                </Button>
+              </motion.div>
+            )
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredWorlds.map((world, index) => (
@@ -279,7 +282,7 @@ export default function Dashboard() {
                     </CardHeader>
                     <CardContent>
                       <div className="h-28 bg-gradient-to-br from-moon/10 via-primary/10 to-aurora/10 rounded-lg flex items-center justify-center mb-4 group-hover:from-moon/20 group-hover:via-primary/20 group-hover:to-aurora/20 transition-colors">
-                        <MoonLogo size={48} className="opacity-30 group-hover:opacity-50 transition-opacity" />
+                        <MoonLogo size="lg" animate={false} className="opacity-30 group-hover:opacity-50 transition-opacity" />
                       </div>
                       <Link to={`/w/${world._id}`} className="block">
                         <Button
