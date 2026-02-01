@@ -1,5 +1,5 @@
 import { Inngest } from "inngest";
-import { serve } from "inngest/vercel";
+import { serve } from "inngest/next";
 
 // Create the Inngest client
 const inngest = new Inngest({
@@ -7,7 +7,7 @@ const inngest = new Inngest({
   name: "Meoluna",
 });
 
-// Background job for world generation (can be triggered later)
+// Background job for world generation
 const generateWorldBackground = inngest.createFunction(
   {
     id: "generate-world",
@@ -18,7 +18,6 @@ const generateWorldBackground = inngest.createFunction(
   async ({ event, step }) => {
     const { prompt, gradeLevel, subject, style } = event.data;
 
-    // Generate the world code via Claude API
     const worldCode = await step.run("generate-code", async () => {
       const response = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
@@ -46,7 +45,6 @@ const generateWorldBackground = inngest.createFunction(
       const data = await response.json();
       let code = data.content[0]?.text || "";
 
-      // Clean up markdown code blocks
       code = code
         .replace(/^```(?:jsx|tsx|javascript|typescript|react)?\n?/gm, "")
         .replace(/```$/gm, "")
@@ -55,29 +53,19 @@ const generateWorldBackground = inngest.createFunction(
       return code;
     });
 
-    return {
-      success: true,
-      code: worldCode,
-    };
+    return { success: true, code: worldCode };
   }
 );
 
-// Health check function
+// Health check
 const healthCheck = inngest.createFunction(
   { id: "health-check", name: "Health Check" },
   { event: "system/health.check" },
-  async () => {
-    return { status: "ok", timestamp: new Date().toISOString() };
-  }
+  async () => ({ status: "ok", timestamp: new Date().toISOString() })
 );
 
-// Serve the Inngest API
+// Export handler
 export default serve({
   client: inngest,
   functions: [generateWorldBackground, healthCheck],
 });
-
-// Required for Vercel Serverless
-export const config = {
-  maxDuration: 300,
-};
