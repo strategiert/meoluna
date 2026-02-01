@@ -117,6 +117,85 @@ WICHTIG: Nutze KEINE externen Bild-URLs! Stattdessen:
 
 Gib NUR den vollständigen React-Code zurück. Keine Erklärungen.
 
+## FEEDBACK BEI FALSCHEN ANTWORTEN (KRITISCH!)
+
+Jede Aufgabe MUSS ein Feedback-System haben:
+
+### Bei falscher Antwort:
+- Zeige SOFORT: "Das ist leider nicht richtig."
+- Erkläre WARUM die gewählte Antwort falsch ist
+- Zeige die RICHTIGE Antwort mit Begründung
+- Optional: Gib einen Tipp für ähnliche Aufgaben
+
+### Bei richtiger Antwort:
+- Positive Bestätigung: "Genau richtig!"
+- Kurze Verstärkung des Lernstoffs
+- XP-Animation
+
+### Feedback-State Pattern (IMMER verwenden!):
+\`\`\`jsx
+const [feedback, setFeedback] = useState(null);
+
+const checkAnswer = (selected, correct, explanation) => {
+  if (selected === correct) {
+    setFeedback({ type: 'correct', message: 'Genau richtig!' });
+    setXp(xp + 10);
+    confetti();
+  } else {
+    setFeedback({
+      type: 'wrong',
+      selected,
+      correct,
+      explanation
+    });
+  }
+};
+
+// Im Render:
+{feedback && (
+  <div className={feedback.type === 'correct'
+    ? 'bg-green-500/20 border border-green-500 rounded-lg p-4 mt-4'
+    : 'bg-red-500/20 border border-red-500 rounded-lg p-4 mt-4'}>
+    {feedback.type === 'correct' ? (
+      <p className="font-bold text-green-400">{feedback.message}</p>
+    ) : (
+      <>
+        <p className="font-bold text-red-400">Leider falsch!</p>
+        <p className="text-gray-300 mt-2">Du hast "{feedback.selected}" gewählt.</p>
+        <p className="text-gray-300">Richtig wäre: "{feedback.correct}"</p>
+        <p className="text-gray-400 mt-2 italic">{feedback.explanation}</p>
+      </>
+    )}
+  </div>
+)}
+\`\`\`
+
+## KEIN MARKDOWN IN TEXTEN! (KRITISCH!)
+
+NIEMALS Markdown-Syntax in Strings verwenden! Der Code wird in React gerendert, nicht in einem Markdown-Parser.
+
+### FALSCH (Markdown in Strings):
+\`\`\`jsx
+// NIEMALS SO:
+<p>Die Antwort ist **falsch** weil...</p>
+<p>Das ist *wichtig* zu wissen</p>
+<p>Nutze \`useState\` für State</p>
+\`\`\`
+
+### RICHTIG (JSX mit Tailwind):
+\`\`\`jsx
+// IMMER SO:
+<p>Die Antwort ist <span className="font-bold">falsch</span> weil...</p>
+<p>Das ist <span className="italic">wichtig</span> zu wissen</p>
+<p>Nutze <code className="bg-gray-700 px-1 rounded">useState</code> für State</p>
+\`\`\`
+
+### Formatierungs-Mapping:
+- **fett** → <span className="font-bold">fett</span>
+- *kursiv* → <span className="italic">kursiv</span>
+- \`code\` → <code className="bg-gray-700 px-1 rounded">code</code>
+- ~~durchgestrichen~~ → <span className="line-through">durchgestrichen</span>
+
 ## QUALITÄTSKONTROLLE
 
 Bevor du antwortest, prüfe:
@@ -127,6 +206,8 @@ Bevor du antwortest, prüfe:
 - [ ] SVG-Grafiken statt externe Bilder?
 - [ ] XP und Fortschritt funktional?
 - [ ] Code kompiliert fehlerfrei?
+- [ ] Feedback bei JEDER Aufgabe vorhanden?
+- [ ] KEIN Markdown in Strings (kein **, *, \`)?
 
 Du erstellst keine Demo - du erstellst eine echte Lernplattform.`;
 
