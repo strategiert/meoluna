@@ -286,6 +286,108 @@ export const generateWorld = action({
 });
 
 // ============================================================================
+// GENERATE WORLD FROM PDF ACTION
+// ============================================================================
+export const generateWorldFromPDF = action({
+  args: {
+    prompt: v.string(),
+    pdfText: v.string(),
+    gradeLevel: v.optional(v.string()),
+    subject: v.optional(v.string()),
+    style: v.optional(v.string()),
+  },
+  handler: async (_ctx, args) => {
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+
+    if (!apiKey) {
+      throw new Error("ANTHROPIC_API_KEY nicht konfiguriert");
+    }
+
+    // Enhanced system prompt for PDF-based generation
+    const pdfSystemPrompt = `${SYSTEM_PROMPT}
+
+## ZUSÄTZLICHE ANWEISUNG: DOKUMENT-BASIERTE LERNWELT
+
+Du erhältst ein Dokument (z.B. Arbeitsblatt, Lehrbuchseite, Skript) als Textextraktion.
+Deine Aufgabe ist es, den Inhalt dieses Dokuments in eine interaktive Lernwelt zu verwandeln.
+
+### Wichtig bei Dokument-basierten Welten:
+1. **Analysiere den Inhalt** - Identifiziere Hauptthemen, Fakten, Definitionen
+2. **Strukturiere intelligent** - Teile den Inhalt in sinnvolle Lernmodule
+3. **Erstelle passende Aufgaben** - Basierend auf dem tatsächlichen Inhalt
+4. **Nutze die Originalformulierungen** - Wenn möglich, verwende Begriffe aus dem Dokument
+5. **Ergänze sinnvoll** - Füge Erklärungen und Kontext hinzu wo nötig
+
+### Aufgaben aus Dokumenten erstellen:
+- Definitionen → Multiple Choice oder Lückentext
+- Listen/Aufzählungen → Sortierung oder Zuordnung
+- Fakten → Wahr/Falsch mit Begründung
+- Prozesse/Abläufe → Sortierung oder Timeline
+- Diagramme/Beschreibungen → SVG-Visualisierung mit Beschriftung`;
+
+    // Build user prompt with PDF content
+    let userPrompt = `Erstelle eine Lernwelt basierend auf diesem Dokument:\n\n`;
+    userPrompt += `=== DOKUMENT-INHALT (aus OCR extrahiert) ===\n${args.pdfText}\n=== ENDE DOKUMENT ===\n\n`;
+
+    if (args.prompt) {
+      userPrompt += `Zusätzliche Anweisungen vom Nutzer: "${args.prompt}"\n\n`;
+    }
+
+    if (args.gradeLevel) {
+      userPrompt += `Klassenstufe: ${args.gradeLevel}\n`;
+    }
+    if (args.subject) {
+      userPrompt += `Fach: ${args.subject}\n`;
+    }
+    if (args.style) {
+      userPrompt += `Gewünschter Stil: ${args.style}\n`;
+    }
+
+    userPrompt += `\nErstelle jetzt den kompletten React-Code für diese Lernwelt basierend auf dem Dokument-Inhalt.`;
+
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 64000,
+        system: pdfSystemPrompt,
+        messages: [{ role: "user", content: userPrompt }],
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Claude API Error: ${response.status} - ${error}`);
+    }
+
+    const data = await response.json();
+    let code = data.content[0]?.text || "";
+
+    // Clean up: Remove markdown code blocks
+    code = code
+      .replace(/^```(?:jsx|tsx|javascript|typescript|react)?\n?/gm, "")
+      .replace(/```$/gm, "")
+      .trim();
+
+    // Validation
+    if (!code.includes("function App") && !code.includes("const App")) {
+      throw new Error("Generated code does not contain an App component");
+    }
+
+    if (!code.includes("export default")) {
+      code = code + "\n\nexport default App;";
+    }
+
+    return { code };
+  },
+});
+
+// ============================================================================
 // AUTO-FIX ACTION
 // ============================================================================
 export const autoFixCode = action({

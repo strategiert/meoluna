@@ -18,10 +18,12 @@ import {
   Maximize2,
   Minimize2,
   ArrowLeft,
-  Save
+  Save,
+  FileText
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { WorldPreview } from '@/components/WorldPreview';
+import { PdfUpload } from '@/components/PdfUpload';
 import { SignedIn, SignedOut, SignInButton, useUser } from '@clerk/clerk-react';
 
 interface Message {
@@ -50,8 +52,16 @@ export default function Create() {
 
   // Convex Actions
   const generateWorld = useAction(api.generate.generateWorld);
+  const generateWorldFromPDF = useAction(api.generate.generateWorldFromPDF);
+  const extractPDF = useAction(api.documents.extractTextFromPDF);
   const autoFixCode = useAction(api.generate.autoFixCode);
   const saveWorld = useMutation(api.worlds.create);
+
+  // PDF State
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [pdfText, setPdfText] = useState<string>('');
+  const [isExtracting, setIsExtracting] = useState(false);
+  const [pdfError, setPdfError] = useState<string | null>(null);
 
   // Auto-scroll zu neuen Nachrichten
   useEffect(() => {
@@ -66,13 +76,66 @@ export default function Create() {
     }
   }, [input]);
 
+  // Helper: Convert file to base64
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        // Remove data URL prefix (data:application/pdf;base64,)
+        const base64 = result.split(',')[1];
+        resolve(base64);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // PDF Upload Handler
+  const handlePdfSelect = async (file: File) => {
+    setPdfFile(file);
+    setPdfError(null);
+    setPdfText('');
+    setIsExtracting(true);
+
+    try {
+      const base64 = await fileToBase64(file);
+      const result = await extractPDF({
+        pdfBase64: base64,
+        fileName: file.name,
+      });
+      setPdfText(result.text);
+    } catch (err) {
+      console.error('PDF extraction failed:', err);
+      setPdfError(
+        err instanceof Error
+          ? err.message
+          : 'Text konnte nicht extrahiert werden. Ist der OCR-Service aktiv?'
+      );
+    } finally {
+      setIsExtracting(false);
+    }
+  };
+
+  // Clear PDF
+  const handlePdfClear = () => {
+    setPdfFile(null);
+    setPdfText('');
+    setPdfError(null);
+  };
+
   const handleGenerate = async () => {
     if (!input.trim() || isGenerating) return;
+
+    // Build message content - include PDF indicator if present
+    const messageContent = pdfText
+      ? `${input.trim()}\n\n📄 PDF: ${pdfFile?.name}`
+      : input.trim();
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: input.trim(),
+      content: messageContent,
       timestamp: new Date()
     };
 
@@ -82,18 +145,31 @@ export default function Create() {
     setIsGenerating(true);
 
     try {
-      const result = await generateWorld({ prompt: userMessage.content });
+      // Use PDF-aware generation if text was extracted
+      const result = pdfText
+        ? await generateWorldFromPDF({
+            prompt: input.trim(),
+            pdfText: pdfText,
+          })
+        : await generateWorld({ prompt: userMessage.content });
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'Hier ist deine Lernwelt! 🌙✨',
+        content: pdfText
+          ? 'Hier ist deine Lernwelt basierend auf dem PDF! 🌙📄✨'
+          : 'Hier ist deine Lernwelt! 🌙✨',
         code: result.code,
         timestamp: new Date()
       };
 
       setMessages(prev => [...prev, assistantMessage]);
       setCurrentCode(result.code);
+
+      // Clear PDF after successful generation
+      if (pdfText) {
+        handlePdfClear();
+      }
 
     } catch (err) {
       const errorMessage: Message = {
@@ -199,9 +275,30 @@ export default function Create() {
               <h2 className="text-xl font-semibold mb-2">
                 Was möchtest du lernen?
               </h2>
-              <p className="text-muted-foreground mb-6">
-                Beschreibe deine Lernwelt und ich erschaffe sie für dich.
+              <p className="text-muted-foreground mb-4">
+                Beschreibe deine Lernwelt oder lade ein PDF hoch.
               </p>
+
+              {/* PDF Upload Section */}
+              <div className="w-full mb-6">
+                <PdfUpload
+                  file={pdfFile}
+                  isExtracting={isExtracting}
+                  extractedText={pdfText}
+                  error={pdfError}
+                  onFileSelect={handlePdfSelect}
+                  onFileClear={handlePdfClear}
+                />
+              </div>
+
+              {/* Divider */}
+              <div className="w-full flex items-center gap-3 mb-4">
+                <div className="flex-1 h-px bg-border/50" />
+                <span className="text-xs text-muted-foreground">oder Beispiele</span>
+                <div className="flex-1 h-px bg-border/50" />
+              </div>
+
+              {/* Prompt Suggestions */}
               <div className="space-y-2 text-sm w-full">
                 <button
                   onClick={() => setInput('Eine Vulkanwelt für Klasse 7 Geografie')}
@@ -280,13 +377,28 @@ export default function Create() {
             </SignInButton>
           </SignedOut>
           <SignedIn>
+            {/* PDF Indicator when loaded */}
+            {pdfText && messages.length > 0 && (
+              <div className="mb-2 flex items-center gap-2 px-3 py-1.5 bg-moon/10 rounded-lg border border-moon/20">
+                <FileText className="w-4 h-4 text-moon" />
+                <span className="text-xs text-moon flex-1 truncate">
+                  {pdfFile?.name}
+                </span>
+                <button
+                  onClick={handlePdfClear}
+                  className="text-xs text-muted-foreground hover:text-foreground"
+                >
+                  Entfernen
+                </button>
+              </div>
+            )}
             <div className="flex gap-2">
               <textarea
                 ref={textareaRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Beschreibe deine Lernwelt..."
+                placeholder={pdfText ? "Beschreibe was du mit dem PDF erstellen möchtest..." : "Beschreibe deine Lernwelt..."}
                 rows={1}
                 className="flex-1 bg-secondary border border-border rounded-xl px-4 py-3 placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
               />

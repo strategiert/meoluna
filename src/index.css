@@ -24,28 +24,56 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 245 58% 51%;
     --radius: 0.5rem;
+
+    /* Meoluna Theme Colors */
+    --moon: 45 100% 75%;
+    --moon-glow: 45 100% 90%;
+    --stars: 45 100% 80%;
+    --night-sky: 240 50% 15%;
+    --aurora: 170 80% 50%;
+
+    /* Subject Colors */
+    --subject-math: 220 90% 56%;
+    --subject-german: 350 80% 55%;
+    --subject-english: 200 90% 50%;
+    --subject-biology: 140 70% 45%;
+    --subject-physics: 270 80% 60%;
+    --subject-chemistry: 30 90% 55%;
+    --subject-history: 25 70% 45%;
+    --subject-geography: 160 60% 45%;
+    --subject-art: 320 80% 55%;
+    --subject-music: 280 70% 50%;
+    --subject-sport: 15 90% 55%;
+    --subject-informatics: 200 80% 50%;
   }
 
   .dark {
-    --background: 240 10% 4%;
+    --background: 240 50% 5%;
     --foreground: 210 40% 98%;
-    --card: 240 10% 6%;
+    --card: 240 50% 8%;
     --card-foreground: 210 40% 98%;
-    --popover: 240 10% 6%;
+    --popover: 240 50% 8%;
     --popover-foreground: 210 40% 98%;
     --primary: 245 58% 51%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 240 30% 15%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
+    --muted: 240 30% 15%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
+    --accent: 240 30% 15%;
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 50.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
+    --border: 240 30% 18%;
+    --input: 240 30% 18%;
     --ring: 245 58% 51%;
+
+    /* Meoluna Theme Colors - Dark Mode */
+    --moon: 45 100% 75%;
+    --moon-glow: 45 100% 90%;
+    --stars: 45 100% 80%;
+    --night-sky: 240 50% 10%;
+    --aurora: 170 80% 50%;
   }
 }
 
