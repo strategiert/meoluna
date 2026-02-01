@@ -2,29 +2,14 @@
  * Privacy Page - Datenschutz
  */
 
-import { Link } from 'react-router-dom';
-import { Moon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Navbar } from '@/components/layout/Navbar';
 
 export default function Privacy() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Navbar */}
-      <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary to-purple-600 rounded-lg flex items-center justify-center">
-              <Moon className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-bold text-xl">Meoluna</span>
-          </Link>
-          <Link to="/">
-            <Button variant="ghost">Zurück zur Startseite</Button>
-          </Link>
-        </div>
-      </nav>
+      <Navbar />
 
-      <main className="container mx-auto px-4 py-16 max-w-3xl">
+      <main className="container mx-auto px-4 pt-24 pb-16 max-w-3xl">
         <h1 className="text-4xl font-bold mb-8">Datenschutzerklärung</h1>
         
         <div className="prose prose-lg dark:prose-invert max-w-none">

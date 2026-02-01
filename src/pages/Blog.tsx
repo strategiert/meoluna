@@ -6,13 +6,13 @@ import { Link } from 'react-router-dom';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { motion } from 'framer-motion';
-import { Moon, Search, BookOpen, Clock, Tag } from 'lucide-react';
+import { Search, BookOpen, Clock, Tag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
+import { Navbar } from '@/components/layout/Navbar';
 import { useState } from 'react';
 
 export default function Blog() {
@@ -39,34 +39,10 @@ export default function Blog() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Navbar */}
-      <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary to-purple-600 rounded-lg flex items-center justify-center">
-              <Moon className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-bold text-xl">Meoluna</span>
-          </Link>
-
-          <div className="flex items-center gap-4">
-            <SignedOut>
-              <SignInButton mode="modal">
-                <Button variant="ghost">Anmelden</Button>
-              </SignInButton>
-            </SignedOut>
-            <SignedIn>
-              <Link to="/dashboard">
-                <Button variant="ghost">Dashboard</Button>
-              </Link>
-              <UserButton afterSignOutUrl="/" />
-            </SignedIn>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Hero */}
-      <section className="py-16 px-4 text-center bg-gradient-to-b from-primary/5 to-background">
+      <section className="pt-24 pb-16 px-4 text-center bg-gradient-to-b from-primary/5 to-background">
         <div className="container mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

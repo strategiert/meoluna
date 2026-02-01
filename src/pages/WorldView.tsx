@@ -7,6 +7,7 @@ import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Id } from '../../convex/_generated/dataModel';
 import { Moon, ArrowLeft, Share2, Heart, Star } from 'lucide-react';
+import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { WorldPreview } from '@/components/WorldPreview';
@@ -190,12 +191,8 @@ export default function WorldView() {
   if (world === undefined) {
     return (
       <div className="min-h-screen bg-background">
-        <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
-          <div className="container mx-auto px-4 h-16 flex items-center">
-            <Skeleton className="h-8 w-48" />
-          </div>
-        </nav>
-        <div className="container mx-auto px-4 py-8">
+        <Navbar />
+        <div className="container mx-auto px-4 pt-24 pb-8">
           <Skeleton className="h-[600px] w-full rounded-xl" />
         </div>
       </div>
@@ -204,16 +201,19 @@ export default function WorldView() {
 
   if (world === null) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <Moon className="w-16 h-16 mx-auto mb-4 text-primary opacity-50" />
-          <h1 className="text-2xl font-bold mb-2">Welt nicht gefunden</h1>
-          <p className="text-muted-foreground mb-6">
-            Diese Lernwelt existiert nicht oder wurde gelöscht.
-          </p>
-          <Link to="/explore">
-            <Button>Andere Welten entdecken</Button>
-          </Link>
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="flex items-center justify-center pt-24 pb-16">
+          <div className="text-center">
+            <Moon className="w-16 h-16 mx-auto mb-4 text-primary opacity-50" />
+            <h1 className="text-2xl font-bold mb-2">Welt nicht gefunden</h1>
+            <p className="text-muted-foreground mb-6">
+              Diese Lernwelt existiert nicht oder wurde gelöscht.
+            </p>
+            <Link to="/explore">
+              <Button>Andere Welten entdecken</Button>
+            </Link>
+          </div>
         </div>
       </div>
     );

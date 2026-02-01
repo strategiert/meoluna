@@ -6,11 +6,11 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { motion } from 'framer-motion';
-import { Moon, ArrowLeft, Clock, User, Tag, Share2 } from 'lucide-react';
+import { ArrowLeft, Clock, User, Tag, Share2, Moon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react';
+import { Navbar } from '@/components/layout/Navbar';
 
 export default function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
@@ -46,12 +46,8 @@ export default function BlogPost() {
   if (post === undefined) {
     return (
       <div className="min-h-screen bg-background">
-        <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
-          <div className="container mx-auto px-4 h-16 flex items-center">
-            <Skeleton className="h-8 w-32" />
-          </div>
-        </nav>
-        <main className="container mx-auto px-4 py-8 max-w-3xl">
+        <Navbar />
+        <main className="container mx-auto px-4 pt-24 pb-8 max-w-3xl">
           <Skeleton className="h-8 w-24 mb-8" />
           <Skeleton className="h-12 w-full mb-4" />
           <Skeleton className="h-6 w-48 mb-8" />
@@ -66,16 +62,19 @@ export default function BlogPost() {
 
   if (post === null) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Artikel nicht gefunden</h1>
-          <p className="text-muted-foreground mb-4">
-            Dieser Artikel existiert nicht oder wurde entfernt.
-          </p>
-          <Button onClick={() => navigate('/blog')}>
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Zurück zum Blog
-          </Button>
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="flex items-center justify-center pt-24">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">Artikel nicht gefunden</h1>
+            <p className="text-muted-foreground mb-4">
+              Dieser Artikel existiert nicht oder wurde entfernt.
+            </p>
+            <Button onClick={() => navigate('/blog')}>
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Zurück zum Blog
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -83,34 +82,10 @@ export default function BlogPost() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Navbar */}
-      <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-xl">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary to-purple-600 rounded-lg flex items-center justify-center">
-              <Moon className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-bold text-xl">Meoluna</span>
-          </Link>
-
-          <div className="flex items-center gap-4">
-            <SignedOut>
-              <SignInButton mode="modal">
-                <Button variant="ghost">Anmelden</Button>
-              </SignInButton>
-            </SignedOut>
-            <SignedIn>
-              <Link to="/dashboard">
-                <Button variant="ghost">Dashboard</Button>
-              </Link>
-              <UserButton afterSignOutUrl="/" />
-            </SignedIn>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Article */}
-      <article className="container mx-auto px-4 py-8 max-w-3xl">
+      <article className="container mx-auto px-4 pt-24 pb-8 max-w-3xl">
         {/* Back Link */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
