@@ -61,23 +61,43 @@ class OCRResponse(BaseModel):
 
 def extract_text_from_image(image: Image.Image) -> list[str]:
     """Extract text from a single image using PaddleOCR"""
-    # Convert PIL Image to numpy array
-    img_array = np.array(image)
+    try:
+        # Convert PIL Image to numpy array (ensure RGB)
+        if image.mode != 'RGB':
+            image = image.convert('RGB')
+        img_array = np.array(image)
 
-    # Run OCR
-    result = ocr.ocr(img_array, cls=True)
+        # Run OCR - PaddleOCR v3+ may have different API
+        result = ocr.ocr(img_array)
 
-    # Extract text lines
-    lines = []
-    if result and result[0]:
-        for line in result[0]:
-            if line and len(line) > 1:
-                text = line[1][0]  # Get the text content
-                confidence = line[1][1]  # Get confidence score
-                if confidence > 0.5:  # Filter low-confidence results
-                    lines.append(text)
+        # Extract text lines - handle various result formats
+        lines = []
+        if result is None:
+            return lines
 
-    return lines
+        # PaddleOCR can return different formats depending on version
+        for page_result in result:
+            if page_result is None:
+                continue
+            for line in page_result:
+                try:
+                    if line and len(line) >= 2:
+                        # Format: [bbox, (text, confidence)]
+                        text_info = line[1]
+                        if isinstance(text_info, tuple) and len(text_info) >= 2:
+                            text = text_info[0]
+                            confidence = text_info[1]
+                            if confidence > 0.5:
+                                lines.append(str(text))
+                        elif isinstance(text_info, str):
+                            lines.append(text_info)
+                except (IndexError, TypeError):
+                    continue
+
+        return lines
+    except Exception as e:
+        print(f"OCR error: {str(e)}")
+        return []
 
 
 def process_pdf_content(content: bytes) -> OCRResponse:
@@ -86,28 +106,45 @@ def process_pdf_content(content: bytes) -> OCRResponse:
         # Convert PDF to images (200 DPI for good quality)
         images = convert_from_bytes(content, dpi=200)
     except Exception as e:
+        print(f"PDF conversion error: {str(e)}")
         raise HTTPException(
             status_code=400,
             detail=f"Failed to process PDF: {str(e)}"
+        )
+
+    if not images:
+        raise HTTPException(
+            status_code=400,
+            detail="No pages found in PDF"
         )
 
     all_pages = []
     markdown_parts = []
 
     for page_num, image in enumerate(images, 1):
-        # Extract text from this page
-        lines = extract_text_from_image(image)
-        page_text = "\n".join(lines)
+        try:
+            # Extract text from this page
+            lines = extract_text_from_image(image)
+            page_text = "\n".join(lines)
 
-        # Store structured data
-        all_pages.append({
-            "page": page_num,
-            "text": page_text,
-            "line_count": len(lines)
-        })
+            # Store structured data
+            all_pages.append({
+                "page": page_num,
+                "text": page_text,
+                "line_count": len(lines)
+            })
 
-        # Build markdown (AI-optimized format)
-        markdown_parts.append(f"## Seite {page_num}\n\n{page_text}")
+            # Build markdown (AI-optimized format)
+            markdown_parts.append(f"## Seite {page_num}\n\n{page_text}")
+        except Exception as e:
+            print(f"Error processing page {page_num}: {str(e)}")
+            all_pages.append({
+                "page": page_num,
+                "text": "",
+                "line_count": 0,
+                "error": str(e)
+            })
+            markdown_parts.append(f"## Seite {page_num}\n\n[Fehler bei der Verarbeitung]")
 
     # Combine all pages
     full_markdown = "\n\n---\n\n".join(markdown_parts)
