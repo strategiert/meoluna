@@ -1,5 +1,36 @@
 # CLAUDE.md - Meoluna Project Briefing
 
+---
+
+## 🤝 KOORDINATION: Claw + Claude Code
+
+**Zwei Agents, ein Repo. So vermeiden wir Konflikte:**
+
+### Arbeitsaufteilung
+| Agent | Zuständigkeit | Dateien |
+|-------|---------------|---------|
+| **Claude Code** | App-Entwicklung | `src/`, `convex/`, `api/` |
+| **Claw (OpenClaw)** | Content, Marketing, Daten | `content/`, `scripts/`, `data/`, Docs |
+
+### Regeln
+1. **Vor dem Start:** `git pull` + CLAUDE.md checken ob der andere gerade arbeitet
+2. **Nach Abschluss:** Änderungen committen, CLAUDE.md updaten
+3. **Kommunikation:** Status-Updates in Activity Log unten
+4. **Konflikte:** Wenn beide dieselbe Datei brauchen → Klaus fragen
+
+### Aktueller Status (2026-02-01 21:30)
+| Agent | Status | Working On |
+|-------|--------|------------|
+| Claude Code | ⏸️ Idle | Progress System fertig |
+| Claw | 🔄 Active | Crawler läuft, Content fertig |
+
+### Nächste Tasks (noch zu vergeben)
+- [ ] Blog-System mit Content verbinden (wer?)
+- [ ] Progress System testen + deployen (Claude Code)
+- [ ] Crawler-Ergebnisse parsen (Claw)
+
+---
+
 ## Was ist Meoluna?
 
 **"Lovable für Bildung"** — Eine App die interaktive Lernwelten aus natürlicher Sprache oder PDFs generiert.
@@ -74,8 +105,11 @@ meoluna/
 ```typescript
 worlds: { title, prompt, code, userId, gradeLevel, subject, isPublic, views, likes }
 messages: { worldId, role, content, code, createdAt }
-users: { clerkId, email, name, role: student|creator|admin }
+users: { clerkId, email, name, role: student|creator|teacher|admin }
 progress: { userId, worldId, moduleIndex, xp, completedAt }
+classrooms: { name, description, teacherId, inviteCode, gradeLevel, subject, isArchived }
+classroomMembers: { classroomId, userId, role: student|assistant, joinedAt }
+classroomAssignments: { classroomId, worldId, assignedBy, title, instructions, dueDate, isRequired }
 blogPosts: { slug, title, content, category, tags, isPublished }
 ```
 
@@ -89,9 +123,15 @@ blogPosts: { slug, title, content, category, tags, isPublished }
 | `src/pages/WorldView.tsx` | Lernwelt spielen |
 | `src/pages/Dashboard.tsx` | User Dashboard |
 | `src/pages/Explore.tsx` | Öffentliche Welten entdecken |
+| `src/pages/TeacherDashboard.tsx` | Lehrer-Dashboard (Klassen verwalten) |
+| `src/pages/ClassroomDetail.tsx` | Einzelne Klasse (Schüler, Assignments) |
+| `src/pages/JoinClassroom.tsx` | Klasse beitreten (für Schüler) |
 | `src/components/WorldPreview.tsx` | Sandboxed Code Renderer |
+| `src/components/ProgressStats.tsx` | XP/Level Anzeige |
 | `convex/generate.ts` | AI Generation Logic |
 | `convex/documents.ts` | PDF Extraction |
+| `convex/progress.ts` | XP/Level System |
+| `convex/classrooms.ts` | Classroom CRUD |
 
 ---
 
@@ -132,13 +172,42 @@ Siehe `.env.example` für alle Keys. Wichtig:
 
 ---
 
-## Aktuelle Prioritäten
+## Aktuelle Prioritäten (Update 2026-02-01 19:00)
 
-1. **PaddleOCR Railway Deployment** - Config-Pfad fixen (siehe Activity Log)
-2. **Stabilität** - Generation muss zuverlässig funktionieren
-3. **Auto-Fix** - Fehlerhafte Welten automatisch reparieren
-4. **UX** - Schnelle, intuitive Interaktion
-5. **Content** - Blog + SEO für Sichtbarkeit
+### PRIO 1: Progress System ✅ FERTIG
+- [x] XP-Tracking wenn User Module abschließt
+- [x] Level-System (XP → Level)
+- [x] Progress-Dashboard im User-Bereich (ProgressStats.tsx)
+- [ ] Badges/Achievements (später)
+
+### PRIO 2: Rollen-System ✅ FERTIG
+- [x] Teacher zu Schema hinzufügen (`student|creator|teacher|admin`)
+- [ ] Rollenbasierte UI (Navbar zeigt Teacher-Link für alle)
+- [ ] Permissions in Convex Functions (noch offen)
+
+### PRIO 3: Teacher/Classroom Features ✅ FERTIG
+- [x] Klassen/Gruppen erstellen (`/teacher`)
+- [x] Schüler einladen (6-stelliger Invite-Code)
+- [x] Schüler beitreten (`/join`)
+- [x] Welten an Klassen zuweisen
+- [x] Schüler-Fortschritt Dashboard
+- [ ] Reports: Detaillierte Berichte (später)
+
+### PRIO 4: Bewertungs-System
+- [ ] Likes (views/likes Felder existieren)
+- [ ] Sterne-Rating (1-5)?
+- [ ] Reviews/Kommentare
+
+### Kontext: Share-First Philosophy
+**"Es soll sich schlecht anfühlen, nicht zu teilen."**
+- Sharing = Default
+- Gute Creator werden belohnt
+- KEIN Social Network (kein Feed, keine Follower)
+
+### Infrastruktur (vorher)
+1. **PaddleOCR Railway** - Config-Pfad fixen (siehe Activity Log)
+2. **Stabilität** - Generation zuverlässig
+3. **Auto-Fix** - Fehlerhafte Welten reparieren
 
 ---
 
@@ -242,4 +311,33 @@ fix: Disable Docker cache to force clean rebuild
 
 ---
 
-*Letztes Update: 2026-02-01 16:30 UTC*
+## 2026-02-01 - Classroom System Implementation
+
+### Implementiert ✅
+| Komponente | Beschreibung |
+|------------|--------------|
+| `convex/schema.ts` | Teacher-Rolle + classrooms/members/assignments Tabellen |
+| `convex/classrooms.ts` | Vollständiges CRUD für Classroom-System |
+| `src/pages/TeacherDashboard.tsx` | Lehrer-Dashboard mit Klassenübersicht |
+| `src/pages/ClassroomDetail.tsx` | Einzelne Klasse verwalten (Schüler, Assignments) |
+| `src/pages/JoinClassroom.tsx` | Schüler können mit Code beitreten |
+| `src/components/layout/Navbar.tsx` | Teacher-Link hinzugefügt |
+| `src/App.tsx` | Routes: /teacher, /teacher/classroom/:id, /join |
+
+### Features
+- 6-stelliger Invite-Code (keine verwechselbaren Zeichen)
+- Klassen mit Klassenstufe und Fach
+- Welten an Klassen zuweisen mit optionalen Anweisungen und Fälligkeitsdatum
+- Schüler-Fortschritt pro Assignment tracken
+- Code-Regenerierung für Sicherheit
+
+### Neue Routes
+| Route | Funktion |
+|-------|----------|
+| `/teacher` | Lehrer-Dashboard |
+| `/teacher/classroom/:id` | Klassen-Detail |
+| `/join` | Klasse beitreten (mit ?code=ABC123) |
+
+---
+
+*Letztes Update: 2026-02-01 19:00 UTC*
