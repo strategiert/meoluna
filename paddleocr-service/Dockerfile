@@ -4,6 +4,7 @@ FROM python:3.10-slim-bookworm
 ENV PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK=True
 ENV PYTHONUNBUFFERED=1
 
+# Cache bust: 2024-02-01-v2
 WORKDIR /app
 
 # Install system dependencies for OpenCV, PDF processing, PaddlePaddle
