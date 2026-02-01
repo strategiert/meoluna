@@ -22,6 +22,7 @@ import { Input } from '@/components/ui/input';
 import { StarField } from '@/components/landing/StarField';
 import { Navbar } from '@/components/layout/Navbar';
 import { MoonLogo } from '@/components/icons/MoonLogo';
+import { ProgressStats } from '@/components/ProgressStats';
 import {
   SignedIn,
   SignedOut,
@@ -136,6 +137,11 @@ export default function Dashboard() {
                 </Button>
               </Link>
             </div>
+
+            {/* Progress Stats */}
+            {user?.id && (
+              <ProgressStats userId={user.id} variant="compact" className="mb-6" />
+            )}
 
             {/* Search & Filter */}
             <div className="flex flex-col sm:flex-row gap-3">

@@ -3,22 +3,104 @@
  */
 
 import { useParams, Link } from 'react-router-dom';
-import { useQuery } from 'convex/react';
+import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Id } from '../../convex/_generated/dataModel';
-import { Moon, ArrowLeft, Share2, Heart } from 'lucide-react';
+import { Moon, ArrowLeft, Share2, Heart, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { WorldPreview } from '@/components/WorldPreview';
 import { useAction } from 'convex/react';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useUser } from '@clerk/clerk-react';
+import { XPPopup } from '@/components/XPPopup';
+import { ProgressStats } from '@/components/ProgressStats';
 
 export default function WorldView() {
   const { worldId } = useParams<{ worldId: string }>();
+  const { user } = useUser();
   const world = useQuery(api.worlds.get, worldId ? { id: worldId as Id<"worlds"> } : 'skip');
+  const progress = useQuery(
+    api.progress.getByWorld,
+    user?.id && worldId ? { userId: user.id, worldId: worldId as Id<"worlds"> } : 'skip'
+  );
+  // userStats für zukünftige Level-Up Detection
+  const _userStats = useQuery(api.progress.getStats, user?.id ? { userId: user.id } : 'skip');
+  void _userStats; // Suppress unused warning
+
   const autoFixCode = useAction(api.generate.autoFixCode);
+  const addXP = useMutation(api.progress.addXP);
+  const completeWorld = useMutation(api.progress.completeWorld);
+
   const [currentCode, setCurrentCode] = useState<string | null>(null);
   const [isFixing, setIsFixing] = useState(false);
+  const [showXPPopup, setShowXPPopup] = useState(false);
+  const [earnedXP, setEarnedXP] = useState(0);
+  const [levelUp] = useState(false);
+  const [newLevel] = useState(1);
+
+  // Handler für XP Events aus der Lernwelt
+  const handleWorldMessage = useCallback(async (event: MessageEvent) => {
+    if (!user?.id || !worldId) return;
+
+    const data = event.data;
+    if (typeof data !== 'object' || !data.type) return;
+
+    const showXP = (amount: number) => {
+      setEarnedXP(amount);
+      setShowXPPopup(true);
+    };
+
+    try {
+      switch (data.type) {
+        case 'xp':
+          // XP verdient
+          if (typeof data.amount === 'number' && data.amount > 0) {
+            await addXP({
+              userId: user.id,
+              worldId: worldId as Id<"worlds">,
+              xpEarned: data.amount,
+              moduleIndex: data.moduleIndex,
+            });
+            showXP(data.amount);
+          }
+          break;
+
+        case 'module':
+          // Modul abgeschlossen (gibt 20 XP)
+          if (typeof data.index === 'number') {
+            await addXP({
+              userId: user.id,
+              worldId: worldId as Id<"worlds">,
+              xpEarned: 20,
+              moduleIndex: data.index,
+            });
+            showXP(20);
+          }
+          break;
+
+        case 'complete':
+          // Welt abgeschlossen (gibt 50 Bonus XP)
+          const result = await completeWorld({
+            userId: user.id,
+            worldId: worldId as Id<"worlds">,
+            bonusXP: 50,
+          });
+          if (!result.alreadyCompleted) {
+            showXP(50);
+          }
+          break;
+      }
+    } catch (error) {
+      console.error('XP tracking error:', error);
+    }
+  }, [user?.id, worldId, addXP, completeWorld]);
+
+  // Event Listener für postMessage
+  useEffect(() => {
+    window.addEventListener('message', handleWorldMessage);
+    return () => window.removeEventListener('message', handleWorldMessage);
+  }, [handleWorldMessage]);
 
   const handleAutoFix = async (error: string, failedCode: string) => {
     if (isFixing) return;
@@ -90,6 +172,16 @@ export default function WorldView() {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* XP Progress Anzeige */}
+            {user?.id && (
+              <ProgressStats userId={user.id} variant="minimal" className="mr-2" />
+            )}
+            {progress?.xp !== undefined && (
+              <div className="flex items-center gap-1 text-sm text-muted-foreground mr-2">
+                <Star className="w-4 h-4 text-moon" />
+                <span>{progress.xp} XP</span>
+              </div>
+            )}
             <Button variant="ghost" size="icon">
               <Heart className="w-5 h-5" />
             </Button>
@@ -114,6 +206,15 @@ export default function WorldView() {
           </div>
         )}
       </div>
+
+      {/* XP Popup */}
+      <XPPopup
+        xp={earnedXP}
+        show={showXPPopup}
+        onComplete={() => setShowXPPopup(false)}
+        levelUp={levelUp}
+        newLevel={newLevel}
+      />
     </div>
   );
 }

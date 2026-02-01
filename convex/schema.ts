@@ -33,7 +33,12 @@ export default defineSchema({
     email: v.optional(v.string()),
     name: v.optional(v.string()),
     imageUrl: v.optional(v.string()),
-    role: v.optional(v.union(v.literal("student"), v.literal("creator"), v.literal("admin"))),
+    role: v.optional(v.union(
+      v.literal("student"),
+      v.literal("creator"),
+      v.literal("teacher"),
+      v.literal("admin")
+    )),
     createdAt: v.number(),
   })
     .index("by_clerk_id", ["clerkId"]),
@@ -48,4 +53,62 @@ export default defineSchema({
     updatedAt: v.number(),
   })
     .index("by_user_world", ["userId", "worldId"]),
+
+  // Classrooms (Teacher-managed groups)
+  classrooms: defineTable({
+    name: v.string(),
+    description: v.optional(v.string()),
+    teacherId: v.string(), // Clerk ID
+    inviteCode: v.string(), // 6-stelliger Code zum Beitreten
+    gradeLevel: v.optional(v.string()),
+    subject: v.optional(v.string()),
+    isArchived: v.optional(v.boolean()),
+    createdAt: v.number(),
+  })
+    .index("by_teacher", ["teacherId"])
+    .index("by_invite_code", ["inviteCode"]),
+
+  // Classroom Members (Students in a classroom)
+  classroomMembers: defineTable({
+    classroomId: v.id("classrooms"),
+    userId: v.string(), // Clerk ID
+    role: v.union(v.literal("student"), v.literal("assistant")),
+    joinedAt: v.number(),
+  })
+    .index("by_classroom", ["classroomId"])
+    .index("by_user", ["userId"])
+    .index("by_classroom_user", ["classroomId", "userId"]),
+
+  // Classroom Assignments (Worlds assigned to a classroom)
+  classroomAssignments: defineTable({
+    classroomId: v.id("classrooms"),
+    worldId: v.id("worlds"),
+    assignedBy: v.string(), // Teacher's Clerk ID
+    title: v.optional(v.string()), // Optional custom title
+    instructions: v.optional(v.string()),
+    dueDate: v.optional(v.number()),
+    isRequired: v.optional(v.boolean()),
+    createdAt: v.number(),
+  })
+    .index("by_classroom", ["classroomId"])
+    .index("by_world", ["worldId"]),
+
+  // Blog Posts
+  blogPosts: defineTable({
+    slug: v.string(),
+    title: v.string(),
+    excerpt: v.string(),
+    content: v.string(),
+    coverImage: v.optional(v.string()),
+    category: v.string(),
+    tags: v.array(v.string()),
+    author: v.string(),
+    isPublished: v.boolean(),
+    publishedAt: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_published", ["isPublished", "publishedAt"])
+    .index("by_category", ["category", "isPublished"]),
 });
