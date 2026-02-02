@@ -18,6 +18,39 @@
 3. **Kommunikation:** Status-Updates in Activity Log unten
 4. **Konflikte:** Wenn beide dieselbe Datei brauchen → Klaus fragen
 
+### 🚀 Workflow nach Code-Änderungen (WICHTIG!)
+
+**Nach jeder abgeschlossenen Implementierung SELBSTSTÄNDIG:**
+
+1. **Git Commit & Push**
+   ```bash
+   git add <geänderte-dateien>
+   git commit -m "feat/fix/chore: Beschreibung"
+   git push
+   ```
+
+2. **Deploy auslösen** (falls nötig)
+   - Convex: `npx convex deploy` (bei Backend-Änderungen)
+   - Vercel: Automatisch bei Push zu main
+
+3. **Mission Control updaten**
+   ```bash
+   # Task-Status updaten
+   curl -X PATCH -H "Authorization: Bearer a8c0ea72755c4fe081c5156a03060695" \
+     -H "Content-Type: application/json" \
+     -d '{"status": "Done"}' \
+     "https://mission-control-etj.pages.dev/api/tasks/<task-id>?project=meoluna"
+   ```
+
+4. **Activity Log in CLAUDE.md updaten** mit:
+   - Was wurde implementiert
+   - Welche Dateien wurden geändert
+   - Aktueller Status
+
+5. **Task beenden** (nur wenn wirklich fertig!)
+
+**Keine halben Sachen!** Erst wenn alles committed, deployed und dokumentiert ist, ist der Task abgeschlossen.
+
 ### Aktueller Status (2026-02-01 21:30)
 | Agent | Status | Working On |
 |-------|--------|------------|

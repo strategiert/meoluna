@@ -7,6 +7,8 @@ import { Routes, Route } from 'react-router-dom';
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { useUserSync } from '@/hooks/useUserSync';
+import { useAnalytics } from '@/hooks/useAnalytics';
 
 // Pages
 import Index from '@/pages/Index';
@@ -27,6 +29,9 @@ import JoinClassroom from '@/pages/JoinClassroom';
 import NotFound from '@/pages/NotFound';
 
 export default function App() {
+  useUserSync();
+  useAnalytics(); // Server-side tracking
+
   return (
     <TooltipProvider>
       <Toaster />

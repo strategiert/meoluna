@@ -57,7 +57,8 @@ export default defineSchema({
     content: v.string(),
     code: v.optional(v.string()),
     createdAt: v.number(),
-  }),
+  })
+    .index("by_world", ["worldId"]),
 
   // User Profiles (synced from Clerk)
   users: defineTable({
@@ -161,4 +162,115 @@ export default defineSchema({
     .index("by_slug", ["slug"])
     .index("by_published", ["isPublished", "publishedAt"])
     .index("by_category", ["category", "isPublished"]),
+
+  // ============================================================================
+  // ANALYTICS - Server-Side Tracking Engine
+  // ============================================================================
+
+  // Session Clicks - Server-Side Click Tracking
+  sessionClicks: defineTable({
+    sessionId: v.string(),
+    anonymousId: v.string(),
+    // Ad Attribution
+    fbclid: v.optional(v.string()),
+    gclid: v.optional(v.string()),
+    ttclid: v.optional(v.string()),
+    // UTM Parameters
+    utm_source: v.optional(v.string()),
+    utm_medium: v.optional(v.string()),
+    utm_campaign: v.optional(v.string()),
+    utm_term: v.optional(v.string()),
+    utm_content: v.optional(v.string()),
+    // Context
+    referrer: v.optional(v.string()),
+    landingPage: v.string(),
+    ipHash: v.optional(v.string()),
+    userAgent: v.optional(v.string()),
+    acceptLanguage: v.optional(v.string()),
+    // Timestamps
+    firstClickTime: v.number(),
+    lastSeenTime: v.number(),
+  })
+    .index("by_session", ["sessionId"])
+    .index("by_anonymous", ["anonymousId"])
+    .index("by_fbclid", ["fbclid"])
+    .index("by_gclid", ["gclid"]),
+
+  // User Identity Graph - Cross-Platform Identity Resolution
+  userIdentityGraph: defineTable({
+    canonicalUserId: v.string(),
+    userId: v.optional(v.string()), // Clerk ID wenn eingeloggt
+    emailHash: v.optional(v.string()), // SHA-256 gehasht für DSGVO
+    devices: v.array(v.object({
+      platform: v.string(),
+      deviceId: v.optional(v.string()),
+      fingerprint: v.optional(v.string()),
+      sessionIds: v.array(v.string()),
+      firstSeen: v.number(),
+      lastSeen: v.number(),
+    })),
+    // Attribution
+    firstTouchAttribution: v.optional(v.object({
+      source: v.optional(v.string()),
+      medium: v.optional(v.string()),
+      campaign: v.optional(v.string()),
+      fbclid: v.optional(v.string()),
+      gclid: v.optional(v.string()),
+      timestamp: v.number(),
+    })),
+    lastTouchAttribution: v.optional(v.object({
+      source: v.optional(v.string()),
+      medium: v.optional(v.string()),
+      campaign: v.optional(v.string()),
+      fbclid: v.optional(v.string()),
+      gclid: v.optional(v.string()),
+      timestamp: v.number(),
+    })),
+    // Timestamps
+    firstSeen: v.number(),
+    lastActivity: v.number(),
+  })
+    .index("by_canonical_id", ["canonicalUserId"])
+    .index("by_user_id", ["userId"])
+    .index("by_email_hash", ["emailHash"]),
+
+  // Analytics Events - All Tracked Events
+  analyticsEvents: defineTable({
+    canonicalUserId: v.string(),
+    sessionId: v.string(),
+    eventType: v.string(),
+    eventData: v.string(), // JSON string für flexible event properties
+    platform: v.union(v.literal("web"), v.literal("ios"), v.literal("android")),
+    route: v.optional(v.string()),
+    timestamp: v.number(),
+  })
+    .index("by_canonical_user", ["canonicalUserId"])
+    .index("by_session", ["sessionId"])
+    .index("by_event_type", ["eventType"])
+    .index("by_timestamp", ["timestamp"]),
+
+  // Conversions - Conversion Tracking for Ad Platforms
+  conversions: defineTable({
+    canonicalUserId: v.string(),
+    userId: v.optional(v.string()),
+    emailHash: v.optional(v.string()),
+    conversionType: v.string(),
+    value: v.optional(v.number()),
+    currency: v.optional(v.string()),
+    // Attribution
+    fbclid: v.optional(v.string()),
+    gclid: v.optional(v.string()),
+    utm_source: v.optional(v.string()),
+    utm_campaign: v.optional(v.string()),
+    // API Status
+    sentToFacebook: v.boolean(),
+    sentToGoogle: v.boolean(),
+    facebookEventId: v.optional(v.string()),
+    googleEventId: v.optional(v.string()),
+    // Timestamp
+    timestamp: v.number(),
+  })
+    .index("by_canonical_user", ["canonicalUserId"])
+    .index("by_conversion_type", ["conversionType"])
+    .index("by_timestamp", ["timestamp"]),
 });
