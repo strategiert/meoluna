@@ -46,8 +46,6 @@ export default function WorldView() {
   const reportScore = useMutation(api.progress.reportScore);
   const addXP = useMutation(api.progress.addXP);
   const completeWorldMutation = useMutation(api.progress.completeWorld);
-  const updateWorld = useMutation(api.worlds.update);
-
   const [currentCode, setCurrentCode] = useState<string | null>(null);
   const [isFixing, setIsFixing] = useState(false);
   const [isUpgrading, setIsUpgrading] = useState(false);
