@@ -470,15 +470,6 @@ export default function Create() {
                 onCodeUpdate={setCurrentCode}
                 onError={handleAutoFix}
               />
-            ) : isGenerating ? (
-              <div className="h-full flex flex-col items-center justify-center p-8">
-                <div className="max-w-md w-full">
-                  <GenerationProgress
-                    isGenerating={isGenerating}
-                    isPdfBased={!!pdfText}
-                  />
-                </div>
-              </div>
             ) : (
               <div className="h-full flex flex-col items-center justify-center text-muted-foreground">
                 <Moon className="w-16 h-16 mb-4 opacity-30" />

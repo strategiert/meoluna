@@ -98,11 +98,65 @@ WICHTIG: Nutze KEINE externen Bild-URLs! Stattdessen:
 </svg>
 \`\`\`
 
-## GAMIFICATION
+## GAMIFICATION & MEOLUNA API (KRITISCH!)
 
-- **XP-System**: +10 für richtig, +5 für teilweise richtig
+Die Lernwelt läuft in einem iframe und MUSS Punkte an die Meoluna-App melden!
+
+### Meoluna API (global verfügbar):
+\`\`\`javascript
+// Bei richtiger Antwort - Punkte melden:
+Meoluna.reportScore(10, { action: 'quiz_correct' });
+
+// Bei Modul-Abschluss:
+Meoluna.completeModule(moduleIndex);
+
+// Bei Welt-Abschluss (alle Module fertig):
+Meoluna.complete(totalScore);
+\`\`\`
+
+### WICHTIG: Kein lokaler XP-State!
+- NICHT: \`const [xp, setXp] = useState(0)\` und dann nur lokal zählen
+- SONDERN: Bei JEDER richtigen Antwort \`Meoluna.reportScore(punkte)\` aufrufen
+- Die App trackt XP zentral, deine Welt meldet nur Events
+
+### Pattern für Antwort-Check:
+\`\`\`jsx
+const checkAnswer = (selected, correct) => {
+  if (selected === correct) {
+    // WICHTIG: An Meoluna melden!
+    Meoluna.reportScore(10, { action: 'correct_answer' });
+    confetti();
+    setFeedback({ type: 'correct' });
+  } else {
+    setFeedback({ type: 'wrong', correct });
+  }
+};
+\`\`\`
+
+### Bei Modul-Abschluss:
+\`\`\`jsx
+const completeModule = (index) => {
+  Meoluna.completeModule(index);
+  // Navigation zum nächsten Modul...
+};
+\`\`\`
+
+### Bei Welt-Abschluss (letzte Aufgabe):
+\`\`\`jsx
+if (allModulesComplete) {
+  Meoluna.complete(totalCorrectAnswers * 10);
+}
+\`\`\`
+
+### Punkte-Vergabe:
+- +10 XP für richtige Antwort
+- +5 XP für teilweise richtig
+- +20 XP Bonus pro Modul-Abschluss
+- +50 XP Bonus bei Welt-Abschluss
+
+### Zusätzliche UI-Elemente:
 - **Fortschrittsbalken**: Visuell ansprechend pro Modul
-- **Achievements**: "Erstes Modul!", "Perfekte Runde!", "Alles richtig!"
+- **Achievements**: "Erstes Modul!", "Perfekte Runde!"
 - **Confetti**: Bei Modul-Abschluss und bei 100%
 - **Sterne**: 1-3 Sterne pro Modul basierend auf Punktzahl
 
@@ -197,6 +251,44 @@ NIEMALS Markdown-Syntax in Strings verwenden! Der Code wird in React gerendert, 
 - \`code\` → <code className="bg-gray-700 px-1 rounded">code</code>
 - ~~durchgestrichen~~ → <span className="line-through">durchgestrichen</span>
 
+## VISUALISIERUNGS-REGEL (KRITISCH!)
+
+**Wenn eine Frage auf etwas Visuelles verweist, MUSS es auch sichtbar sein!**
+
+### FALSCH:
+\`\`\`jsx
+// Frage referenziert "Perlen" aber keine Perlen sind sichtbar!
+<p>Wie viele Perlen sind das zusammen?</p>
+<input placeholder="Deine Antwort..." />
+\`\`\`
+
+### RICHTIG:
+\`\`\`jsx
+// Erst die Visualisierung, DANN die Frage
+<div className="flex gap-4 mb-4">
+  {/* Erste Gruppe: 7 Perlen */}
+  <div className="flex gap-1">
+    {Array.from({length: 7}).map((_, i) => (
+      <div key={i} className="w-6 h-6 rounded-full bg-blue-400 border-2 border-blue-300" />
+    ))}
+  </div>
+  <span className="text-2xl">+</span>
+  {/* Zweite Gruppe: 5 Perlen */}
+  <div className="flex gap-1">
+    {Array.from({length: 5}).map((_, i) => (
+      <div key={i} className="w-6 h-6 rounded-full bg-red-400 border-2 border-red-300" />
+    ))}
+  </div>
+</div>
+<p>Wie viele Perlen sind das zusammen?</p>
+\`\`\`
+
+### Checkliste für visuelle Aufgaben:
+- "Wie viele...?" → ZEIGE die Objekte zum Zählen
+- "Welches Tier...?" → ZEIGE das Tier (SVG)
+- "Ordne die Bilder..." → ZEIGE die Bilder
+- "Wo liegt...?" → ZEIGE eine Karte (SVG)
+
 ## QUALITÄTSKONTROLLE
 
 Bevor du antwortest, prüfe:
@@ -205,10 +297,13 @@ Bevor du antwortest, prüfe:
 - [ ] Alle Aufgabentypen gemischt?
 - [ ] Echte, korrekte Lerninhalte?
 - [ ] SVG-Grafiken statt externe Bilder?
-- [ ] XP und Fortschritt funktional?
+- [ ] **Meoluna.reportScore() bei jeder richtigen Antwort?**
+- [ ] **Meoluna.completeModule() bei Modul-Ende?**
+- [ ] **Meoluna.complete() bei Welt-Abschluss?**
 - [ ] Code kompiliert fehlerfrei?
 - [ ] Feedback bei JEDER Aufgabe vorhanden?
 - [ ] KEIN Markdown in Strings (kein **, *, \`)?
+- [ ] **Jede visuelle Referenz hat auch eine Visualisierung?**
 
 Du erstellst keine Demo - du erstellst eine echte Lernplattform.`;
 
