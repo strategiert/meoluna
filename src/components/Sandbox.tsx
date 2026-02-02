@@ -242,6 +242,88 @@ export const Sandbox: React.FC<SandboxProps> = ({
       }, '*');
     }
 
+    // =========================================================================
+    // MEOLUNA API - Für generierte Welten
+    // =========================================================================
+    window.Meoluna = {
+      /**
+       * Score/Punkte an Meoluna melden
+       * @param {number} score - Erreichte Punkte (z.B. 10, 50, 100)
+       * @param {object} [context] - Optionaler Kontext
+       * @param {string} [context.action] - Was wurde gemacht (z.B. "quiz_correct")
+       * @param {number} [context.moduleIndex] - Welches Modul (0-basiert)
+       */
+      reportScore: function(score, context) {
+        if (typeof score !== 'number' || score <= 0) return;
+        window.parent.postMessage({
+          type: 'meoluna:progress',
+          payload: {
+            event: 'score',
+            amount: score,
+            context: context || {}
+          }
+        }, '*');
+      },
+
+      /**
+       * Modul als abgeschlossen markieren
+       * @param {number} moduleIndex - Index des abgeschlossenen Moduls
+       */
+      completeModule: function(moduleIndex) {
+        window.parent.postMessage({
+          type: 'meoluna:progress',
+          payload: {
+            event: 'module',
+            amount: 0,
+            context: { moduleIndex: moduleIndex }
+          }
+        }, '*');
+      },
+
+      /**
+       * Gesamte Lernwelt als abgeschlossen markieren
+       * @param {number} [finalScore] - Optionaler Endscore
+       */
+      complete: function(finalScore) {
+        window.parent.postMessage({
+          type: 'meoluna:progress',
+          payload: {
+            event: 'complete',
+            amount: finalScore || 0,
+            context: {}
+          }
+        }, '*');
+      },
+
+      /**
+       * Beliebiges Event senden (für erweiterte Use-Cases)
+       * @param {string} eventType - 'score' | 'module' | 'complete'
+       * @param {number} amount - Punktzahl
+       * @param {object} [context] - Zusätzlicher Kontext
+       */
+      emit: function(eventType, amount, context) {
+        const validEvents = ['score', 'module', 'complete'];
+        if (!validEvents.includes(eventType)) {
+          console.warn('[Meoluna] Invalid event type:', eventType);
+          return;
+        }
+        window.parent.postMessage({
+          type: 'meoluna:progress',
+          payload: {
+            event: eventType,
+            amount: amount || 0,
+            context: context || {}
+          }
+        }, '*');
+      },
+
+      // Version für Debugging
+      _version: '1.0.0'
+    };
+
+    // Auch als globales "meoluna" (lowercase) verfügbar
+    window.meoluna = window.Meoluna;
+
     // Globaler Error Handler
     window.onerror = function(msg, url, line, col, error) {
       showError(

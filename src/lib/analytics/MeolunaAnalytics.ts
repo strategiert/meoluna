@@ -22,7 +22,7 @@ export class MeolunaAnalytics {
   private config: AnalyticsConfig;
   private anonymousId: string;
   private sessionId: string;
-  private _userId: string | null = null; // Stored for future use
+  private userId: string | null = null; // For identity resolution
   private initialized = false;
   private currentRoute: string = "";
 
@@ -72,14 +72,14 @@ export class MeolunaAnalytics {
   /**
    * Link user ID after login/signup
    */
-  setUserId(userId: string, email?: string): void {
-    this._userId = userId;
+  setUserId(id: string, email?: string): void {
+    this.userId = id;
 
     // Call identity linking endpoint
-    this.linkIdentity(userId, email);
+    this.linkIdentity(id, email);
 
     if (this.config.debug) {
-      console.log("[MeolunaAnalytics] User linked", { userId, email: email ? "[SET]" : "[NOT SET]" });
+      console.log("[MeolunaAnalytics] User linked", { userId: id, email: email ? "[SET]" : "[NOT SET]" });
     }
   }
 
@@ -118,10 +118,10 @@ export class MeolunaAnalytics {
   }
 
   /**
-   * Get the canonical user ID (for manual use if needed)
+   * Get the canonical user ID (logged-in userId or anonymousId)
    */
   getCanonicalUserId(): string {
-    return this.anonymousId;
+    return this.userId || this.anonymousId;
   }
 
   /**
