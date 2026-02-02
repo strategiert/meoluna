@@ -6,7 +6,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Id } from '../../convex/_generated/dataModel';
-import { Moon, ArrowLeft, Share2, Heart, Star } from 'lucide-react';
+import { Moon, ArrowLeft, Share2, Heart, Star, RefreshCw, Sparkles, Check } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -42,12 +42,47 @@ export default function WorldView() {
   const userStats = useQuery(api.progress.getUserStats, user?.id ? { userId: user.id } : 'skip');
 
   const autoFixCode = useAction(api.generate.autoFixCode);
+  const upgradeWorld = useAction(api.worlds.upgradeWorld);
   const reportScore = useMutation(api.progress.reportScore);
   const addXP = useMutation(api.progress.addXP);
   const completeWorldMutation = useMutation(api.progress.completeWorld);
+  const updateWorld = useMutation(api.worlds.update);
 
   const [currentCode, setCurrentCode] = useState<string | null>(null);
   const [isFixing, setIsFixing] = useState(false);
+  const [isUpgrading, setIsUpgrading] = useState(false);
+  const [upgradeSuccess, setUpgradeSuccess] = useState(false);
+  
+  // Check if world has Meoluna API
+  const hasMeolunaAPI = (code: string | null | undefined): boolean => {
+    if (!code) return false;
+    return code.includes('Meoluna.reportScore') || 
+           code.includes('Meoluna.completeModule') ||
+           code.includes('Meoluna.complete(');
+  };
+  
+  const needsUpgrade = world?.code && !hasMeolunaAPI(world.code);
+  
+  // Handle upgrade
+  const handleUpgrade = async () => {
+    if (!worldId || isUpgrading) return;
+    
+    setIsUpgrading(true);
+    try {
+      const result = await upgradeWorld({ worldId: worldId as Id<"worlds"> });
+      
+      if (result.success && !result.skipped) {
+        // Reload the page to get new code
+        window.location.reload();
+      } else if (result.skipped) {
+        setUpgradeSuccess(true);
+      }
+    } catch (error) {
+      console.error('Upgrade failed:', error);
+    } finally {
+      setIsUpgrading(false);
+    }
+  };
   const [showXPPopup, setShowXPPopup] = useState(false);
   const [earnedXP, setEarnedXP] = useState(0);
   const [levelUp, setLevelUp] = useState(false);
@@ -239,6 +274,35 @@ export default function WorldView() {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Upgrade-Button wenn Welt alte Version hat */}
+            {needsUpgrade && user?.id === world.userId && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleUpgrade}
+                disabled={isUpgrading}
+                className="gap-2 border-amber-500/50 text-amber-500 hover:bg-amber-500/10"
+              >
+                {isUpgrading ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    Upgrade läuft...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" />
+                    XP-Tracking aktivieren
+                  </>
+                )}
+              </Button>
+            )}
+            {/* Erfolgs-Badge nach Upgrade */}
+            {upgradeSuccess && (
+              <div className="flex items-center gap-1 text-sm text-green-500">
+                <Check className="w-4 h-4" />
+                <span>Bereits aktuell</span>
+              </div>
+            )}
             {/* XP Progress Anzeige */}
             {user?.id && (
               <ProgressStats userId={user.id} variant="minimal" className="mr-2" />

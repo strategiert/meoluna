@@ -1,5 +1,7 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { mutation, query, action, internalMutation } from "./_generated/server";
+import { api, internal } from "./_generated/api";
+import { Id } from "./_generated/dataModel";
 
 // ============================================================================
 // QUERIES
@@ -112,5 +114,165 @@ export const toggleLike = mutation({
     if (world) {
       await ctx.db.patch(args.id, { likes: (world.likes || 0) + 1 });
     }
+  },
+});
+
+// ============================================================================
+// MIGRATION: Upgrade worlds to use Meoluna API
+// ============================================================================
+
+// List all worlds that need upgrading (don't have Meoluna.reportScore)
+export const listNeedingUpgrade = query({
+  args: {},
+  handler: async (ctx) => {
+    const allWorlds = await ctx.db.query("worlds").collect();
+    
+    // Filter worlds that don't have Meoluna API calls
+    return allWorlds.filter(world => {
+      const code = world.code || '';
+      const hasMeolunaCall = code.includes('Meoluna.reportScore') || 
+                            code.includes('Meoluna.completeModule') ||
+                            code.includes('Meoluna.complete(');
+      return !hasMeolunaCall;
+    }).map(w => ({
+      id: w._id,
+      title: w.title,
+      userId: w.userId,
+      codeLength: w.code?.length || 0,
+    }));
+  },
+});
+
+// Internal mutation to update a single world's code
+export const updateWorldCode = internalMutation({
+  args: {
+    worldId: v.id("worlds"),
+    newCode: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.worldId, { 
+      code: args.newCode,
+    });
+  },
+});
+
+// Action: Upgrade a single world
+export const upgradeWorld = action({
+  args: { worldId: v.id("worlds") },
+  handler: async (ctx, args) => {
+    // 1. Get the world
+    const world = await ctx.runQuery(api.worlds.get, { id: args.worldId });
+    
+    if (!world) {
+      throw new Error("World not found");
+    }
+    
+    if (!world.code) {
+      throw new Error("World has no code");
+    }
+    
+    // Check if already upgraded
+    const hasMeolunaCall = world.code.includes('Meoluna.reportScore') || 
+                          world.code.includes('Meoluna.completeModule') ||
+                          world.code.includes('Meoluna.complete(');
+    
+    if (hasMeolunaCall) {
+      return { 
+        success: true, 
+        skipped: true, 
+        reason: "Already has Meoluna API calls" 
+      };
+    }
+    
+    // 2. Upgrade the code via Claude
+    const result = await ctx.runAction(api.generate.upgradeWorldCode, {
+      code: world.code,
+    });
+    
+    if (!result.upgradedCode) {
+      throw new Error("Upgrade failed - no code returned");
+    }
+    
+    // 3. Save the upgraded code
+    await ctx.runMutation(internal.worlds.updateWorldCode, {
+      worldId: args.worldId,
+      newCode: result.upgradedCode,
+    });
+    
+    return {
+      success: true,
+      skipped: false,
+      hasMeolunaCall: result.hasMeolunaCall,
+      originalLength: result.originalLength,
+      upgradedLength: result.upgradedLength,
+    };
+  },
+});
+
+// Action: Batch upgrade all worlds (with rate limiting)
+export const migrateAllWorlds = action({
+  args: { 
+    dryRun: v.optional(v.boolean()),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const dryRun = args.dryRun ?? true;
+    const limit = args.limit ?? 10;
+    
+    // Get worlds needing upgrade
+    const worldsToUpgrade = await ctx.runQuery(api.worlds.listNeedingUpgrade, {});
+    
+    const results: Array<{
+      worldId: string;
+      title: string;
+      success: boolean;
+      skipped?: boolean;
+      error?: string;
+    }> = [];
+    
+    // Process up to limit worlds
+    const toProcess = worldsToUpgrade.slice(0, limit);
+    
+    for (const world of toProcess) {
+      if (dryRun) {
+        results.push({
+          worldId: world.id,
+          title: world.title,
+          success: true,
+          skipped: true,
+        });
+        continue;
+      }
+      
+      try {
+        // Add delay between API calls to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        const result = await ctx.runAction(api.worlds.upgradeWorld, {
+          worldId: world.id,
+        });
+        
+        results.push({
+          worldId: world.id,
+          title: world.title,
+          success: result.success,
+          skipped: result.skipped,
+        });
+      } catch (error) {
+        results.push({
+          worldId: world.id,
+          title: world.title,
+          success: false,
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
+      }
+    }
+    
+    return {
+      totalNeedingUpgrade: worldsToUpgrade.length,
+      processed: results.length,
+      dryRun,
+      results,
+    };
   },
 });

@@ -550,3 +550,128 @@ Repariere den Code und gib ihn zurück.`;
     return { fixedCode };
   },
 });
+
+// ============================================================================
+// UPGRADE WORLD CODE - Meoluna API nachrüsten
+// ============================================================================
+export const upgradeWorldCode = action({
+  args: {
+    code: v.string(),
+  },
+  handler: async (_ctx, args) => {
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+
+    if (!apiKey) {
+      throw new Error("ANTHROPIC_API_KEY nicht konfiguriert");
+    }
+
+    const systemPrompt = `Du bist ein React-Experte der bestehenden Code aktualisiert.
+
+DEINE AUFGABE:
+Füge die Meoluna Progress API zu diesem bestehenden Lernwelt-Code hinzu.
+
+## MEOLUNA API (global verfügbar im iframe):
+
+\`\`\`javascript
+// Bei richtiger Antwort - Punkte melden:
+Meoluna.reportScore(punkte, { action: 'correct_answer' });
+
+// Bei Modul-Abschluss:
+Meoluna.completeModule(moduleIndex);
+
+// Bei Welt-Abschluss (alle Module fertig):
+Meoluna.complete(totalScore);
+\`\`\`
+
+## WAS DU TUN MUSST:
+
+1. Finde alle Stellen wo Punkte/XP vergeben werden (z.B. bei richtigen Antworten)
+2. Füge dort \`Meoluna.reportScore(punkte)\` hinzu
+3. Finde Modul-Abschlüsse und füge \`Meoluna.completeModule(index)\` hinzu
+4. Finde den Welt-Abschluss und füge \`Meoluna.complete(score)\` hinzu
+5. ENTFERNE NICHT den lokalen XP-State (der kann für die UI bleiben)
+6. FÜGE die Meoluna-Aufrufe ZUSÄTZLICH hinzu
+
+## PUNKTE-VERGABE:
+- +10 XP für richtige Antwort
+- +5 XP für teilweise richtig  
+- +20 XP Bonus pro Modul-Abschluss
+- +50 XP Bonus bei Welt-Abschluss
+
+## BEISPIEL-TRANSFORMATION:
+
+VORHER:
+\`\`\`jsx
+const checkAnswer = (selected, correct) => {
+  if (selected === correct) {
+    setXp(xp + 10);
+    setFeedback({ type: 'correct' });
+  }
+};
+\`\`\`
+
+NACHHER:
+\`\`\`jsx
+const checkAnswer = (selected, correct) => {
+  if (selected === correct) {
+    setXp(xp + 10);
+    Meoluna.reportScore(10, { action: 'correct_answer' });
+    setFeedback({ type: 'correct' });
+  }
+};
+\`\`\`
+
+## REGELN:
+1. Gib NUR den aktualisierten Code zurück, keine Erklärungen
+2. Behalte ALLE bestehende Funktionalität bei
+3. Ändere das Design/Layout NICHT
+4. Der Code muss weiterhin kompilieren
+5. Füge Meoluna-Aufrufe nur dort hinzu wo es Sinn macht
+
+WICHTIG: Antworte NUR mit dem kompletten, aktualisierten Code.`;
+
+    const userPrompt = `Aktualisiere diesen Lernwelt-Code um die Meoluna Progress API zu nutzen:
+
+${args.code}`;
+
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 64000,
+        system: systemPrompt,
+        messages: [{ role: "user", content: userPrompt }],
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Claude API Error: ${response.status} - ${error}`);
+    }
+
+    const data = await response.json();
+    let upgradedCode = data.content[0]?.text || "";
+
+    upgradedCode = upgradedCode
+      .replace(/^```(?:jsx|tsx|javascript|typescript|react)?\n?/gm, "")
+      .replace(/```$/gm, "")
+      .trim();
+
+    // Validierung: Prüfe ob Meoluna-Aufrufe hinzugefügt wurden
+    const hasMeolunaCall = upgradedCode.includes('Meoluna.reportScore') || 
+                          upgradedCode.includes('Meoluna.completeModule') ||
+                          upgradedCode.includes('Meoluna.complete');
+
+    return { 
+      upgradedCode,
+      hasMeolunaCall,
+      originalLength: args.code.length,
+      upgradedLength: upgradedCode.length,
+    };
+  },
+});
