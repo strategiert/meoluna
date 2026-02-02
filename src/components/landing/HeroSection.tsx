@@ -7,12 +7,12 @@ import { Link } from "react-router-dom";
 import { ArrowRight, Sparkles, BookOpen, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MoonLogo } from "@/components/icons/MoonLogo";
-import { StarField } from "./StarField";
+import { P5Background } from "./P5Background";
 
 export function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-hero">
-      <StarField />
+      <P5Background />
 
       {/* Aurora effect */}
       <div className="absolute inset-0 opacity-30">

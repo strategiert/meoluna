@@ -27,6 +27,7 @@ import TeacherDashboard from '@/pages/TeacherDashboard';
 import ClassroomDetail from '@/pages/ClassroomDetail';
 import JoinClassroom from '@/pages/JoinClassroom';
 import NotFound from '@/pages/NotFound';
+import BackgroundsDemo from '@/pages/demo/Backgrounds';
 
 export default function App() {
   useUserSync();
@@ -55,6 +56,8 @@ export default function App() {
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/imprint" element={<Imprint />} />
         <Route path="/terms" element={<Terms />} />
+        {/* Demo Pages */}
+        <Route path="/demo/backgrounds" element={<BackgroundsDemo />} />
         {/* Fallback */}
         <Route path="*" element={<NotFound />} />
       </Routes>
