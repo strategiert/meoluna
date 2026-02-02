@@ -220,6 +220,7 @@ export const Sandbox: React.FC<SandboxProps> = ({
       "@dnd-kit/core": "https://esm.sh/@dnd-kit/core@6.1.0?deps=react@18.2.0",
       "react-confetti": "https://esm.sh/react-confetti@6.1.0?deps=react@18.2.0",
       "howler": "https://esm.sh/howler@2.2.4",
+      "p5": "https://esm.sh/p5@1.9.0",
     };
 
     // =========================================================================

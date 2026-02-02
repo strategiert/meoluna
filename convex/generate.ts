@@ -47,6 +47,7 @@ import { IconName } from 'lucide-react';  // Alle Icons verfügbar
 import confetti from 'canvas-confetti';
 import { LineChart, BarChart, PieChart, ... } from 'recharts';
 import clsx from 'clsx';
+import p5 from 'p5';  // Für interaktive Visualisierungen (optional)
 \`\`\`
 
 ### Styling
