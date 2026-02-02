@@ -1,10 +1,19 @@
 import { mutation, query } from "../_generated/server";
 import { v } from "convex/values";
-import { createHash } from "crypto";
+
+// Simple hash function for GDPR compliance (djb2 algorithm)
+// Note: For production, consider using a Node.js action for SHA-256
+function simpleHash(str: string): string {
+  let hash = 5381;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) + hash) ^ str.charCodeAt(i);
+  }
+  return Math.abs(hash).toString(16).padStart(8, "0");
+}
 
 // Hash email for GDPR compliance
 function hashEmail(email: string): string {
-  return createHash("sha256").update(email.toLowerCase().trim()).digest("hex");
+  return simpleHash(email.toLowerCase().trim() + "meoluna_salt_2026");
 }
 
 // Resolve identity - get or create canonical user ID
