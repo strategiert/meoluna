@@ -20,6 +20,7 @@ const SESSION_TIMEOUT = 30 * 60 * 1000;
  */
 export class MeolunaAnalytics {
   private config: AnalyticsConfig;
+  private httpUrl: string; // HTTP Actions URL (.convex.site)
   private anonymousId: string;
   private sessionId: string;
   private userId: string | null = null; // For identity resolution
@@ -28,6 +29,8 @@ export class MeolunaAnalytics {
 
   constructor(config: AnalyticsConfig) {
     this.config = config;
+    // Convert .convex.cloud to .convex.site for HTTP Actions
+    this.httpUrl = config.convexUrl.replace('.convex.cloud', '.convex.site');
     this.anonymousId = this.getOrCreateAnonymousId();
     this.sessionId = this.getOrCreateSessionId();
   }
@@ -183,7 +186,7 @@ export class MeolunaAnalytics {
 
   private async sendPageview(data: PageviewData): Promise<void> {
     try {
-      const response = await fetch(`${this.config.convexUrl}/api/track/pageview`, {
+      const response = await fetch(`${this.httpUrl}/api/track/pageview`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -203,7 +206,7 @@ export class MeolunaAnalytics {
 
   private async sendEvent(data: EventData): Promise<void> {
     try {
-      const response = await fetch(`${this.config.convexUrl}/api/track/event`, {
+      const response = await fetch(`${this.httpUrl}/api/track/event`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
