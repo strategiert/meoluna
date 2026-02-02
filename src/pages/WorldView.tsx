@@ -116,12 +116,22 @@ export default function WorldView() {
     }
   }, [user?.id, worldId, reportScore]);
 
+  // Queue for messages that arrive before user is loaded
+  const messageQueueRef = useRef<MessageEvent[]>([]);
+
   // Handler für XP Events aus der Lernwelt
   const handleWorldMessage = useCallback(async (event: MessageEvent) => {
-    if (!user?.id || !worldId) return;
-
     const data = event.data;
     if (typeof data !== 'object' || !data.type) return;
+
+    // Queue messages if user not loaded yet
+    if (!user?.id || !worldId) {
+      if (data.type === 'meoluna:progress' || data.type === 'xp' || data.type === 'module' || data.type === 'complete') {
+        console.log('[Meoluna] Queuing message - user not ready:', data.type);
+        messageQueueRef.current.push(event);
+      }
+      return;
+    }
 
     try {
       // ========================================
@@ -187,6 +197,16 @@ export default function WorldView() {
     window.addEventListener('message', handleWorldMessage);
     return () => window.removeEventListener('message', handleWorldMessage);
   }, [handleWorldMessage]);
+
+  // Process queued messages when user becomes available
+  useEffect(() => {
+    if (user?.id && worldId && messageQueueRef.current.length > 0) {
+      console.log('[Meoluna] Processing queued messages:', messageQueueRef.current.length);
+      const queue = [...messageQueueRef.current];
+      messageQueueRef.current = [];
+      queue.forEach(event => handleWorldMessage(event));
+    }
+  }, [user?.id, worldId, handleWorldMessage]);
 
   const handleAutoFix = async (error: string, failedCode: string) => {
     if (isFixing) return;
