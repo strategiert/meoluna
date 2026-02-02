@@ -3,7 +3,6 @@ import type {
   PageviewData,
   EventData,
   MeolunaEventType,
-  Platform,
 } from "./types";
 
 // Storage keys
@@ -23,7 +22,7 @@ export class MeolunaAnalytics {
   private config: AnalyticsConfig;
   private anonymousId: string;
   private sessionId: string;
-  private userId: string | null = null;
+  private _userId: string | null = null; // Stored for future use
   private initialized = false;
   private currentRoute: string = "";
 
@@ -74,7 +73,7 @@ export class MeolunaAnalytics {
    * Link user ID after login/signup
    */
   setUserId(userId: string, email?: string): void {
-    this.userId = userId;
+    this._userId = userId;
 
     // Call identity linking endpoint
     this.linkIdentity(userId, email);

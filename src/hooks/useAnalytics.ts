@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
-import { initAnalytics, getAnalytics, MeolunaAnalytics } from "@/lib/analytics/MeolunaAnalytics";
+import { initAnalytics, MeolunaAnalytics } from "@/lib/analytics/MeolunaAnalytics";
 import type { MeolunaEventType } from "@/lib/analytics/types";
 
 /**
