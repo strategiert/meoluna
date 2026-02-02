@@ -5,6 +5,7 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
+import { Doc } from '../../convex/_generated/dataModel';
 import { motion } from 'framer-motion';
 import { Search, BookOpen, Clock, Tag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -24,7 +25,7 @@ export default function Blog() {
   });
   const categories = useQuery(api.blog.getCategories);
 
-  const filteredPosts = posts?.filter(post =>
+  const filteredPosts = posts?.filter((post: Doc<"blogPosts">) =>
     post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     post.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -87,7 +88,7 @@ export default function Blog() {
             >
               Alle
             </Button>
-            {categories?.map((cat) => (
+            {categories?.map((cat: { name: string; count: number }) => (
               <Button
                 key={cat.name}
                 variant={selectedCategory === cat.name ? "default" : "outline"}
@@ -125,7 +126,7 @@ export default function Blog() {
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredPosts?.map((post, index) => (
+            {filteredPosts?.map((post: Doc<"blogPosts">, index: number) => (
               <motion.div
                 key={post._id}
                 initial={{ opacity: 0, y: 20 }}
@@ -158,7 +159,7 @@ export default function Blog() {
                     </CardHeader>
                     <CardContent>
                       <div className="flex flex-wrap gap-1">
-                        {post.tags.slice(0, 3).map((tag) => (
+                        {post.tags.slice(0, 3).map((tag: string) => (
                           <Badge key={tag} variant="outline" className="text-xs">
                             <Tag className="w-2 h-2 mr-1" />
                             {tag}

@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
+import { Doc } from '../../convex/_generated/dataModel';
 import { motion } from 'framer-motion';
 import {
   Plus,
@@ -500,7 +501,7 @@ export default function TeacherDashboard() {
             </motion.div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {classrooms.map((classroom) => (
+              {classrooms.map((classroom: Doc<"classrooms">) => (
                 <ClassroomCard
                   key={classroom._id}
                   classroom={classroom as any}

@@ -6,6 +6,7 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
+import { Doc } from '../../convex/_generated/dataModel';
 import { motion } from 'framer-motion';
 import {
   Plus,
@@ -55,7 +56,7 @@ export default function Dashboard() {
   // Filter worlds based on search and filter
   const filteredWorlds = useMemo(() => {
     if (!worlds) return [];
-    return worlds.filter((world) => {
+    return worlds.filter((world: Doc<"worlds">) => {
       const matchesSearch = world.title.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesFilter = filterPublic === null || world.isPublic === filterPublic;
       return matchesSearch && matchesFilter;
@@ -243,7 +244,7 @@ export default function Dashboard() {
             )
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredWorlds.map((world, index) => (
+              {filteredWorlds.map((world: Doc<"worlds">, index: number) => (
                 <motion.div
                   key={world._id}
                   initial={{ opacity: 0, y: 20 }}

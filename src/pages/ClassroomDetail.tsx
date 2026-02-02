@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
-import { Id } from '../../convex/_generated/dataModel';
+import { Id, Doc } from '../../convex/_generated/dataModel';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft,
@@ -147,8 +147,8 @@ function AssignWorldDialog({
 
   // Kombiniere eigene und öffentliche Welten, filtere bereits zugewiesene
   const availableWorlds = [
-    ...(worlds || []).filter(w => !existingWorldIds.includes(w._id)),
-    ...(publicWorlds || []).filter(w =>
+    ...(worlds || []).filter((w: Doc<"worlds">) => !existingWorldIds.includes(w._id)),
+    ...(publicWorlds || []).filter((w: Doc<"worlds">) =>
       !existingWorldIds.includes(w._id) &&
       w.userId !== userId
     ),
@@ -344,7 +344,7 @@ export default function ClassroomDetail() {
     );
   }
 
-  const existingWorldIds = classroom.assignments?.map(a => a.worldId) || [];
+  const existingWorldIds = classroom.assignments?.map((a: any) => a.worldId) || [];
 
   return (
     <div className="min-h-screen bg-background relative">
@@ -458,7 +458,7 @@ export default function ClassroomDetail() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {members.map((member) => (
+                      {members.map((member: any) => (
                         <TableRow key={member._id}>
                           <TableCell className="font-medium">
                             {member.userId.slice(0, 8)}...
@@ -535,7 +535,7 @@ export default function ClassroomDetail() {
               <CardContent>
                 {classroom.assignments && classroom.assignments.length > 0 ? (
                   <div className="space-y-4">
-                    {classroom.assignments.map((assignment) => (
+                    {classroom.assignments.map((assignment: any) => (
                       <div
                         key={assignment._id}
                         className="flex items-center justify-between p-4 rounded-lg border border-border/50 bg-card/30"

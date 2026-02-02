@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { Doc } from "../../convex/_generated/dataModel";
 import { motion } from "framer-motion";
 import { Search, Filter, Sparkles, TrendingUp, Clock, Star, Eye, Heart } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -67,12 +68,12 @@ export default function Explore() {
 
   // Filter and sort worlds
   const filteredWorlds = worlds
-    ?.filter((world) => {
+    ?.filter((world: Doc<"worlds">) => {
       const matchesSearch = world.title.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesSubject = selectedSubject === "all" || world.subject === selectedSubject;
       return matchesSearch && matchesSubject;
     })
-    .sort((a, b) => {
+    .sort((a: Doc<"worlds">, b: Doc<"worlds">) => {
       switch (sortBy) {
         case "popular":
           return (b.views || 0) - (a.views || 0);
@@ -204,7 +205,7 @@ export default function Explore() {
             transition={{ delay: 0.2 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
-            {filteredWorlds?.map((world, index) => {
+            {filteredWorlds?.map((world: Doc<"worlds">, index: number) => {
               const subjectColor = subjectColors[world.subject || "allgemein"] || subjectColors.allgemein;
 
               return (

@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query, action, internalMutation } from "./_generated/server";
 import { api, internal } from "./_generated/api";
-import { Id } from "./_generated/dataModel";
+import type { Id } from "./_generated/dataModel";
 
 // ============================================================================
 // QUERIES
@@ -156,10 +156,20 @@ export const updateWorldCode = internalMutation({
   },
 });
 
+// Types for upgrade results
+type UpgradeResult = {
+  success: boolean;
+  skipped: boolean;
+  reason?: string;
+  hasMeolunaCall?: boolean;
+  originalLength?: number;
+  upgradedLength?: number;
+};
+
 // Action: Upgrade a single world
 export const upgradeWorld = action({
   args: { worldId: v.id("worlds") },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<UpgradeResult> => {
     // 1. Get the world
     const world = await ctx.runQuery(api.worlds.get, { id: args.worldId });
     
@@ -209,26 +219,37 @@ export const upgradeWorld = action({
   },
 });
 
+// Types for migration
+type MigrationResultItem = {
+  worldId: string;
+  title: string;
+  success: boolean;
+  skipped?: boolean;
+  error?: string;
+};
+
+type MigrationResult = {
+  totalNeedingUpgrade: number;
+  processed: number;
+  dryRun: boolean;
+  results: MigrationResultItem[];
+};
+
 // Action: Batch upgrade all worlds (with rate limiting)
 export const migrateAllWorlds = action({
   args: { 
     dryRun: v.optional(v.boolean()),
     limit: v.optional(v.number()),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<MigrationResult> => {
     const dryRun = args.dryRun ?? true;
     const limit = args.limit ?? 10;
     
     // Get worlds needing upgrade
-    const worldsToUpgrade = await ctx.runQuery(api.worlds.listNeedingUpgrade, {});
+    const worldsToUpgrade: Array<{id: Id<"worlds">; title: string; userId: string | undefined; codeLength: number}> = 
+      await ctx.runQuery(api.worlds.listNeedingUpgrade, {});
     
-    const results: Array<{
-      worldId: string;
-      title: string;
-      success: boolean;
-      skipped?: boolean;
-      error?: string;
-    }> = [];
+    const results: MigrationResultItem[] = [];
     
     // Process up to limit worlds
     const toProcess = worldsToUpgrade.slice(0, limit);
@@ -236,7 +257,7 @@ export const migrateAllWorlds = action({
     for (const world of toProcess) {
       if (dryRun) {
         results.push({
-          worldId: world.id,
+          worldId: world.id as string,
           title: world.title,
           success: true,
           skipped: true,
@@ -248,19 +269,49 @@ export const migrateAllWorlds = action({
         // Add delay between API calls to avoid rate limiting
         await new Promise(resolve => setTimeout(resolve, 2000));
         
-        const result = await ctx.runAction(api.worlds.upgradeWorld, {
+        // Get full world data
+        const fullWorld = await ctx.runQuery(api.worlds.get, { id: world.id });
+        
+        if (!fullWorld?.code) {
+          results.push({
+            worldId: world.id as string,
+            title: world.title,
+            success: false,
+            error: "No code found",
+          });
+          continue;
+        }
+        
+        // Upgrade code via Claude
+        const upgradeResult = await ctx.runAction(api.generate.upgradeWorldCode, {
+          code: fullWorld.code,
+        });
+        
+        if (!upgradeResult.upgradedCode) {
+          results.push({
+            worldId: world.id as string,
+            title: world.title,
+            success: false,
+            error: "Upgrade failed - no code returned",
+          });
+          continue;
+        }
+        
+        // Save upgraded code
+        await ctx.runMutation(internal.worlds.updateWorldCode, {
           worldId: world.id,
+          newCode: upgradeResult.upgradedCode,
         });
         
         results.push({
-          worldId: world.id,
+          worldId: world.id as string,
           title: world.title,
-          success: result.success,
-          skipped: result.skipped,
+          success: true,
+          skipped: false,
         });
       } catch (error) {
         results.push({
-          worldId: world.id,
+          worldId: world.id as string,
           title: world.title,
           success: false,
           error: error instanceof Error ? error.message : "Unknown error",

@@ -168,7 +168,7 @@ export default function BlogPost() {
           transition={{ delay: 0.3 }}
           className="flex flex-wrap gap-2 mb-12"
         >
-          {post.tags.map((tag) => (
+          {post.tags.map((tag: string) => (
             <Badge key={tag} variant="outline">
               <Tag className="w-3 h-3 mr-1" />
               {tag}
