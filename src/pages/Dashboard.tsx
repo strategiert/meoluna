@@ -4,9 +4,9 @@
  */
 
 import { Link } from 'react-router-dom';
-import { useQuery } from 'convex/react';
+import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
-import { Doc } from '../../convex/_generated/dataModel';
+import { Doc, Id } from '../../convex/_generated/dataModel';
 import { motion } from 'framer-motion';
 import {
   Plus,
@@ -50,8 +50,16 @@ function getGreeting(): string {
 export default function Dashboard() {
   const { user, isLoaded } = useUser();
   const worlds = useQuery(api.worlds.listByUser, user?.id ? { userId: user.id } : 'skip');
+  const togglePublic = useMutation(api.worlds.togglePublic);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterPublic, setFilterPublic] = useState<boolean | null>(null);
+
+  // Toggle public/private
+  const handleTogglePublic = async (worldId: Id<"worlds">, e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent card click
+    e.stopPropagation();
+    await togglePublic({ id: worldId });
+  };
 
   // Filter worlds based on search and filter
   const filteredWorlds = useMemo(() => {
@@ -271,7 +279,8 @@ export default function Dashboard() {
                         </div>
                         <Badge
                           variant={world.isPublic ? 'default' : 'secondary'}
-                          className={world.isPublic ? 'bg-aurora/20 text-aurora border-aurora/30' : ''}
+                          className={`cursor-pointer hover:opacity-80 transition-opacity ${world.isPublic ? 'bg-aurora/20 text-aurora border-aurora/30' : ''}`}
+                          onClick={(e) => handleTogglePublic(world._id, e)}
                         >
                           {world.isPublic ? (
                             <><Globe className="w-3 h-3 mr-1" /> Öffentlich</>

@@ -106,7 +106,7 @@ export const incrementViews = mutation({
   },
 });
 
-// Toggle like
+// Toggle like (simple increment for now)
 export const toggleLike = mutation({
   args: { id: v.id("worlds") },
   handler: async (ctx, args) => {
@@ -114,6 +114,21 @@ export const toggleLike = mutation({
     if (world) {
       await ctx.db.patch(args.id, { likes: (world.likes || 0) + 1 });
     }
+    return { likes: (world?.likes || 0) + 1 };
+  },
+});
+
+// Toggle public/private
+export const togglePublic = mutation({
+  args: { id: v.id("worlds") },
+  handler: async (ctx, args) => {
+    const world = await ctx.db.get(args.id);
+    if (world) {
+      const newValue = !world.isPublic;
+      await ctx.db.patch(args.id, { isPublic: newValue });
+      return { isPublic: newValue };
+    }
+    return { isPublic: false };
   },
 });
 

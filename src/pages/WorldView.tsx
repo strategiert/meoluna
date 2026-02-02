@@ -6,7 +6,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Id } from '../../convex/_generated/dataModel';
-import { Moon, ArrowLeft, Share2, Heart, Star } from 'lucide-react';
+import { Moon, ArrowLeft, Share2, Heart, Star, Check } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -45,8 +45,26 @@ export default function WorldView() {
   const reportScore = useMutation(api.progress.reportScore);
   const addXP = useMutation(api.progress.addXP);
   const completeWorldMutation = useMutation(api.progress.completeWorld);
+  const toggleLike = useMutation(api.worlds.toggleLike);
+  
   const [currentCode, setCurrentCode] = useState<string | null>(null);
   const [isFixing, setIsFixing] = useState(false);
+  const [liked, setLiked] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  // Like handler
+  const handleLike = async () => {
+    if (!worldId || liked) return;
+    setLiked(true);
+    await toggleLike({ id: worldId as Id<"worlds"> });
+  };
+
+  // Share handler
+  const handleShare = async () => {
+    await navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const [showXPPopup, setShowXPPopup] = useState(false);
   const [earnedXP, setEarnedXP] = useState(0);
@@ -250,11 +268,21 @@ export default function WorldView() {
                 <span>{progress.worldScore ?? progress.xp} Punkte</span>
               </div>
             )}
-            <Button variant="ghost" size="icon">
-              <Heart className="w-5 h-5" />
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={handleLike}
+              className={liked ? "text-red-500" : ""}
+            >
+              <Heart className={`w-5 h-5 ${liked ? "fill-current" : ""}`} />
             </Button>
-            <Button variant="ghost" size="icon">
-              <Share2 className="w-5 h-5" />
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={handleShare}
+              className={copied ? "text-green-500" : ""}
+            >
+              {copied ? <Check className="w-5 h-5" /> : <Share2 className="w-5 h-5" />}
             </Button>
           </div>
         </div>
