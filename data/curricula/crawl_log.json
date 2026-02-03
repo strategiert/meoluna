@@ -1,0 +1,3874 @@
+{
+  "crawled": {
+    "f953a4e92401": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GS",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:06:21.867082",
+      "status": 200
+    },
+    "d8121627c0d6": {
+      "url": "https://www.bildungsplaene-bw.de/site/bildungsplan-rebrush2024/sitemap/2128165/Lde/inhaltsuebersicht.html",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:06:22.828282",
+      "status": 200
+    },
+    "7409deaf6296": {
+      "url": "https://www.bildungsplaene-bw.de/site/bildungsplan-rebrush2024/sitemap/2128165/Lde/inhaltsuebersicht.html#content",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:06:23.811187",
+      "status": 200
+    },
+    "c1bf3502582d": {
+      "url": "https://www.bildungsplaene-bw.de/site/bildungsplan-rebrush2024/sitemap/2128165/Lde/inhaltsuebersicht.html#",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:06:25.249960",
+      "status": 200
+    },
+    "2c616cd62cb6": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/25862912",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:06:28.695803",
+      "status": 200
+    },
+    "45f9bd5a6d43": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/25862921",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:06:29.632916",
+      "status": 200
+    },
+    "0872410371df": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/25862930",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:06:30.614296",
+      "status": 200
+    },
+    "ce6ec64723bd": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/25862939",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:06:31.558873",
+      "status": 200
+    },
+    "7135229368f8": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/25863633",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:06:34.099800",
+      "status": 200
+    },
+    "a3f899e5707d": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/25863653",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:06:35.072829",
+      "status": 200
+    },
+    "f44143f278ee": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/25862055",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:06:36.518978",
+      "status": 200
+    },
+    "f8e400d4013f": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/25862076",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:06:37.432822",
+      "status": 200
+    },
+    "3341c70d8548": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/25862101",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:06:38.363997",
+      "status": 200
+    },
+    "1a8a3975bed8": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/25862111",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:06:39.197676",
+      "status": 200
+    },
+    "e962786f6ad1": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/25862121",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:06:40.093385",
+      "status": 200
+    },
+    "5c3de912d280": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/25862142",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:06:41.082987",
+      "status": 200
+    },
+    "a2aa28d2dfe7": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/25862255",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:06:43.072086",
+      "status": 200
+    },
+    "6c9ccd228294": {
+      "url": "https://www.bildungsplaene-bw.de/auth/index.html?method=layoutAuthentication&secure=true&url=%2Fsite%2Fbildungsplan-rebrush2024%2Fsitemap%2F2128165%2FLde%2Finhaltsuebersicht.html&locale=de",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:06:45.458392",
+      "status": 200
+    },
+    "403a729a3d02": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GS#",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:06:46.412092",
+      "status": 200
+    },
+    "abb4d1a67b6e": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GS_BSS",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:06:48.900603",
+      "status": 200
+    },
+    "13f4bb022baf": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GS_D",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:06:49.876147",
+      "status": 200
+    },
+    "44cdcfe07ecf": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GS_D.V2",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:06:50.766992",
+      "status": 200
+    },
+    "9acbf1f64e9f": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GS_KUW",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:06:51.753433",
+      "status": 200
+    },
+    "90c5c198fbd5": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_SEK1",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:06:56.734446",
+      "status": 200
+    },
+    "62a241b599f0": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_SEK1#",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:06:58.121946",
+      "status": 200
+    },
+    "15a5153bb7b2": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_SEK1_AES",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:00.478617",
+      "status": 200
+    },
+    "cb111b71a945": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_SEK1_BK",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:01.425939",
+      "status": 200
+    },
+    "943dddf6b5b6": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_SEK1_BKPROFIL",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:02.445743",
+      "status": 200
+    },
+    "110ae57d2ff2": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_SEK1_D",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:03.389813",
+      "status": 200
+    },
+    "471f1b217da4": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_SEK1_D.V2",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:04.324683",
+      "status": 200
+    },
+    "2e21bb1de201": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_SEK1_E2",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:05.280568",
+      "status": 200
+    },
+    "b5e7e736dbff": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/23967685",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:06.254750",
+      "status": 200
+    },
+    "ac8bd6581a42": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_SEK1_ETH",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:07.214392",
+      "status": 200
+    },
+    "9e91fd36ca36": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_SEK1_F2",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:08.332805",
+      "status": 200
+    },
+    "6ff5be8b0fe7": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_SEK1_INFWF",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:09.802000",
+      "status": 200
+    },
+    "a155eba679a2": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_SEK1_IMP",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:10.902438",
+      "status": 200
+    },
+    "dee11f9b0d69": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_SEK1_MUSPROFIL",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:11.926903",
+      "status": 200
+    },
+    "01c6ada7b43b": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_SEK1_NWTPROFIL",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:12.922546",
+      "status": 200
+    },
+    "75b3d182cc2f": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_SEK1_SPA3PROFIL",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:13.933634",
+      "status": 200
+    },
+    "42f2a22f5034": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_SEK1_SPO",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:14.907181",
+      "status": 200
+    },
+    "ac633251d23a": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_SEK1_SPOPROFIL",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:15.896391",
+      "status": 200
+    },
+    "d2279188d09c": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_SEK1_SPOELITE",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:16.825206",
+      "status": 200
+    },
+    "2bd9ac6cce2c": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_SEK1_T",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:17.719369",
+      "status": 200
+    },
+    "0ddc2c6c989c": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:30.114585",
+      "status": 200
+    },
+    "765773a3ffea": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM#",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:31.520899",
+      "status": 200
+    },
+    "c37312640cef": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_ASTRO",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:33.922011",
+      "status": 200
+    },
+    "b4aa7059d60c": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_BK",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:34.860711",
+      "status": 200
+    },
+    "39e7737a33c7": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_BKPROFIL",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:35.818168",
+      "status": 200
+    },
+    "89ca4d94fdff": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_CHIN4",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:36.782480",
+      "status": 200
+    },
+    "584b5bd33c69": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_DG",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:37.780310",
+      "status": 200
+    },
+    "18537956da61": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_D",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:38.757799",
+      "status": 200
+    },
+    "bed842e3866f": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_D.V2",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:39.705174",
+      "status": 200
+    },
+    "d3f3f127b98c": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_DMW",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:40.866455",
+      "status": 200
+    },
+    "3d6d6126ef50": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_ETH",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:41.775930",
+      "status": 200
+    },
+    "ab9f4037860c": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_F3",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:43.257377",
+      "status": 200
+    },
+    "714fa540610a": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_F4",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:44.645702",
+      "status": 200
+    },
+    "106e62f760ad": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_GEOL",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:46.187660",
+      "status": 200
+    },
+    "e43f810d9087": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_GR3",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:47.147505",
+      "status": 200
+    },
+    "3da0b40dd735": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_GR4",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:48.143640",
+      "status": 200
+    },
+    "1db616443981": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_HEBR4",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:49.047376",
+      "status": 200
+    },
+    "069e03d71343": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_IMP",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:50.045942",
+      "status": 200
+    },
+    "7a0a3f7825d9": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_INFWFO",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:50.994234",
+      "status": 200
+    },
+    "9643823f934b": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_ITAL3",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:51.884709",
+      "status": 200
+    },
+    "c7edaeaa75d9": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_ITAL4",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:52.949549",
+      "status": 200
+    },
+    "345e1c231b14": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_JAP4",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:53.931905",
+      "status": 200
+    },
+    "2393636c8e4a": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_L3",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:54.943446",
+      "status": 200
+    },
+    "2237dab5206c": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_L4",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:55.913707",
+      "status": 200
+    },
+    "c40ba8895e81": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_LIT",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:56.866440",
+      "status": 200
+    },
+    "9ca3aedfc6c8": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_MUSPROFIL",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:57.820697",
+      "status": 200
+    },
+    "145cd21909e2": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_NWT",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:58.728556",
+      "status": 200
+    },
+    "e94380c11d42": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/5729913",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:07:59.602591",
+      "status": 200
+    },
+    "42a671a98b66": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/5729921",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:08:00.522306",
+      "status": 200
+    },
+    "efe7e110fcbf": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_PHIL",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:08:01.387134",
+      "status": 200
+    },
+    "f48db294ae27": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_PORT3",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:08:02.319819",
+      "status": 200
+    },
+    "dd620f1d9992": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_PORT4",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:08:03.260302",
+      "status": 200
+    },
+    "1c41293d63f4": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_PSY",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:08:04.274027",
+      "status": 200
+    },
+    "b71f9ae868a4": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_RU3",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:08:05.217696",
+      "status": 200
+    },
+    "e8dbfb19327b": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_RU4",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:08:06.246222",
+      "status": 200
+    },
+    "5356b21085f7": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_SPA3",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:08:07.163936",
+      "status": 200
+    },
+    "8bf2433148b7": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_SPA4",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:08:08.113420",
+      "status": 200
+    },
+    "a6b4878bb007": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_SPO",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:08:09.073623",
+      "status": 200
+    },
+    "4b2fffdcc034": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_SPOPROFIL",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:08:10.048549",
+      "status": 200
+    },
+    "6954b42245da": {
+      "url": "https://www.bildungsplaene-bw.de/,Lde/BP2016BW_ALLG_GYM_TUERK4",
+      "land": "baden-wuerttemberg",
+      "time": "2026-02-01T21:08:11.091605",
+      "status": 200
+    },
+    "a37b53e33635": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule",
+      "land": "bayern",
+      "time": "2026-02-01T21:08:44.748034",
+      "status": 200
+    },
+    "a59cf2d5dbed": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule#header_zeile_2",
+      "land": "bayern",
+      "time": "2026-02-01T21:08:45.790315",
+      "status": 200
+    },
+    "df7d699055f6": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule#navi_left",
+      "land": "bayern",
+      "time": "2026-02-01T21:08:49.019182",
+      "status": 200
+    },
+    "0c8eba039a16": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule#content",
+      "land": "bayern",
+      "time": "2026-02-01T21:08:53.581859",
+      "status": 200
+    },
+    "4f14d7efb577": {
+      "url": "https://www.lehrplanplus.bayern.de/",
+      "land": "bayern",
+      "time": "2026-02-01T21:08:55.584587",
+      "status": 200
+    },
+    "18b8472018d5": {
+      "url": "https://www.lehrplanplus.bayern.de/seite/hilfe",
+      "land": "bayern",
+      "time": "2026-02-01T21:08:56.891666",
+      "status": 200
+    },
+    "4c2fb8137e01": {
+      "url": "https://www.lehrplanplus.bayern.de/seite/kontakt",
+      "land": "bayern",
+      "time": "2026-02-01T21:08:58.530947",
+      "status": 200
+    },
+    "db21d2f1b2da": {
+      "url": "https://www.lehrplanplus.bayern.de/suche/lehrplan",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:01.380812",
+      "status": 200
+    },
+    "fdc10f4ff1ea": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule#",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:02.543665",
+      "status": 200
+    },
+    "f6d3593f5c59": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule/fach/deutsch",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:04.070491",
+      "status": 200
+    },
+    "f765d2299536": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule/fach/daz",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:05.250772",
+      "status": 200
+    },
+    "7f499f71a972": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule/fach/englisch",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:06.322807",
+      "status": 200
+    },
+    "336f79e50249": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule/fach/ethik",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:07.412552",
+      "status": 200
+    },
+    "b9ffa0b1eb9e": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule/fach/evangelische-religionslehre",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:08.492772",
+      "status": 200
+    },
+    "433686b1aec2": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule/fach/hsu",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:09.676830",
+      "status": 200
+    },
+    "5731b31b0278": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule/fach/iu",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:10.782979",
+      "status": 200
+    },
+    "6cd551db7c0d": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule/fach/ir",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:11.937050",
+      "status": 200
+    },
+    "828e823c6a4b": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule/fach/katholische-religionslehre",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:13.045062",
+      "status": 200
+    },
+    "0dbeb0004550": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule/fach/kunst",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:14.180485",
+      "status": 200
+    },
+    "36b5606f885f": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule/fach/mathematik",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:15.308369",
+      "status": 200
+    },
+    "a3a7dbdd37fb": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule/fach/musik",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:16.483289",
+      "status": 200
+    },
+    "8fed8ebc31e0": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule/fach/or",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:17.655754",
+      "status": 200
+    },
+    "3258e568fcfa": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule/fach/sport",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:18.713992",
+      "status": 200
+    },
+    "7163edebba5c": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule/fach/werken-und-gestalten",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:19.713109",
+      "status": 200
+    },
+    "669a3709485a": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule/jgs",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:20.785126",
+      "status": 200
+    },
+    "75eb8cbe4ed6": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule/jgs/2",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:21.829869",
+      "status": 200
+    },
+    "240843ddd5af": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule/jgs/3",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:22.828336",
+      "status": 200
+    },
+    "37f6ff237021": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule/jgs/4",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:23.858403",
+      "status": 200
+    },
+    "6f945986cb9d": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule/inhalt/leitlinien",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:26.250418",
+      "status": 200
+    },
+    "dad539c20aa4": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule/inhalt/bildungs-und-erziehungsauftrag",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:27.693283",
+      "status": 200
+    },
+    "867a7a967402": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule/inhalt/uebergreifende-ziele",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:29.177210",
+      "status": 200
+    },
+    "0baa34a27ca0": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule/inhalt/fachprofile",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:30.205409",
+      "status": 200
+    },
+    "9c094363641c": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule/inhalt/jahrgangsstufenprofile",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:31.219186",
+      "status": 200
+    },
+    "43a3bbfee3aa": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/grundschule/inhalt/fachlehrplaene",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:32.213390",
+      "status": 200
+    },
+    "12cb04f6e554": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/mittelschule",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:33.305413",
+      "status": 200
+    },
+    "4bb8fb644daf": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/foerderschule",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:34.284875",
+      "status": 200
+    },
+    "59f1374ee613": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/realschule",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:35.330346",
+      "status": 200
+    },
+    "a71813c489d8": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/gymnasium",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:36.377265",
+      "status": 200
+    },
+    "195746cdb668": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/wirtschaftsschule",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:37.358037",
+      "status": 200
+    },
+    "4aebe5603a81": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/fos",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:38.365951",
+      "status": 200
+    },
+    "1e4fb73be5ed": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/bos",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:39.331239",
+      "status": 200
+    },
+    "679617103a73": {
+      "url": "https://www.lehrplanplus.bayern.de/schulart/weitere_schularten",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:40.356375",
+      "status": 200
+    },
+    "90f499915e9a": {
+      "url": "https://www.lehrplanplus.bayern.de/newsletter",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:41.735657",
+      "status": 200
+    },
+    "b0826ad2e65c": {
+      "url": "https://www.lehrplanplus.bayern.de/vergleich?schulart=grundschule",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:46.089237",
+      "status": 200
+    },
+    "79d1269a39d1": {
+      "url": "https://www.lehrplanplus.bayern.de/seite/impressum",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:47.124496",
+      "status": 200
+    },
+    "5739c8033eef": {
+      "url": "https://www.lehrplanplus.bayern.de/seite/datenschutz",
+      "land": "bayern",
+      "time": "2026-02-01T21:09:48.255382",
+      "status": 200
+    },
+    "024e8c8b2e26": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/rahmenlehrplaene/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:25.161403",
+      "status": 200
+    },
+    "faf03033d681": {
+      "url": "https://www.berlin.de/sen/bildung/leichte-sprache/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:26.264186",
+      "status": 200
+    },
+    "26667109dd56": {
+      "url": "https://www.berlin.de/sen/bildung/gebaerdensprache/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:27.964178",
+      "status": 200
+    },
+    "4dbaedc63282": {
+      "url": "https://www.berlin.de/sen/bildung/barrierefreiheitserklaerung.1557695.php#contactbfelb",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:29.143158",
+      "status": 200
+    },
+    "cb81ae60a988": {
+      "url": "https://www.berlin.de/sen/bildung/schule/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:30.034553",
+      "status": 200
+    },
+    "62816c307124": {
+      "url": "https://www.berlin.de/sen/bildung/schule/berliner-schulen/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:31.021190",
+      "status": 200
+    },
+    "031797907340": {
+      "url": "https://www.berlin.de/sen/bildung/schule/berliner-schulen/schulwechsel-nach-berlin/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:31.983076",
+      "status": 200
+    },
+    "813f72342508": {
+      "url": "https://www.berlin.de/sen/bildung/schule/berliner-schulen/schulen-in-freier-traegerschaft/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:33.168745",
+      "status": 200
+    },
+    "afd0c2289d99": {
+      "url": "https://www.berlin.de/sen/bildung/schule/bildungswege/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:34.055302",
+      "status": 200
+    },
+    "8537e4028002": {
+      "url": "https://www.berlin.de/sen/bildung/schule/bildungswege/berliner-schulsystem/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:34.964218",
+      "status": 200
+    },
+    "ae874d93cbaa": {
+      "url": "https://www.berlin.de/sen/bildung/schule/bildungswege/fruehkindliche-bildung/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:35.864614",
+      "status": 200
+    },
+    "be0687b9d504": {
+      "url": "https://www.berlin.de/sen/bildung/schule/bildungswege/fruehkindliche-bildung/sprachfoerderung/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:36.864010",
+      "status": 200
+    },
+    "3fdf4c2d2511": {
+      "url": "https://www.berlin.de/sen/bildung/schule/bildungswege/fruehkindliche-bildung/sprachfoerderung/bezirke/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:38.222219",
+      "status": 200
+    },
+    "1eaee48b61a7": {
+      "url": "https://www.berlin.de/sen/bildung/schule/bildungswege/grundschule/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:39.210013",
+      "status": 200
+    },
+    "a40c794a9b28": {
+      "url": "https://www.berlin.de/sen/bildung/schule/bildungswege/grundschule/anmeldung/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:40.150048",
+      "status": 200
+    },
+    "81899c64fb6a": {
+      "url": "https://www.berlin.de/sen/bildung/schule/bildungswege/uebergang-weiterfuehrende-schule/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:40.987047",
+      "status": 200
+    },
+    "f66268c74f42": {
+      "url": "https://www.berlin.de/sen/bildung/schule/bildungswege/uebergang-weiterfuehrende-schule/wechsel-zur-5-klasse/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:41.954953",
+      "status": 200
+    },
+    "acc0de7d4e55": {
+      "url": "https://www.berlin.de/sen/bildung/schule/bildungswege/uebergang-weiterfuehrende-schule/wechsel-zur-7-klasse/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:42.875422",
+      "status": 200
+    },
+    "812a16bcc447": {
+      "url": "https://www.berlin.de/sen/bildung/schule/bildungswege/uebergang-weiterfuehrende-schule/probeunterricht/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:43.810393",
+      "status": 200
+    },
+    "09a5700e65d8": {
+      "url": "https://www.berlin.de/sen/bildung/schule/bildungswege/uebergang-weiterfuehrende-schule/lernausgangslage/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:44.906350",
+      "status": 200
+    },
+    "20952ed5b490": {
+      "url": "https://www.berlin.de/sen/bildung/schule/bildungswege/integrierte-sekundarschule/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:45.821896",
+      "status": 200
+    },
+    "86ca006a416d": {
+      "url": "https://www.berlin.de/sen/bildung/schule/bildungswege/integrierte-sekundarschule/fachinfo/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:46.711787",
+      "status": 200
+    },
+    "94d9d717b34d": {
+      "url": "https://www.berlin.de/sen/bildung/schule/bildungswege/gemeinschaftsschule/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:47.663957",
+      "status": 200
+    },
+    "274df563d589": {
+      "url": "https://www.berlin.de/sen/bildung/schule/bildungswege/gymnasium/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:48.543815",
+      "status": 200
+    },
+    "72a87d4775f9": {
+      "url": "https://www.berlin.de/sen/bildung/schule/bildungswege/foerderschule/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:49.387869",
+      "status": 200
+    },
+    "565026917de9": {
+      "url": "https://www.berlin.de/sen/bildung/schule/bildungswege/11-pflichtschuljahr/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:50.275702",
+      "status": 200
+    },
+    "59634c667321": {
+      "url": "https://www.berlin.de/sen/bildung/schule/bildungswege/nach-der-schule/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:52.564124",
+      "status": 200
+    },
+    "f5277e3192e0": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:53.574625",
+      "status": 200
+    },
+    "8d57922c2b0c": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:54.551538",
+      "status": 200
+    },
+    "30fbc7b73f8e": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abschluesse-an-der-iss-nach-klasse-9-und-10/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:55.507893",
+      "status": 200
+    },
+    "0dd31ce3fa53": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abschluesse-am-gymnasium-nach-klasse-9-und-10/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:56.473013",
+      "status": 200
+    },
+    "8769275ef7b2": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abschluesse-am-gymnasium-nach-klasse-9-und-10/faq-mpa/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:57.439334",
+      "status": 200
+    },
+    "e94098c4012a": {
+      "url": "https://www.berlin.de/sen/bildung/schule/besondere-schulangebote/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:58.662880",
+      "status": 200
+    },
+    "5aed8358c678": {
+      "url": "https://www.berlin.de/sen/bildung/schule/besondere-schulangebote/staatliche-europaschule/",
+      "land": "berlin",
+      "time": "2026-02-01T21:10:59.677065",
+      "status": 200
+    },
+    "16f64745e168": {
+      "url": "https://www.berlin.de/sen/bildung/schule/besondere-schulangebote/bilinguale-bildung/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:00.694261",
+      "status": 200
+    },
+    "82fc711681be": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/sprachen/#hsu",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:01.659765",
+      "status": 200
+    },
+    "e61df381591c": {
+      "url": "https://www.berlin.de/sen/bildung/schule/besondere-schulangebote/sportbetonte-schulen/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:02.605290",
+      "status": 200
+    },
+    "74a3bbbd2934": {
+      "url": "https://www.berlin.de/sen/bildung/schule/integration/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:03.488846",
+      "status": 200
+    },
+    "9e975a4d1c08": {
+      "url": "https://www.berlin.de/sen/bildung/schule/inklusion/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:04.434732",
+      "status": 200
+    },
+    "8619044f07b3": {
+      "url": "https://www.berlin.de/sen/bildung/schule/inklusion/inklusion-kompakt/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:05.706545",
+      "status": 200
+    },
+    "290477702daa": {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:06.794136",
+      "status": 200
+    },
+    "d3a46712f508": {
+      "url": "https://www.berlin.de/sen/bildung/schule/inklusion/schwerpunktschulen/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:07.642509",
+      "status": 200
+    },
+    "f6935b3cc5db": {
+      "url": "https://www.berlin.de/sen/bildung/schule/inklusion/schulische-inklusionsassistenz/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:09.028523",
+      "status": 200
+    },
+    "e6bc4b5b3b6e": {
+      "url": "https://www.berlin.de/sen/bildung/schule/inklusion/beispiele-und-erfahrungen/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:10.198905",
+      "status": 200
+    },
+    "f1709b2d71ee": {
+      "url": "https://www.berlin.de/sen/bildung/schule/inklusion/fachbeirat-inklusion/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:11.875123",
+      "status": 200
+    },
+    "a671e13261a2": {
+      "url": "https://www.berlin.de/sen/bildung/schule/inklusion/fachinfo/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:13.419136",
+      "status": 200
+    },
+    "46202a9eed97": {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/begabungsfoerderung/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:14.939100",
+      "status": 200
+    },
+    "1e4af8f863ff": {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/begabungsfoerderung/angebote-von-kitas-schulen-universitaeten/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:16.760845",
+      "status": 200
+    },
+    "3850cb62a3cf": {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/begabungsfoerderung/begaschule/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:18.651594",
+      "status": 200
+    },
+    "f598b3dc50c1": {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/begabungsfoerderung/schnelllerner/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:19.551487",
+      "status": 200
+    },
+    "15691929e4fc": {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/begabungsfoerderung/mathematisch-naturwissenschaftliches-profil/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:20.582196",
+      "status": 200
+    },
+    "58e4340b4213": {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/begabungsfoerderung/regionale-begabtengruppen/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:22.030365",
+      "status": 200
+    },
+    "d9d4af36c323": {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/begabungsfoerderung/sommercamps-und-akademien/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:23.288515",
+      "status": 200
+    },
+    "e21ec9e9edb4": {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/begabungsfoerderung/stiftungen-vereine-institutionen/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:24.307632",
+      "status": 200
+    },
+    "9d19f98adc1f": {
+      "url": "https://www.berlin.de/sen/bildung/schule/ganztaegiges-lernen/ganztagsschulen/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:35.271418",
+      "status": 200
+    },
+    "897cd3223dcb": {
+      "url": "https://www.berlin.de/sen/bildung/schule/ganztaegiges-lernen/ganztagsschulen/fachinfo/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:36.728972",
+      "status": 200
+    },
+    "05df3c1199af": {
+      "url": "https://www.berlin.de/sen/bildung/schule/ganztaegiges-lernen/ganztagsschulen/investitionsprogramm/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:38.393074",
+      "status": 200
+    },
+    "4507d0c9d1f5": {
+      "url": "https://www.berlin.de/sen/bildung/schule/gute-schule/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:39.327039",
+      "status": 200
+    },
+    "5e149c7e37ba": {
+      "url": "https://www.berlin.de/sen/bildung/schule/gute-schule/schuelerfahrten/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:40.277447",
+      "status": 200
+    },
+    "ee60a855912f": {
+      "url": "https://www.berlin.de/sen/bildung/schule/gute-schule/mitwirkung-von-schuelern-und-eltern/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:41.837372",
+      "status": 200
+    },
+    "ff99e6308943": {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:43.859188",
+      "status": 200
+    },
+    "578de99b774f": {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/digitalisierungsstrategie/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:44.855744",
+      "status": 200
+    },
+    "f9292af5e7b7": {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/digitalpakt/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:45.830313",
+      "status": 200
+    },
+    "bc09296f42d5": {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/digitalpakt/oeffentliche-schulen/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:46.993544",
+      "status": 200
+    },
+    "bbaf6d8de3ef": {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/digitalpakt/schulen-in-freier-traegerschaft/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:48.692067",
+      "status": 200
+    },
+    "2fae46907708": {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/digitalpakt/fachinfo/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:49.861535",
+      "status": 200
+    },
+    "ede387f7a12a": {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/digitale-plattformen/",
+      "land": "berlin",
+      "time": "2026-02-01T21:11:50.831043",
+      "status": 200
+    },
+    "d409c1e290d3": {
+      "url": "https://www.berlin.de/sen/bildung/schule/rechtsvorschriften/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:00.242428",
+      "status": 200
+    },
+    "120aea071c4f": {
+      "url": "https://www.berlin.de/sen/bildung/schule/rechtsvorschriften/schulformen/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:01.203789",
+      "status": 200
+    },
+    "9e143c154c55": {
+      "url": "https://www.berlin.de/sen/bildung/schule/rechtsvorschriften/verwaltungsvorschriften/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:02.166005",
+      "status": 200
+    },
+    "fa2be394d536": {
+      "url": "https://www.berlin.de/sen/bildung/schule/schulentwicklungsplanung/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:03.154489",
+      "status": 200
+    },
+    "cbcbbdecc675": {
+      "url": "https://www.berlin.de/sen/bildung/schule/bauen-und-sanieren/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:04.275330",
+      "status": 200
+    },
+    "b7b6e3d57078": {
+      "url": "https://www.berlin.de/sen/bildung/schule/bauen-und-sanieren/schulbaukarte/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:05.581452",
+      "status": 200
+    },
+    "3f39d7a8984f": {
+      "url": "https://www.berlin.de/sen/bildung/schule/bauen-und-sanieren/mensabauprogramm/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:06.780666",
+      "status": 200
+    },
+    "390ecce270d3": {
+      "url": "https://www.berlin.de/sen/bildung/schule/bildungsstatistik/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:07.685028",
+      "status": 200
+    },
+    "40193246dc56": {
+      "url": "https://www.berlin.de/sen/bildung/schule/bildungsforschung/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:08.642318",
+      "status": 200
+    },
+    "6ffc48ce532c": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:09.572095",
+      "status": 200
+    },
+    "65c8b1aba34c": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:10.480090",
+      "status": 200
+    },
+    "87080758b042": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/rahmenlehrplaene/klasse-1-10/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:11.915112",
+      "status": 200
+    },
+    "a4dd2aca43be": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/rahmenlehrplaene/oberstufe/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:12.812852",
+      "status": 200
+    },
+    "46a24915ce91": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/sprachen/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:13.787627",
+      "status": 200
+    },
+    "cfa2fa25bf02": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/ethik/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:14.698301",
+      "status": 200
+    },
+    "3561cfbf167a": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/religion-und-weltanschauung/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:15.881682",
+      "status": 200
+    },
+    "f8a119c4a5a7": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/kulturelle-bildung/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:29.124369",
+      "status": 200
+    },
+    "fd27ac1540d5": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/kulturelle-bildung/kreativpotentiale-berlin/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:30.362815",
+      "status": 200
+    },
+    "f800e7014837": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/politische-bildung/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:31.320495",
+      "status": 200
+    },
+    "d9afd8a76136": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/politische-bildung/angebote-ausserschulischer-partner/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:32.611800",
+      "status": 200
+    },
+    "6bbdc3795384": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/politische-bildung/demokratisch-handeln/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:33.671995",
+      "status": 200
+    },
+    "45781439d7bf": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/politische-bildung/interkulturelle-bildung/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:34.909909",
+      "status": 200
+    },
+    "14bae3862135": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/schulqualitaet/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:36.168422",
+      "status": 200
+    },
+    "34ae862fb6b8": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/schulqualitaet/designbasierte-schulentwicklung/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:37.292391",
+      "status": 200
+    },
+    "1d9c3e26845f": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/schulqualitaet/qualitaetsbeirat/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:38.384902",
+      "status": 200
+    },
+    "92c4e0f9989d": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/schulqualitaet/schulvertrag/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:39.549859",
+      "status": 200
+    },
+    "7be04a59b27e": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/schulqualitaet/massnahmen/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:40.925907",
+      "status": 200
+    },
+    "2c6d5ff1575e": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/kooperationen/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:42.266922",
+      "status": 200
+    },
+    "99defd53cc13": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/wettbewerbe/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:43.498829",
+      "status": 200
+    },
+    "90948c73c17d": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/wettbewerbe/politik/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:44.418966",
+      "status": 200
+    },
+    "bfbae6f28fdd": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/wettbewerbe/mint/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:45.484991",
+      "status": 200
+    },
+    "16774509d6a7": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/wettbewerbe/sprachen/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:46.362109",
+      "status": 200
+    },
+    "1b9168580eb0": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/wettbewerbe/kreativ/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:47.461918",
+      "status": 200
+    },
+    "616f6482ab78": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/wettbewerbe/multimedia/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:48.645666",
+      "status": 200
+    },
+    "91ec10c27568": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/wettbewerbe/schule-und-klassen/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:49.540275",
+      "status": 200
+    },
+    "859689134dbf": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/medien/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:50.767564",
+      "status": 200
+    },
+    "0ec82a2be89d": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/medien/lehr-und-lernmittel/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:51.762760",
+      "status": 200
+    },
+    "cc82e7086963": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/medien/digitales-lernen/artikel.432434.php",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:53.043943",
+      "status": 200
+    },
+    "22baa8cb4ce3": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/medien/medienforum/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:54.047078",
+      "status": 200
+    },
+    "e0a76c7c6abd": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/reisende/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:55.249941",
+      "status": 200
+    },
+    "15eca5b2657b": {
+      "url": "https://www.berlin.de/sen/bildung/schule-und-beruf/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:56.375452",
+      "status": 200
+    },
+    "9d193b262db8": {
+      "url": "https://www.berlin.de/sen/bildung/schule-und-beruf/talente-check-berlin/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:57.536973",
+      "status": 200
+    },
+    "a3a6db528a07": {
+      "url": "https://www.berlin.de/sen/bildung/schule-und-beruf/jugendberufsagentur/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:58.461890",
+      "status": 200
+    },
+    "91bde518d037": {
+      "url": "https://www.berlin.de/sen/bildung/schule-und-beruf/berufs-und-studienorientierung/",
+      "land": "berlin",
+      "time": "2026-02-01T21:12:59.750927",
+      "status": 200
+    },
+    "faf39c602598": {
+      "url": "https://www.berlin.de/sen/bildung/schule-und-beruf/berufs-und-studienorientierung/praktika/",
+      "land": "berlin",
+      "time": "2026-02-01T21:13:00.739817",
+      "status": 200
+    },
+    "282f15c657f8": {
+      "url": "https://www.berlin.de/sen/bildung/schule-und-beruf/berufliche-chancen/",
+      "land": "berlin",
+      "time": "2026-02-01T21:13:01.727131",
+      "status": 200
+    },
+    "e0dd020770d5": {
+      "url": "https://www.berlin.de/sen/bildung/unterstuetzung/beratungszentren-sibuz/berufliche-schulen-und-osz/",
+      "land": "berlin",
+      "time": "2026-02-01T21:13:02.935238",
+      "status": 200
+    },
+    "435ab888f450": {
+      "url": "https://www.berlin.de/sen/bildung/unterstuetzung/kinderschutz-an-schulen/",
+      "land": "berlin",
+      "time": "2026-02-01T21:13:03.920412",
+      "status": 200
+    },
+    "aa8355be0f36": {
+      "url": "https://www.berlin.de/sen/bildung/unterstuetzung/praevention-in-der-schule/",
+      "land": "berlin",
+      "time": "2026-02-01T21:13:05.225375",
+      "status": 200
+    },
+    "7de550dea52a": {
+      "url": "https://www.berlin.de/sen/bildung/unterstuetzung/praevention-in-der-schule/gewaltpraevention/",
+      "land": "berlin",
+      "time": "2026-02-01T21:13:06.369434",
+      "status": 200
+    },
+    "2296ac9c3c54": {
+      "url": "https://www.berlin.de/sen/bildung/unterstuetzung/praevention-in-der-schule/suchtpraevention/",
+      "land": "berlin",
+      "time": "2026-02-01T21:13:07.739817",
+      "status": 200
+    },
+    "0c7bffa70ac9": {
+      "url": "https://www.berlin.de/sen/bildung/unterstuetzung/praevention-in-der-schule/gesundheit/",
+      "land": "berlin",
+      "time": "2026-02-01T21:13:08.692529",
+      "status": 200
+    },
+    "81396aafdae8": {
+      "url": "https://www.berlin.de/sen/bildung/unterstuetzung/praevention-in-der-schule/schulverweigerung/",
+      "land": "berlin",
+      "time": "2026-02-01T21:13:09.639810",
+      "status": 200
+    },
+    "bba89006bf52": {
+      "url": "https://www.berlin.de/sen/bildung/unterstuetzung/startchancen-programm/schulen/",
+      "land": "berlin",
+      "time": "2026-02-01T21:13:11.254551",
+      "status": 200
+    },
+    "8104cf761b79": {
+      "url": "https://www.berlin.de/sen/jugend/jugend/jugendsozialarbeit/an-berliner-schulen/",
+      "land": "berlin",
+      "time": "2026-02-01T21:13:12.942650",
+      "status": 200
+    },
+    "3dee8fa0fbed": {
+      "url": "https://www.berlin.de/sen/bildung/unterstuetzung/koordinierung-schule-und-jugendhilfe/",
+      "land": "berlin",
+      "time": "2026-02-01T21:13:13.914105",
+      "status": 200
+    },
+    "d332c695ef7d": {
+      "url": "https://www.berlin.de/sen/bildung/lebenslanges-lernen/vhs/fachinfo/",
+      "land": "berlin",
+      "time": "2026-02-01T21:13:14.870693",
+      "status": 200
+    },
+    "c9df2c7d64fe": {
+      "url": "https://www.berlin.de/sen/bildung/politik/bildungspolitik/",
+      "land": "berlin",
+      "time": "2026-02-01T21:13:15.981577",
+      "status": 200
+    },
+    "1a9bf751ac3e": {
+      "url": "https://www.berlin.de/sen/bildung/leichte-sprache/#kontakt",
+      "land": "berlin",
+      "time": "2026-02-01T21:13:17.426954",
+      "status": 200
+    },
+    "b6f64e4deb93": {
+      "url": "https://www.berlin.de/sen/bildung/leichte-sprache/artikel.1555632.de-plain.php",
+      "land": "berlin",
+      "time": "2026-02-01T21:13:18.524582",
+      "status": 200
+    },
+    "622835f2b55b": {
+      "url": "https://www.berlin.de/sen/bildung/leichte-sprache/artikel.1556683.de-plain.php",
+      "land": "berlin",
+      "time": "2026-02-01T21:13:19.933933",
+      "status": 200
+    },
+    "427b6b935e25": {
+      "url": "https://www.berlin.de/sen/bildung/leichte-sprache/erklaerung-zur-barriere-freiheit/",
+      "land": "berlin",
+      "time": "2026-02-01T21:13:21.062000",
+      "status": 200
+    },
+    "e979e85e952b": {
+      "url": "https://berlin.de/sen/bjf/leichte-sprache/artikel.1438151.de-plain.php",
+      "land": "berlin",
+      "time": "2026-02-01T21:13:22.827645",
+      "status": 200
+    },
+    "479f06dc3c7a": {
+      "url": "https://www.berlin.de/sen/bildung/leichte-sprache/#top",
+      "land": "berlin",
+      "time": "2026-02-01T21:13:23.816330",
+      "status": 200
+    },
+    "87b33b5a9756": {
+      "url": "https://www.berlin.de/sen/bjf/aktuelles/social-media-834945.php",
+      "land": "berlin",
+      "time": "2026-02-01T21:13:25.927954",
+      "status": 200
+    },
+    "6d16eab1ff19": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/individuelles-lernen/",
+      "land": "berlin",
+      "time": "2026-02-01T21:13:29.926674",
+      "status": 200
+    },
+    "17db9ffd94c5": {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/sprachfoerderung/",
+      "land": "berlin",
+      "time": "2026-02-01T21:13:31.168485",
+      "status": 200
+    },
+    "fd5a739a435a": {
+      "url": "https://www.berlin.de/sen/bildung/unterstuetzung/gewalt-und-notfaelle/",
+      "land": "berlin",
+      "time": "2026-02-01T21:13:34.667868",
+      "status": 200
+    },
+    "77831fcea95e": {
+      "url": "https://www.berlin.de/sen/bildung/fachkraefte/",
+      "land": "berlin",
+      "time": "2026-02-01T21:13:36.057503",
+      "status": 200
+    },
+    "b92b37335f8a": {
+      "url": "https://www.berlin.de/rbmskzl/politik/senat/",
+      "land": "berlin",
+      "time": "2026-02-01T21:13:37.959514",
+      "status": 200
+    },
+    "065ffa7249ce": {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/begabungsfoerderung/fachinfo/",
+      "land": "berlin",
+      "time": "2026-02-01T21:14:06.432034",
+      "status": 200
+    },
+    "345514311f38": {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/sonderpaedagogische-foerderung/",
+      "land": "berlin",
+      "time": "2026-02-01T21:14:35.741419",
+      "status": 200
+    },
+    "3b72c1c25cf0": {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/sonderpaedagogische-foerderung/fachinfo/",
+      "land": "berlin",
+      "time": "2026-02-01T21:14:37.124237",
+      "status": 200
+    },
+    "ba1df7730277": {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/sprachfoerderung/fachinfo/",
+      "land": "berlin",
+      "time": "2026-02-01T21:14:38.829793",
+      "status": 200
+    },
+    "9e9c7d4b62c4": {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/lernschwierigkeiten/",
+      "land": "berlin",
+      "time": "2026-02-01T21:14:39.997428",
+      "status": 200
+    },
+    "d4b7a2cb1c45": {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/lernschwierigkeiten/rechenschwierigkeiten/",
+      "land": "berlin",
+      "time": "2026-02-01T21:14:41.215736",
+      "status": 200
+    },
+    "6a8f7311766e": {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/lernschwierigkeiten/lese-und-rechtschreibschwierigkeiten/",
+      "land": "berlin",
+      "time": "2026-02-01T21:14:42.118585",
+      "status": 200
+    },
+    "4fb11d6cab1f": {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/diagnostik/",
+      "land": "berlin",
+      "time": "2026-02-01T21:14:43.438339",
+      "status": 200
+    },
+    "eea30a377a44": {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/diagnostik/fachinfo/",
+      "land": "berlin",
+      "time": "2026-02-01T21:14:44.992252",
+      "status": 200
+    },
+    "a6cfa2bb192f": {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/emotionale-soziale-entwicklung/",
+      "land": "berlin",
+      "time": "2026-02-01T21:14:45.884288",
+      "status": 200
+    },
+    "1f343e0ee200": {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/digitale-plattformen/lusd/",
+      "land": "berlin",
+      "time": "2026-02-01T21:14:53.745219",
+      "status": 200
+    },
+    "6820e5a37ee3": {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/digitale-infrastruktur/",
+      "land": "berlin",
+      "time": "2026-02-01T21:14:54.857230",
+      "status": 200
+    },
+    "9f883adda0f0": {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/digitale-infrastruktur/breitband-und-netze/",
+      "land": "berlin",
+      "time": "2026-02-01T21:14:56.057310",
+      "status": 200
+    },
+    "1022e3ca3a5e": {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/digitale-infrastruktur/nachhaltigkeit-und-digitale-endgeraete/",
+      "land": "berlin",
+      "time": "2026-02-01T21:14:57.440022",
+      "status": 200
+    },
+    "82592ec05bf3": {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/digitale-infrastruktur/zentrale-schulverwaltungsumgebung/",
+      "land": "berlin",
+      "time": "2026-02-01T21:14:58.632365",
+      "status": 200
+    },
+    "f0816e4c4ebb": {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/landesbeirat-digitalisierung/",
+      "land": "berlin",
+      "time": "2026-02-01T21:14:59.780770",
+      "status": 200
+    },
+    "141c54d5b368": {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/digitale-leitprojekte-eeducation-berlin-masterplan/",
+      "land": "berlin",
+      "time": "2026-02-01T21:15:00.648861",
+      "status": 200
+    },
+    "57bc48bba74d": {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/digitale-leitprojekte-eeducation-berlin-masterplan/qualitaetssiegel/",
+      "land": "berlin",
+      "time": "2026-02-01T21:15:01.964153",
+      "status": 200
+    },
+    "01f8ad7521d9": {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/digitale-leitprojekte-eeducation-berlin-masterplan/weitere-leitprojekte/",
+      "land": "berlin",
+      "time": "2026-02-01T21:15:03.193516",
+      "status": 200
+    },
+    "dfa7614cbd7a": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/schulsport/",
+      "land": "berlin",
+      "time": "2026-02-01T21:15:12.952692",
+      "status": 200
+    },
+    "b233845910cf": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/schulsport/karte/",
+      "land": "berlin",
+      "time": "2026-02-01T21:15:14.078211",
+      "status": 200
+    },
+    "e1703da02054": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/",
+      "land": "berlin",
+      "time": "2026-02-01T21:15:15.214371",
+      "status": 200
+    },
+    "41d9af4ded8c": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/verbraucherbildung/",
+      "land": "berlin",
+      "time": "2026-02-01T21:15:16.390746",
+      "status": 200
+    },
+    "105875ea3bb3": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/globale-entwicklung/",
+      "land": "berlin",
+      "time": "2026-02-01T21:15:17.300978",
+      "status": 200
+    },
+    "886b7387731d": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/filmbildung/",
+      "land": "berlin",
+      "time": "2026-02-01T21:15:18.412398",
+      "status": 200
+    },
+    "3146b570dabe": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/gewaltpraevention/",
+      "land": "berlin",
+      "time": "2026-02-01T21:15:19.523833",
+      "status": 200
+    },
+    "9b37509a9eef": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/digitale-welten/",
+      "land": "berlin",
+      "time": "2026-02-01T21:15:20.449135",
+      "status": 200
+    },
+    "3fe1f3ebb5cc": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/digitale-welten/schulversuch-hybrides-lehren-und-lernen/",
+      "land": "berlin",
+      "time": "2026-02-01T21:15:21.747917",
+      "status": 200
+    },
+    "f09b9e229c56": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/digitale-welten/blending4futures/",
+      "land": "berlin",
+      "time": "2026-02-01T21:15:23.331419",
+      "status": 200
+    },
+    "d7ff77659e40": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/mobilitaetsbildung-und-verkehrserziehung/",
+      "land": "berlin",
+      "time": "2026-02-01T21:15:24.483348",
+      "status": 200
+    },
+    "3dbedca7ec18": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/individuelles-lernen/fachinfo/",
+      "land": "berlin",
+      "time": "2026-02-01T21:15:26.250262",
+      "status": 200
+    },
+    "bb2c54376819": {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/begabungsfoerderung/fachinfo/#kontakt",
+      "land": "berlin",
+      "time": "2026-02-01T21:15:51.185145",
+      "status": 200
+    },
+    "f649e21c0660": {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/begabungsfoerderung/fachinfo/#top",
+      "land": "berlin",
+      "time": "2026-02-01T21:15:52.041123",
+      "status": 200
+    },
+    "f3e1c4c40b59": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/rahmenlehrplaene/#kontakt",
+      "land": "berlin",
+      "time": "2026-02-01T21:16:58.993947",
+      "status": 200
+    },
+    "1886aa3483a2": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/rahmenlehrplaene/rlp_teil_c_ps_sesb-2019.pdf?ts=1752674592",
+      "land": "berlin",
+      "time": "2026-02-01T21:18:25.764863",
+      "status": 200
+    },
+    "5a3b44ece24b": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/rahmenlehrplaene/rlp_teil_c_ms_sesb-2019.pdf?ts=1752674592",
+      "land": "berlin",
+      "time": "2026-02-01T21:18:27.562061",
+      "status": 200
+    },
+    "42b11152f54a": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/rahmenlehrplaene/rlp_geistige_entwicklung_oberstufe.pdf?ts=1752674592",
+      "land": "berlin",
+      "time": "2026-02-01T21:18:29.069185",
+      "status": 200
+    },
+    "f52664dc19fa": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/rahmenlehrplaene/mdb-sen-bildung-unterricht-lehrplaene-rlp_bql_ge.pdf?ts=1752674592",
+      "land": "berlin",
+      "time": "2026-02-01T21:18:30.483490",
+      "status": 200
+    },
+    "7a6fb2b2c037": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/rahmenlehrplaene/rlp-teil_c-esu_1-10.pdf?ts=1754291406",
+      "land": "berlin",
+      "time": "2026-02-01T21:18:31.578305",
+      "status": 200
+    },
+    "39ea494b8ded": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/rahmenlehrplaene/ohr_sexualerziehung.pdf?ts=1752674592",
+      "land": "berlin",
+      "time": "2026-02-01T21:18:33.024768",
+      "status": 200
+    },
+    "27ecd07f08b3": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/rahmenlehrplaene/#top",
+      "land": "berlin",
+      "time": "2026-02-01T21:18:33.966239",
+      "status": 200
+    },
+    "9fdefacc6257": {
+      "url": "https://www.berlin.de/sen/bildung/schule/bildungswege/uebergang-weiterfuehrende-schule/probeunterricht/arbeitsheft_beispielseiten.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\arbeitsheft_beispielseiten.pdf",
+      "size": 80813,
+      "text": "die ersten zwei Seiten eines Arbeitsheftes",
+      "time": "2026-02-01T21:19:05.041645"
+    },
+    "733623729063": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_biologie_2026_gk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_biologie_2026_gk.pdf",
+      "size": 61046,
+      "text": "Biologie Grundkurs",
+      "time": "2026-02-01T21:19:05.957995"
+    },
+    "5b116bd0792d": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_biologie_2026_lk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_biologie_2026_lk.pdf",
+      "size": 60871,
+      "text": "Biologie Leistungskurs",
+      "time": "2026-02-01T21:19:06.878804"
+    },
+    "8f01533f4941": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_chemie_2026_gk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_chemie_2026_gk.pdf",
+      "size": 111064,
+      "text": "Chemie Grundkurs",
+      "time": "2026-02-01T21:19:07.826102"
+    },
+    "6e6fa3a8010d": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_chemie_2026_lk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_chemie_2026_lk.pdf",
+      "size": 111143,
+      "text": "Chemie Leistungskurs",
+      "time": "2026-02-01T21:19:09.255966"
+    },
+    "d81fc7e43a50": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_deutsch_2026_gk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_deutsch_2026_gk.pdf",
+      "size": 49145,
+      "text": "Deutsch Grundkurs",
+      "time": "2026-02-01T21:19:10.158575"
+    },
+    "5a872cc84dd9": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_deutsch_2026_lk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_deutsch_2026_lk.pdf",
+      "size": 49198,
+      "text": "Deutsch Leistungskurs",
+      "time": "2026-02-01T21:19:11.635198"
+    },
+    "f0012407c67a": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_englisch_2026_gk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_englisch_2026_gk.pdf",
+      "size": 67806,
+      "text": "Englisch Grundkurs",
+      "time": "2026-02-01T21:19:12.866161"
+    },
+    "df11494a2224": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_englisch_2026_lk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_englisch_2026_lk.pdf",
+      "size": 67557,
+      "text": "Englisch Leistungskurs",
+      "time": "2026-02-01T21:19:13.778279"
+    },
+    "486f16593683": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_franzoesisch_2026_gk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_franzoesisch_2026_gk.pdf",
+      "size": 68544,
+      "text": "Französisch Grundkurs",
+      "time": "2026-02-01T21:19:15.177266"
+    },
+    "64a111b9d763": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_franzoesisch_2026_lk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_franzoesisch_2026_lk.pdf",
+      "size": 68143,
+      "text": "Französisch Leistungskurs",
+      "time": "2026-02-01T21:19:16.536855"
+    },
+    "3a38c5ec890a": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_geografie_2026_gk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_geografie_2026_gk.pdf",
+      "size": 66112,
+      "text": "Geografie Grundkurs",
+      "time": "2026-02-01T21:19:17.805005"
+    },
+    "d6174caa76f4": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_geografie_2026_lk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_geografie_2026_lk.pdf",
+      "size": 67634,
+      "text": "Geografie Leistungskurs",
+      "time": "2026-02-01T21:19:19.034656"
+    },
+    "cf5f855b44ce": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_geschichte_2026_gk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_geschichte_2026_gk.pdf",
+      "size": 567768,
+      "text": "Geschichte Grundkurs",
+      "time": "2026-02-01T21:19:20.162590"
+    },
+    "8821b605e21f": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_geschichte_2026_lk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_geschichte_2026_lk.pdf",
+      "size": 580332,
+      "text": "Geschichte Leistungskurs",
+      "time": "2026-02-01T21:19:21.569320"
+    },
+    "b8e675485d56": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_mathematik_2026_gk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_mathematik_2026_gk.pdf",
+      "size": 357086,
+      "text": "Mathematik Grundkurs",
+      "time": "2026-02-01T21:19:22.544940"
+    },
+    "94ab2db4f14c": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_physik_2026_gk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_physik_2026_gk.pdf",
+      "size": 110585,
+      "text": "Physik Grundkurs",
+      "time": "2026-02-01T21:19:34.610107"
+    },
+    "01c2da839406": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_physik_2026_lk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_physik_2026_lk.pdf",
+      "size": 111887,
+      "text": "Physik Leistungskurs",
+      "time": "2026-02-01T21:19:35.492639"
+    },
+    "c0e787479c4e": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_uebrige_faecher_2026.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_uebrige_faecher_2026.pdf",
+      "size": 463357,
+      "text": "Weitere Sprachen (Grund- und Leistungskurs)",
+      "time": "2026-02-01T21:19:36.946371"
+    },
+    "bf01fccd2df2": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_biologie_2027_lk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_biologie_2027_lk.pdf",
+      "size": 156451,
+      "text": "Biologie Leistungskurs",
+      "time": "2026-02-01T21:20:28.792924"
+    },
+    "b0577455c451": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_chemie_2027_gk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_chemie_2027_gk.pdf",
+      "size": 773595,
+      "text": "Chemie Grundkurs",
+      "time": "2026-02-01T21:20:29.866703"
+    },
+    "87655b1034af": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_chemie_2027_lk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_chemie_2027_lk.pdf",
+      "size": 779061,
+      "text": "Chemie Leistungskurs",
+      "time": "2026-02-01T21:20:31.281155"
+    },
+    "118cd9bc9096": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_deutsch_2027_gk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_deutsch_2027_gk.pdf",
+      "size": 92468,
+      "text": "Deutsch Grundkurs",
+      "time": "2026-02-01T21:20:32.558078"
+    },
+    "e7ec12a2600a": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_deutsch_2027_lk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_deutsch_2027_lk.pdf",
+      "size": 95356,
+      "text": "Deutsch Leistungskurs",
+      "time": "2026-02-01T21:20:33.980373"
+    },
+    "d68763b2f53c": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_englisch_2027_gk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_englisch_2027_gk.pdf",
+      "size": 143868,
+      "text": "Englisch Grundkurs",
+      "time": "2026-02-01T21:20:34.916961"
+    },
+    "c3600990989e": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_englisch_2027_lk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_englisch_2027_lk.pdf",
+      "size": 144064,
+      "text": "Englisch Leistungskurs",
+      "time": "2026-02-01T21:20:35.845526"
+    },
+    "844995e9b328": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_franzoesisch_2027_gk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_franzoesisch_2027_gk.pdf",
+      "size": 147421,
+      "text": "Französisch Grundkurs",
+      "time": "2026-02-01T21:20:37.163888"
+    },
+    "859380644864": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_franzoesisch_2027_lk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_franzoesisch_2027_lk.pdf",
+      "size": 142375,
+      "text": "Französisch Leistungskurs",
+      "time": "2026-02-01T21:20:38.587995"
+    },
+    "f2ffc057441d": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_geografie_2027_gk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_geografie_2027_gk.pdf",
+      "size": 210535,
+      "text": "Geografie Grundkurs",
+      "time": "2026-02-01T21:20:40.148236"
+    },
+    "a580763e22d4": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_geografie_2027_lk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_geografie_2027_lk.pdf",
+      "size": 207618,
+      "text": "Geografie Leistungskurs",
+      "time": "2026-02-01T21:20:41.581170"
+    },
+    "226dc284230a": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_geschichte_2027_gk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_geschichte_2027_gk.pdf",
+      "size": 121368,
+      "text": "Geschichte Grundkurs",
+      "time": "2026-02-01T21:20:42.547899"
+    },
+    "1baa0a028e2a": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_geschichte_2027_lk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_geschichte_2027_lk.pdf",
+      "size": 136859,
+      "text": "Geschichte Leistungskurs",
+      "time": "2026-02-01T21:20:43.496350"
+    },
+    "2729d3ebed58": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_mathematik_2027_gk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_mathematik_2027_gk.pdf",
+      "size": 359322,
+      "text": "Mathematik Grundkurs",
+      "time": "2026-02-01T21:20:45.134663"
+    },
+    "2d773489e614": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_mathematik_2027_lk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_mathematik_2027_lk.pdf",
+      "size": 375859,
+      "text": "Mathematik Leistungskurs",
+      "time": "2026-02-01T21:20:46.655326"
+    },
+    "44bcd1b44892": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_physik_2027_gk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_physik_2027_gk.pdf",
+      "size": 128968,
+      "text": "Physik Grundkurs",
+      "time": "2026-02-01T21:20:47.604067"
+    },
+    "1f2a0b1aa86d": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_physik_2027_lk.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ps_physik_2027_lk.pdf",
+      "size": 130296,
+      "text": "Physik Leistungskurs",
+      "time": "2026-02-01T21:20:48.940075"
+    },
+    "ebf9a638226c": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/weitere-sprachen_2027.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\weitere-sprachen_2027.pdf",
+      "size": 1363054,
+      "text": "Weitere Sprachen (Grund- und Leistungskurs)",
+      "time": "2026-02-01T21:20:50.745737"
+    },
+    "ac82e797eb9b": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abschluesse-an-der-iss-nach-klasse-9-und-10/praesentationspruefung_sek1_schueler.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\praesentationspruefung_sek1_schueler.pdf",
+      "size": 519806,
+      "text": "Download",
+      "time": "2026-02-01T21:20:52.170265"
+    },
+    "01ad16dde525": {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abschluesse-an-der-iss-nach-klasse-9-und-10/praesentationspruefung_sek1_lehrer.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\praesentationspruefung_sek1_lehrer.pdf",
+      "size": 805191,
+      "text": "Download",
+      "time": "2026-02-01T21:20:53.834228"
+    },
+    "7f3ba2f5edf2": {
+      "url": "https://www.berlin.de/sen/bildung/schule/rechtsvorschriften/av-bilingualer-unterricht-202021.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\av-bilingualer-unterricht-202021.pdf",
+      "size": 166797,
+      "text": "AV bilingualer Unterricht",
+      "time": "2026-02-01T21:20:54.976655"
+    },
+    "c23fe87ff6a1": {
+      "url": "https://www.berlin.de/sen/bildung/schule/inklusion/inklusion-berliner-schule.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\inklusion-berliner-schule.pdf",
+      "size": 1314420,
+      "text": "in der nachstehenden Präsentation",
+      "time": "2026-02-01T21:20:57.345286"
+    },
+    "7970b0342a7e": {
+      "url": "https://www.berlin.de/sen/bildung/schule/inklusion/fachinfo/gesamtkonzept_inklusion.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\gesamtkonzept_inklusion.pdf",
+      "size": 480851,
+      "text": "Gesamtkonzepts ‘Inklusive Schule in Berlin’",
+      "time": "2026-02-01T21:20:58.431740"
+    },
+    "31114ed16854": {
+      "url": "https://www.berlin.de/sen/bildung/schule/ganztaegiges-lernen/ganztagsschulen/flyer_unterstutzung.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\flyer_unterstutzung.pdf",
+      "size": 279934,
+      "text": "Unterstützung durch die Serviceagentur Ganztag Berlin",
+      "time": "2026-02-01T21:21:00.853407"
+    },
+    "54bc1efea1fb": {
+      "url": "https://www.berlin.de/sen/bildung/schule/ganztaegiges-lernen/ganztagsschulen/implementierung_qualitatsstandards_inklusive_berliner_ganztagsschule.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\implementierung_qualitatsstandards_inklusive_berliner_ganztagsschule.pdf",
+      "size": 365668,
+      "text": "Übersicht Implementierung der Qualitätsstandards für die inklusive Berliner Ganztagsschule",
+      "time": "2026-02-01T21:21:01.903978"
+    },
+    "890e721f0a85": {
+      "url": "https://www.berlin.de/sen/bildung/schule/gute-schule/mitwirkung-von-schuelern-und-eltern/schulverfassung-grafik.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\schulverfassung-grafik.pdf",
+      "size": 32757,
+      "text": "Grafische Darstellung zur Mitwirkung von Schüler/-innen und Eltern in den schulischen Gremien",
+      "time": "2026-02-01T21:21:02.924236"
+    },
+    "88480e129aa5": {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/eeducation-masterplan.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\eeducation-masterplan.pdf",
+      "size": 2257545,
+      "text": "eEducation Berlin Masterplan",
+      "time": "2026-02-01T21:21:04.760305"
+    },
+    "380f341deeae": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/rahmenlehrplaene/rlp-deutsch_1-10-teil-c.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\rlp-deutsch_1-10-teil-c.pdf",
+      "size": 871529,
+      "text": "Deutsch (Jahrgangsstufen 1-10)",
+      "time": "2026-02-01T21:21:05.742266"
+    },
+    "9ae739d66f3f": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/rahmenlehrplaene/rahmenlehrplan-teil-c_mathe-1-10.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\rahmenlehrplan-teil-c_mathe-1-10.pdf",
+      "size": 774091,
+      "text": "Mathematik (Jahrgangsstufen 1-10)",
+      "time": "2026-02-01T21:21:06.815145"
+    },
+    "b01a0553c51d": {
+      "url": "https://berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/rahmenlehrplaene/klasse-1-10/moderne-fremdsprachen-teil-c.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\moderne-fremdsprachen-teil-c.pdf",
+      "size": 720377,
+      "text": "Moderne Fremdsprachen NEU (Jahrgangsstufen 1-10)",
+      "time": "2026-02-01T21:21:08.178452"
+    },
+    "1f60554f5672": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/rahmenlehrplaene/rahmenlehrplan-deutsch-go-teil-c.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\rahmenlehrplan-deutsch-go-teil-c.pdf",
+      "size": 291004,
+      "text": "Deutsch",
+      "time": "2026-02-01T21:21:59.983358"
+    },
+    "9d04e1deb4c4": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/rahmenlehrplaene/oberstufe/rlp-go-teil-c-geografie-neu_26-27.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\rlp-go-teil-c-geografie-neu_26-27.pdf",
+      "size": 476696,
+      "text": "Geografie (ab 2026/27 in Klasse 11)",
+      "time": "2026-02-01T21:22:01.019276"
+    },
+    "cda2cf6fab4f": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/rahmenlehrplaene/oberstufe/rlp-go-teil-c-geschichte-neu_26-27.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\rlp-go-teil-c-geschichte-neu_26-27.pdf",
+      "size": 543935,
+      "text": "Geschichte (ab 2026/27 in Klasse 11)",
+      "time": "2026-02-01T21:22:02.005698"
+    },
+    "580d53c88e6d": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/rahmenlehrplaene/oberstufe/rlp-go-teil-c-latein-neu_25-26.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\rlp-go-teil-c-latein-neu_25-26.pdf",
+      "size": 369166,
+      "text": "Latein (ab 2025/26 in Klasse 11)",
+      "time": "2026-02-01T21:22:03.375206"
+    },
+    "8bb4be51379d": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/rahmenlehrplaene/oberstufe/rlp-go-teil-c-philosophie-neu_26-27.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\rlp-go-teil-c-philosophie-neu_26-27.pdf",
+      "size": 456733,
+      "text": "Philosophie (ab 2026/27 in Klasse 11)",
+      "time": "2026-02-01T21:22:04.343345"
+    },
+    "c816f91224a3": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/rahmenlehrplaene/oberstufe/rlp-go-teil-c-politische_-bildung-neu_26-27.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\rlp-go-teil-c-politische_-bildung-neu_26-27.pdf",
+      "size": 427982,
+      "text": "Politische Bildung (ab 2026/27 in Klasse 11)",
+      "time": "2026-02-01T21:22:05.325378"
+    },
+    "4e4d1e88eba5": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/rahmenlehrplaene/oberstufe/ukrainisch-teil-c.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\ukrainisch-teil-c.pdf",
+      "size": 486498,
+      "text": "Ukrainisch",
+      "time": "2026-02-01T21:22:06.301638"
+    },
+    "c214435639f2": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/ethik/kurzinfo_ethik.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\kurzinfo_ethik.pdf",
+      "size": 168449,
+      "text": "Kurz-Info zum Schulfach Ethik",
+      "time": "2026-02-01T21:22:08.538673"
+    },
+    "e262f68cb3b7": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/kulturelle-bildung/mdb-sen-bildung-besondere_paedagogische_konzepte-kulturelle_bildung-rahmenkonzept_kulturelle_bildung.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\mdb-sen-bildung-besondere_paedagogische_konzepte-kulturelle_bildung-rahmenkonzept_kulturelle_bildung.pdf",
+      "size": 115924,
+      "text": "Rahmenkonzeptes Kulturelle Bildung aus dem Jahr 2008",
+      "time": "2026-02-01T21:22:10.713014"
+    },
+    "5ff65d610c61": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/kulturelle-bildung/kulturelle-bildung-das-rahmenkonzept-2016-fuer-berlin.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\kulturelle-bildung-das-rahmenkonzept-2016-fuer-berlin.pdf",
+      "size": 263046,
+      "text": "Rahmenkonzept Kulturelle Bildung",
+      "time": "2026-02-01T21:22:11.754823"
+    },
+    "51130c17459a": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/reisende/schultagebuch-2019_berlin.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\schultagebuch-2019_berlin.pdf",
+      "size": 441668,
+      "text": "Schultagebuch",
+      "time": "2026-02-01T21:22:13.283761"
+    },
+    "7483e8b383b1": {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/reisende/handreichung-zum-schultagebuch_2019_berlin.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\handreichung-zum-schultagebuch_2019_berlin.pdf",
+      "size": 556979,
+      "text": "Handreichung",
+      "time": "2026-02-01T21:22:14.908474"
+    },
+    "30947caf1ee5": {
+      "url": "https://www.berlin.de/sen/bildung/schule/rechtsvorschriften/forderrichtlinie_jsa.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\forderrichtlinie_jsa.pdf",
+      "size": 1027867,
+      "text": "Förderrichtlinie zum Landesprogramm",
+      "time": "2026-02-01T21:22:18.670884"
+    },
+    "5b16b2083f37": {
+      "url": "https://www.berlin.de/sen/jugend/_assets/jugendsozialarbeit-an-berliner-schulen-jahresbericht.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\jugendsozialarbeit-an-berliner-schulen-jahresbericht.pdf",
+      "size": 16070491,
+      "text": "Jugendsozialarbeit an Berliner Schulen - Jahresbericht 2023",
+      "time": "2026-02-01T21:22:22.543581"
+    },
+    "ca61534abedd": {
+      "url": "https://www.berlin.de/sen/jugend/jugend/jugendsozialarbeit/an-berliner-schulen/jugendsozialarbeit-an-berliner-schulen---jahresbericht-2024.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\jugendsozialarbeit-an-berliner-schulen---jahresbericht-2024.pdf",
+      "size": 11751131,
+      "text": "Jugendsozialarbeit an Berliner Schulen - Jahresbericht 2024",
+      "time": "2026-02-01T21:22:26.193813"
+    },
+    "a089ca8c3c60": {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/emotionale-soziale-entwicklung/fachbrief_3.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\fachbrief_3.pdf",
+      "size": 251170,
+      "text": "Download",
+      "time": "2026-02-01T21:22:29.671504"
+    },
+    "2bcba2105d49": {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/green_it-arbeitsmaterialien-fuer-schuelerinnen-und-schueler.pdf",
+      "land": "berlin",
+      "file": "C:\\Users\\karent\\Documents\\Software\\meoluna\\data\\curricula\\raw\\berlin\\green_it-arbeitsmaterialien-fuer-schuelerinnen-und-schueler.pdf",
+      "size": 6784964,
+      "text": "Broschüre des Bundesumweltamts mit Arbeitsmaterialen",
+      "time": "2026-02-01T21:22:32.449673"
+    },
+    "5cdaaeff43e2": {
+      "url": "https://bildungsplaene.hamburg.de/grundschule",
+      "land": "hamburg",
+      "time": "2026-02-01T21:22:36.682178",
+      "status": 200
+    },
+    "6bd7f56fe509": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung",
+      "land": "hamburg",
+      "time": "2026-02-01T21:22:37.943334",
+      "status": 200
+    },
+    "4f5e61729f0f": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/aktuelles",
+      "land": "hamburg",
+      "time": "2026-02-01T21:22:39.864375",
+      "status": 200
+    },
+    "44de02be58c7": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/senat",
+      "land": "hamburg",
+      "time": "2026-02-01T21:22:41.090081",
+      "status": 200
+    },
+    "be63ec167f9d": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/senat/der-hamburger-senat",
+      "land": "hamburg",
+      "time": "2026-02-01T21:22:42.380079",
+      "status": 200
+    },
+    "a50c0929898a": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/senat/staatsraetinnen-und-staatsraete",
+      "land": "hamburg",
+      "time": "2026-02-01T21:22:43.658360",
+      "status": 200
+    },
+    "92d1bc17b08e": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/senat/reden-und-dokumente",
+      "land": "hamburg",
+      "time": "2026-02-01T21:22:45.020036",
+      "status": 200
+    },
+    "21cdc2f4c03b": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/senat/rathaus-hamburg",
+      "land": "hamburg",
+      "time": "2026-02-01T21:22:46.308626",
+      "status": 200
+    },
+    "f6c1c707e11e": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/senat/rathaus-hamburg/matthiae-mahl",
+      "land": "hamburg",
+      "time": "2026-02-01T21:22:47.658307",
+      "status": 200
+    },
+    "7b5d9789b063": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/senat/rathaus-hamburg/das-goldene-buch",
+      "land": "hamburg",
+      "time": "2026-02-01T21:22:48.993260",
+      "status": 200
+    },
+    "a421fff7971a": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/senat/presseservice-des-senats",
+      "land": "hamburg",
+      "time": "2026-02-01T21:22:50.258470",
+      "status": 200
+    },
+    "6accaad8c710": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/senat/presseservice-des-senats/landespressekonferenz",
+      "land": "hamburg",
+      "time": "2026-02-01T21:22:51.463117",
+      "status": 200
+    },
+    "8bc89eb9be59": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/senat/presseservice-des-senats/pressemeldungen-des-senats",
+      "land": "hamburg",
+      "time": "2026-02-01T21:22:52.723886",
+      "status": 200
+    },
+    "d160d2878222": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/senat/presseservice-des-senats/senatskalender",
+      "land": "hamburg",
+      "time": "2026-02-01T21:22:54.080329",
+      "status": 200
+    },
+    "feadd4601496": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/senat/presseservice-des-senats/pressemeldungen-der-bezirke",
+      "land": "hamburg",
+      "time": "2026-02-01T21:22:55.391330",
+      "status": 200
+    },
+    "18fdd6101949": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/senat/presseservice-des-senats/akkreditierungen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:22:56.745616",
+      "status": 200
+    },
+    "862204eabfc5": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden",
+      "land": "hamburg",
+      "time": "2026-02-01T21:22:57.987418",
+      "status": 200
+    },
+    "6da2cdf3e19a": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/sozialbehoerde",
+      "land": "hamburg",
+      "time": "2026-02-01T21:22:59.257244",
+      "status": 200
+    },
+    "9a0398bf2027": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/sozialbehoerde/wir-ueber-uns",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:00.534756",
+      "status": 200
+    },
+    "a248601e69fb": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/sozialbehoerde/einrichtungen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:01.752729",
+      "status": 200
+    },
+    "3f994c665a39": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/sozialbehoerde/themen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:03.026730",
+      "status": 200
+    },
+    "233883d98e3d": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/sozialbehoerde/karriere",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:04.300221",
+      "status": 200
+    },
+    "978c3231872f": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/sozialbehoerde/rechtliche-grundlagen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:05.532110",
+      "status": 200
+    },
+    "1c20bf262a1e": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bukea",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:06.747493",
+      "status": 200
+    },
+    "f5e2644d9ca2": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bukea/wir-ueber-uns",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:07.938622",
+      "status": 200
+    },
+    "b5471cefc68e": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bukea/fachaemter",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:09.134505",
+      "status": 200
+    },
+    "63707fb1eb47": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bukea/themen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:10.436638",
+      "status": 200
+    },
+    "0e342b2937d1": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bukea/projekte-und-initiativen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:11.646181",
+      "status": 200
+    },
+    "de55ac66f9d9": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bukea/services",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:13.291417",
+      "status": 200
+    },
+    "7f1cd9b674de": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bukea/aktuelles",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:14.669414",
+      "status": 200
+    },
+    "7b7279dcbb2d": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bukea/veroeffentlichungen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:16.026181",
+      "status": 200
+    },
+    "13036a069f3b": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bukea/hu",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:17.219488",
+      "status": 200
+    },
+    "3e5f090e4f28": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bsfb",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:18.507118",
+      "status": 200
+    },
+    "a2da6690d0f9": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bsfb/wir-ueber-uns",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:19.853488",
+      "status": 200
+    },
+    "05eb6758c895": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bsfb/lehrkraft-werden",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:21.110487",
+      "status": 200
+    },
+    "56d5fea4890b": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bsfb/schulen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:22.275348",
+      "status": 200
+    },
+    "fddba5cd476a": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bsfb/familie",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:23.659859",
+      "status": 200
+    },
+    "380f97b5546f": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bsfb/themen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:25.059794",
+      "status": 200
+    },
+    "6a4eb07f73fd": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bsfb/einrichtungen-beratung",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:26.275601",
+      "status": 200
+    },
+    "b4292bdf568f": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bsfb/veroeffentlichungen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:27.511496",
+      "status": 200
+    },
+    "c3666290448c": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/finanzbehoerde",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:28.792182",
+      "status": 200
+    },
+    "1ccd6c6b00f3": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/finanzbehoerde/wir-ueber-uns",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:29.948239",
+      "status": 200
+    },
+    "ef96257bb2ec": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/finanzbehoerde/einrichtungen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:31.159180",
+      "status": 200
+    },
+    "406881870266": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/finanzbehoerde/themen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:32.493314",
+      "status": 200
+    },
+    "b1ee200867f0": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/finanzbehoerde/services",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:33.831590",
+      "status": 200
+    },
+    "baf9aacb59cc": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/finanzbehoerde/aktuelles",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:35.172985",
+      "status": 200
+    },
+    "c6a92c22d3a4": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/finanzbehoerde/veroeffentlichungen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:36.397887",
+      "status": 200
+    },
+    "f65b567a9499": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/finanzbehoerde/karriere",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:37.706484",
+      "status": 200
+    },
+    "1de3dcef0ca2": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bwfg",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:39.035315",
+      "status": 200
+    },
+    "cbe2a2efbedd": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bwfg/wir-ueber-uns",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:40.380862",
+      "status": 200
+    },
+    "f8c4c564b510": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bwfg/unsere-themen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:41.612462",
+      "status": 200
+    },
+    "c92a7f6e56f2": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bwfg/einrichtungen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:42.903555",
+      "status": 200
+    },
+    "b3b9e1f282a3": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bwfg/aktuelles",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:44.192387",
+      "status": 200
+    },
+    "3c2dbddaa4ae": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bwfg/digitaler-service",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:45.529787",
+      "status": 200
+    },
+    "c54d317fdd0c": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bwfg/veroeffentlichungen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:46.837973",
+      "status": 200
+    },
+    "892fc7e52729": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/behoerde-fuer-stadtentwicklung-und-wohnen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:48.128465",
+      "status": 200
+    },
+    "42d0308e4766": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/behoerde-fuer-stadtentwicklung-und-wohnen/themen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:49.388457",
+      "status": 200
+    },
+    "43756e7ef801": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/behoerde-fuer-stadtentwicklung-und-wohnen/aemter-und-landesbetrieb",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:50.692642",
+      "status": 200
+    },
+    "86c6caabf13b": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/behoerde-fuer-stadtentwicklung-und-wohnen/projekte-und-kampagnen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:51.931549",
+      "status": 200
+    },
+    "edf0780abf81": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/behoerde-fuer-stadtentwicklung-und-wohnen/aktuelles",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:53.159017",
+      "status": 200
+    },
+    "404d96395765": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/behoerde-fuer-stadtentwicklung-und-wohnen/veroeffentlichungen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:54.446034",
+      "status": 200
+    },
+    "c62005c3d9c0": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/behoerde-fuer-stadtentwicklung-und-wohnen/services",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:55.691349",
+      "status": 200
+    },
+    "2d1d4d286f5c": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/behoerde-fuer-stadtentwicklung-und-wohnen/wir-ueber-uns",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:56.939657",
+      "status": 200
+    },
+    "7b9d124abb47": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/behoerde-fuer-stadtentwicklung-und-wohnen/karriere",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:58.129605",
+      "status": 200
+    },
+    "4ede6d3ccb9b": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/senatskanzlei",
+      "land": "hamburg",
+      "time": "2026-02-01T21:23:59.401210",
+      "status": 200
+    },
+    "32dd40a85374": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/senatskanzlei/wir-ueber-uns",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:00.705449",
+      "status": 200
+    },
+    "6addab790b68": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/senatskanzlei/einrichtungen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:02.049284",
+      "status": 200
+    },
+    "d5932bb4417e": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/senatskanzlei/themen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:03.200924",
+      "status": 200
+    },
+    "471fa09bc3f6": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/senatskanzlei/aktuelles",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:04.400779",
+      "status": 200
+    },
+    "fbf131508dcb": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bvm",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:05.655911",
+      "status": 200
+    },
+    "41a1bafa14b7": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bvm/wir-ueber-uns",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:06.951952",
+      "status": 200
+    },
+    "a0318c6695e7": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bvm/die-themen-der-behoerde",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:08.204781",
+      "status": 200
+    },
+    "6d3ade23a155": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bvm/projekte-und-initiativen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:09.456925",
+      "status": 200
+    },
+    "b52591e0fad9": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bvm/services",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:10.708164",
+      "status": 200
+    },
+    "e413b80722c8": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bvm/einrichtungen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:11.877448",
+      "status": 200
+    },
+    "344c7b564b15": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bvm/presse",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:13.084083",
+      "status": 200
+    },
+    "87103ecb191f": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bvm/karriere",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:14.306890",
+      "status": 200
+    },
+    "edf6f16a2e5b": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bvm/kontakt",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:15.688842",
+      "status": 200
+    },
+    "9ca9d31c08b7": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bjv",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:16.889342",
+      "status": 200
+    },
+    "af39332add06": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bjv/wir-ueber-uns",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:18.109760",
+      "status": 200
+    },
+    "913c693ccd81": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bjv/aktuelles",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:19.327509",
+      "status": 200
+    },
+    "d4d7794c8ddc": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bjv/karriere",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:20.505078",
+      "status": 200
+    },
+    "c49c185de217": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bjv/themen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:21.739547",
+      "status": 200
+    },
+    "fef9531db50a": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bjv/projekte-und-initiativen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:23.038885",
+      "status": 200
+    },
+    "bcf430ca5d1c": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bjv/services",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:24.321935",
+      "status": 200
+    },
+    "1094a82eac80": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/behoerde-fuer-kultur-und-medien",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:25.596408",
+      "status": 200
+    },
+    "8a50616a5398": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/behoerde-fuer-kultur-und-medien/aktuelles",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:26.829930",
+      "status": 200
+    },
+    "ba69ffe817dd": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/behoerde-fuer-kultur-und-medien/themen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:28.074287",
+      "status": 200
+    },
+    "86556b09685a": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/behoerde-fuer-kultur-und-medien/einrichtungen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:29.316478",
+      "status": 200
+    },
+    "1bf21084a22b": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/behoerde-fuer-kultur-und-medien/einrichtungen/staatsarchiv",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:30.484035",
+      "status": 200
+    },
+    "e177f2570e28": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/behoerde-fuer-kultur-und-medien/projekte-und-initiativen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:31.724385",
+      "status": 200
+    },
+    "6620091b30fb": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/behoerde-fuer-kultur-und-medien/wir-ueber-uns",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:33.004405",
+      "status": 200
+    },
+    "fd20f653fe84": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/behoerde-fuer-kultur-und-medien/wir-ueber-uns/kontaktinformationen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:34.204149",
+      "status": 200
+    },
+    "4f38c6ab5f97": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/behoerde-fuer-kultur-und-medien/oper",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:35.464026",
+      "status": 200
+    },
+    "ec41542e6235": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bwai",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:36.785906",
+      "status": 200
+    },
+    "743c6b9b9e52": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bwai/wir-ueber-uns",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:38.097597",
+      "status": 200
+    },
+    "a7f5a9b05dcd": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bwai/einrichtungen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:39.459895",
+      "status": 200
+    },
+    "564f5ca7a427": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bwai/themen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:40.768972",
+      "status": 200
+    },
+    "022c3fbd2d60": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bwai/projekte-und-initiativen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:42.078569",
+      "status": 200
+    },
+    "0a6af5168de0": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bwai/services",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:43.349798",
+      "status": 200
+    },
+    "a4e9b9141e89": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bwai/pressestelle",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:44.590493",
+      "status": 200
+    },
+    "d8f845ba8c26": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bwai/efre",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:45.992102",
+      "status": 200
+    },
+    "9d64a6419abc": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/behoerde-fuer-inneres-und-sport",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:47.244244",
+      "status": 200
+    },
+    "74835f01fa0d": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/behoerde-fuer-inneres-und-sport/wir-ueber-uns",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:48.446945",
+      "status": 200
+    },
+    "934948a16c51": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/behoerde-fuer-inneres-und-sport/aemter",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:49.735338",
+      "status": 200
+    },
+    "95d4a125f56c": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/behoerde-fuer-inneres-und-sport/themen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:51.000885",
+      "status": 200
+    },
+    "245e3c174167": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/behoerde-fuer-inneres-und-sport/presseservice",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:52.283473",
+      "status": 200
+    },
+    "9a4fdab6b5f7": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/personalamt",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:53.574398",
+      "status": 200
+    },
+    "850a2c367510": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/personalamt/wir-ueber-uns",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:54.831857",
+      "status": 200
+    },
+    "0abfc4f2f576": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/personalamt/kontakt-und-datenschutz",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:56.041679",
+      "status": 200
+    },
+    "25c52c36ffa5": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/personalamt/themen-und-veroeffentlichungen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:57.256960",
+      "status": 200
+    },
+    "7c7b6e75a213": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/personalamt/pressemeldungen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:58.497692",
+      "status": 200
+    },
+    "39d8bcdffdb7": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/personalamt/karriere",
+      "land": "hamburg",
+      "time": "2026-02-01T21:24:59.822411",
+      "status": 200
+    },
+    "5e73721e2b8a": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/personalamt/landesbetriebe",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:01.121127",
+      "status": 200
+    },
+    "53754c1603dd": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/rechnungshof",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:02.418625",
+      "status": 200
+    },
+    "aa0bac0fe809": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/rechnungshof/pressemitteilungen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:03.645708",
+      "status": 200
+    },
+    "a08c211b14d5": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/rechnungshof/veroeffentlichungen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:04.892541",
+      "status": 200
+    },
+    "17081e07a139": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/rechnungshof/wir-ueber-uns",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:06.077473",
+      "status": 200
+    },
+    "775266f9cc7b": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/frag-den-michel-917964",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:07.284635",
+      "status": 200
+    },
+    "edf058b650cb": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:08.567748",
+      "status": 200
+    },
+    "dd35175f17a2": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/altona",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:09.782761",
+      "status": 200
+    },
+    "f2c1e5041654": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/altona/bezirksamt",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:11.028719",
+      "status": 200
+    },
+    "f485ca22a48b": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/altona/bezirksversammlung",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:12.279999",
+      "status": 200
+    },
+    "c9e150851c5b": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/altona/themen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:13.522745",
+      "status": 200
+    },
+    "2d8c8e8e1cb0": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/altona/aktuelles",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:14.694399",
+      "status": 200
+    },
+    "18e4d8c58e39": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/altona/buergerservice",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:15.987483",
+      "status": 200
+    },
+    "96b0df0dec02": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/altona/projekte-initiativen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:17.300511",
+      "status": 200
+    },
+    "9d5a7fb9e232": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/bergedorf",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:18.567148",
+      "status": 200
+    },
+    "e7858f1652d5": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/bergedorf/bezirksamt",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:19.813196",
+      "status": 200
+    },
+    "1b255d6ad6a3": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/bergedorf/bezirksversammlung",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:21.076677",
+      "status": 200
+    },
+    "b33c5dd71a6f": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/bergedorf/themen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:22.259588",
+      "status": 200
+    },
+    "a9da2b9b68aa": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/bergedorf/aktuelles",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:23.570720",
+      "status": 200
+    },
+    "8be0f404b8c2": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/bergedorf/buergerservice",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:24.785920",
+      "status": 200
+    },
+    "34ac9be40bde": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/bezirksamt-eimsbuettel",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:26.117046",
+      "status": 200
+    },
+    "1735225f53f9": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/bezirksamt-eimsbuettel/ihr-bezirksamt",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:27.374686",
+      "status": 200
+    },
+    "c3abe9ca10ca": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/bezirksamt-eimsbuettel/bezirksversammlung",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:28.659643",
+      "status": 200
+    },
+    "c4535ce87f6b": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/bezirksamt-eimsbuettel/themen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:29.836148",
+      "status": 200
+    },
+    "e59e309b0ab2": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/bezirksamt-eimsbuettel/aktuelles",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:31.021582",
+      "status": 200
+    },
+    "c504bc5cf1fd": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/bezirksamt-eimsbuettel/buergerservice",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:32.209902",
+      "status": 200
+    },
+    "4d089e4da7c6": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/bezirksamt-eimsbuettel/projekte-und-initiativen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:33.486942",
+      "status": 200
+    },
+    "f3d69e7a929c": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/mitte",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:34.704804",
+      "status": 200
+    },
+    "ea56606e5785": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/mitte/bezirksamt",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:35.996340",
+      "status": 200
+    },
+    "3b5e3956f96a": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/mitte/bezirksversammlung",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:37.204573",
+      "status": 200
+    },
+    "c4e08a2763ef": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/mitte/themen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:38.366058",
+      "status": 200
+    },
+    "ed19ffffd5a9": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/mitte/aktuelles",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:39.634724",
+      "status": 200
+    },
+    "c620b29f6031": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/mitte/buergerservice",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:40.826054",
+      "status": 200
+    },
+    "9bf02f539ba5": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/mitte/projekte-initiativen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:41.996493",
+      "status": 200
+    },
+    "fe5262be9df9": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/hamburg-nord",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:43.199418",
+      "status": 200
+    },
+    "3f333592c3df": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/hamburg-nord/ihr-bezirksamt",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:44.574684",
+      "status": 200
+    },
+    "6720c596c6b1": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/hamburg-nord/bezirksversammlung",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:45.816162",
+      "status": 200
+    },
+    "ec4bff812b65": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/hamburg-nord/themen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:47.091633",
+      "status": 200
+    },
+    "5f42a0582d24": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/hamburg-nord/aktuelles",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:48.341766",
+      "status": 200
+    },
+    "cead09db6e9c": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/hamburg-nord/buergerservice",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:49.524500",
+      "status": 200
+    },
+    "e7078d8f45ae": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/hamburg-nord/projekte-und-initiativen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:50.814230",
+      "status": 200
+    },
+    "ac7f0bf58512": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/harburg",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:52.111345",
+      "status": 200
+    },
+    "ad7531e3dd57": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/harburg/bezirksamt-harburg",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:53.510281",
+      "status": 200
+    },
+    "db14fce28ac7": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/harburg/bezirksversammlung",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:54.712847",
+      "status": 200
+    },
+    "a7a62eeb7600": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/harburg/themen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:55.866297",
+      "status": 200
+    },
+    "5c593d558cde": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/harburg/buergerservice",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:57.044982",
+      "status": 200
+    },
+    "d46984855b0f": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/harburg/aktuelles",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:58.197056",
+      "status": 200
+    },
+    "23baa039e18f": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/wandsbek",
+      "land": "hamburg",
+      "time": "2026-02-01T21:25:59.427112",
+      "status": 200
+    },
+    "f30cc416c5e2": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/wandsbek/ihr-bezirksamt",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:00.609298",
+      "status": 200
+    },
+    "3233ccd1c4a8": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/wandsbek/bezirksversammlung-wandsbek",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:01.892333",
+      "status": 200
+    },
+    "37ba5f1ccd77": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/wandsbek/themen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:03.214634",
+      "status": 200
+    },
+    "3a82f567f164": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/wandsbek/aktuelles",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:04.396524",
+      "status": 200
+    },
+    "294ddb6ceb40": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/wandsbek/buergerservice",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:05.697533",
+      "status": 200
+    },
+    "70b065b9b47e": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/bezirke/wandsbek/projekte-und-initiativen",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:06.899410",
+      "status": 200
+    },
+    "0a64d1fdb531": {
+      "url": "https://bildungsplaene.hamburg.de/freizeit/maerkte-und-messen/designmaerkte",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:09.244012",
+      "status": 200
+    },
+    "e0a17fb62518": {
+      "url": "https://bildungsplaene.hamburg.de/freizeit/sport",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:10.525598",
+      "status": 200
+    },
+    "d54988cd8889": {
+      "url": "https://bildungsplaene.hamburg.de/kultur/musik",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:11.741984",
+      "status": 200
+    },
+    "58351d85c2c9": {
+      "url": "https://bildungsplaene.hamburg.de/kultur/musik/konzerte",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:12.906253",
+      "status": 200
+    },
+    "9520b4f278f0": {
+      "url": "https://bildungsplaene.hamburg.de/kultur/musik/clubs",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:14.239975",
+      "status": 200
+    },
+    "bbb75a18e54a": {
+      "url": "https://bildungsplaene.hamburg.de/kultur/kultur-a-z/galerien-kunstorte",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:15.625239",
+      "status": 200
+    },
+    "87e508405652": {
+      "url": "https://bildungsplaene.hamburg.de/kultur/kultur-a-z/musik",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:16.813265",
+      "status": 200
+    },
+    "e4507759fbaa": {
+      "url": "https://bildungsplaene.hamburg.de/kultur/kultur-a-z/musik/klassik",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:18.089631",
+      "status": 200
+    },
+    "98ed859d358b": {
+      "url": "https://bildungsplaene.hamburg.de/kultur/kultur-a-z/musik/clubs",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:19.607840",
+      "status": 200
+    },
+    "0ebbc18af39d": {
+      "url": "https://bildungsplaene.hamburg.de/kultur/kultur-a-z/musik/musiktheater",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:21.285509",
+      "status": 200
+    },
+    "161c062ec242": {
+      "url": "https://bildungsplaene.hamburg.de/kultur/kultur-a-z/musik/vereine",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:22.534810",
+      "status": 200
+    },
+    "2ec88da12a7c": {
+      "url": "https://bildungsplaene.hamburg.de/leben-in-hamburg/wohnen/schulen-und-kitas",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:23.933677",
+      "status": 200
+    },
+    "63f80bbc7916": {
+      "url": "https://bildungsplaene.hamburg.de/verkehr/fahrradfahren-in-hamburg/radverkehrspolitik",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:25.148508",
+      "status": 200
+    },
+    "d334f2e386a3": {
+      "url": "https://bildungsplaene.hamburg.de/barrierefrei/gebaerdensprache",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:26.896287",
+      "status": 200
+    },
+    "cc480f9fd4d7": {
+      "url": "https://bildungsplaene.hamburg.de/barrierefrei/leichte-sprache",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:28.149385",
+      "status": 200
+    },
+    "6c7f5774fffb": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bsfb/veroeffentlichungen/bildungsplaene",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:32.340211",
+      "status": 200
+    },
+    "99fae2b2cf7d": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bsfb/veroeffentlichungen/bildungsplaene/start-grundschule-122924",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:33.539716",
+      "status": 200
+    },
+    "e6b2bd1630ae": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bsfb/veroeffentlichungen/bildungsplaene/stadtteilschule-2022-122976",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:34.782154",
+      "status": 200
+    },
+    "49f51ec1acd5": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bsfb/veroeffentlichungen/bildungsplaene/gym-seki-122942",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:35.976718",
+      "status": 200
+    },
+    "387b2a5cbf23": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bsfb/veroeffentlichungen/bildungsplaene/start-sek2-2022-123118",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:37.159848",
+      "status": 200
+    },
+    "1af2bb67b378": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bsfb/veroeffentlichungen/bildungsplaene/abiturrichtlinie-123314",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:38.353595",
+      "status": 200
+    },
+    "795cf8f9b925": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bsfb/veroeffentlichungen/bildungsplaene/praesentationspruefung-beispielaufgaben-123320",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:39.530157",
+      "status": 200
+    },
+    "f7ed0b7daa34": {
+      "url": "https://bildungsplaene.hamburg.de/politik-und-verwaltung/behoerden/bsfb/veroeffentlichungen/bildungsplaene/bildungsplaene-123350",
+      "land": "hamburg",
+      "time": "2026-02-01T21:26:40.837505",
+      "status": 200
+    },
+    "e10da2ec41ad": {
+      "url": "https://bildungsplaene.hamburg.de/stadtteilschule",
+      "land": "hamburg",
+      "time": "2026-02-01T21:28:28.351295",
+      "status": 200
+    },
+    "8676a48c906c": {
+      "url": "https://bildungsplaene.hamburg.de/gymnasium",
+      "land": "hamburg",
+      "time": "2026-02-01T21:30:13.480995",
+      "status": 200
+    }
+  },
+  "errors": [
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule-und-beruf/berufliche-bildung/",
+      "error": "404 Client Error: Not Found for url: https://www.berlin.de/sen/bildung/schule-und-beruf/berufliche-bildung/",
+      "time": "2026-02-01T21:10:51.240289"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/begabungsfoerderung/fachinfo/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/schule/foerderung/begabungsfoerderung/fachinfo/",
+      "time": "2026-02-01T21:11:25.268823"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/sonderpaedagogische-foerderung/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/schule/foerderung/sonderpaedagogische-foerderung/",
+      "time": "2026-02-01T21:11:26.204930"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/sonderpaedagogische-foerderung/fachinfo/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/schule/foerderung/sonderpaedagogische-foerderung/fachinfo/",
+      "time": "2026-02-01T21:11:27.112542"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/sprachfoerderung/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/schule/foerderung/sprachfoerderung/",
+      "time": "2026-02-01T21:11:27.958614"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/sprachfoerderung/fachinfo/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/schule/foerderung/sprachfoerderung/fachinfo/",
+      "time": "2026-02-01T21:11:28.841821"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/lernschwierigkeiten/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/schule/foerderung/lernschwierigkeiten/",
+      "time": "2026-02-01T21:11:29.741876"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/lernschwierigkeiten/rechenschwierigkeiten/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/schule/foerderung/lernschwierigkeiten/rechenschwierigkeiten/",
+      "time": "2026-02-01T21:11:30.678252"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/lernschwierigkeiten/lese-und-rechtschreibschwierigkeiten/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/schule/foerderung/lernschwierigkeiten/lese-und-rechtschreibschwierigkeiten/",
+      "time": "2026-02-01T21:11:31.547691"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/diagnostik/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/schule/foerderung/diagnostik/",
+      "time": "2026-02-01T21:11:32.506070"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/diagnostik/fachinfo/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/schule/foerderung/diagnostik/fachinfo/",
+      "time": "2026-02-01T21:11:33.474870"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/emotionale-soziale-entwicklung/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/schule/foerderung/emotionale-soziale-entwicklung/",
+      "time": "2026-02-01T21:11:34.379231"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/digitale-plattformen/lusd/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/schule/digitale-schule/digitale-plattformen/lusd/",
+      "time": "2026-02-01T21:11:51.818388"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/digitale-infrastruktur/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/schule/digitale-schule/digitale-infrastruktur/",
+      "time": "2026-02-01T21:11:52.779205"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/digitale-infrastruktur/breitband-und-netze/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/schule/digitale-schule/digitale-infrastruktur/breitband-und-netze/",
+      "time": "2026-02-01T21:11:53.735621"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/digitale-infrastruktur/nachhaltigkeit-und-digitale-endgeraete/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/schule/digitale-schule/digitale-infrastruktur/nachhaltigkeit-und-digitale-endgeraete/",
+      "time": "2026-02-01T21:11:54.618394"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/digitale-infrastruktur/zentrale-schulverwaltungsumgebung/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/schule/digitale-schule/digitale-infrastruktur/zentrale-schulverwaltungsumgebung/",
+      "time": "2026-02-01T21:11:55.578820"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/landesbeirat-digitalisierung/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/schule/digitale-schule/landesbeirat-digitalisierung/",
+      "time": "2026-02-01T21:11:56.512439"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/digitale-leitprojekte-eeducation-berlin-masterplan/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/schule/digitale-schule/digitale-leitprojekte-eeducation-berlin-masterplan/",
+      "time": "2026-02-01T21:11:57.396963"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/digitale-leitprojekte-eeducation-berlin-masterplan/qualitaetssiegel/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/schule/digitale-schule/digitale-leitprojekte-eeducation-berlin-masterplan/qualitaetssiegel/",
+      "time": "2026-02-01T21:11:58.340969"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule/digitale-schule/digitale-leitprojekte-eeducation-berlin-masterplan/weitere-leitprojekte/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/schule/digitale-schule/digitale-leitprojekte-eeducation-berlin-masterplan/weitere-leitprojekte/",
+      "time": "2026-02-01T21:11:59.311365"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/schulsport/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/schulsport/",
+      "time": "2026-02-01T21:12:16.787345"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/schulsport/karte/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/schulsport/karte/",
+      "time": "2026-02-01T21:12:17.699545"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/",
+      "time": "2026-02-01T21:12:18.623501"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/verbraucherbildung/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/verbraucherbildung/",
+      "time": "2026-02-01T21:12:19.587443"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/globale-entwicklung/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/globale-entwicklung/",
+      "time": "2026-02-01T21:12:20.450137"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/filmbildung/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/filmbildung/",
+      "time": "2026-02-01T21:12:21.311257"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/gewaltpraevention/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/gewaltpraevention/",
+      "time": "2026-02-01T21:12:22.132466"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/digitale-welten/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/digitale-welten/",
+      "time": "2026-02-01T21:12:22.928310"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/digitale-welten/schulversuch-hybrides-lehren-und-lernen/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/digitale-welten/schulversuch-hybrides-lehren-und-lernen/",
+      "time": "2026-02-01T21:12:23.836753"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/digitale-welten/blending4futures/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/digitale-welten/blending4futures/",
+      "time": "2026-02-01T21:12:24.734176"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/mobilitaetsbildung-und-verkehrserziehung/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/faecheruebergreifende-themen/mobilitaetsbildung-und-verkehrserziehung/",
+      "time": "2026-02-01T21:12:25.601527"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/individuelles-lernen/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/unterricht/individuelles-lernen/",
+      "time": "2026-02-01T21:12:26.462426"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/individuelles-lernen/fachinfo/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/unterricht/individuelles-lernen/fachinfo/",
+      "time": "2026-02-01T21:12:27.330464"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/sprachfoerderung/",
+      "error": "429 Client Error: Too Many Requests for url: https://www.berlin.de/sen/bildung/schule/foerderung/sprachfoerderung/",
+      "time": "2026-02-01T21:12:28.216076"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule-und-beruf/berufliche-bildung/",
+      "error": "404 Client Error: Not Found for url: https://www.berlin.de/sen/bildung/schule-und-beruf/berufliche-bildung/",
+      "time": "2026-02-01T21:13:50.809462"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule-und-beruf/berufliche-bildung/",
+      "error": "404 Client Error: Not Found for url: https://www.berlin.de/sen/bildung/schule-und-beruf/berufliche-bildung/",
+      "time": "2026-02-01T21:14:19.804944"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule-und-beruf/berufliche-bildung/",
+      "error": "404 Client Error: Not Found for url: https://www.berlin.de/sen/bildung/schule-und-beruf/berufliche-bildung/",
+      "time": "2026-02-01T21:17:12.395055"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule/berliner-schulen/schulen-in-freier-traegerschaft/mitteilung-aenderung-stammdaten.pdf",
+      "error": "404 Client Error: Not Found for url: https://www.berlin.de/sen/bildung/schule/berliner-schulen/schulen-in-freier-traegerschaft/mitteilung-aenderung-stammdaten.pdf",
+      "time": "2026-02-01T21:19:04.179103"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_mathematik_2026_lk.pdf",
+      "error": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+      "time": "2026-02-01T21:19:33.628665"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule/pruefungen-und-abschluesse/abitur/ps_biologie_2027_gk.pdf",
+      "error": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+      "time": "2026-02-01T21:20:27.782670"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule/inklusion/fachinfo/beiratsempfehlungen_2013.pdf",
+      "error": "404 Client Error: Not Found for url: https://www.berlin.de/sen/bildung/schule/inklusion/fachinfo/beiratsempfehlungen_2013.pdf",
+      "time": "2026-02-01T21:20:56.135764"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/schulqualitaet/mdb-sen-bildung-schulqualitaet-handlungsrahmen_schulqualitaet.pdf",
+      "error": "404 Client Error: Not Found for url: https://www.berlin.de/sen/bildung/unterricht/schulqualitaet/mdb-sen-bildung-schulqualitaet-handlungsrahmen_schulqualitaet.pdf",
+      "time": "2026-02-01T21:20:59.496730"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/rahmenlehrplaene/oberstufe/rlp-go-teil-c-altgriechisch-neu_25-26.pdf",
+      "error": "('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
+      "time": "2026-02-01T21:21:59.034254"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/ethik/ethik_flyer.pdf",
+      "error": "404 Client Error: Not Found for url: https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/ethik/ethik_flyer.pdf",
+      "time": "2026-02-01T21:22:07.488850"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/ethik/broschuere_ethische_reflexionen.pdf",
+      "error": "404 Client Error: Not Found for url: https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/ethik/broschuere_ethische_reflexionen.pdf",
+      "time": "2026-02-01T21:22:09.674988"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/rahmenlehrplaene/mdb-sen-bildung-unterricht-lehrplaene-sek1_wat.pdf",
+      "error": "404 Client Error: Not Found for url: https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/rahmenlehrplaene/mdb-sen-bildung-unterricht-lehrplaene-sek1_wat.pdf",
+      "time": "2026-02-01T21:22:16.156983"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/rahmenlehrplaene/mdb-sen-bildung-schulorganisation-lehrplaene-rahmenplan_foerder.pdf",
+      "error": "404 Client Error: Not Found for url: https://www.berlin.de/sen/bildung/unterricht/faecher-rahmenlehrplaene/rahmenlehrplaene/mdb-sen-bildung-schulorganisation-lehrplaene-rahmenplan_foerder.pdf",
+      "time": "2026-02-01T21:22:17.365912"
+    },
+    {
+      "url": "https://www.bildungsstatistik.berlin.de/next/opendata/pdf/VV_Zumessung_Lehrkraefte_2025_26.pdf",
+      "error": "HTTPSConnectionPool(host='www.bildungsstatistik.berlin.de', port=443): Max retries exceeded with url: /next/opendata/pdf/VV_Zumessung_Lehrkraefte_2025_26.pdf (Caused by SSLError(SSLCertVerificationError(1, '[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate (_ssl.c:1081)')))",
+      "time": "2026-02-01T21:22:27.040339"
+    },
+    {
+      "url": "https://www.berlin.de/sen/bildung/schule/foerderung/sprachfoerderung/fachinfo/fachbrief-nr-24.pdf",
+      "error": "404 Client Error: Not Found for url: https://www.berlin.de/sen/bildung/schule/foerderung/sprachfoerderung/fachinfo/fachbrief-nr-24.pdf",
+      "time": "2026-02-01T21:22:28.316616"
+    },
+    {
+      "url": "https://www.lis.bremen.de/schulqualitaet/curriculumentwicklung/bildungsplaene/",
+      "error": "404 Client Error: Not Found for url: https://www.lis.bremen.de/schulqualitaet/curriculumentwicklung/bildungsplaene/",
+      "time": "2026-02-01T21:22:34.587740"
+    },
+    {
+      "url": "https://bildungsserver.berlin-brandenburg.de/rahmenlehrplaene",
+      "error": "404 Client Error: Not Found for url: https://bildungsserver.berlin-brandenburg.de/rahmenlehrplaene",
+      "time": "2026-02-03T01:21:07.441668"
+    },
+    {
+      "url": "https://bildungsserver.berlin-brandenburg.de/rahmenlehrplaene",
+      "error": "404 Client Error: Not Found for url: https://bildungsserver.berlin-brandenburg.de/rahmenlehrplaene",
+      "time": "2026-02-03T01:21:08.851985"
+    },
+    {
+      "url": "https://www.lis.bremen.de/schulqualitaet/curriculumentwicklung/bildungsplaene-702",
+      "error": "404 Client Error: Not Found for url: https://www.lis.bremen.de/schulqualitaet/curriculumentwicklung/bildungsplaene-702",
+      "time": "2026-02-03T01:21:10.214898"
+    },
+    {
+      "url": "https://bildungsserver.berlin-brandenburg.de/rahmenlehrplaene",
+      "error": "404 Client Error: Not Found for url: https://bildungsserver.berlin-brandenburg.de/rahmenlehrplaene",
+      "time": "2026-02-03T01:22:12.447675"
+    },
+    {
+      "url": "https://bildungsserver.berlin-brandenburg.de/rahmenlehrplaene",
+      "error": "404 Client Error: Not Found for url: https://bildungsserver.berlin-brandenburg.de/rahmenlehrplaene",
+      "time": "2026-02-03T01:22:13.871755"
+    },
+    {
+      "url": "https://www.lis.bremen.de/schulqualitaet/curriculumentwicklung/bildungsplaene-702",
+      "error": "404 Client Error: Not Found for url: https://www.lis.bremen.de/schulqualitaet/curriculumentwicklung/bildungsplaene-702",
+      "time": "2026-02-03T01:22:15.250260"
+    },
+    {
+      "url": "https://bildungsserver.berlin-brandenburg.de/rahmenlehrplaene",
+      "error": "404 Client Error: Not Found for url: https://bildungsserver.berlin-brandenburg.de/rahmenlehrplaene",
+      "time": "2026-02-03T01:33:18.078401"
+    },
+    {
+      "url": "https://bildungsserver.berlin-brandenburg.de/rahmenlehrplaene",
+      "error": "404 Client Error: Not Found for url: https://bildungsserver.berlin-brandenburg.de/rahmenlehrplaene",
+      "time": "2026-02-03T01:33:19.505530"
+    },
+    {
+      "url": "https://www.lis.bremen.de/schulqualitaet/curriculumentwicklung/bildungsplaene-702",
+      "error": "404 Client Error: Not Found for url: https://www.lis.bremen.de/schulqualitaet/curriculumentwicklung/bildungsplaene-702",
+      "time": "2026-02-03T01:33:20.867956"
+    },
+    {
+      "url": "https://bildungsserver.berlin-brandenburg.de/rahmenlehrplaene",
+      "error": "404 Client Error: Not Found for url: https://bildungsserver.berlin-brandenburg.de/rahmenlehrplaene",
+      "time": "2026-02-03T01:33:56.501577"
+    },
+    {
+      "url": "https://bildungsserver.berlin-brandenburg.de/rahmenlehrplaene",
+      "error": "404 Client Error: Not Found for url: https://bildungsserver.berlin-brandenburg.de/rahmenlehrplaene",
+      "time": "2026-02-03T01:33:57.850450"
+    },
+    {
+      "url": "https://www.lis.bremen.de/schulqualitaet/curriculumentwicklung/bildungsplaene-702",
+      "error": "404 Client Error: Not Found for url: https://www.lis.bremen.de/schulqualitaet/curriculumentwicklung/bildungsplaene-702",
+      "time": "2026-02-03T01:33:59.218010"
+    },
+    {
+      "url": "https://bildungsserver.berlin-brandenburg.de/rahmenlehrplaene",
+      "error": "404 Client Error: Not Found for url: https://bildungsserver.berlin-brandenburg.de/rahmenlehrplaene",
+      "time": "2026-02-03T01:35:01.331261"
+    },
+    {
+      "url": "https://bildungsserver.berlin-brandenburg.de/rahmenlehrplaene",
+      "error": "404 Client Error: Not Found for url: https://bildungsserver.berlin-brandenburg.de/rahmenlehrplaene",
+      "time": "2026-02-03T01:35:02.744626"
+    },
+    {
+      "url": "https://www.lis.bremen.de/schulqualitaet/curriculumentwicklung/bildungsplaene-702",
+      "error": "404 Client Error: Not Found for url: https://www.lis.bremen.de/schulqualitaet/curriculumentwicklung/bildungsplaene-702",
+      "time": "2026-02-03T01:35:04.077566"
+    },
+    {
+      "url": "https://bildungsserver.berlin-brandenburg.de/rahmenlehrplaene",
+      "error": "404 Client Error: Not Found for url: https://bildungsserver.berlin-brandenburg.de/rahmenlehrplaene",
+      "time": "2026-02-03T01:35:37.694372"
+    },
+    {
+      "url": "https://bildungsserver.berlin-brandenburg.de/rahmenlehrplaene",
+      "error": "404 Client Error: Not Found for url: https://bildungsserver.berlin-brandenburg.de/rahmenlehrplaene",
+      "time": "2026-02-03T01:35:39.186152"
+    },
+    {
+      "url": "https://www.lis.bremen.de/schulqualitaet/curriculumentwicklung/bildungsplaene-702",
+      "error": "404 Client Error: Not Found for url: https://www.lis.bremen.de/schulqualitaet/curriculumentwicklung/bildungsplaene-702",
+      "time": "2026-02-03T01:35:40.551828"
+    }
+  ],
+  "last_run": "2026-02-03T01:35:44.557605"
+}
