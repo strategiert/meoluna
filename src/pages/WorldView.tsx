@@ -281,11 +281,11 @@ export default function WorldView() {
             {user?.id && (
               <ProgressStats userId={user.id} variant="minimal" className="mr-2" />
             )}
-            {/* Welt-spezifische Punkte */}
-            {progress && (progress.worldScore ?? progress.xp) > 0 && (
+            {/* Welt-spezifische XP */}
+            {progress && (progress.xpEarned ?? progress.xp) > 0 && (
               <div className="flex items-center gap-1 text-sm text-muted-foreground mr-2 border-l border-border pl-2">
                 <Star className="w-4 h-4 text-moon" />
-                <span>{progress.worldScore ?? progress.xp} Punkte</span>
+                <span>{progress.xpEarned ?? progress.xp} XP in dieser Welt</span>
               </div>
             )}
             <Button 
