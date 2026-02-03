@@ -169,7 +169,7 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[500px] p-0 gap-0 overflow-hidden">
+      <DialogContent className="max-w-[95vw] sm:max-w-[500px] max-h-[90vh] p-0 gap-0 overflow-y-auto">
         <DialogTitle className="sr-only">Neue Lernwelt erstellen</DialogTitle>
 
         {/* Progress Indicator */}

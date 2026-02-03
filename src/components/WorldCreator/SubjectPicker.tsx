@@ -3,7 +3,6 @@
  * Große, bunte Icons für Kinder
  */
 
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import {
   Calculator,
@@ -92,20 +91,17 @@ export function SubjectPicker({
       {/* Grundschule */}
       <div>
         <p className="text-sm text-muted-foreground mb-3 px-1">Grundschule</p>
-        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-          {primarySubjects.map((subject, index) => {
+        <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-3">
+          {primarySubjects.map((subject) => {
             const IconComponent = iconMap[subject.icon] || BookOpen;
             const isSelected = selectedSubject?._id === subject._id;
 
             return (
-              <motion.button
+              <button
                 key={subject._id}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.05 }}
                 onClick={() => onSelect(subject)}
                 className={cn(
-                  'relative flex flex-col items-center justify-center gap-2 p-4 rounded-2xl transition-all duration-200',
+                  'relative flex flex-col items-center justify-center gap-2 p-3 sm:p-4 rounded-2xl transition-all duration-200',
                   'hover:scale-105 active:scale-95',
                   'border-2',
                   isSelected
@@ -114,26 +110,23 @@ export function SubjectPicker({
                 )}
               >
                 <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center"
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center"
                   style={{ backgroundColor: subject.color + '20' }}
                 >
                   <IconComponent
-                    className="w-7 h-7"
+                    className="w-6 h-6 sm:w-7 sm:h-7"
                     style={{ color: subject.color }}
                   />
                 </div>
-                <span className="text-sm font-medium text-center leading-tight">
+                <span className="text-xs sm:text-sm font-medium text-center leading-tight">
                   {subject.name}
                 </span>
                 {isSelected && (
-                  <motion.div
-                    layoutId="subject-check"
-                    className="absolute -top-1 -right-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center"
-                  >
+                  <div className="absolute -top-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-primary rounded-full flex items-center justify-center">
                     <span className="text-white text-xs">✓</span>
-                  </motion.div>
+                  </div>
                 )}
-              </motion.button>
+              </button>
             );
           })}
         </div>
@@ -145,17 +138,14 @@ export function SubjectPicker({
           <p className="text-sm text-muted-foreground mb-3 px-1">
             Weiterführende Schule
           </p>
-          <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
-            {secondarySubjects.map((subject, index) => {
+          <div className="grid grid-cols-3 xs:grid-cols-4 sm:grid-cols-5 gap-2">
+            {secondarySubjects.map((subject) => {
               const IconComponent = iconMap[subject.icon] || BookOpen;
               const isSelected = selectedSubject?._id === subject._id;
 
               return (
-                <motion.button
+                <button
                   key={subject._id}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.3 + index * 0.03 }}
                   onClick={() => onSelect(subject)}
                   className={cn(
                     'flex flex-col items-center justify-center gap-1 p-2 rounded-xl transition-all duration-200',
@@ -173,7 +163,7 @@ export function SubjectPicker({
                   <span className="text-xs text-center leading-tight">
                     {subject.name.split('/')[0]}
                   </span>
-                </motion.button>
+                </button>
               );
             })}
           </div>
