@@ -51,35 +51,75 @@
 
 **Keine halben Sachen!** Erst wenn alles committed, deployed und dokumentiert ist, ist der Task abgeschlossen.
 
-### Aktueller Status (2026-02-02 09:30)
+### Aktueller Status (2026-02-03 09:00)
 | Agent | Status | Working On |
 |-------|--------|------------|
-| Claude Code | ⏸️ Idle | Tracking Engine fertig, deployed |
+| Claude Code | ⏸️ Idle | XP-Konsistenz Fix deployed |
 | Claw | 🔄 Active | Crawler läuft, Content fertig |
 
 ### Nächste Tasks (noch zu vergeben)
 - [ ] Blog-System mit Content verbinden (wer?)
-- [ ] Progress System testen + deployen (Claude Code)
+- [x] XP-Anzeige Konsistenz Fix (Claude Code) ✅
 - [ ] Crawler-Ergebnisse parsen (Claw)
 
 ### 🎯 Mission Control API (für Task-Tracking)
 
-**URL:** `https://mission-control-etj.pages.dev`  
+**URL:** `https://mission-control-etj.pages.dev`
 **Auth:** `Authorization: Bearer a8c0ea72755c4fe081c5156a03060695`
+**Projekt:** `meoluna`
 
+#### Alle Tasks abrufen
 ```bash
-# Tasks abrufen
 curl -H "Authorization: Bearer a8c0ea72755c4fe081c5156a03060695" \
-  "https://mission-control-etj.pages.dev/api/tasks?project=meoluna"
-
-# Task erstellen
-curl -X POST -H "Authorization: Bearer a8c0ea72755c4fe081c5156a03060695" \
-  -H "Content-Type: application/json" \
-  -d '{"title": "Neuer Task", "status": "In Progress"}' \
   "https://mission-control-etj.pages.dev/api/tasks?project=meoluna"
 ```
 
-**Regel:** Vor größerer Arbeit Task erstellen, danach Status updaten!
+#### Neuen Task erstellen
+```bash
+curl -X POST -H "Authorization: Bearer a8c0ea72755c4fe081c5156a03060695" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Task-Titel hier",
+    "status": "In Progress",
+    "notes": "Beschreibung was gemacht wird",
+    "tags": "meoluna,feature,bereich"
+  }' \
+  "https://mission-control-etj.pages.dev/api/tasks?project=meoluna"
+```
+
+#### Task updaten (Status ändern)
+```bash
+curl -X PATCH -H "Authorization: Bearer a8c0ea72755c4fe081c5156a03060695" \
+  -H "Content-Type: application/json" \
+  -d '{"status": "Done", "notes": "Ergebnis: Was wurde erreicht. Commit xyz."}' \
+  "https://mission-control-etj.pages.dev/api/tasks/<TASK-ID>?project=meoluna"
+```
+
+#### Verfügbare Status-Werte
+| Status | Verwendung |
+|--------|------------|
+| `Backlog` | Geplant, aber noch nicht begonnen |
+| `In Progress` | Aktiv in Arbeit |
+| `In Review` | Fertig, wartet auf Review/Test |
+| `Blocked` | Blockiert durch Abhängigkeit |
+| `Done` | Abgeschlossen |
+
+#### Task-Felder
+| Feld | Typ | Beschreibung |
+|------|-----|--------------|
+| `title` | string | Kurzer Titel (Pflicht) |
+| `status` | string | Siehe Status-Werte oben |
+| `notes` | string | Längere Beschreibung, Ergebnisse, Links |
+| `tags` | string | Komma-separiert: `meoluna,feature,frontend` |
+| `owner` | string | Wer arbeitet dran (optional) |
+| `due` | string | Fälligkeitsdatum ISO-Format (optional) |
+
+#### Workflow für Agents
+1. **Vor Arbeitsbeginn:** Task erstellen mit `status: "In Progress"`
+2. **Während Arbeit:** Bei Bedarf `notes` updaten
+3. **Nach Abschluss:** Status auf `"Done"` setzen + Ergebnis in `notes`
+
+**Regel:** Jeder abgeschlossene Task muss in Mission Control dokumentiert sein!
 
 ---
 
