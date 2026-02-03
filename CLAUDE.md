@@ -1,17 +1,22 @@
 # CLAUDE.md - Meoluna Project Briefing
 
+> **Neu hier?** Lies zuerst das zentrale Onboarding:
+> `C:\Users\karent\.openclaw\workspace\ONBOARDING.md`
+
 ---
 
-## 🤝 KOORDINATION: Drei Agents, ein Repo
+## 🤝 KOORDINATION: Fünf Agents, ein Repo
 
 **OpenClaw + Claude Code + Goose arbeiten zusammen.**
 
-### Die Agents
+### Die Agents (5 AIs + 1 Human)
 | Agent | Stärke | Besonderheit |
 |-------|--------|--------------|
-| **OpenClaw** | Autonomie, 24/7, Allrounder | Arbeitet via WhatsApp/Telegram, proaktiv, Memory, kann selbst Skills schreiben. Wichtigster Mitarbeiter für autonome Arbeit. |
+| **OpenClaw** | Autonomie, 24/7, Allrounder | Arbeitet via WhatsApp/Telegram, proaktiv, Memory, kann selbst Skills schreiben. |
 | **Claude Code** | Code-Tiefe, IDE-Integration | Primär Code-Experte, Skills-basiert, direkt im Terminal. |
-| **Goose** | Lead/Worker, Recipes, Memory | Lokal, MCP-Server, gute Memory. Hat z.B. das Tracking gefixt. |
+| **Goose** | Lead/Worker, Recipes, Memory | Lokal, MCP-Server, gute Memory. |
+| **Gemini/Antigravity** | Google-Integration | Neu im Team |
+| **OpenAI Codex** | Code-Generierung | Neu im Team |
 
 ### Arbeitsaufteilung (flexibel)
 | Bereich | Primär | Auch möglich |
@@ -61,12 +66,14 @@
 
 **Keine halben Sachen!** Erst wenn alles committed, deployed und dokumentiert ist, ist der Task abgeschlossen.
 
-### Aktueller Status (2026-02-03 09:30)
+### Aktueller Status (2026-02-03 10:00)
 | Agent | Status | Working On |
 |-------|--------|------------|
-| OpenClaw | 🔄 Active | Crawler läuft, Content fertig |
-| Claude Code | ⏸️ Idle | XP-Konsistenz Fix deployed |
+| OpenClaw | 🔄 Active | Crawler, Content |
+| Claude Code | 🔄 Active | Onboarding-Docs erstellen |
 | Goose | ⏸️ Idle | - |
+| Gemini | 🆕 Neu | Onboarding |
+| Codex | 🆕 Neu | Onboarding |
 
 ### Nächste Tasks (noch zu vergeben)
 - [ ] Blog-System mit Content verbinden (wer?)
