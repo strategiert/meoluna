@@ -144,6 +144,54 @@ export default defineSchema({
     .index("by_classroom", ["classroomId"])
     .index("by_world", ["worldId"]),
 
+  // ============================================================================
+  // CURRICULUM (Schulcurricula für modulare Welt-Erstellung)
+  // ============================================================================
+
+  // Fächer (Mathematik, Deutsch, etc.)
+  subjects: defineTable({
+    name: v.string(),           // "Mathematik"
+    slug: v.string(),           // "mathematik"
+    icon: v.string(),           // "Calculator" (Lucide icon name)
+    color: v.string(),          // "#3B82F6" (Tailwind-kompatibel)
+    order: v.number(),          // Sortierreihenfolge
+    isActive: v.boolean(),      // Für UI anzeigen?
+  })
+    .index("by_slug", ["slug"])
+    .index("by_active", ["isActive", "order"]),
+
+  // Themen aus dem Curriculum (pro Fach + Klassenstufe)
+  topics: defineTable({
+    subjectId: v.id("subjects"),
+    name: v.string(),           // "Addition und Subtraktion bis 100"
+    slug: v.string(),           // "addition-subtraktion-100"
+    gradeLevel: v.number(),     // 1-13
+    bundesland: v.optional(v.string()), // null = bundesweit, sonst z.B. "bayern"
+    keywords: v.array(v.string()),      // ["addieren", "subtrahieren", "rechnen"]
+    competencies: v.optional(v.array(v.string())), // Kompetenzen aus Lehrplan
+    sourceUrl: v.optional(v.string()),  // Link zum Original-PDF
+    isActive: v.boolean(),
+  })
+    .index("by_subject", ["subjectId"])
+    .index("by_subject_grade", ["subjectId", "gradeLevel"])
+    .index("by_grade", ["gradeLevel"])
+    .index("by_bundesland", ["bundesland"]),
+
+  // Curriculum-Quelldateien (PDFs)
+  curriculumSources: defineTable({
+    bundesland: v.string(),     // "bayern", "nrw", etc.
+    schulart: v.optional(v.string()), // "grundschule", "gymnasium", etc.
+    fach: v.optional(v.string()),     // "mathematik", etc.
+    filename: v.string(),       // "lehrplan_mathe_gs.pdf"
+    url: v.optional(v.string()), // Original-URL
+    isParsed: v.boolean(),      // Wurde bereits extrahiert?
+    parsedAt: v.optional(v.number()),
+    topicsExtracted: v.optional(v.number()), // Anzahl extrahierter Themen
+    createdAt: v.number(),
+  })
+    .index("by_bundesland", ["bundesland"])
+    .index("by_parsed", ["isParsed"]),
+
   // Blog Posts
   blogPosts: defineTable({
     slug: v.string(),

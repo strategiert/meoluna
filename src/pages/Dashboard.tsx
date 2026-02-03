@@ -31,6 +31,7 @@ import {
   useUser,
 } from '@clerk/clerk-react';
 import { useState, useMemo } from 'react';
+import { WorldCreatorModal } from '@/components/WorldCreator';
 
 // Moon phase icons for world cards
 const moonPhases = ['🌑', '🌒', '🌓', '🌔', '🌕', '🌖', '🌗', '🌘'];
@@ -53,6 +54,7 @@ export default function Dashboard() {
   const togglePublic = useMutation(api.worlds.togglePublic);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterPublic, setFilterPublic] = useState<boolean | null>(null);
+  const [showCreator, setShowCreator] = useState(false);
 
   // Toggle public/private
   const handleTogglePublic = async (worldId: Id<"worlds">, e: React.MouseEvent) => {
@@ -130,12 +132,13 @@ export default function Dashboard() {
                   Verwalte deine magischen Lernwelten
                 </p>
               </div>
-              <Link to="/create">
-                <Button className="gap-2 bg-gradient-to-r from-moon to-aurora hover:opacity-90 text-background font-medium">
-                  <Plus className="w-4 h-4" />
-                  Neue Welt erstellen
-                </Button>
-              </Link>
+              <Button 
+                onClick={() => setShowCreator(true)}
+                className="gap-2 bg-gradient-to-r from-moon to-aurora hover:opacity-90 text-background font-medium"
+              >
+                <Plus className="w-4 h-4" />
+                Neue Welt erstellen
+              </Button>
             </div>
 
             {/* Progress Stats */}
@@ -311,6 +314,9 @@ export default function Dashboard() {
           )}
         </SignedIn>
       </main>
+
+      {/* World Creator Modal */}
+      <WorldCreatorModal open={showCreator} onOpenChange={setShowCreator} />
     </div>
   );
 }
