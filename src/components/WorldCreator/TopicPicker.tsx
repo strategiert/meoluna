@@ -1,12 +1,14 @@
 /**
  * TopicPicker - Thema auswählen (Schritt 3)
- * Liste von Themen aus dem Curriculum
+ * Liste von Themen aus dem Curriculum + Freitext + Datei-Upload
  */
 
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { ArrowLeft, Sparkles, Shuffle } from 'lucide-react';
+import { ArrowLeft, Sparkles, Shuffle, Upload, FileText, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 
 export interface Topic {
   _id: string;
@@ -14,6 +16,12 @@ export interface Topic {
   slug: string;
   gradeLevel: number;
   keywords: string[];
+}
+
+export interface UploadedFile {
+  file: File;
+  preview?: string;
+  type: 'image' | 'pdf';
 }
 
 interface TopicPickerProps {
@@ -25,6 +33,11 @@ interface TopicPickerProps {
   subjectName?: string;
   gradeLevel?: number;
   isLoading?: boolean;
+  // Neue Props für Freitext + Upload
+  customPrompt?: string;
+  onCustomPromptChange?: (prompt: string) => void;
+  uploadedFiles?: UploadedFile[];
+  onFilesChange?: (files: UploadedFile[]) => void;
 }
 
 export function TopicPicker({
@@ -36,7 +49,35 @@ export function TopicPicker({
   subjectName,
   gradeLevel,
   isLoading,
+  customPrompt = '',
+  onCustomPromptChange,
+  uploadedFiles = [],
+  onFilesChange,
 }: TopicPickerProps) {
+  const [showCustomInput, setShowCustomInput] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const newFiles: UploadedFile[] = files.map(file => {
+      const isImage = file.type.startsWith('image/');
+      return {
+        file,
+        type: isImage ? 'image' : 'pdf',
+        preview: isImage ? URL.createObjectURL(file) : undefined,
+      };
+    });
+    onFilesChange?.([...uploadedFiles, ...newFiles]);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const removeFile = (index: number) => {
+    const newFiles = uploadedFiles.filter((_, i) => i !== index);
+    onFilesChange?.(newFiles);
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-4 p-4">
@@ -152,15 +193,109 @@ export function TopicPicker({
         </div>
       )}
 
-      {/* Tip */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3 }}
-        className="text-center text-sm text-muted-foreground"
-      >
-        💡 Du kannst später das Thema ändern
-      </motion.div>
+      {/* Divider */}
+      <div className="flex items-center gap-3 my-4">
+        <div className="flex-1 h-px bg-border" />
+        <span className="text-sm text-muted-foreground">oder</span>
+        <div className="flex-1 h-px bg-border" />
+      </div>
+
+      {/* Custom Input Toggle */}
+      {!showCustomInput ? (
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() => {
+            setShowCustomInput(true);
+            onSelect(null as unknown as Topic); // Deselect topic
+          }}
+        >
+          ✏️ Eigenes Thema beschreiben
+        </Button>
+      ) : (
+        <div className="space-y-3">
+          {/* Custom Text Input */}
+          <div>
+            <label className="text-sm font-medium mb-2 block">
+              Beschreibe, was du lernen möchtest:
+            </label>
+            <Textarea
+              placeholder="z.B. 'Bruchrechnen mit Pizzastücken' oder 'Die Planeten unseres Sonnensystems'"
+              value={customPrompt}
+              onChange={(e) => onCustomPromptChange?.(e.target.value)}
+              className="min-h-[100px] resize-none"
+            />
+          </div>
+
+          {/* File Upload */}
+          <div>
+            <label className="text-sm font-medium mb-2 block">
+              Optional: Bild oder PDF hochladen
+            </label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*,.pdf"
+              multiple
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+            <Button
+              variant="outline"
+              className="w-full gap-2"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <Upload className="w-4 h-4" />
+              Datei auswählen
+            </Button>
+            
+            {/* Uploaded Files Preview */}
+            {uploadedFiles.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-3">
+                {uploadedFiles.map((file, index) => (
+                  <div
+                    key={index}
+                    className="relative group flex items-center gap-2 p-2 rounded-lg bg-secondary/50 border"
+                  >
+                    {file.type === 'image' && file.preview ? (
+                      <img
+                        src={file.preview}
+                        alt="Preview"
+                        className="w-10 h-10 object-cover rounded"
+                      />
+                    ) : (
+                      <FileText className="w-10 h-10 text-muted-foreground p-2" />
+                    )}
+                    <span className="text-xs truncate max-w-[100px]">
+                      {file.file.name}
+                    </span>
+                    <button
+                      onClick={() => removeFile(index)}
+                      className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Back to Topics */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full text-muted-foreground"
+            onClick={() => {
+              setShowCustomInput(false);
+              onCustomPromptChange?.('');
+              onFilesChange?.([]);
+            }}
+          >
+            ← Zurück zur Themenauswahl
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

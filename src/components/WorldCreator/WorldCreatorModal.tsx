@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, Sparkles, Moon } from 'lucide-react';
 import { SubjectPicker, Subject } from './SubjectPicker';
 import { GradePicker } from './GradePicker';
-import { TopicPicker, Topic } from './TopicPicker';
+import { TopicPicker, Topic, UploadedFile } from './TopicPicker';
 import { useUser } from '@clerk/clerk-react';
 
 type Step = 'subject' | 'grade' | 'topic' | 'generating';
@@ -49,6 +49,9 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
   const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null);
   const [generatingMessage, setGeneratingMessage] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  // Custom input state
+  const [customPrompt, setCustomPrompt] = useState('');
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
 
   // Convex Queries
   const subjects = useQuery(api.curriculum.getSubjects) as Subject[] | undefined;
@@ -75,6 +78,8 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
     setSelectedTopic(null);
     setError(null);
     setGeneratingMessage(0);
+    setCustomPrompt('');
+    setUploadedFiles([]);
   }, []);
 
   // Handle close
@@ -118,13 +123,23 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
     } else if (step === 'topic') {
       setStep('grade');
       setSelectedTopic(null);
+      setCustomPrompt('');
+      setUploadedFiles([]);
     }
   };
 
+  // Check if we can generate (either topic selected or custom prompt)
+  const canGenerate = selectedSubject && selectedGrade && (selectedTopic || customPrompt.trim().length > 10);
+
   // Generate World
   const handleGenerate = async () => {
-    if (!selectedSubject || !selectedGrade || !selectedTopic || !user) {
-      setError('Bitte wähle Fach, Klasse und Thema aus');
+    if (!selectedSubject || !selectedGrade || !user) {
+      setError('Bitte wähle Fach und Klasse aus');
+      return;
+    }
+
+    if (!selectedTopic && !customPrompt.trim()) {
+      setError('Bitte wähle ein Thema oder beschreibe dein eigenes');
       return;
     }
 
@@ -137,14 +152,38 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
     }, 2000);
 
     try {
-      // Generate prompt from selection
-      const prompt = `Erstelle eine Lernwelt zum Thema "${selectedTopic.name}" für Klasse ${selectedGrade} im Fach ${selectedSubject.name}. Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
+      // Generate prompt from selection or custom input
+      let prompt: string;
+      let title: string;
+
+      if (customPrompt.trim()) {
+        // Custom prompt mode
+        prompt = `Erstelle eine Lernwelt für Klasse ${selectedGrade} im Fach ${selectedSubject.name}. 
+        
+Der Nutzer wünscht sich: "${customPrompt}"
+
+Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
+        title = customPrompt.slice(0, 50) + (customPrompt.length > 50 ? '...' : '');
+      } else if (selectedTopic) {
+        // Topic selection mode
+        prompt = `Erstelle eine Lernwelt zum Thema "${selectedTopic.name}" für Klasse ${selectedGrade} im Fach ${selectedSubject.name}. Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
+        title = `${selectedTopic.name} - Klasse ${selectedGrade}`;
+      } else {
+        throw new Error('Kein Thema ausgewählt');
+      }
+
+      // TODO: Handle file uploads (convert to base64 and send to API)
+      // For now, we just log them
+      if (uploadedFiles.length > 0) {
+        console.log('Uploaded files:', uploadedFiles.map(f => f.file.name));
+        // Future: Add file content to prompt or send separately
+      }
 
       const result = await generateWorld({ prompt });
 
       // Save the world
       const worldId = await saveWorld({
-        title: `${selectedTopic.name} - Klasse ${selectedGrade}`,
+        title,
         prompt,
         code: result.code,
         userId: user.id,
@@ -257,6 +296,10 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
                 subjectName={selectedSubject?.name}
                 gradeLevel={selectedGrade || undefined}
                 isLoading={!topics && selectedSubject !== null && selectedGrade !== null}
+                customPrompt={customPrompt}
+                onCustomPromptChange={setCustomPrompt}
+                uploadedFiles={uploadedFiles}
+                onFilesChange={setUploadedFiles}
               />
 
               {/* Generate Button */}
@@ -268,7 +311,7 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
                 )}
                 <Button
                   onClick={handleGenerate}
-                  disabled={!selectedTopic}
+                  disabled={!canGenerate}
                   className="w-full gap-2"
                   size="lg"
                 >
@@ -306,7 +349,7 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Loader2 className="w-4 h-4 animate-spin" />
                 <span className="text-sm">
-                  {selectedTopic?.name} · Klasse {selectedGrade}
+                  {customPrompt ? customPrompt.slice(0, 30) + '...' : selectedTopic?.name} · Klasse {selectedGrade}
                 </span>
               </div>
             </motion.div>
