@@ -66,8 +66,11 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
       : 'skip'
   ) as Topic[] | undefined;
 
-  // Convex Actions
+  // Convex Actions & Mutations
   const generateWorld = useAction(api.generate.generateWorld);
+  const generateWorldFromPDF = useAction(api.generate.generateWorldFromPDF);
+  const extractTextFromPDF = useAction(api.documents.extractTextFromPDF);
+  // const generateUploadUrl = useMutation(api.storage.generateUploadUrl); // For future: persistent file storage
   const saveWorld = useMutation(api.worlds.create);
 
   // Reset modal state
@@ -131,6 +134,21 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
   // Check if we can generate (either topic selected or custom prompt)
   const canGenerate = selectedSubject && selectedGrade && (selectedTopic || customPrompt.trim().length > 10);
 
+  // Helper: File to Base64
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const result = reader.result as string;
+        // Remove data URL prefix (e.g., "data:application/pdf;base64,")
+        const base64 = result.split(',')[1];
+        resolve(base64);
+      };
+      reader.onerror = reject;
+    });
+  };
+
   // Generate World
   const handleGenerate = async () => {
     if (!selectedSubject || !selectedGrade || !user) {
@@ -158,8 +176,8 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
 
       if (customPrompt.trim()) {
         // Custom prompt mode
-        prompt = `Erstelle eine Lernwelt für Klasse ${selectedGrade} im Fach ${selectedSubject.name}. 
-        
+        prompt = `Erstelle eine Lernwelt für Klasse ${selectedGrade} im Fach ${selectedSubject.name}.
+
 Der Nutzer wünscht sich: "${customPrompt}"
 
 Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
@@ -172,14 +190,40 @@ Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
         throw new Error('Kein Thema ausgewählt');
       }
 
-      // TODO: Handle file uploads (convert to base64 and send to API)
-      // For now, we just log them
+      // Handle file uploads
+      let pdfText: string | null = null;
+
       if (uploadedFiles.length > 0) {
-        console.log('Uploaded files:', uploadedFiles.map(f => f.file.name));
-        // Future: Add file content to prompt or send separately
+        for (const uploadedFile of uploadedFiles) {
+          if (uploadedFile.type === 'pdf') {
+            // Extract text from PDF using OCR
+            const base64 = await fileToBase64(uploadedFile.file);
+            const extractResult = await extractTextFromPDF({
+              pdfBase64: base64,
+              fileName: uploadedFile.file.name,
+            });
+            pdfText = extractResult.text;
+            prompt += `\n\nDer Nutzer hat ein Dokument hochgeladen: "${uploadedFile.file.name}"`;
+          } else if (uploadedFile.type === 'image') {
+            // For images, we mention them in the prompt
+            // The actual image could be uploaded to storage for future Vision API use
+            prompt += `\n\nDer Nutzer hat ein Bild hochgeladen: "${uploadedFile.file.name}" - Bitte beziehe dich thematisch darauf.`;
+          }
+        }
       }
 
-      const result = await generateWorld({ prompt });
+      // Generate world - use PDF version if we have extracted text
+      let result;
+      if (pdfText) {
+        result = await generateWorldFromPDF({
+          prompt,
+          pdfText,
+          gradeLevel: String(selectedGrade),
+          subject: selectedSubject.slug,
+        });
+      } else {
+        result = await generateWorld({ prompt });
+      }
 
       // Save the world
       const worldId = await saveWorld({
