@@ -2,21 +2,31 @@
 
 ---
 
-## 🤝 KOORDINATION: Claw + Claude Code
+## 🤝 KOORDINATION: Drei Agents, ein Repo
 
-**Zwei Agents, ein Repo. So vermeiden wir Konflikte:**
+**OpenClaw + Claude Code + Goose arbeiten zusammen.**
 
-### Arbeitsaufteilung
-| Agent | Zuständigkeit | Dateien |
-|-------|---------------|---------|
-| **Claude Code** | App-Entwicklung | `src/`, `convex/`, `api/` |
-| **Claw (OpenClaw)** | Content, Marketing, Daten | `content/`, `scripts/`, `data/`, Docs |
+### Die Agents
+| Agent | Stärke | Besonderheit |
+|-------|--------|--------------|
+| **OpenClaw** | Autonomie, 24/7, Allrounder | Arbeitet via WhatsApp/Telegram, proaktiv, Memory, kann selbst Skills schreiben. Wichtigster Mitarbeiter für autonome Arbeit. |
+| **Claude Code** | Code-Tiefe, IDE-Integration | Primär Code-Experte, Skills-basiert, direkt im Terminal. |
+| **Goose** | Lead/Worker, Recipes, Memory | Lokal, MCP-Server, gute Memory. Hat z.B. das Tracking gefixt. |
+
+### Arbeitsaufteilung (flexibel)
+| Bereich | Primär | Auch möglich |
+|---------|--------|--------------|
+| App-Code (`src/`, `convex/`) | Claude Code | Goose, OpenClaw |
+| Content, Marketing, Daten | OpenClaw | Goose |
+| Autonome Tasks (nachts/abwesend) | OpenClaw | - |
+| Komplexe Debugging-Sessions | Goose, Claude Code | - |
+| Scripts, Tooling | Alle | - |
 
 ### Regeln
-1. **Vor dem Start:** `git pull` + CLAUDE.md checken ob der andere gerade arbeitet
-2. **Nach Abschluss:** Änderungen committen, CLAUDE.md updaten
-3. **Kommunikation:** Status-Updates in Activity Log unten
-4. **Konflikte:** Wenn beide dieselbe Datei brauchen → Klaus fragen
+1. **Vor dem Start:** `git pull` + CLAUDE.md checken ob ein anderer Agent gerade arbeitet
+2. **Nach Abschluss:** Änderungen committen, CLAUDE.md updaten, Mission Control updaten
+3. **Kommunikation:** Status-Updates in Activity Log + Mission Control
+4. **Konflikte:** Wenn mehrere dieselbe Datei brauchen → Klaus fragen
 
 ### 🚀 Workflow nach Code-Änderungen (WICHTIG!)
 
@@ -51,11 +61,12 @@
 
 **Keine halben Sachen!** Erst wenn alles committed, deployed und dokumentiert ist, ist der Task abgeschlossen.
 
-### Aktueller Status (2026-02-03 09:00)
+### Aktueller Status (2026-02-03 09:30)
 | Agent | Status | Working On |
 |-------|--------|------------|
+| OpenClaw | 🔄 Active | Crawler läuft, Content fertig |
 | Claude Code | ⏸️ Idle | XP-Konsistenz Fix deployed |
-| Claw | 🔄 Active | Crawler läuft, Content fertig |
+| Goose | ⏸️ Idle | - |
 
 ### Nächste Tasks (noch zu vergeben)
 - [ ] Blog-System mit Content verbinden (wer?)
