@@ -39,6 +39,30 @@ Erstelle eine VOLLSTÄNDIGE Lerneinheit mit echtem pädagogischem Wert. Keine ob
 - Functional components mit Hooks
 - State für: aktuelles Modul, Fortschritt, Punkte, Antworten
 
+### KRITISCH: VERBOTENE PATTERNS!
+
+**NIEMALS top-level await verwenden!**
+\`\`\`javascript
+// VERBOTEN - Der Code wird nicht kompilieren:
+const { createRoot } = await import("react-dom/client");
+const React = (await import("react")).default;
+createRoot(document.getElementById('root')).render(<App />);
+
+// Der Code soll NUR die App-Komponente exportieren!
+// Das Rendering übernimmt die Sandbox automatisch.
+\`\`\`
+
+**NIEMALS p5.js Konstanten neu deklarieren!**
+\`\`\`javascript
+// VERBOTEN - Konflikt mit p5.js globals:
+const PI = 3.14159;
+const TWO_PI = 6.28318;
+const HALF_PI = 1.5708;
+
+// RICHTIG - Nutze Math.PI oder die p5.js globals direkt:
+Math.PI  // oder einfach PI (wenn p5 importiert)
+\`\`\`
+
 ### Verfügbare Imports
 \`\`\`javascript
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
@@ -304,6 +328,8 @@ Bevor du antwortest, prüfe:
 - [ ] Feedback bei JEDER Aufgabe vorhanden?
 - [ ] KEIN Markdown in Strings (kein **, *, \`)?
 - [ ] **Jede visuelle Referenz hat auch eine Visualisierung?**
+- [ ] **KEIN top-level await (kein "await import", kein "createRoot")?**
+- [ ] **KEINE Redeclaration von PI, TWO_PI, HALF_PI?**
 
 Du erstellst keine Demo - du erstellst eine echte Lernplattform.`;
 
