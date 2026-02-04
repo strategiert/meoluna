@@ -63,6 +63,45 @@ const HALF_PI = 1.5708;
 Math.PI  // oder einfach PI (wenn p5 importiert)
 \`\`\`
 
+**NIEMALS Objekte direkt in JSX rendern! (React Error #31)**
+\`\`\`javascript
+// VERBOTEN - Führt zu "Objects are not valid as a React child":
+const data = { name: 'Test', value: 42 };
+return <div>{data}</div>;  // FEHLER!
+
+// VERBOTEN - Objekt-ähnliche Strukturen:
+const items = { 0: 'A', 1: 'B', 2: 'C' };  // Das ist ein Objekt, kein Array!
+return <div>{items}</div>;  // FEHLER!
+
+// VERBOTEN - .map() auf Objekt statt Array:
+{Object.keys(data).map(key => data[key])}  // Wenn data[key] ein Objekt ist = FEHLER!
+
+// RICHTIG - Objekt-Eigenschaften einzeln rendern:
+return <div>{data.name}: {data.value}</div>;
+
+// RICHTIG - Arrays verwenden und JSX zurückgeben:
+const items = ['A', 'B', 'C'];  // Echtes Array!
+{items.map((item, i) => <span key={i}>{item}</span>)}
+
+// RICHTIG - Objekte zu Arrays konvertieren:
+{Object.entries(data).map(([key, value]) => (
+  <div key={key}>{key}: {String(value)}</div>
+))}
+
+// RICHTIG - Objekte als String:
+{JSON.stringify(data)}
+\`\`\`
+
+**NIEMALS Arrays von Objekten ohne .map() rendern!**
+\`\`\`javascript
+// VERBOTEN:
+const questions = [{ text: 'Frage 1' }, { text: 'Frage 2' }];
+return <div>{questions}</div>;  // FEHLER!
+
+// RICHTIG:
+return <div>{questions.map((q, i) => <p key={i}>{q.text}</p>)}</div>;
+\`\`\`
+
 ### Verfügbare Imports
 \`\`\`javascript
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
@@ -330,6 +369,9 @@ Bevor du antwortest, prüfe:
 - [ ] **Jede visuelle Referenz hat auch eine Visualisierung?**
 - [ ] **KEIN top-level await (kein "await import", kein "createRoot")?**
 - [ ] **KEINE Redeclaration von PI, TWO_PI, HALF_PI?**
+- [ ] **KEINE Objekte direkt in JSX rendern (React Error #31)?**
+- [ ] **Alle Arrays mit .map() und key-prop rendern?**
+- [ ] **Objekt-Properties einzeln zugreifen, nicht das ganze Objekt?**
 
 Du erstellst keine Demo - du erstellst eine echte Lernplattform.`;
 
@@ -534,12 +576,60 @@ REGELN:
 5. Nutze nur diese Imports: react, framer-motion, lucide-react, canvas-confetti, recharts, clsx
 6. Verwende Tailwind CSS Klassen für Styling
 
+## HÄUFIGE FEHLER UND FIXES:
+
+### React Error #31 ("Objects are not valid as a React child")
+Dieser Fehler tritt auf wenn ein Objekt direkt gerendert wird:
+
+FALSCH:
+\`\`\`jsx
+const data = { name: 'Test' };
+return <div>{data}</div>;  // FEHLER!
+
+const items = { 0: 'A', 1: 'B' };  // Objekt mit numerischen Keys
+return <ul>{items}</ul>;  // FEHLER!
+
+{questions}  // Wenn questions ein Array von Objekten ist = FEHLER!
+\`\`\`
+
+RICHTIG:
+\`\`\`jsx
+return <div>{data.name}</div>;  // Eigenschaft rendern
+
+const items = ['A', 'B'];  // Echtes Array verwenden
+return <ul>{items.map((item, i) => <li key={i}>{item}</li>)}</ul>;
+
+{questions.map((q, i) => <div key={i}>{q.text}</div>)}  // Mit .map() und JSX
+\`\`\`
+
+Suche nach:
+- Variablen die direkt in JSX {variable} gerendert werden wo variable ein Objekt ist
+- .map() Aufrufe die kein JSX zurückgeben
+- Objekte mit numerischen Keys (0, 1, 2, 3) die eigentlich Arrays sein sollten
+
 WICHTIG: Antworte NUR mit dem kompletten, funktionierenden Code.`;
+
+    // Erweitere Error-Beschreibung für bekannte Fehler
+    let errorDescription = args.error;
+
+    // React Error #31 - Objects not valid as React child
+    if (args.error.includes('#31') || args.error.includes('invariant=31') || args.error.includes('object with keys')) {
+      errorDescription = `React Error #31: "Objects are not valid as a React child"
+
+Der Code versucht ein Objekt direkt zu rendern statt seine Eigenschaften.
+Mögliche Ursachen:
+1. Eine Variable die ein Objekt ist wird direkt in JSX gerendert: {someObject} statt {someObject.property}
+2. Ein Array von Objekten wird ohne .map() gerendert: {items} statt {items.map(item => <div>{item.name}</div>)}
+3. Ein Objekt mit numerischen Keys (0, 1, 2, 3) wird als Array behandelt
+4. Object.keys() oder Object.values() Ergebnis wird direkt gerendert ohne .map()
+
+Original-Fehler: ${args.error}`;
+    }
 
     const userPrompt = `Dieser React-Code hat einen Fehler:
 
 FEHLER:
-${args.error}
+${errorDescription}
 
 CODE:
 ${args.code}
