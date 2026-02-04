@@ -21,6 +21,7 @@ import { SubjectPicker, Subject } from './SubjectPicker';
 import { GradePicker } from './GradePicker';
 import { TopicPicker, Topic, UploadedFile } from './TopicPicker';
 import { useUser } from '@clerk/clerk-react';
+import { P5Background } from '@/components/landing/P5Background';
 
 type Step = 'subject' | 'grade' | 'topic' | 'generating';
 
@@ -369,32 +370,58 @@ Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
           {step === 'generating' && (
             <motion.div
               key="generating"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="flex flex-col items-center justify-center py-16 px-8 text-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="relative min-h-[400px] overflow-hidden rounded-lg bg-gradient-to-b from-[#0a0a1a] to-[#1a1a2e]"
             >
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
-                className="mb-6"
-              >
-                <Moon className="w-16 h-16 text-primary" />
-              </motion.div>
+              {/* Animated p5.js Background */}
+              <P5Background />
 
-              <motion.p
-                key={generatingMessage}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-lg font-medium mb-2"
-              >
-                {generatingMessages[generatingMessage]}
-              </motion.p>
+              {/* Gradient overlay for better text readability */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/40" />
 
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span className="text-sm">
-                  {customPrompt ? customPrompt.slice(0, 30) + '...' : selectedTopic?.name} · Klasse {selectedGrade}
-                </span>
+              {/* Content overlay */}
+              <div className="relative z-10 flex flex-col items-center justify-center min-h-[400px] px-8 text-center">
+                <motion.div
+                  animate={{
+                    rotate: 360,
+                    scale: [1, 1.1, 1],
+                  }}
+                  transition={{
+                    rotate: { duration: 20, repeat: Infinity, ease: 'linear' },
+                    scale: { duration: 3, repeat: Infinity, ease: 'easeInOut' }
+                  }}
+                  className="mb-8"
+                >
+                  <Moon className="w-20 h-20 text-amber-200 drop-shadow-[0_0_30px_rgba(251,191,36,0.5)]" />
+                </motion.div>
+
+                <motion.p
+                  key={generatingMessage}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="text-xl font-medium mb-4 text-white drop-shadow-lg"
+                >
+                  {generatingMessages[generatingMessage]}
+                </motion.p>
+
+                <div className="flex items-center gap-3 text-white/70 bg-black/30 px-4 py-2 rounded-full backdrop-blur-sm">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span className="text-sm">
+                    {customPrompt ? customPrompt.slice(0, 30) + '...' : selectedTopic?.name} · Klasse {selectedGrade}
+                  </span>
+                </div>
+
+                {/* Floating particles hint */}
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 2 }}
+                  className="mt-8 text-xs text-white/40"
+                >
+                  Beobachte die Magie im Hintergrund...
+                </motion.p>
               </div>
             </motion.div>
           )}
