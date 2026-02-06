@@ -411,25 +411,25 @@ export const Sandbox: React.FC<SandboxProps> = ({
           .replace(/export\\s+default\\s+function\\s+App/g, 'function App')
           .replace(/export\\s+\\{[^}]*\\}\\s*;?/g, '');
 
-        // 3b. Strip duplicate React/ReactDOM imports from generated code (Sandbox wrapper handles these)
-        processedCode = processedCode
-          .replace(/const\\s+React\\s*=\\s*\\(await\\s+import\\([^)]+\\)\\)\\.default;?/g, '// [Sandbox] React provided by wrapper')
-          .replace(/const\\s+\\{\\s*createRoot[^}]*\\}\\s*=\\s*await\\s+import\\([^)]+\\);?/g, '// [Sandbox] createRoot provided by wrapper')
-          .replace(/const\\s+ReactDOM\\s*=\\s*\\(await\\s+import\\([^)]+\\)\\)\\.default;?/g, '// [Sandbox] ReactDOM provided by wrapper')
-          .replace(/const\\s+_mod\\s*=\\s*await\\s+import\\([^)]*react@[^)]*\\);\\s*const\\s+React\\s*=\\s*_mod\\.default;/g, '// [Sandbox] React provided by wrapper');
-
-        // 3c. Strip PI/TWO_PI/HALF_PI redeclarations (conflict with p5.js)
+        // 3b. Strip PI/TWO_PI/HALF_PI redeclarations (conflict with p5.js)
         processedCode = processedCode
           .replace(/const\\s+(PI|TWO_PI|HALF_PI)\\s*=\\s*[^;]+;?/g, '// [Sandbox] using Math.$1 instead');
+
+        // 3c. Strip any standalone ReactDOM render calls from generated code (Sandbox wrapper handles rendering)
+        processedCode = processedCode
+          .replace(/const\\s+root\\s*=\\s*createRoot\\([^)]*\\);?/g, '// [Sandbox] render handled by wrapper')
+          .replace(/root\\.render\\([^)]*\\);?/g, '// [Sandbox] render handled by wrapper');
 
         // 4. Wrap in async function für top-level await
         const wrappedCode = \`
           (async () => {
             \${processedCode}
 
-            // Render the App - nur importieren wenn noch nicht vorhanden
-            const { createRoot } = await import("https://esm.sh/react-dom@18.2.0/client");
-            const _React = typeof React !== 'undefined' ? React : (await import("https://esm.sh/react@18.2.0")).default;
+            // Render the App - sichere Imports (kollidieren nicht mit generiertem Code)
+            const __rdom = await import("https://esm.sh/react-dom@18.2.0/client");
+            const __react = await import("https://esm.sh/react@18.2.0");
+            const _React = __react.default;
+            const _createRoot = __rdom.createRoot;
 
             // Error Boundary Component
             class ErrorBoundary extends _React.Component {
@@ -471,7 +471,7 @@ export const Sandbox: React.FC<SandboxProps> = ({
               throw new Error('Keine App-Komponente gefunden. Bitte exportiere eine "App" oder "export default" Komponente.');
             }
 
-            const root = createRoot(document.getElementById('root'));
+            const root = _createRoot(document.getElementById('root'));
             root.render(
               _React.createElement(ErrorBoundary, null,
                 _React.createElement(AppComponent)
