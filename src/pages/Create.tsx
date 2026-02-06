@@ -32,6 +32,7 @@ interface Message {
   role: 'user' | 'assistant';
   content: string;
   code?: string;
+  worldId?: string;
   timestamp: Date;
 }
 
@@ -47,6 +48,7 @@ export default function Create() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [worldTitle, setWorldTitle] = useState('');
+  const [worldId, setWorldId] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -169,11 +171,13 @@ export default function Create() {
           ? `${result.worldName} — basierend auf dem PDF! 🌙📄✨`
           : `${result.worldName} — deine einzigartige Lernwelt! 🌙✨`,
         code: result.code,
+        worldId: result.worldId,
         timestamp: new Date()
       };
 
       setMessages(prev => [...prev, assistantMessage]);
       setCurrentCode(result.code);
+      setWorldId(result.worldId);
       setSessionId(null);
 
       // Clear PDF after successful generation
@@ -216,14 +220,21 @@ export default function Create() {
   const handleSaveWorld = async () => {
     if (!currentCode || !user) return;
 
+    // V2 pipeline already saved the world — just navigate
+    if (worldId) {
+      navigate(`/w/${worldId}`);
+      return;
+    }
+
+    // Fallback: manual save (shouldn't happen with V2)
     try {
-      const worldId = await saveWorld({
+      const newWorldId = await saveWorld({
         title: worldTitle || 'Neue Lernwelt',
         code: currentCode,
         userId: user.id,
         isPublic: false
       });
-      navigate(`/w/${worldId}`);
+      navigate(`/w/${newWorldId}`);
     } catch (err) {
       console.error('Save failed:', err);
     }
