@@ -12,14 +12,14 @@ import { MoonLogo } from "@/components/icons/MoonLogo";
 
 // V2 Pipeline Stages (echte Steps)
 const V2_STAGES = [
-  { step: 0, label: "Analysiere deine Aufgabe...", icon: Brain, message: "Thema, Lernziele und Schwierigkeit werden erkannt..." },
-  { step: 1, label: "Erfinde einzigartiges Universum...", icon: Sparkles, message: "Ein kreatives Weltkonzept wird erschaffen..." },
-  { step: 2, label: "Designe Spielmechaniken...", icon: Gamepad2, message: "Einzigartige Interaktionsformen für jedes Modul..." },
+  { step: 0, label: "Analysiere dein Thema...", icon: Brain, message: "Thema, Lernziele und Schwierigkeit werden erkannt..." },
+  { step: 1, label: "Erfinde einzigartiges Universum...", icon: Sparkles, message: "Ein kreatives Spielwelt-Konzept wird erschaffen..." },
+  { step: 2, label: "Designe die Minigames...", icon: Gamepad2, message: "Einzigartige Spielmechaniken für jedes Level..." },
   { step: 3, label: "Plane Grafiken...", icon: Palette, message: "Bild-Prompts und visuelle Identität werden erstellt..." },
   { step: 4, label: "Generiere Bilder...", icon: Image, message: "KI-Bilder werden parallel generiert..." },
-  { step: 5, label: "Erstelle Lerninhalte...", icon: Brain, message: "Aufgaben, Lösungen und Feedback werden geschrieben..." },
+  { step: 5, label: "Erstelle Spiel-Challenges...", icon: Brain, message: "Challenges, Lösungen und Feedback werden designt..." },
   { step: 6, label: "Qualitätsprüfung...", icon: ShieldCheck, message: "Alle Inhalte werden auf Korrektheit geprüft..." },
-  { step: 7, label: "Baue deine Lernwelt...", icon: Code, message: "React-Code wird aus dem Plan generiert..." },
+  { step: 7, label: "Baue deine Spielwelt...", icon: Code, message: "React-Code wird aus dem Plan generiert..." },
   { step: 8, label: "Teste und optimiere...", icon: Wrench, message: "Code wird validiert und Fehler automatisch gefixt..." },
 ];
 
