@@ -52,11 +52,13 @@ export default function Create() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Convex Actions
-  const generateWorld = useAction(api.generate.generateWorld);
-  const generateWorldFromPDF = useAction(api.generate.generateWorldFromPDF);
+  const generateWorldV2 = useAction(api.pipeline.orchestrator.generateWorldV2);
   const extractPDF = useAction(api.documents.extractTextFromPDF);
   const autoFixCode = useAction(api.generate.autoFixCode);
   const saveWorld = useMutation(api.worlds.create);
+
+  // V2 Pipeline Session
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
   // PDF State
   const [pdfFile, setPdfFile] = useState<File | null>(null);
@@ -146,26 +148,33 @@ export default function Create() {
     setIsGenerating(true);
 
     try {
-      // Use PDF-aware generation if text was extracted
-      const result = pdfText
-        ? await generateWorldFromPDF({
-            prompt: input.trim(),
-            pdfText: pdfText,
-          })
-        : await generateWorld({ prompt: userMessage.content });
+      if (!user) throw new Error("Nicht angemeldet");
+
+      // Generate unique session ID for progress tracking
+      const newSessionId = `gen_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      setSessionId(newSessionId);
+
+      // Pipeline V2: 10-step orchestration
+      const result = await generateWorldV2({
+        prompt: input.trim(),
+        pdfText: pdfText || undefined,
+        userId: user.id,
+        sessionId: newSessionId,
+      });
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: pdfText
-          ? 'Hier ist deine Lernwelt basierend auf dem PDF! 🌙📄✨'
-          : 'Hier ist deine Lernwelt! 🌙✨',
+          ? `${result.worldName} — basierend auf dem PDF! 🌙📄✨`
+          : `${result.worldName} — deine einzigartige Lernwelt! 🌙✨`,
         code: result.code,
         timestamp: new Date()
       };
 
       setMessages(prev => [...prev, assistantMessage]);
       setCurrentCode(result.code);
+      setSessionId(null);
 
       // Clear PDF after successful generation
       if (pdfText) {
@@ -173,6 +182,7 @@ export default function Create() {
       }
 
     } catch (err) {
+      setSessionId(null);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
@@ -356,6 +366,7 @@ export default function Create() {
 
           {isGenerating && (
             <GenerationProgress
+              sessionId={sessionId || undefined}
               isGenerating={isGenerating}
               isPdfBased={!!pdfText}
             />
