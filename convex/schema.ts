@@ -321,4 +321,21 @@ export default defineSchema({
     .index("by_canonical_user", ["canonicalUserId"])
     .index("by_conversion_type", ["conversionType"])
     .index("by_timestamp", ["timestamp"]),
+
+  // ============================================================================
+  // PIPELINE V2 - Generation Sessions (Real-time Progress Tracking)
+  // ============================================================================
+  generationSessions: defineTable({
+    sessionId: v.string(),
+    userId: v.string(),
+    status: v.string(),              // "running" | "completed" | "failed"
+    currentStep: v.number(),         // 0-9 (index in STEP_ORDER)
+    stepLabel: v.string(),           // Human-readable label
+    error: v.optional(v.string()),
+    worldId: v.optional(v.id("worlds")),
+    startedAt: v.number(),
+    completedAt: v.optional(v.number()),
+  })
+    .index("by_session", ["sessionId"])
+    .index("by_user", ["userId"]),
 });

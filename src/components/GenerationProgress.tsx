@@ -1,22 +1,32 @@
 /**
- * GenerationProgress - Original Design aus eigen-app-studio
+ * GenerationProgress - Live-Progress für Pipeline V2
+ * Zeigt entweder echte Convex-Status oder Auto-Progression (V1 Fallback)
  */
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Check, FileText, Brain, Sparkles, Loader2 } from "lucide-react";
+import { Check, FileText, Brain, Sparkles, Loader2, Palette, Gamepad2, Image, ShieldCheck, Code, Wrench } from "lucide-react";
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 import { MoonLogo } from "@/components/icons/MoonLogo";
 
-type Stage = "uploading" | "extracting" | "analyzing" | "designing" | "generating" | "images" | "finalizing" | "complete";
+// V2 Pipeline Stages (echte Steps)
+const V2_STAGES = [
+  { step: 0, label: "Analysiere deine Aufgabe...", icon: Brain, message: "Thema, Lernziele und Schwierigkeit werden erkannt..." },
+  { step: 1, label: "Erfinde einzigartiges Universum...", icon: Sparkles, message: "Ein kreatives Weltkonzept wird erschaffen..." },
+  { step: 2, label: "Designe Spielmechaniken...", icon: Gamepad2, message: "Einzigartige Interaktionsformen für jedes Modul..." },
+  { step: 3, label: "Plane Grafiken...", icon: Palette, message: "Bild-Prompts und visuelle Identität werden erstellt..." },
+  { step: 4, label: "Generiere Bilder...", icon: Image, message: "KI-Bilder werden parallel generiert..." },
+  { step: 5, label: "Erstelle Lerninhalte...", icon: Brain, message: "Aufgaben, Lösungen und Feedback werden geschrieben..." },
+  { step: 6, label: "Qualitätsprüfung...", icon: ShieldCheck, message: "Alle Inhalte werden auf Korrektheit geprüft..." },
+  { step: 7, label: "Baue deine Lernwelt...", icon: Code, message: "React-Code wird aus dem Plan generiert..." },
+  { step: 8, label: "Teste und optimiere...", icon: Wrench, message: "Code wird validiert und Fehler automatisch gefixt..." },
+];
 
-interface GenerationProgressProps {
-  stage?: Stage;
-  progress?: number;
-  isGenerating?: boolean;
-  isPdfBased?: boolean;
-}
+// V1 Legacy Stages (Auto-Progression)
+type LegacyStage = "uploading" | "extracting" | "analyzing" | "designing" | "generating" | "images" | "finalizing" | "complete";
 
-const stages = [
+const LEGACY_STAGES = [
   { id: "uploading", label: "Hochladen...", icon: FileText, duration: 2 },
   { id: "extracting", label: "Text wird extrahiert...", icon: FileText, duration: 5 },
   { id: "analyzing", label: "Analysiere Lerninhalt...", icon: Brain, duration: 15 },
@@ -27,58 +37,193 @@ const stages = [
   { id: "complete", label: "Fertig!", icon: Check, duration: 0 },
 ];
 
-// Stages ohne PDF-Upload
-const stagesWithoutPdf = stages.filter(s => s.id !== "uploading" && s.id !== "extracting");
+const LEGACY_STAGES_NO_PDF = LEGACY_STAGES.filter(s => s.id !== "uploading" && s.id !== "extracting");
+
+interface GenerationProgressProps {
+  // V2 mode: subscribe to real Convex session
+  sessionId?: string;
+  // V1 fallback: manual stage/progress
+  stage?: LegacyStage;
+  progress?: number;
+  isGenerating?: boolean;
+  isPdfBased?: boolean;
+}
 
 export function GenerationProgress({
+  sessionId,
   stage: externalStage,
   progress: externalProgress,
   isGenerating = true,
   isPdfBased = false,
 }: GenerationProgressProps) {
-  const [internalStage, setInternalStage] = useState<Stage>(isPdfBased ? "uploading" : "analyzing");
+  // V2: Subscribe to real-time session status
+  const session = useQuery(
+    api.pipeline.status.getSession,
+    sessionId ? { sessionId } : "skip"
+  );
+
+  const isV2 = !!sessionId && !!session;
+
+  // V2 rendering
+  if (isV2) {
+    const currentStep = session.currentStep ?? 0;
+    const isComplete = session.status === "completed";
+    const isFailed = session.status === "failed";
+    const progress = isComplete ? 100 : Math.floor((currentStep / V2_STAGES.length) * 95);
+
+    return (
+      <div className="space-y-6">
+        {/* Animated moon logo */}
+        <div className="flex justify-center">
+          <motion.div
+            animate={{
+              scale: isComplete ? [1, 1.2, 1] : 1,
+              rotate: isComplete ? 0 : 360,
+            }}
+            transition={{
+              rotate: { repeat: Infinity, duration: 8, ease: "linear" },
+              scale: { duration: 0.5 },
+            }}
+            className="relative"
+          >
+            <div className={`w-20 h-20 rounded-full flex items-center justify-center ${
+              isFailed
+                ? "bg-gradient-to-br from-red-500 via-red-400 to-red-600"
+                : "bg-gradient-to-br from-moon via-moon/80 to-aurora"
+            }`}>
+              {isComplete ? (
+                <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 200 }}>
+                  <Check className="w-10 h-10 text-background" />
+                </motion.div>
+              ) : (
+                <MoonLogo size="lg" />
+              )}
+            </div>
+
+            {/* Orbiting particles */}
+            {!isComplete && !isFailed && (
+              <>
+                {[0, 1, 2].map((i) => (
+                  <motion.div
+                    key={i}
+                    className="absolute w-2 h-2 bg-moon rounded-full"
+                    animate={{ rotate: 360 }}
+                    transition={{ repeat: Infinity, duration: 2 + i * 0.5, ease: "linear", delay: i * 0.3 }}
+                    style={{ top: "50%", left: "50%", marginTop: -4, marginLeft: -4, transformOrigin: `${40 + i * 10}px 0` }}
+                  />
+                ))}
+              </>
+            )}
+          </motion.div>
+        </div>
+
+        {/* V2 Pipeline stages */}
+        <div className="space-y-2">
+          {V2_STAGES.map((s, index) => {
+            const isCompleted = index < currentStep;
+            const isCurrent = index === currentStep && !isComplete;
+            const Icon = s.icon;
+
+            return (
+              <motion.div
+                key={s.step}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${
+                  isCurrent
+                    ? "bg-moon/10 border border-moon/30"
+                    : isCompleted
+                    ? "bg-muted/30"
+                    : "opacity-30"
+                }`}
+              >
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-all ${
+                  isCompleted
+                    ? "bg-green-500/20 text-green-500"
+                    : isCurrent
+                    ? "bg-moon/20 text-moon"
+                    : "bg-muted text-muted-foreground"
+                }`}>
+                  {isCompleted ? (
+                    <Check className="w-3.5 h-3.5" />
+                  ) : isCurrent ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Icon className="w-3.5 h-3.5" />
+                  )}
+                </div>
+                <span className={`text-sm ${isCurrent ? "text-foreground font-medium" : "text-muted-foreground"}`}>
+                  {s.label}
+                </span>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Progress bar */}
+        <div className="space-y-2">
+          <div className="h-2 bg-muted rounded-full overflow-hidden">
+            <motion.div
+              className={`h-full ${isFailed ? "bg-red-500" : "bg-gradient-to-r from-moon to-aurora"}`}
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.5 }}
+            />
+          </div>
+          <p className="text-xs text-center text-muted-foreground">{progress}%</p>
+        </div>
+
+        {/* Current message */}
+        <motion.p
+          key={currentStep}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center text-sm text-muted-foreground"
+        >
+          {isFailed
+            ? `Fehler: ${session.error || "Unbekannter Fehler"}`
+            : isComplete
+            ? "Deine Lernwelt ist bereit! ✨"
+            : V2_STAGES[currentStep]?.message || "Wird verarbeitet..."}
+        </motion.p>
+      </div>
+    );
+  }
+
+  // ── V1 LEGACY FALLBACK ──────────────────────────────────────────
+  const [internalStage, setInternalStage] = useState<LegacyStage>(isPdfBased ? "uploading" : "analyzing");
   const [internalProgress, setInternalProgress] = useState(0);
 
-  const activeStages = isPdfBased ? stages : stagesWithoutPdf;
+  const activeStages = isPdfBased ? LEGACY_STAGES : LEGACY_STAGES_NO_PDF;
   const stage = externalStage ?? internalStage;
-  const progress = externalProgress ?? internalProgress;
+  const legacyProgress = externalProgress ?? internalProgress;
   const currentIndex = activeStages.findIndex((s) => s.id === stage);
 
-  // Automatische Stage-Progression wenn keine externe Stage gegeben
   useEffect(() => {
     if (externalStage || !isGenerating) return;
 
     let elapsed = 0;
     const interval = setInterval(() => {
       elapsed += 1;
-
-      // Berechne kumulative Zeit bis zur aktuellen Stage
       let cumulativeTime = 0;
       let newStageIndex = 0;
 
       for (let i = 0; i < activeStages.length - 1; i++) {
         cumulativeTime += activeStages[i].duration;
-        if (elapsed < cumulativeTime) {
-          newStageIndex = i;
-          break;
-        }
+        if (elapsed < cumulativeTime) { newStageIndex = i; break; }
         newStageIndex = i + 1;
       }
 
-      // Begrenze auf vorletzte Stage (nicht complete)
       newStageIndex = Math.min(newStageIndex, activeStages.length - 2);
-      setInternalStage(activeStages[newStageIndex].id as Stage);
-
-      // Progress berechnen (0-95%, nie 100% bis tatsächlich fertig)
+      setInternalStage(activeStages[newStageIndex].id as LegacyStage);
       const totalDuration = activeStages.slice(0, -1).reduce((sum, s) => sum + s.duration, 0);
-      const newProgress = Math.min((elapsed / totalDuration) * 100, 95);
-      setInternalProgress(Math.floor(newProgress));
+      setInternalProgress(Math.min(Math.floor((elapsed / totalDuration) * 100), 95));
     }, 1000);
 
     return () => clearInterval(interval);
   }, [externalStage, isGenerating, activeStages]);
 
-  // Reset bei neuem Start
   useEffect(() => {
     if (isGenerating) {
       setInternalStage(isPdfBased ? "uploading" : "analyzing");
@@ -88,56 +233,30 @@ export function GenerationProgress({
 
   return (
     <div className="space-y-6">
-      {/* Animated moon logo */}
       <div className="flex justify-center">
         <motion.div
-          animate={{
-            scale: stage === "complete" ? [1, 1.2, 1] : 1,
-            rotate: stage !== "complete" ? 360 : 0
-          }}
-          transition={{
-            rotate: { repeat: Infinity, duration: 8, ease: "linear" },
-            scale: { duration: 0.5 }
-          }}
+          animate={{ scale: stage === "complete" ? [1, 1.2, 1] : 1, rotate: stage !== "complete" ? 360 : 0 }}
+          transition={{ rotate: { repeat: Infinity, duration: 8, ease: "linear" }, scale: { duration: 0.5 } }}
           className="relative"
         >
           <div className="w-20 h-20 rounded-full bg-gradient-to-br from-moon via-moon/80 to-aurora flex items-center justify-center">
             {stage === "complete" ? (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 200 }}
-              >
+              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 200 }}>
                 <Check className="w-10 h-10 text-background" />
               </motion.div>
             ) : (
               <MoonLogo size="lg" />
             )}
           </div>
-
-          {/* Orbiting particles */}
           {stage !== "complete" && (
             <>
               {[0, 1, 2].map((i) => (
                 <motion.div
                   key={i}
                   className="absolute w-2 h-2 bg-moon rounded-full"
-                  animate={{
-                    rotate: 360,
-                  }}
-                  transition={{
-                    repeat: Infinity,
-                    duration: 2 + i * 0.5,
-                    ease: "linear",
-                    delay: i * 0.3,
-                  }}
-                  style={{
-                    top: "50%",
-                    left: "50%",
-                    marginTop: -4,
-                    marginLeft: -4,
-                    transformOrigin: `${40 + i * 10}px 0`,
-                  }}
+                  animate={{ rotate: 360 }}
+                  transition={{ repeat: Infinity, duration: 2 + i * 0.5, ease: "linear", delay: i * 0.3 }}
+                  style={{ top: "50%", left: "50%", marginTop: -4, marginLeft: -4, transformOrigin: `${40 + i * 10}px 0` }}
                 />
               ))}
             </>
@@ -145,13 +264,11 @@ export function GenerationProgress({
         </motion.div>
       </div>
 
-      {/* Progress stages */}
       <div className="space-y-3">
         {activeStages.slice(0, -1).map((s, index) => {
           const isCompleted = index < currentIndex;
           const isCurrent = index === currentIndex;
           const Icon = s.icon;
-
           return (
             <motion.div
               key={s.id}
@@ -159,64 +276,30 @@ export function GenerationProgress({
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.1 }}
               className={`flex items-center gap-3 p-3 rounded-lg transition-all ${
-                isCurrent
-                  ? "bg-moon/10 border border-moon/30"
-                  : isCompleted
-                  ? "bg-muted/30"
-                  : "opacity-40"
+                isCurrent ? "bg-moon/10 border border-moon/30" : isCompleted ? "bg-muted/30" : "opacity-40"
               }`}
             >
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-                  isCompleted
-                    ? "bg-green-500/20 text-green-500"
-                    : isCurrent
-                    ? "bg-moon/20 text-moon"
-                    : "bg-muted text-muted-foreground"
-                }`}
-              >
-                {isCompleted ? (
-                  <Check className="w-4 h-4" />
-                ) : isCurrent ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Icon className="w-4 h-4" />
-                )}
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                isCompleted ? "bg-green-500/20 text-green-500" : isCurrent ? "bg-moon/20 text-moon" : "bg-muted text-muted-foreground"
+              }`}>
+                {isCompleted ? <Check className="w-4 h-4" /> : isCurrent ? <Loader2 className="w-4 h-4 animate-spin" /> : <Icon className="w-4 h-4" />}
               </div>
-              <span
-                className={`text-sm font-medium ${
-                  isCurrent ? "text-foreground" : "text-muted-foreground"
-                }`}
-              >
-                {s.label}
-              </span>
+              <span className={`text-sm font-medium ${isCurrent ? "text-foreground" : "text-muted-foreground"}`}>{s.label}</span>
             </motion.div>
           );
         })}
       </div>
 
-      {/* Progress bar */}
-      {progress !== undefined && (
+      {legacyProgress !== undefined && (
         <div className="space-y-2">
           <div className="h-2 bg-muted rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-gradient-to-r from-moon to-aurora"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.3 }}
-            />
+            <motion.div className="h-full bg-gradient-to-r from-moon to-aurora" initial={{ width: 0 }} animate={{ width: `${legacyProgress}%` }} transition={{ duration: 0.3 }} />
           </div>
-          <p className="text-xs text-center text-muted-foreground">{progress}%</p>
+          <p className="text-xs text-center text-muted-foreground">{legacyProgress}%</p>
         </div>
       )}
 
-      {/* Motivational messages */}
-      <motion.p
-        key={stage}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center text-sm text-muted-foreground"
-      >
+      <motion.p key={stage} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="text-center text-sm text-muted-foreground">
         {stage === "uploading" && "Datei wird hochgeladen..."}
         {stage === "extracting" && "KI liest und analysiert das Dokument..."}
         {stage === "analyzing" && "Thema, Stimmung und Konzepte werden erkannt..."}
