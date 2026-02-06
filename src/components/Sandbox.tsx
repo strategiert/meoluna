@@ -401,7 +401,7 @@ export const Sandbox: React.FC<SandboxProps> = ({
           );
           processedCode = processedCode.replace(mixedImportRegex, (match, defaultName, names) => {
             const namedImports = names.split(',').map(n => n.trim()).filter(Boolean);
-            return \`const _mod = await import("\${url}"); const \${defaultName} = _mod.default; const { \${namedImports.join(', ')} } = _mod;\`;
+            return \`const \${defaultName} = (await import("\${url}")).default; const { \${namedImports.join(', ')} } = await import("\${url}");\`;
           });
         }
 
@@ -423,16 +423,36 @@ export const Sandbox: React.FC<SandboxProps> = ({
         // 4. Wrap in async function für top-level await
         const wrappedCode = \`
           (async () => {
+            // PRE-LOAD: React global verfügbar machen BEVOR der User-Code läuft
+            // Babel transpiliert JSX zu React.createElement() — React MUSS vorher existieren
+            const __preload = await import("https://esm.sh/react@18.2.0");
+            window.React = __preload.default;
+            window.useState = __preload.useState;
+            window.useEffect = __preload.useEffect;
+            window.useRef = __preload.useRef;
+            window.useMemo = __preload.useMemo;
+            window.useCallback = __preload.useCallback;
+            window.useReducer = __preload.useReducer;
+            window.useContext = __preload.useContext;
+            window.createContext = __preload.createContext;
+            window.Fragment = __preload.Fragment;
+            window.createElement = __preload.createElement;
+            window.Component = __preload.Component;
+            window.forwardRef = __preload.forwardRef;
+            window.memo = __preload.memo;
+            window.Suspense = __preload.Suspense;
+            window.Children = __preload.Children;
+            window.cloneElement = __preload.cloneElement;
+
+            // User-Code (kann React re-importieren — const shadowed window.React, kein Konflikt)
             \${processedCode}
 
-            // Render the App - sichere Imports (kollidieren nicht mit generiertem Code)
+            // Render the App — window.React ist immer definiert
             const __rdom = await import("https://esm.sh/react-dom@18.2.0/client");
-            const __react = await import("https://esm.sh/react@18.2.0");
-            const _React = __react.default;
             const _createRoot = __rdom.createRoot;
 
             // Error Boundary Component
-            class ErrorBoundary extends _React.Component {
+            class ErrorBoundary extends window.React.Component {
               constructor(props) {
                 super(props);
                 this.state = { hasError: false, error: null };
@@ -452,11 +472,11 @@ export const Sandbox: React.FC<SandboxProps> = ({
 
               render() {
                 if (this.state.hasError) {
-                  return _React.createElement('div', { className: 'error-screen' },
-                    _React.createElement('div', { className: 'error-icon' }, '🌋'),
-                    _React.createElement('div', { className: 'error-title' }, 'Hoppla! Die Lernwelt hat sich verschluckt'),
-                    _React.createElement('div', { className: 'error-message' }, 'Keine Sorge, wir reparieren das gerade...'),
-                    _React.createElement('div', { className: 'error-details' }, this.state.error?.message || 'Unbekannter Fehler')
+                  return window.React.createElement('div', { className: 'error-screen' },
+                    window.React.createElement('div', { className: 'error-icon' }, '🌋'),
+                    window.React.createElement('div', { className: 'error-title' }, 'Hoppla! Die Lernwelt hat sich verschluckt'),
+                    window.React.createElement('div', { className: 'error-message' }, 'Keine Sorge, wir reparieren das gerade...'),
+                    window.React.createElement('div', { className: 'error-details' }, this.state.error?.message || 'Unbekannter Fehler')
                   );
                 }
                 return this.props.children;
@@ -473,8 +493,8 @@ export const Sandbox: React.FC<SandboxProps> = ({
 
             const root = _createRoot(document.getElementById('root'));
             root.render(
-              _React.createElement(ErrorBoundary, null,
-                _React.createElement(AppComponent)
+              window.React.createElement(ErrorBoundary, null,
+                window.React.createElement(AppComponent)
               )
             );
 
