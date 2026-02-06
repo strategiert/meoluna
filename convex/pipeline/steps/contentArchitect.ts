@@ -1,5 +1,5 @@
 // ============================================================================
-// STEP 6: CONTENT ARCHITECT - Aufgaben, Lösungen, Feedback, Hints
+// STEP 6: CONTENT ARCHITECT - Spiel-Challenges, Lösungen, Feedback, Hints
 // Model: Opus (pädagogisch) | Temp: 0.5 | Max: 8000
 // ============================================================================
 
@@ -19,7 +19,7 @@ export async function runContentArchitect(
   gameDesign: GameDesignerOutput,
   qualityFeedback?: QualityGateOutput
 ) {
-  let userMessage = `Erstelle die kompletten Lerninhalte für diese Welt:
+  let userMessage = `Erstelle die kompletten Spiel-Challenges für diese Minigame-Welt:
 
 === PÄDAGOGISCHE GRUNDLAGE ===
 ${JSON.stringify(interpreted, null, 2)}
@@ -27,10 +27,11 @@ ${JSON.stringify(interpreted, null, 2)}
 === KREATIVES KONZEPT ===
 ${JSON.stringify(concept, null, 2)}
 
-=== MODUL-STRUKTUR & SPIELMECHANIKEN ===
+=== MODUL-STRUKTUR & MINIGAME-MECHANIKEN ===
 ${JSON.stringify(gameDesign, null, 2)}
 
-Erstelle jetzt ALLE Aufgaben mit Lösungen, Feedback und Socratic Hints.
+Erstelle jetzt ALLE Spiel-Challenges mit gameData, Lösungen, Feedback und Socratic Hints.
+WICHTIG: Jede Challenge muss sich wie ein SPIEL anfühlen, nicht wie eine Schulaufgabe!
 Achte auf absolute fachliche Korrektheit!`;
 
   // If Quality Gate gave feedback (retry), include it
@@ -54,6 +55,9 @@ WICHTIG: Korrigiere ALLE criticalErrors aus dem Quality-Gate!`;
   // Validate
   if (!result.modules?.length) {
     throw new Error("Content Architect output missing modules");
+  }
+  if (!result.modules[0]?.challenges?.length) {
+    throw new Error("Content Architect output missing challenges in modules");
   }
 
   return { result, inputTokens, outputTokens };

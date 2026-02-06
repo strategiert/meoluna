@@ -64,8 +64,9 @@ export interface GameDesignerModule {
   interactionMethod: string;
   visualConcept: string;
   difficulty: number;
-  estimatedTasks: number;
+  estimatedChallenges: number;
   uniqueElement: string;
+  winCondition: string;
 }
 
 export interface GameDesignerOutput {
@@ -106,23 +107,23 @@ export interface AssetManifestEntry {
 export type AssetManifest = Record<string, AssetManifestEntry>;
 
 // --- Step 6: Content Architect Output ---
-export interface TaskHints {
+export interface ChallengeHints {
   level1: string;
   level2: string;
   level3: string;
 }
 
-export interface ContentTask {
+export interface ContentChallenge {
   id: string;
   type: string;
-  questionText: string;
+  challengeText: string;
   visualDescription: string | null;
-  options?: string[];
-  correctAnswer: string;
-  correctIndex?: number;
+  gameData: Record<string, unknown>;
+  correctAnswer: string | number;
+  tolerance?: number | null;
   feedbackCorrect: string;
   feedbackWrong: string;
-  hints: TaskHints;
+  hints: ChallengeHints;
   xpValue: number;
 }
 
@@ -130,17 +131,17 @@ export interface ContentModule {
   index: number;
   title: string;
   introText: string;
-  tasks: ContentTask[];
+  challenges: ContentChallenge[];
   summaryText: string;
   moduleCompleteMessage: string;
 }
 
 export interface ContentArchitectOutput {
   modules: ContentModule[];
-  finalTest: {
+  finalChallenge: {
     title: string;
     introText: string;
-    tasks: ContentTask[];
+    challenges: ContentChallenge[];
     completionMessage: string;
   };
   guideDialogues: {
@@ -214,16 +215,16 @@ export type GenerationStep =
   | "complete";
 
 export const STEP_LABELS: Record<GenerationStep, string> = {
-  interpreter: "Analysiere deine Aufgabe...",
-  creative_director: "Erfinde eine einzigartige Welt...",
-  game_designer: "Designe die Spielmechaniken...",
+  interpreter: "Analysiere dein Thema...",
+  creative_director: "Erfinde ein einzigartiges Universum...",
+  game_designer: "Designe die Minigames...",
   asset_planner: "Plane die Grafiken...",
   asset_generation: "Generiere einzigartige Grafiken...",
-  content_architect: "Erstelle die Lerninhalte...",
-  quality_gate: "Prüfe auf Fehler...",
-  code_generator: "Baue deine Lernwelt...",
+  content_architect: "Erstelle die Spiel-Challenges...",
+  quality_gate: "Qualitätsprüfung...",
+  code_generator: "Baue deine Spielwelt...",
   validation: "Teste und optimiere...",
-  complete: "Fertig! Deine Welt ist bereit!",
+  complete: "Fertig! Deine Spielwelt ist bereit!",
 };
 
 export const STEP_ORDER: GenerationStep[] = [

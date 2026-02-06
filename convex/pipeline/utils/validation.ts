@@ -52,8 +52,33 @@ export function validateCode(code: string): string[] {
   if (!code.includes("Meoluna.reportScore")) {
     errors.push("MISSING: Meoluna.reportScore() calls");
   }
+  if (!code.includes("Meoluna.completeModule")) {
+    errors.push("MISSING: Meoluna.completeModule() calls — every module must call this on completion");
+  }
   if (!code.includes("Meoluna.complete")) {
-    errors.push("MISSING: Meoluna.complete() call");
+    errors.push("MISSING: Meoluna.complete() call — must be called when all modules are done");
+  }
+
+  // 6b. Interactive element checks
+  // If code has <input type="range" it should have onChange
+  if (code.includes('type="range"') || code.includes("type='range'")) {
+    if (!code.includes("onChange")) {
+      errors.push("BROKEN: Slider (<input type=\"range\">) without onChange handler — slider won't move!");
+    }
+  }
+
+  // If code references DndContext, check for onDragEnd
+  if (code.includes("DndContext")) {
+    if (!code.includes("onDragEnd")) {
+      errors.push("BROKEN: DndContext without onDragEnd handler — drag & drop won't work!");
+    }
+  }
+
+  // If code has number input, check for parseFloat/parseInt (not string comparison)
+  if (code.includes('type="number"') || code.includes("type='number'")) {
+    if (!code.includes("parseFloat") && !code.includes("parseInt") && !code.includes("Number(")) {
+      errors.push("WARNING: Number input found but no parseFloat/parseInt/Number() — string comparison may fail");
+    }
   }
 
   // 7. Markdown in strings

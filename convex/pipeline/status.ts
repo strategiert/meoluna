@@ -83,7 +83,7 @@ export const completeSession = internalMutation({
       await ctx.db.patch(session._id, {
         status: "completed",
         currentStep: 9,
-        stepLabel: "Fertig! Deine Welt ist bereit!",
+        stepLabel: "Fertig! Deine Spielwelt ist bereit!",
         worldId: args.worldId,
         completedAt: Date.now(),
       });
