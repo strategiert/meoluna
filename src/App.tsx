@@ -9,6 +9,7 @@ import { Toaster as Sonner } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { useUserSync } from '@/hooks/useUserSync';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { useAnimatedTitle } from '@/hooks/useAnimatedTitle';
 
 // Pages
 import Index from '@/pages/Index';
@@ -31,7 +32,8 @@ import BackgroundsDemo from '@/pages/demo/Backgrounds';
 
 export default function App() {
   useUserSync();
-  useAnalytics(); // Server-side tracking
+  useAnalytics();
+  useAnimatedTitle();
 
   return (
     <TooltipProvider>
