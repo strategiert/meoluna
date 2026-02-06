@@ -360,6 +360,18 @@ export const Sandbox: React.FC<SandboxProps> = ({
           return;
         }
 
+        // 1b. HTML-Legacy-Code erkennen und direkt rendern (ohne Babel)
+        const trimmedCode = userCode.trim();
+        if (trimmedCode.startsWith('<!DOCTYPE') || trimmedCode.startsWith('<html') || trimmedCode.startsWith('<HTML')) {
+          // Legacy HTML: Direkt ins DOM schreiben (DEPRECATED - neue Welten sollten React sein!)
+          console.warn('[Sandbox] Legacy HTML-Welt erkannt. Bitte zu React migrieren!');
+          document.open();
+          document.write(userCode);
+          document.close();
+          window.parent.postMessage({ type: 'SANDBOX_SUCCESS' }, '*');
+          return;
+        }
+
         // 2. Imports ersetzen mit esm.sh URLs
         let processedCode = userCode;
 
@@ -399,17 +411,28 @@ export const Sandbox: React.FC<SandboxProps> = ({
           .replace(/export\\s+default\\s+function\\s+App/g, 'function App')
           .replace(/export\\s+\\{[^}]*\\}\\s*;?/g, '');
 
+        // 3b. Strip duplicate React/ReactDOM imports from generated code (Sandbox wrapper handles these)
+        processedCode = processedCode
+          .replace(/const\\s+React\\s*=\\s*\\(await\\s+import\\([^)]+\\)\\)\\.default;?/g, '// [Sandbox] React provided by wrapper')
+          .replace(/const\\s+\\{\\s*createRoot[^}]*\\}\\s*=\\s*await\\s+import\\([^)]+\\);?/g, '// [Sandbox] createRoot provided by wrapper')
+          .replace(/const\\s+ReactDOM\\s*=\\s*\\(await\\s+import\\([^)]+\\)\\)\\.default;?/g, '// [Sandbox] ReactDOM provided by wrapper')
+          .replace(/const\\s+_mod\\s*=\\s*await\\s+import\\([^)]*react@[^)]*\\);\\s*const\\s+React\\s*=\\s*_mod\\.default;/g, '// [Sandbox] React provided by wrapper');
+
+        // 3c. Strip PI/TWO_PI/HALF_PI redeclarations (conflict with p5.js)
+        processedCode = processedCode
+          .replace(/const\\s+(PI|TWO_PI|HALF_PI)\\s*=\\s*[^;]+;?/g, '// [Sandbox] using Math.$1 instead');
+
         // 4. Wrap in async function für top-level await
         const wrappedCode = \`
           (async () => {
             \${processedCode}
 
-            // Render the App
+            // Render the App - nur importieren wenn noch nicht vorhanden
             const { createRoot } = await import("https://esm.sh/react-dom@18.2.0/client");
-            const React = (await import("https://esm.sh/react@18.2.0")).default;
+            const _React = typeof React !== 'undefined' ? React : (await import("https://esm.sh/react@18.2.0")).default;
 
             // Error Boundary Component
-            class ErrorBoundary extends React.Component {
+            class ErrorBoundary extends _React.Component {
               constructor(props) {
                 super(props);
                 this.state = { hasError: false, error: null };
@@ -429,11 +452,11 @@ export const Sandbox: React.FC<SandboxProps> = ({
 
               render() {
                 if (this.state.hasError) {
-                  return React.createElement('div', { className: 'error-screen' },
-                    React.createElement('div', { className: 'error-icon' }, '🌋'),
-                    React.createElement('div', { className: 'error-title' }, 'Hoppla! Die Lernwelt hat sich verschluckt'),
-                    React.createElement('div', { className: 'error-message' }, 'Keine Sorge, wir reparieren das gerade...'),
-                    React.createElement('div', { className: 'error-details' }, this.state.error?.message || 'Unbekannter Fehler')
+                  return _React.createElement('div', { className: 'error-screen' },
+                    _React.createElement('div', { className: 'error-icon' }, '🌋'),
+                    _React.createElement('div', { className: 'error-title' }, 'Hoppla! Die Lernwelt hat sich verschluckt'),
+                    _React.createElement('div', { className: 'error-message' }, 'Keine Sorge, wir reparieren das gerade...'),
+                    _React.createElement('div', { className: 'error-details' }, this.state.error?.message || 'Unbekannter Fehler')
                   );
                 }
                 return this.props.children;
@@ -450,8 +473,8 @@ export const Sandbox: React.FC<SandboxProps> = ({
 
             const root = createRoot(document.getElementById('root'));
             root.render(
-              React.createElement(ErrorBoundary, null,
-                React.createElement(AppComponent)
+              _React.createElement(ErrorBoundary, null,
+                _React.createElement(AppComponent)
               )
             );
 
