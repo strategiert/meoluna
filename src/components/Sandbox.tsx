@@ -73,6 +73,7 @@ const INDEX_HTML = `<!DOCTYPE html>
 // ENTRY POINT — Meoluna API + Error Handler + React Mount
 // ============================================================================
 const INDEX_JS = `import { createRoot } from "react-dom/client";
+import React from "react";
 import App from "./App";
 
 // Meoluna API — global für alle generierten Welten
@@ -121,8 +122,33 @@ window.onunhandledrejection = function(event) {
   }, '*');
 };
 
+// Error Boundary — fängt React Render-Fehler und meldet sie via postMessage
+class SandboxErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error) {
+    window.parent.postMessage({
+      type: 'SANDBOX_ERROR',
+      error: error.message || 'Render-Fehler in der Lernwelt'
+    }, '*');
+  }
+  render() {
+    if (this.state.hasError) return null;
+    return this.props.children;
+  }
+}
+
 const root = createRoot(document.getElementById("root"));
-root.render(<App />);
+root.render(
+  <SandboxErrorBoundary>
+    <App />
+  </SandboxErrorBoundary>
+);
 `;
 
 // ============================================================================
