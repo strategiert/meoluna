@@ -70,7 +70,7 @@ const INDEX_HTML = `<!DOCTYPE html>
 </html>`;
 
 // ============================================================================
-// ENTRY POINT — Meoluna API + React Mount
+// ENTRY POINT — Meoluna API + Error Handler + React Mount
 // ============================================================================
 const INDEX_JS = `import { createRoot } from "react-dom/client";
 import App from "./App";
@@ -106,9 +106,36 @@ window.Meoluna = {
 };
 window.meoluna = window.Meoluna;
 
+// Runtime-Fehler an Parent melden (für AutoFix)
+window.onerror = function(msg, _url, line) {
+  window.parent.postMessage({
+    type: 'SANDBOX_ERROR',
+    error: msg + (line ? ' (Zeile ' + line + ')' : '')
+  }, '*');
+  return false;
+};
+window.onunhandledrejection = function(event) {
+  window.parent.postMessage({
+    type: 'SANDBOX_ERROR',
+    error: event.reason?.message || String(event.reason)
+  }, '*');
+};
+
 const root = createRoot(document.getElementById("root"));
 root.render(<App />);
 `;
+
+// ============================================================================
+// CODE SANITIZER — Bekannte LLM-Fehler vor dem Rendern fixen
+// ============================================================================
+function sanitizeCode(code: string): string {
+  return code
+    // PI/TWO_PI/HALF_PI redeclarations — Konflikt mit p5.js globals
+    .replace(/\bconst\s+(PI|TWO_PI|HALF_PI)\s*=\s*[^;]+;?/g, '/* p5 constant, nicht neu deklarieren */')
+    // ReactDOM render calls — Rendering übernimmt index.js
+    .replace(/\bconst\s+root\s*=\s*createRoot\([^)]*\);?/g, '/* handled by sandbox */')
+    .replace(/\broot\.render\([^)]*\);?/g, '/* handled by sandbox */');
+}
 
 // ============================================================================
 // SANDPACK BRIDGE — Error/Success Callbacks aus Sandpack-State
@@ -150,13 +177,26 @@ export const Sandbox: React.FC<SandboxProps> = ({
   onError,
   onSuccess,
 }) => {
+  const sanitized = sanitizeCode(code);
+
+  // Runtime-Fehler aus iframe abfangen (window.onerror aus INDEX_JS)
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'SANDBOX_ERROR') {
+        onError?.(event.data.error, code);
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [code, onError]);
+
   return (
     <SandpackProvider
-      key={code}
+      key={sanitized}
       template="react"
       theme="dark"
       files={{
-        '/App.js': { code, active: true },
+        '/App.js': { code: sanitized, active: true },
         '/index.js': { code: INDEX_JS, hidden: true },
         '/public/index.html': { code: INDEX_HTML, hidden: true },
       }}
