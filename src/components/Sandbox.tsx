@@ -4,7 +4,8 @@
  * Ersetzt die fragile Babel+esm.sh Lösung aus v2.
  * Läuft stabil auf Desktop, iPad und Mobile ohne Client-seitige Transpilation.
  *
- * Tailwind via PostCSS/npm (NICHT CDN) — Sandpack's iframe-CSP blockiert externe Skripte.
+ * Tailwind via CDN (externalResources) — PostCSS braucht node:fs, nicht verfügbar im Browser-Sandbox.
+ * Fix: Sandpack's `externalResources` Option lädt das Script in den iframe (kein CSP-Problem).
  */
 
 import React, { useEffect, useRef } from 'react';
@@ -29,7 +30,8 @@ interface SandboxProps {
 }
 
 // ============================================================================
-// HTML-TEMPLATE — kein CDN, nur Basis-Styles (Tailwind kommt via PostCSS)
+// HTML-TEMPLATE — Basis-Styles + Inline Tailwind-Config (kein CDN src-Tag hier,
+// das CDN-Script wird via externalResources von Sandpack in den iframe injiziert)
 // ============================================================================
 const INDEX_HTML = `<!DOCTYPE html>
 <html lang="de">
@@ -45,6 +47,33 @@ const INDEX_HTML = `<!DOCTYPE html>
       ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
       ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
     </style>
+    <script>
+      /* Tailwind CDN Play config — wird von cdn.tailwindcss.com nach dem Laden gelesen */
+      window.tailwind = window.tailwind || {};
+      window.tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            animation: {
+              'float': 'float 3s ease-in-out infinite',
+              'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+              'shake': 'shake 0.5s ease-in-out',
+              'bounce-in': 'bounce-in 0.5s ease-out',
+              'fade-in': 'fade-in 0.3s ease-out',
+              'slide-up': 'slide-up 0.4s ease-out',
+            },
+            keyframes: {
+              float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
+              'pulse-glow': { '0%, 100%': { boxShadow: '0 0 20px rgba(255,255,255,0.3)' }, '50%': { boxShadow: '0 0 40px rgba(255,255,255,0.6)' } },
+              shake: { '0%, 100%': { transform: 'translateX(0)' }, '25%': { transform: 'translateX(-5px)' }, '75%': { transform: 'translateX(5px)' } },
+              'bounce-in': { '0%': { transform: 'scale(0.8)', opacity: '0' }, '70%': { transform: 'scale(1.05)' }, '100%': { transform: 'scale(1)', opacity: '1' } },
+              'fade-in': { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+              'slide-up': { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
+            }
+          }
+        }
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
@@ -52,60 +81,10 @@ const INDEX_HTML = `<!DOCTYPE html>
 </html>`;
 
 // ============================================================================
-// TAILWIND CSS — @tailwind Direktiven + Basis-Styles
+// ENTRY POINT — Meoluna API + Error Handler + React Mount
+// (kein CSS-Import nötig — Tailwind kommt via externalResources CDN)
 // ============================================================================
-const INDEX_CSS = `@tailwind base;
-@tailwind components;
-@tailwind utilities;
-`;
-
-// ============================================================================
-// TAILWIND CONFIG — Dark Mode + Custom Animations
-// ============================================================================
-const TAILWIND_CONFIG = `/** @type {import('tailwindcss').Config} */
-module.exports = {
-  darkMode: 'class',
-  content: ['./**/*.{js,jsx}'],
-  theme: {
-    extend: {
-      animation: {
-        'float': 'float 3s ease-in-out infinite',
-        'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
-        'shake': 'shake 0.5s ease-in-out',
-        'bounce-in': 'bounce-in 0.5s ease-out',
-        'fade-in': 'fade-in 0.3s ease-out',
-        'slide-up': 'slide-up 0.4s ease-out',
-      },
-      keyframes: {
-        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
-        'pulse-glow': { '0%, 100%': { boxShadow: '0 0 20px rgba(255,255,255,0.3)' }, '50%': { boxShadow: '0 0 40px rgba(255,255,255,0.6)' } },
-        shake: { '0%, 100%': { transform: 'translateX(0)' }, '25%': { transform: 'translateX(-5px)' }, '75%': { transform: 'translateX(5px)' } },
-        'bounce-in': { '0%': { transform: 'scale(0.8)', opacity: '0' }, '70%': { transform: 'scale(1.05)' }, '100%': { transform: 'scale(1)', opacity: '1' } },
-        'fade-in': { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-        'slide-up': { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } },
-      }
-    }
-  },
-  plugins: [],
-}
-`;
-
-// ============================================================================
-// POSTCSS CONFIG
-// ============================================================================
-const POSTCSS_CONFIG = `module.exports = {
-  plugins: {
-    tailwindcss: {},
-    autoprefixer: {},
-  },
-}
-`;
-
-// ============================================================================
-// ENTRY POINT — CSS Import + Meoluna API + Error Handler + React Mount
-// ============================================================================
-const INDEX_JS = `import "./index.css";
-import { createRoot } from "react-dom/client";
+const INDEX_JS = `import { createRoot } from "react-dom/client";
 import React from "react";
 import App from "./App";
 
@@ -264,16 +243,10 @@ export const Sandbox: React.FC<SandboxProps> = ({
       files={{
         '/App.js': { code: sanitized, active: true },
         '/index.js': { code: INDEX_JS, hidden: true },
-        '/index.css': { code: INDEX_CSS, hidden: true },
-        '/tailwind.config.js': { code: TAILWIND_CONFIG, hidden: true },
-        '/postcss.config.js': { code: POSTCSS_CONFIG, hidden: true },
         '/public/index.html': { code: INDEX_HTML, hidden: true },
       }}
       customSetup={{
         dependencies: {
-          'tailwindcss': '3.4.0',
-          'postcss': '8.4.32',
-          'autoprefixer': '10.4.16',
           'framer-motion': '10.18.0',
           'lucide-react': '0.330.0',
           'canvas-confetti': '1.9.2',
@@ -293,6 +266,7 @@ export const Sandbox: React.FC<SandboxProps> = ({
       options={{
         recompileMode: 'delayed',
         recompileDelay: 500,
+        externalResources: ['https://cdn.tailwindcss.com'],
       }}
     >
       <SandpackBridge onError={onError} onSuccess={onSuccess} code={code} />

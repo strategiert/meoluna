@@ -19,18 +19,34 @@ const ALLOWED_PACKAGES = [
 /**
  * Validates generated React code against known error patterns.
  * Returns an array of error descriptions. Empty array = valid.
+ *
+ * Fehlercode-Taxonomie (Pipeline v3):
+ *   E_STRUCT_001  missing App component
+ *   E_STRUCT_002  missing export default
+ *   E_NAV_001     missing completeModule()
+ *   E_NAV_002     missing complete()
+ *   E_CODE_003    full HTML document (<!DOCTYPE)
+ *   E_CODE_004    full HTML document (<html>)
+ *   E_CODE_005    full HTML document (<body>)
+ *   E_CODE_006    external script src
+ *   E_CODE_007    window.location.replace / document.write
+ *   E_CODE_008    duplicate function declaration
+ *   E_CODE_009    Markdown in strings
+ *   E_CODE_010    empty code
+ *   E_CODE_011    code too short
+ *   E_UI_001      Tailwind not loaded (runtime check — in Sandbox)
  */
 export function validateCode(code: string): string[] {
   const errors: string[] = [];
 
   // 1. App component present
   if (!code.includes("function App") && !code.includes("const App")) {
-    errors.push("MISSING: App component definition");
+    errors.push("E_STRUCT_001: MISSING App component definition");
   }
 
   // 2. export default present
   if (!code.includes("export default")) {
-    errors.push("MISSING: export default statement");
+    errors.push("E_STRUCT_002: MISSING export default statement");
   }
 
   // 3. Forbidden: PI/TWO_PI/HALF_PI redeclaration
@@ -50,13 +66,13 @@ export function validateCode(code: string): string[] {
 
   // 6. Meoluna API integration check
   if (!code.includes("Meoluna.reportScore")) {
-    errors.push("MISSING: Meoluna.reportScore() calls");
+    errors.push("E_NAV_003: MISSING Meoluna.reportScore() calls");
   }
   if (!code.includes("Meoluna.completeModule")) {
-    errors.push("MISSING: Meoluna.completeModule() calls — every module must call this on completion");
+    errors.push("E_NAV_001: MISSING Meoluna.completeModule() calls — every module must call this on completion");
   }
   if (!code.includes("Meoluna.complete")) {
-    errors.push("MISSING: Meoluna.complete() call — must be called when all modules are done");
+    errors.push("E_NAV_002: MISSING Meoluna.complete() call — must be called when all modules are done");
   }
 
   // 6b. Interactive element checks
@@ -83,7 +99,7 @@ export function validateCode(code: string): string[] {
 
   // 7. Markdown in strings
   if (/["'`][^"'`]{0,200}\*\*[^"'`]{1,100}\*\*[^"'`]{0,200}["'`]/.test(code)) {
-    errors.push("FORBIDDEN: Markdown bold (**) in strings");
+    errors.push("E_CODE_009: FORBIDDEN Markdown bold (**) in strings");
   }
 
   // 8. Invalid imports
@@ -96,9 +112,23 @@ export function validateCode(code: string): string[] {
     }
   }
 
-  // 9. HTML wrapper
-  if (/<html|<head|<script/i.test(code)) {
-    errors.push("FORBIDDEN: HTML wrapper tags (<html>, <head>, <script>)");
+  // 9. HTML wrapper tags (leichte Prüfung — hartes Gate passiert im structuralGate)
+  if (/<html[\s>]/i.test(code)) {
+    errors.push("E_CODE_004: FORBIDDEN <html> tag found — no full HTML documents");
+  }
+  if (/<head[\s>]/i.test(code)) {
+    errors.push("FORBIDDEN: HTML <head> tag found");
+  }
+  if (/<script[\s>]/i.test(code) && !/<script\s+type="application/i.test(code)) {
+    errors.push("FORBIDDEN: HTML <script> tag found");
+  }
+
+  // 10. Full-document patterns (Blockliste v3)
+  if (/<!DOCTYPE/i.test(code)) {
+    errors.push("E_CODE_003: FORBIDDEN <!DOCTYPE> found — kein vollständiges HTML-Dokument");
+  }
+  if (/<body[\s>]/i.test(code)) {
+    errors.push("E_CODE_005: FORBIDDEN <body> tag found — kein vollständiges HTML-Dokument");
   }
 
   return errors;
