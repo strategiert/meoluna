@@ -63,6 +63,45 @@ export function GenerationProgress({
   );
 
   const isV2 = !!sessionId && !!session;
+  const [internalStage, setInternalStage] = useState<LegacyStage>(isPdfBased ? "uploading" : "analyzing");
+  const [internalProgress, setInternalProgress] = useState(0);
+
+  const activeStages = isPdfBased ? LEGACY_STAGES : LEGACY_STAGES_NO_PDF;
+  const stage = externalStage ?? internalStage;
+  const legacyProgress = externalProgress ?? internalProgress;
+  const currentIndex = activeStages.findIndex((s) => s.id === stage);
+
+  useEffect(() => {
+    if (isV2 || externalStage || !isGenerating) return;
+
+    let elapsed = 0;
+    const interval = setInterval(() => {
+      elapsed += 1;
+      let cumulativeTime = 0;
+      let newStageIndex = 0;
+
+      for (let i = 0; i < activeStages.length - 1; i++) {
+        cumulativeTime += activeStages[i].duration;
+        if (elapsed < cumulativeTime) { newStageIndex = i; break; }
+        newStageIndex = i + 1;
+      }
+
+      newStageIndex = Math.min(newStageIndex, activeStages.length - 2);
+      setInternalStage(activeStages[newStageIndex].id as LegacyStage);
+      const totalDuration = activeStages.slice(0, -1).reduce((sum, s) => sum + s.duration, 0);
+      setInternalProgress(Math.min(Math.floor((elapsed / totalDuration) * 100), 95));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isV2, externalStage, isGenerating, activeStages]);
+
+  useEffect(() => {
+    if (isV2) return;
+    if (isGenerating) {
+      setInternalStage(isPdfBased ? "uploading" : "analyzing");
+      setInternalProgress(0);
+    }
+  }, [isV2, isGenerating, isPdfBased]);
 
   // V2 rendering
   if (isV2) {
@@ -190,46 +229,6 @@ export function GenerationProgress({
       </div>
     );
   }
-
-  // ── V1 LEGACY FALLBACK ──────────────────────────────────────────
-  const [internalStage, setInternalStage] = useState<LegacyStage>(isPdfBased ? "uploading" : "analyzing");
-  const [internalProgress, setInternalProgress] = useState(0);
-
-  const activeStages = isPdfBased ? LEGACY_STAGES : LEGACY_STAGES_NO_PDF;
-  const stage = externalStage ?? internalStage;
-  const legacyProgress = externalProgress ?? internalProgress;
-  const currentIndex = activeStages.findIndex((s) => s.id === stage);
-
-  useEffect(() => {
-    if (externalStage || !isGenerating) return;
-
-    let elapsed = 0;
-    const interval = setInterval(() => {
-      elapsed += 1;
-      let cumulativeTime = 0;
-      let newStageIndex = 0;
-
-      for (let i = 0; i < activeStages.length - 1; i++) {
-        cumulativeTime += activeStages[i].duration;
-        if (elapsed < cumulativeTime) { newStageIndex = i; break; }
-        newStageIndex = i + 1;
-      }
-
-      newStageIndex = Math.min(newStageIndex, activeStages.length - 2);
-      setInternalStage(activeStages[newStageIndex].id as LegacyStage);
-      const totalDuration = activeStages.slice(0, -1).reduce((sum, s) => sum + s.duration, 0);
-      setInternalProgress(Math.min(Math.floor((elapsed / totalDuration) * 100), 95));
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [externalStage, isGenerating, activeStages]);
-
-  useEffect(() => {
-    if (isGenerating) {
-      setInternalStage(isPdfBased ? "uploading" : "analyzing");
-      setInternalProgress(0);
-    }
-  }, [isGenerating, isPdfBased]);
 
   return (
     <div className="space-y-6">
