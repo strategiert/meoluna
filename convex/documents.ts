@@ -41,7 +41,13 @@ export const extractTextFromPDF = action({
               },
               {
                 type: "text",
-                text: `Extrahiere den gesamten Text aus diesem Dokument "${args.fileName}". Gib den Text als sauberes Markdown zurück. Behalte die Struktur (Überschriften, Listen, Tabellen) so gut wie möglich bei. Keine Einleitung, kein Kommentar — nur der extrahierte Text.`,
+                text: `Extrahiere den gesamten Inhalt aus diesem Dokument "${args.fileName}" als sauberes Markdown.
+
+Regeln:
+- Text vollständig übernehmen, Struktur (Überschriften, Listen, Tabellen) beibehalten
+- Bilder, Diagramme und Abbildungen beschreiben: "[Bild: kurze Beschreibung was zu sehen ist]"
+- Aufgaben, Lücken, Felder zum Ausfüllen als solche kennzeichnen: "[Aufgabe: ...]" oder "[Lücke]"
+- Keine Einleitung, kein Kommentar — nur der extrahierte Inhalt.`,
               },
             ],
           },
