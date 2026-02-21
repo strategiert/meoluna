@@ -152,6 +152,33 @@ export const togglePublic = mutation({
 });
 
 // ============================================================================
+// ADMIN: Alle Welten mit Status/Qualitätsinfo für Debug-View
+// ============================================================================
+export const listForAdmin = query({
+  args: {},
+  handler: async (ctx) => {
+    const worlds = await ctx.db
+      .query("worlds")
+      .order("desc")
+      .take(200);
+
+    return worlds.map(w => ({
+      _id: w._id,
+      title: w.title,
+      userId: w.userId,
+      status: w.status ?? "published",
+      qualityScore: w.qualityScore,
+      error: w.error,
+      validationMetadata: w.validationMetadata,
+      createdAt: w.createdAt,
+      prompt: w.prompt,
+      subject: w.subject,
+      gradeLevel: w.gradeLevel,
+    }));
+  },
+});
+
+// ============================================================================
 // MIGRATION: Upgrade worlds to use Meoluna API
 // ============================================================================
 

@@ -1,0 +1,85 @@
+{
+  "config": {
+    "name": "Altes Rom",
+    "tagline": "Entdecke das mächtigste Reich der Antike",
+    "emoji": "🏛️",
+    "primaryColor": "#eab308",
+    "bgGradient": "from-stone-950 via-amber-950 to-stone-950",
+    "cardBg": "bg-amber-900/50 backdrop-blur-sm",
+    "accentClass": "bg-amber-500 hover:bg-amber-400 text-white"
+  },
+  "modules": [
+    {
+      "id": 0,
+      "title": "Die Republik Rom",
+      "emoji": "⚔️",
+      "description": "Senat, Konsuln und die frühe Republik",
+      "challenges": [
+        {
+          "type": "multiple-choice",
+          "question": "Wie viele Konsuln regierten Rom in der Republik gleichzeitig?",
+          "options": ["1", "2", "3", "5"],
+          "correct": 1,
+          "xp": 10,
+          "feedbackCorrect": "Richtig! Zwei Konsuln regierten zusammen — eine gegenseitige Kontrolle.",
+          "feedbackWrong": "Es waren 2 Konsuln — so konnte keiner allein zu viel Macht bekommen."
+        },
+        {
+          "type": "true-false",
+          "question": "Der Senat in Rom bestand ausschließlich aus Plebejern.",
+          "correct": false,
+          "xp": 8,
+          "feedbackCorrect": "Richtig! Der Senat bestand hauptsächlich aus Patriziern (Adel).",
+          "feedbackWrong": "Falsch. Der Senat war die Versammlung der Patrizier (Adligen), nicht der Plebejer."
+        },
+        {
+          "type": "matching",
+          "instruction": "Ordne die römischen Begriffe ihrer Bedeutung zu:",
+          "pairs": [
+            { "left": "Senat", "right": "Rat der Alten" },
+            { "left": "Konsul", "right": "Höchster Beamter" },
+            { "left": "Forum", "right": "Marktplatz der Stadt" }
+          ],
+          "xp": 15,
+          "feedbackCorrect": "Alle Paare richtig — du kennst Rom!",
+          "feedbackWrong": "Noch nicht alle Paare stimmen. Denke an die lateinischen Bedeutungen."
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "title": "Julius Caesar",
+      "emoji": "🗡️",
+      "description": "Aufstieg und Fall des großen Feldherrn",
+      "challenges": [
+        {
+          "type": "fill-blank",
+          "questionBefore": "Julius Caesar wurde am 15. März 44 v. Chr. im",
+          "questionAfter": "ermordet.",
+          "answer": "Senat",
+          "xp": 10,
+          "feedbackCorrect": "Richtig! Er wurde im Senat von Brutus und anderen erstochen.",
+          "feedbackWrong": "Es war der Senat — an den Iden des März 44 v. Chr."
+        },
+        {
+          "type": "number",
+          "question": "In welchem Jahr wurde Julius Caesar ermordet? (v. Chr.)",
+          "answer": 44,
+          "tolerance": 0,
+          "unit": "v. Chr.",
+          "xp": 10,
+          "feedbackCorrect": "Genau! 44 v. Chr. — die Iden des März.",
+          "feedbackWrong": "Das Jahr war 44 v. Chr., bekannt als die Iden des März."
+        },
+        {
+          "type": "true-false",
+          "question": "Julius Caesar war der erste Kaiser Roms.",
+          "correct": false,
+          "xp": 10,
+          "feedbackCorrect": "Richtig! Der erste Kaiser war Augustus, Caesars Adoptivsohn.",
+          "feedbackWrong": "Falsch. Caesar war Diktator, aber kein Kaiser. Augustus wurde 27 v. Chr. der erste Kaiser."
+        }
+      ]
+    }
+  ]
+}

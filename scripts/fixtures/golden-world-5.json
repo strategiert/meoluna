@@ -1,0 +1,62 @@
+{
+  "config": {
+    "name": "Hebel-Werkstatt",
+    "tagline": "Physik mit Hebelkraft meistern",
+    "emoji": "⚖️",
+    "primaryColor": "#06b6d4",
+    "bgGradient": "from-cyan-950 via-sky-900 to-blue-950",
+    "cardBg": "bg-cyan-900/60 backdrop-blur-sm",
+    "accentClass": "bg-cyan-500 hover:bg-cyan-400 text-white"
+  },
+  "modules": [
+    {
+      "id": 0,
+      "title": "Das Hebelgesetz",
+      "emoji": "🔩",
+      "description": "Kraft mal Kraftarm = Last mal Lastarm",
+      "challenges": [
+        {
+          "type": "true-false",
+          "question": "Ein längerer Kraftarm macht es leichter, eine Last zu heben.",
+          "correct": true,
+          "xp": 8,
+          "feedbackCorrect": "Richtig! Längerer Kraftarm → weniger Kraft nötig.",
+          "feedbackWrong": "Stimmt doch! Je länger der Kraftarm, desto weniger Kraft brauchst du."
+        },
+        {
+          "type": "number",
+          "question": "Kraft (5 N) × Kraftarm (4 m) = Last (10 N) × Lastarm (? m)",
+          "answer": 2,
+          "tolerance": 0,
+          "unit": "m",
+          "xp": 15,
+          "feedbackCorrect": "Perfekt! 5 × 4 = 20 = 10 × 2 → Lastarm = 2 m.",
+          "feedbackWrong": "Rechne: Kraft × Kraftarm = Last × Lastarm → 5 × 4 ÷ 10 = 2 m."
+        },
+        {
+          "type": "simulation",
+          "instruction": "Stelle den Kraftarm so ein, dass eine Kraft von 30 N eine Last von 90 N heben kann. Setze den Kraftarm auf 60 cm.",
+          "paramLabel": "Kraftarm",
+          "paramMin": 10,
+          "paramMax": 100,
+          "paramUnit": "cm",
+          "targetValue": 60,
+          "tolerance": 5,
+          "sketchDescription": "Waage kippt je nach Hebeleinstellung",
+          "xp": 15,
+          "feedbackCorrect": "Genau! 30 N × 60 cm = 90 N × 20 cm — das Hebelgesetz stimmt.",
+          "feedbackWrong": "Nicht ganz. Berechne: Kraft × Kraftarm = Last × Lastarm → 30 × ? = 90 × 20."
+        },
+        {
+          "type": "multiple-choice",
+          "question": "Was ist der Drehpunkt eines Hebels?",
+          "options": ["Die Last", "Das Fulkrum (Stützpunkt)", "Der Kraftarm", "Die Hebelkraft"],
+          "correct": 1,
+          "xp": 10,
+          "feedbackCorrect": "Richtig! Das Fulkrum ist der feste Drehpunkt des Hebels.",
+          "feedbackWrong": "Der Drehpunkt heißt Fulkrum — der feste Punkt, um den sich der Hebel dreht."
+        }
+      ]
+    }
+  ]
+}

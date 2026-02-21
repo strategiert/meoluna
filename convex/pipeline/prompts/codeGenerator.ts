@@ -113,6 +113,24 @@ Wähle den passenden Typ für jede Aufgabe:
 }
 \`\`\`
 
+**simulation** (Slider-Simulation mit Farb-Feedback — ideal für Naturwissenschaften):
+\`\`\`json
+{
+  "type": "simulation",
+  "instruction": "Stelle den CO₂-Anteil ein, bei dem die Erde eine Durchschnittstemperatur von 15°C hat.",
+  "paramLabel": "CO₂-Anteil",
+  "paramMin": 0,
+  "paramMax": 100,
+  "paramUnit": "%",
+  "targetValue": 40,
+  "tolerance": 8,
+  "sketchDescription": "Kreis wechselt von blau (kalt) zu rot (heiß) je nach Slider-Position",
+  "xp": 15,
+  "feedbackCorrect": "Genau! Bei ~40% CO₂ liegt die Durchschnittstemperatur bei 15°C.",
+  "feedbackWrong": "Nicht ganz — zu heiß oder zu kalt. Probiere einen anderen Wert."
+}
+\`\`\`
+
 ## QUALITÄTS-REGELN
 
 1. **Mindestens 3 Challenges pro Modul** (besser 4-5)
@@ -123,6 +141,8 @@ Wähle den passenden Typ für jede Aufgabe:
 6. **items in "sorting"**: IMMER shuffled (NICHT in der richtigen Reihenfolge!)
 7. **Keine HTML-Tags**, keine Markdown-Syntax (**bold** etc.) in Strings
 8. **xp**: 8-15 pro Challenge (schwieriger = mehr XP)
+9. **simulation**: Maximal 1x pro Modul — nur für Naturwissenschaften/Technik geeignet
+10. **targetValue** muss immer innerhalb [paramMin, paramMax] liegen
 
 ## OUTPUT
 

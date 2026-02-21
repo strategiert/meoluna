@@ -34,12 +34,8 @@ export function runStructuralGate(code: string): StructuralGateResult {
   }
 
   // ── CHECK 4: Meoluna.complete() mindestens 1x vorhanden ──────────────────
-  // Zähle alle complete()-Calls und completeModule()-Calls
-  // Wenn nur completeModule() vorhanden ist, fehlt das echte complete()
-  const completeCallCount = (code.match(/Meoluna\.complete\s*\(/g) || []).length;
-  const completeModuleCallCount = (code.match(/Meoluna\.completeModule\s*\(/g) || []).length;
-  if (completeCallCount <= completeModuleCallCount) {
-    // Nur completeModule gefunden, kein echtes complete()
+  // Negative Lookahead: complete( aber NICHT completeModule(
+  if (!/Meoluna\.complete(?!Module)\s*\(/.test(code)) {
     violations.push("E_NAV_002: Meoluna.complete() fehlt — Welt-Abschluss nicht implementiert");
   }
 

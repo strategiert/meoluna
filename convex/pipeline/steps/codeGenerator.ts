@@ -45,9 +45,13 @@ export async function runCodeGenerator(
   concept: CreativeDirectorOutput,
   gameDesign: GameDesignerOutput,
   content: ContentArchitectOutput,
-  _assetManifest: AssetManifest,
+  assetManifest: AssetManifest,
   quality: QualityGateOutput
 ) {
+  // Hub-Background URL aus AssetManifest extrahieren (erste Background-Asset mit gültiger URL)
+  const hubBgUrl = Object.values(assetManifest).find(
+    entry => entry.category === 'background' && entry.url
+  )?.url ?? undefined;
   const userMessage = `Generiere das WorldData-JSON für diese Lernwelt:
 
 === KREATIVES KONZEPT ===
@@ -79,6 +83,11 @@ Generiere jetzt das WorldData-JSON. Gib NUR das JSON zurück, kein Markdown, kei
 
   // JSON parsen
   const worldData = extractJson(response.text);
+
+  // Hub-Background injizieren (fal.ai Asset, falls vorhanden)
+  if (hubBgUrl && worldData.config) {
+    worldData.config.hubBgUrl = hubBgUrl;
+  }
 
   // Validierung: Mindeststruktur
   if (!worldData.config || !worldData.modules || !Array.isArray(worldData.modules)) {

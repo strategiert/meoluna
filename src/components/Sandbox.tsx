@@ -115,7 +115,14 @@ window.Meoluna = {
       payload: { event: eventType, amount: amount || 0, context: ctx || {} }
     }, '*');
   },
-  _version: '3.0.0',
+  speak(text) {
+    if (!text || typeof text !== 'string') return;
+    window.parent.postMessage({
+      type: 'meoluna:speak',
+      text: String(text).slice(0, 500)
+    }, '*');
+  },
+  _version: '3.1.0',
 };
 window.meoluna = window.Meoluna;
 

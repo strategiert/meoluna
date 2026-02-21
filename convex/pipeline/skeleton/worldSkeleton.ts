@@ -23,6 +23,7 @@ export interface WorldConfig {
   bgGradient: string;          // Tailwind classes, z.B. "from-blue-950 via-blue-900 to-cyan-950"
   cardBg: string;              // Tailwind class, z.B. "bg-blue-900/60"
   accentClass: string;         // Tailwind class für Buttons, z.B. "bg-sky-500 hover:bg-sky-400"
+  hubBgUrl?: string;           // Optional: fal.ai generiertes Hub-Hintergrundbild
 }
 
 export interface MultipleChoiceChallenge {
@@ -84,13 +85,29 @@ export interface MatchingChallenge {
   feedbackWrong: string;
 }
 
+export interface SimulationChallenge {
+  type: 'simulation';
+  instruction: string;        // Aufgabentext
+  paramLabel: string;         // Label für den Slider
+  paramMin: number;
+  paramMax: number;
+  paramUnit: string;          // z.B. "°C" oder "%"
+  targetValue: number;        // Korrekter Wert (innerhalb tolerance)
+  tolerance: number;
+  sketchDescription: string;  // Was die Simulation visuell zeigt
+  xp: number;
+  feedbackCorrect: string;
+  feedbackWrong: string;
+}
+
 export type Challenge =
   | MultipleChoiceChallenge
   | TrueFalseChallenge
   | FillBlankChallenge
   | NumberChallenge
   | SortingChallenge
-  | MatchingChallenge;
+  | MatchingChallenge
+  | SimulationChallenge;
 
 export interface WorldModule {
   id: number;
@@ -115,7 +132,7 @@ export function buildWorldCode(worldData: WorldData): string {
   const dataJson = JSON.stringify(worldData, null, 2);
 
   return [
-    `import { useState, useCallback } from 'react';`,
+    `import { useState, useCallback, useEffect } from 'react';`,
     `import { motion, AnimatePresence } from 'framer-motion';`,
     `import confetti from 'canvas-confetti';`,
     ``,
@@ -127,6 +144,7 @@ export function buildWorldCode(worldData: WorldData): string {
     ``,
     `// ── Feedback-Overlay ──`,
     `function FeedbackOverlay({ correct, message, onNext }) {`,
+    `  useEffect(() => { if (message) window.Meoluna?.speak?.(message); }, [message]);`,
     `  return (`,
     `    <motion.div`,
     `      initial={{ opacity: 0, scale: 0.8 }}`,
@@ -378,6 +396,52 @@ export function buildWorldCode(worldData: WorldData): string {
     `  );`,
     `}`,
     ``,
+    `// ── Simulation Challenge ──`,
+    `function SimulationChallenge({ challenge, onResult }) {`,
+    `  const [value, setValue] = useState(() => Math.round((challenge.paramMin + challenge.paramMax) / 2));`,
+    `  const [feedback, setFeedback] = useState(null);`,
+    `  function check() {`,
+    `    if (feedback) return;`,
+    `    const ok = Math.abs(value - challenge.targetValue) <= challenge.tolerance;`,
+    `    setFeedback({ correct: ok, message: ok ? challenge.feedbackCorrect : challenge.feedbackWrong + ' (Zielwert: ' + challenge.targetValue + ' ' + challenge.paramUnit + ')' });`,
+    `    if (ok) { Meoluna.reportScore(challenge.xp, { action: 'correct', type: 'simulation' }); confetti({ particleCount: 80, spread: 80 }); }`,
+    `  }`,
+    `  const pct = (value - challenge.paramMin) / (challenge.paramMax - challenge.paramMin);`,
+    `  const hue = Math.round((1 - pct) * 220);`,
+    `  return (`,
+    `    <div className="space-y-6">`,
+    `      <p className="text-white text-xl font-semibold text-center">{challenge.instruction}</p>`,
+    `      <div className="flex flex-col items-center gap-5 p-6 rounded-2xl bg-black/30">`,
+    `        <div`,
+    `          className="w-36 h-36 rounded-full flex items-center justify-center text-3xl font-bold text-white shadow-lg transition-all duration-200"`,
+    `          style={{ background: 'hsl(' + hue + ', 65%, 45%)' }}`,
+    `        >{value}{challenge.paramUnit}</div>`,
+    `        <p className="text-white/60 text-sm">{challenge.paramLabel}</p>`,
+    `        <input`,
+    `          type="range"`,
+    `          min={challenge.paramMin} max={challenge.paramMax} value={value}`,
+    `          onChange={e => setValue(Number(e.target.value))}`,
+    `          disabled={!!feedback}`,
+    `          className="w-full max-w-xs h-3 rounded-lg cursor-pointer"`,
+    `          style={{ accentColor: 'hsl(' + hue + ', 65%, 55%)' }}`,
+    `        />`,
+    `        <div className="flex justify-between w-full max-w-xs text-white/40 text-xs">`,
+    `          <span>{challenge.paramMin}{challenge.paramUnit}</span>`,
+    `          <span>{challenge.paramMax}{challenge.paramUnit}</span>`,
+    `        </div>`,
+    `      </div>`,
+    `      {!feedback && (`,
+    `        <motion.button whileTap={{ scale: 0.97 }} onClick={check}`,
+    `          className="w-full py-3 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold text-lg transition-colors"`,
+    `        >Bestätigen ✓</motion.button>`,
+    `      )}`,
+    `      <AnimatePresence>`,
+    `        {feedback && <FeedbackOverlay correct={feedback.correct} message={feedback.message} onNext={() => onResult(feedback.correct)} />}`,
+    `      </AnimatePresence>`,
+    `    </div>`,
+    `  );`,
+    `}`,
+    ``,
     `// ── Challenge Router ──`,
     `function ChallengeView({ challenge, onResult }) {`,
     `  const t = challenge.type;`,
@@ -387,6 +451,7 @@ export function buildWorldCode(worldData: WorldData): string {
     `  if (t === 'number') return <NumberChallenge challenge={challenge} onResult={onResult} />;`,
     `  if (t === 'sorting') return <SortingChallenge challenge={challenge} onResult={onResult} />;`,
     `  if (t === 'matching') return <MatchingChallenge challenge={challenge} onResult={onResult} />;`,
+    `  if (t === 'simulation') return <SimulationChallenge challenge={challenge} onResult={onResult} />;`,
     `  return <p className="text-red-400">Unbekannter Challenge-Typ: {challenge.type}</p>;`,
     `}`,
     ``,
@@ -455,8 +520,12 @@ export function buildWorldCode(worldData: WorldData): string {
     `  const cfg = WORLD_DATA.config;`,
     `  const allDone = completedModules.length >= WORLD_DATA.modules.length;`,
     `  return (`,
-    `    <div className="min-h-screen flex flex-col items-center p-6">`,
-    `      <div className="max-w-2xl w-full space-y-8 pt-8">`,
+    `    <div`,
+    `      className="min-h-screen flex flex-col items-center p-6 relative overflow-hidden bg-gradient-to-br"`,
+    `      style={cfg.hubBgUrl ? { backgroundImage: 'url(' + cfg.hubBgUrl + ')', backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}`,
+    `    >`,
+    `      {cfg.hubBgUrl && <div className="absolute inset-0 bg-black/55 pointer-events-none" />}`,
+    `      <div className="relative z-10 max-w-2xl w-full space-y-8 pt-8">`,
     `        <div className="text-center space-y-2">`,
     `          <div className="text-6xl">{cfg.emoji}</div>`,
     `          <h1 className="text-white text-3xl font-bold">{cfg.name}</h1>`,
