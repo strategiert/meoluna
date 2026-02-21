@@ -193,6 +193,7 @@ const SandpackBridge: React.FC<{
 }> = ({ onError, onSuccess, code }) => {
   const { sandpack } = useSandpack();
   const hasFiredSuccess = useRef(false);
+  const lastBridgeErrorKeyRef = useRef<string | null>(null);
   const onErrorRef = useRef(onError);
   const onSuccessRef = useRef(onSuccess);
 
@@ -207,6 +208,7 @@ const SandpackBridge: React.FC<{
   // Reset bei neuem Code
   useEffect(() => {
     hasFiredSuccess.current = false;
+    lastBridgeErrorKeyRef.current = null;
   }, [code]);
 
   useEffect(() => {
@@ -216,6 +218,10 @@ const SandpackBridge: React.FC<{
       try { return sandpack.error!.message || sandpack.error!.toString() || 'Babel-Fehler'; }
       catch { return 'Babel-Fehler beim Transpilieren'; }
     })();
+    const errorKey = `${msg}::${code}`;
+    if (lastBridgeErrorKeyRef.current === errorKey) return;
+    lastBridgeErrorKeyRef.current = errorKey;
+
     // setTimeout(0) defer aus dem Render-Cycle → verhindert React Error #300
     // "Cannot update a component while rendering a different component"
     const timeoutId = window.setTimeout(() => onErrorRef.current?.(msg, code), 0);
@@ -243,6 +249,7 @@ export const Sandbox: React.FC<SandboxProps> = ({
   const sanitized = sanitizeCode(code);
   const onErrorRef = useRef(onError);
   const codeRef = useRef(code);
+  const lastRuntimeErrorKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
     onErrorRef.current = onError;
@@ -250,13 +257,18 @@ export const Sandbox: React.FC<SandboxProps> = ({
 
   useEffect(() => {
     codeRef.current = code;
+    lastRuntimeErrorKeyRef.current = null;
   }, [code]);
 
   // Runtime-Fehler aus iframe abfangen (window.onerror aus INDEX_JS)
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data?.type === 'SANDBOX_ERROR') {
-        onErrorRef.current?.(event.data.error, codeRef.current);
+        const runtimeError = String(event.data.error || 'Render-Fehler in der Lernwelt');
+        const errorKey = `${runtimeError}::${codeRef.current}`;
+        if (lastRuntimeErrorKeyRef.current === errorKey) return;
+        lastRuntimeErrorKeyRef.current = errorKey;
+        window.setTimeout(() => onErrorRef.current?.(runtimeError, codeRef.current), 0);
       }
     };
     window.addEventListener('message', handleMessage);
