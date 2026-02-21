@@ -60,8 +60,16 @@ export default function WorldView() {
 
   const toggleVoice = () => {
     setVoiceEnabled(v => {
-      localStorage.setItem('meoluna:voice', String(!v));
-      return !v;
+      const next = !v;
+      localStorage.setItem('meoluna:voice', String(next));
+      // AudioContext beim User-Gesture initialisieren (entsperrt autoplay)
+      if (next) {
+        if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
+          audioCtxRef.current = new AudioContext();
+        }
+        audioCtxRef.current.resume().catch(() => {});
+      }
+      return next;
     });
   };
 
@@ -123,6 +131,10 @@ export default function WorldView() {
         audioCtxRef.current = new AudioContext();
       }
       const ctx = audioCtxRef.current;
+      // Resume falls suspended (Browser blockiert ohne vorherigen User-Gesture)
+      if (ctx.state === 'suspended') {
+        await ctx.resume();
+      }
       const audio = await ctx.decodeAudioData(buf.slice(0));
       const src = ctx.createBufferSource();
       src.buffer = audio;
