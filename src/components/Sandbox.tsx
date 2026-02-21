@@ -226,6 +226,9 @@ export const Sandbox: React.FC<SandboxProps> = ({
       key={sanitized}
       template="react"
       theme="dark"
+      // SandpackThemeProvider rendert einen div mit `all:initial; display:block` ohne height.
+      // Wir müssen height explizit durchreichen, damit der Flex-Chain funktioniert.
+      style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column' }}
       files={{
         '/App.js': { code: sanitized, active: true },
         '/index.js': { code: INDEX_JS, hidden: true },
@@ -255,14 +258,12 @@ export const Sandbox: React.FC<SandboxProps> = ({
       }}
     >
       <SandpackBridge onError={onError} onSuccess={onSuccess} code={code} />
-      <div style={{ height: '100%', width: '100%' }}>
-        <SandpackPreview
-          style={{ height: '100%', width: '100%' }}
-          showOpenInCodeSandbox={false}
-          showNavigator={false}
-          showRefreshButton={true}
-        />
-      </div>
+      <SandpackPreview
+        style={{ flex: 1, minHeight: 0 }}
+        showOpenInCodeSandbox={false}
+        showNavigator={false}
+        showRefreshButton={true}
+      />
     </SandpackProvider>
   );
 };
