@@ -176,7 +176,8 @@ root.render(
 function sanitizeCode(code: string): string {
   return code
     // PI/TWO_PI/HALF_PI redeclarations — Konflikt mit p5.js globals
-    .replace(/\bconst\s+(PI|TWO_PI|HALF_PI)\s*=\s*[^;]+;?/g, '/* p5 constant, nicht neu deklarieren */')
+    .replace(/^\s*(?:const|let|var)\s+(PI|TWO_PI|HALF_PI)\s*=.*$/gm, '/* p5 constant, nicht neu deklarieren */')
+    .replace(/\b(?:const|let|var)\s+(PI|TWO_PI|HALF_PI)\s*=\s*[^;]+;?/g, '/* p5 constant, nicht neu deklarieren */')
     // ReactDOM render calls — Rendering übernimmt index.js
     .replace(/\bconst\s+root\s*=\s*createRoot\([^)]*\);?/g, '/* handled by sandbox */')
     .replace(/\broot\.render\([^)]*\);?/g, '/* handled by sandbox */');

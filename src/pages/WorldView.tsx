@@ -48,9 +48,9 @@ export default function WorldView() {
   const toggleLike = useMutation(api.worlds.toggleLike);
   
   const [currentCode, setCurrentCode] = useState<string | null>(null);
-  const [isFixing, setIsFixing] = useState(false);
   const [liked, setLiked] = useState(false);
   const [copied, setCopied] = useState(false);
+  const isFixingRef = useRef(false);
 
   // Voice Mode
   const [voiceEnabled, setVoiceEnabled] = useState(() =>
@@ -107,25 +107,45 @@ export default function WorldView() {
     setShowXPPopup(true);
   };
 
-  // Voice: TTS via /api/speak — new Audio() statt AudioContext (kein suspended-State-Problem)
+  const speakWithBrowser = useCallback((text: string) => {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'de-DE';
+    const voices = window.speechSynthesis.getVoices();
+    const germanVoice = voices.find((v) => v.lang.toLowerCase().startsWith('de'));
+    if (germanVoice) utterance.voice = germanVoice;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+  }, []);
+
+  // Voice: TTS via /api/speak — Fallback auf browser-native SpeechSynthesis
   const handleSpeak = useCallback(async (text: string) => {
     if (!voiceEnabled || !text) return;
+    const safeText = text.trim().slice(0, 500);
+    if (!safeText) return;
+
     try {
       const res = await fetch('/api/speak', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text: safeText }),
       });
-      if (!res.ok) return;
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const audio = new Audio(url);
-      audio.onended = () => URL.revokeObjectURL(url);
-      await audio.play();
+
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        audio.onended = () => URL.revokeObjectURL(url);
+        audio.onerror = () => URL.revokeObjectURL(url);
+        await audio.play();
+        return;
+      }
     } catch (e) {
-      console.warn('[Meoluna Voice] TTS error:', e);
+      console.warn('[Meoluna Voice] Server TTS error:', e);
     }
-  }, [voiceEnabled]);
+
+    speakWithBrowser(safeText);
+  }, [voiceEnabled, speakWithBrowser]);
 
   // Handler für neue meoluna:progress Events
   const handleProgressEvent = useCallback(async (payload: MeolunaProgressPayload) => {
@@ -156,7 +176,12 @@ export default function WorldView() {
     const data = event.data;
     if (typeof data !== 'object' || !data.type) return;
 
-    // Queue messages if user not loaded yet
+    if (data.type === 'meoluna:speak' && typeof data.text === 'string') {
+      handleSpeak(data.text);
+      return;
+    }
+
+    // Queue progress messages if user not loaded yet
     if (!user?.id || !worldId) {
       if (data.type === 'meoluna:progress' || data.type === 'xp' || data.type === 'module' || data.type === 'complete') {
         console.log('[Meoluna] Queuing message - user not ready:', data.type);
@@ -174,11 +199,6 @@ export default function WorldView() {
         if (payload.event && typeof payload.amount === 'number') {
           await handleProgressEvent(payload);
         }
-        return;
-      }
-
-      if (data.type === 'meoluna:speak' && typeof data.text === 'string') {
-        handleSpeak(data.text);
         return;
       }
 
@@ -245,9 +265,10 @@ export default function WorldView() {
     }
   }, [user?.id, worldId, handleWorldMessage]);
 
-  const handleAutoFix = async (error: string, failedCode: string) => {
-    if (isFixing) return;
-    setIsFixing(true);
+  const handleAutoFix = useCallback(async (error: string, failedCode: string) => {
+    if (isFixingRef.current) return;
+
+    isFixingRef.current = true;
     try {
       const result = await autoFixCode({ error, code: failedCode });
       if (result.fixedCode) {
@@ -256,9 +277,9 @@ export default function WorldView() {
     } catch (err) {
       console.error('Auto-fix failed:', err);
     } finally {
-      setIsFixing(false);
+      isFixingRef.current = false;
     }
-  };
+  }, [autoFixCode]);
 
   // Code to render (either fixed code or original)
   const codeToRender = currentCode || world?.code;

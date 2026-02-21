@@ -6,7 +6,7 @@
 
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery, useAction, useMutation } from 'convex/react';
+import { useQuery, useAction } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import { Id } from '../../../convex/_generated/dataModel';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -68,11 +68,8 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
   ) as Topic[] | undefined;
 
   // Convex Actions & Mutations
-  const generateWorld = useAction(api.generate.generateWorld);
-  const generateWorldFromPDF = useAction(api.generate.generateWorldFromPDF);
+  const generateWorldV2 = useAction(api.pipeline.orchestrator.generateWorldV2);
   const extractTextFromPDF = useAction(api.documents.extractTextFromPDF);
-  // const generateUploadUrl = useMutation(api.storage.generateUploadUrl); // For future: persistent file storage
-  const saveWorld = useMutation(api.worlds.create);
 
   // Reset modal state
   const resetState = useCallback(() => {
@@ -173,7 +170,6 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
     try {
       // Generate prompt from selection or custom input
       let prompt: string;
-      let title: string;
 
       if (customPrompt.trim()) {
         // Custom prompt mode
@@ -182,11 +178,9 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
 Der Nutzer wünscht sich: "${customPrompt}"
 
 Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
-        title = customPrompt.slice(0, 50) + (customPrompt.length > 50 ? '...' : '');
       } else if (selectedTopic) {
         // Topic selection mode
         prompt = `Erstelle eine Lernwelt zum Thema "${selectedTopic.name}" für Klasse ${selectedGrade} im Fach ${selectedSubject.name}. Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
-        title = `${selectedTopic.name} - Klasse ${selectedGrade}`;
       } else {
         throw new Error('Kein Thema ausgewählt');
       }
@@ -213,35 +207,30 @@ Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
         }
       }
 
-      // Generate world - use PDF version if we have extracted text
-      let result;
-      if (pdfText) {
-        result = await generateWorldFromPDF({
-          prompt,
-          pdfText,
-          gradeLevel: String(selectedGrade),
-          subject: selectedSubject.slug,
-        });
-      } else {
-        result = await generateWorld({ prompt });
-      }
+      const imageFiles = uploadedFiles
+        .filter((f) => f.type === 'image')
+        .map((f) => f.file.name);
+      const imageDescription = imageFiles.length > 0
+        ? `Hochgeladene Bilder: ${imageFiles.join(', ')}`
+        : undefined;
 
-      // Save the world
-      const worldId = await saveWorld({
-        title,
+      const sessionId = `creator_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
+      const result = await generateWorldV2({
         prompt,
-        code: result.code,
-        userId: user.id,
+        pdfText: pdfText || undefined,
+        imageDescription,
         gradeLevel: String(selectedGrade),
         subject: selectedSubject.slug,
-        isPublic: false,
+        userId: user.id,
+        sessionId,
       });
 
       clearInterval(messageInterval);
       handleClose(false);
 
       // Navigate to the new world
-      navigate(`/w/${worldId}`);
+      navigate(`/w/${result.worldId}`);
     } catch (err) {
       clearInterval(messageInterval);
       setError(
