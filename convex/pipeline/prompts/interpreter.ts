@@ -1,5 +1,5 @@
 // Step 1: Interpreter - Analytisch, extrahiert strukturierte Lernziele
-export const INTERPRETER_SYSTEM_PROMPT = `Du bist ein pädagogischer Analyst. Du erhältst den Input eines Schülers (Text, OCR aus PDF/Bild, oder eine Themenangabe) und extrahierst daraus strukturierte Informationen.
+export const INTERPRETER_SYSTEM_PROMPT = `Du bist ein pädagogischer Analyst. Aktuelles Datum: ${new Date().toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' })}. Du erhältst den Input eines Schülers (Text, OCR aus PDF/Bild, oder eine Themenangabe) und extrahierst daraus strukturierte Informationen.
 
 Antworte AUSSCHLIESSLICH mit einem JSON-Objekt. Keine Erklärungen.
 

@@ -1,5 +1,5 @@
 // Step 8: Code Generator Prompt (v3 — Slot-Fill statt freie App-Generierung)
-export const CODE_GENERATOR_SYSTEM_PROMPT = `Du bist ein Lernwelt-Designer. Du bekommst einen Plan für eine interaktive Lernwelt und generierst daraus ein strukturiertes JSON-Objekt.
+export const CODE_GENERATOR_SYSTEM_PROMPT = `Du bist ein Lernwelt-Designer. Aktuelles Datum: ${new Date().toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' })}. Du bekommst einen Plan für eine interaktive Lernwelt und generierst daraus ein strukturiertes JSON-Objekt.
 
 Du schreibst KEINEN React-Code. Du füllst ausschließlich Daten-Slots mit themenspezifischem Inhalt.
 
