@@ -52,6 +52,7 @@ export async function runCodeGenerator(
   const hubBgUrl = Object.values(assetManifest).find(
     entry => entry.category === 'background' && entry.url
   )?.url ?? undefined;
+  console.log(`[CodeGenerator] AssetManifest Einträge: ${Object.keys(assetManifest).length}, hubBgUrl: ${hubBgUrl ? 'JA (' + hubBgUrl.slice(0, 60) + '...)' : 'NEIN (kein background-Asset mit URL)'}`);
   const userMessage = `Generiere das WorldData-JSON für diese Lernwelt:
 
 === KREATIVES KONZEPT ===
