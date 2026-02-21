@@ -32,7 +32,15 @@ ${JSON.stringify(gameDesign, null, 2)}
 
 Erstelle jetzt ALLE Spiel-Challenges mit gameData, Lösungen, Feedback und Socratic Hints.
 WICHTIG: Jede Challenge muss sich wie ein SPIEL anfühlen, nicht wie eine Schulaufgabe!
-Achte auf absolute fachliche Korrektheit!`;
+Achte auf absolute fachliche Korrektheit!
+
+FORMATAUFLAGEN (KRITISCH):
+- Liefere ausschließlich valides JSON.
+- Keine Markdown-Codeblöcke, keine Kommentare, kein Fließtext außerhalb des JSON.
+- Verwende nur doppelte Anführungszeichen für Strings.
+- Halte Texte kompakt, damit die Antwort vollständig bleibt:
+  introText max 240 Zeichen, challengeText max 180 Zeichen,
+  feedback/hints jeweils max 140 Zeichen.`;
 
   // If Quality Gate gave feedback (retry), include it
   if (qualityFeedback) {
@@ -48,9 +56,9 @@ WICHTIG: Korrigiere ALLE criticalErrors aus dem Quality-Gate!`;
     model: "claude-sonnet-4-20250514",
     systemPrompt: CONTENT_ARCHITECT_SYSTEM_PROMPT,
     userMessage,
-    maxTokens: 8000,
-    temperature: 0.5,
-  });
+    maxTokens: 12000,
+    temperature: 0.3,
+  }, 3);
 
   // Validate
   if (!result.modules?.length) {

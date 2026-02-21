@@ -24,6 +24,26 @@ import { runStructuralGate } from "./steps/structuralGate";
 import { STEP_LABELS, STEP_ORDER } from "./types";
 import type { AssetManifest } from "./types";
 
+function toErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function withStepError(error: unknown, defaultCode: string, jsonCode: string): Error {
+  const message = toErrorMessage(error);
+  if (/^E_[A-Z0-9_]+:/.test(message)) {
+    return new Error(message);
+  }
+
+  const isJsonError =
+    /JSON parse failed/i.test(message) ||
+    /Unexpected token/i.test(message) ||
+    /Unexpected end of JSON input/i.test(message) ||
+    /Kein JSON-Objekt/i.test(message);
+
+  const errorCode = isJsonError ? jsonCode : defaultCode;
+  return new Error(`${errorCode}: ${message}`);
+}
+
 // ============================================================================
 // MAIN ACTION: generateWorldV2
 // ============================================================================
@@ -136,11 +156,17 @@ export const generateWorldV2 = action({
       // ── STEP 6: CONTENT ARCHITECT ────────────────────────────────
       await setStatus(5);
       const step6Start = Date.now();
-      const content = await runContentArchitect(
-        interpreter.result,
-        creative.result,
-        gameDesign.result
-      );
+      const content = await (async () => {
+        try {
+          return await runContentArchitect(
+            interpreter.result,
+            creative.result,
+            gameDesign.result
+          );
+        } catch (error) {
+          throw withStepError(error, "E_CONTENT_ARCHITECT", "E_CONTENT_JSON_PARSE");
+        }
+      })();
       stepTimings.content_architect = {
         durationMs: Date.now() - step6Start,
         model: "sonnet",
@@ -151,12 +177,18 @@ export const generateWorldV2 = action({
       // ── STEP 7: QUALITY GATE ─────────────────────────────────────
       await setStatus(6);
       const step7Start = Date.now();
-      const quality = await runQualityGate(
-        interpreter.result,
-        creative.result,
-        gameDesign.result,
-        content.result
-      );
+      const quality = await (async () => {
+        try {
+          return await runQualityGate(
+            interpreter.result,
+            creative.result,
+            gameDesign.result,
+            content.result
+          );
+        } catch (error) {
+          throw withStepError(error, "E_QUALITY_GATE", "E_QUALITY_JSON_PARSE");
+        }
+      })();
       stepTimings.quality_gate = {
         durationMs: Date.now() - step7Start,
         model: "sonnet",
@@ -168,12 +200,18 @@ export const generateWorldV2 = action({
       let finalContent = content.result;
       if (quality.result.overallScore < 5) {
         console.log("Quality score too low, retrying Content Architect...");
-        const retry = await runContentArchitect(
-          interpreter.result,
-          creative.result,
-          gameDesign.result,
-          quality.result
-        );
+        const retry = await (async () => {
+          try {
+            return await runContentArchitect(
+              interpreter.result,
+              creative.result,
+              gameDesign.result,
+              quality.result
+            );
+          } catch (error) {
+            throw withStepError(error, "E_CONTENT_RETRY", "E_CONTENT_JSON_PARSE");
+          }
+        })();
         finalContent = retry.result;
       } else if (
         quality.result.correctedContent &&
@@ -185,13 +223,19 @@ export const generateWorldV2 = action({
       // ── STEP 8: CODE GENERATION ──────────────────────────────────
       await setStatus(7);
       const step8Start = Date.now();
-      const codeGen = await runCodeGenerator(
-        creative.result,
-        gameDesign.result,
-        finalContent,
-        assetManifest,
-        quality.result
-      );
+      const codeGen = await (async () => {
+        try {
+          return await runCodeGenerator(
+            creative.result,
+            gameDesign.result,
+            finalContent,
+            assetManifest,
+            quality.result
+          );
+        } catch (error) {
+          throw withStepError(error, "E_CODE_GENERATOR", "E_CODEGEN_JSON_PARSE");
+        }
+      })();
       stepTimings.code_generator = {
         durationMs: Date.now() - step8Start,
         model: "opus",
@@ -269,12 +313,14 @@ export const generateWorldV2 = action({
       };
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : "Unknown pipeline error";
+      const errorCode = errorMsg.match(/^(E_[A-Z0-9_]+):/)?.[1];
       console.error("Pipeline V2 failed:", errorMsg);
 
       try {
         await ctx.runMutation(internal.pipeline.status.failSession, {
           sessionId: args.sessionId,
           error: errorMsg,
+          errorCode,
         });
       } catch {
         // Ignore session update failure
