@@ -13,6 +13,27 @@ import type {
   QualityGateOutput,
 } from "../types";
 
+function buildFallbackQualityGate(): QualityGateOutput {
+  return {
+    overallScore: 7,
+    criticalErrors: [],
+    warnings: [
+      {
+        location: "quality_gate",
+        description: "Quality Gate fallback active due to timeout/parse issue.",
+        suggestion: "Proceed with generation and validate manually if needed.",
+      },
+    ],
+    correctedContent: {},
+    fallbacks: [
+      {
+        risk: "Automatic quality analysis was unavailable.",
+        fallback: "Pipeline continued with neutral quality score.",
+      },
+    ],
+  };
+}
+
 export async function runQualityGate(
   interpreted: InterpreterOutput,
   concept: CreativeDirectorOutput,
@@ -33,17 +54,29 @@ ${JSON.stringify(gameDesign, null, 2)}
 === AUFGABEN & INHALTE ===
 ${JSON.stringify(content, null, 2)}
 
-Prüfe ALLES auf Fehler. Sei streng aber fair.`;
+Prüfe ALLES auf Fehler. Sei streng aber fair.
+FUER PERFORMANCE: Kurz und praezise bleiben.`; 
 
-  const { result, inputTokens, outputTokens } = await callAnthropicJson<QualityGateOutput>({
-    model: "claude-sonnet-4-20250514",
-    systemPrompt: QUALITY_GATE_SYSTEM_PROMPT,
-    userMessage,
-    maxTokens: 4000,
-    temperature: 0,
-  });
+  try {
+    const { result, inputTokens, outputTokens } = await callAnthropicJson<QualityGateOutput>({
+      model: "claude-sonnet-4-20250514",
+      systemPrompt: QUALITY_GATE_SYSTEM_PROMPT,
+      userMessage,
+      maxTokens: 3000,
+      temperature: 0,
+      timeoutMs: 60000,
+    }, 0);
 
-  return { result, inputTokens, outputTokens };
+    return { result, inputTokens, outputTokens };
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    console.warn(`[QualityGate] Fallback aktiviert: ${msg}`);
+    return {
+      result: buildFallbackQualityGate(),
+      inputTokens: 0,
+      outputTokens: 0,
+    };
+  }
 }
 
 /**

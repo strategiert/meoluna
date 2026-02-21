@@ -5,6 +5,7 @@
 export interface FalImageRequest {
   prompt: string;
   aspectRatio: "16:9" | "1:1" | "4:3";
+  timeoutMs?: number;
 }
 
 export interface FalImageResult {
@@ -30,6 +31,10 @@ export async function generateImage(request: FalImageRequest): Promise<FalImageR
   }
 
   try {
+    const timeoutMs = request.timeoutMs ?? 25000;
+    const controller = new AbortController();
+    const timeoutHandle = setTimeout(() => controller.abort(), timeoutMs);
+
     const response = await fetch("https://fal.run/fal-ai/flux/schnell", {
       method: "POST",
       headers: {
@@ -42,7 +47,8 @@ export async function generateImage(request: FalImageRequest): Promise<FalImageR
         num_images: 1,
         enable_safety_checker: true,
       }),
-    });
+      signal: controller.signal,
+    }).finally(() => clearTimeout(timeoutHandle));
 
     if (!response.ok) {
       const error = await response.text();
@@ -59,7 +65,11 @@ export async function generateImage(request: FalImageRequest): Promise<FalImageR
 
     return { url: imageUrl };
   } catch (e) {
-    const msg = e instanceof Error ? e.message : "Unknown error";
+    const msg = e instanceof Error && e.name === "AbortError"
+      ? `fal.ai timeout after ${request.timeoutMs ?? 25000}ms`
+      : e instanceof Error
+        ? e.message
+        : "Unknown error";
     console.error(`fal.ai call failed: ${msg}`);
     return { url: null, error: msg };
   }

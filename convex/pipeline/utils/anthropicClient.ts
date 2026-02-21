@@ -8,6 +8,7 @@ export interface AnthropicCallOptions {
   userMessage: string;
   maxTokens: number;
   temperature: number;
+  timeoutMs?: number;
 }
 
 export interface AnthropicResponse {
@@ -28,21 +29,36 @@ export async function callAnthropic(options: AnthropicCallOptions): Promise<Anth
     throw new Error("ANTHROPIC_API_KEY nicht konfiguriert");
   }
 
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model: options.model,
-      max_tokens: options.maxTokens,
-      temperature: options.temperature,
-      system: options.systemPrompt,
-      messages: [{ role: "user", content: options.userMessage }],
-    }),
-  });
+  const timeoutMs = options.timeoutMs ?? 120000;
+  const controller = new AbortController();
+  const timeoutHandle = setTimeout(() => controller.abort(), timeoutMs);
+
+  let response: Response;
+  try {
+    response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: options.model,
+        max_tokens: options.maxTokens,
+        temperature: options.temperature,
+        system: options.systemPrompt,
+        messages: [{ role: "user", content: options.userMessage }],
+      }),
+      signal: controller.signal,
+    });
+  } catch (error) {
+    if (error instanceof Error && error.name === "AbortError") {
+      throw new Error(`Anthropic API timeout after ${timeoutMs}ms`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutHandle);
+  }
 
   if (!response.ok) {
     const error = await response.text();

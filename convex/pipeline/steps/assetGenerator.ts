@@ -16,38 +16,77 @@ export async function runAssetGenerator(
   storage: StorageContext
 ): Promise<AssetManifest> {
   const manifest: AssetManifest = {};
+  const MAX_ASSETS = 8;
+  const MAX_CONCURRENT = 4;
+  const priorityRank: Record<string, number> = {
+    critical: 0,
+    important: 1,
+    "nice-to-have": 2,
+  };
 
-  // Filter: skip nice-to-have if we have > 8 assets
-  const assetsToGenerate = assetPlan.assets.filter(
-    (asset) => asset.priority !== "nice-to-have" || assetPlan.assets.length <= 8
+  const assetsToGenerate = [...assetPlan.assets]
+    .sort((a, b) => {
+      const rankA = priorityRank[a.priority] ?? 9;
+      const rankB = priorityRank[b.priority] ?? 9;
+      return rankA - rankB;
+    })
+    .slice(0, MAX_ASSETS);
+
+  console.log(
+    `[AssetGenerator] Plane ${assetsToGenerate.length}/${assetPlan.assets.length} Assets ` +
+    `(concurrency=${MAX_CONCURRENT})`
   );
 
-  // Generate all images in PARALLEL
-  const promises = assetsToGenerate.map(async (asset) => {
-    const fullPrompt = `${asset.prompt}, ${assetPlan.styleBase}`;
+  let cursor = 0;
+  const workers = Array.from(
+    { length: Math.min(MAX_CONCURRENT, assetsToGenerate.length) },
+    async () => {
+      while (true) {
+        const next = cursor++;
+        if (next >= assetsToGenerate.length) break;
+        const asset = assetsToGenerate[next];
+        const fullPrompt = `${asset.prompt}, ${assetPlan.styleBase}`;
 
-    const result = await generateImage({
-      prompt: fullPrompt,
-      aspectRatio: asset.aspectRatio,
-    });
+        const result = await generateImage({
+          prompt: fullPrompt,
+          aspectRatio: asset.aspectRatio,
+          timeoutMs: 25000,
+        });
 
-    if (result.url) {
-      // Download and persist to Convex storage (fal.ai URLs are temporary)
-      const blob = await downloadImage(result.url);
+        if (result.url) {
+          // Download and persist to Convex storage (fal.ai URLs are temporary)
+          const blob = await downloadImage(result.url);
 
-      if (blob) {
-        try {
-          const storageId = await storage.store(blob);
-          const permanentUrl = await storage.getUrl(storageId);
+          if (blob) {
+            try {
+              const storageId = await storage.store(blob);
+              const permanentUrl = await storage.getUrl(storageId);
 
-          manifest[asset.id] = {
-            url: permanentUrl,
-            storageId,
-            category: asset.category,
-            purpose: asset.purpose,
-          };
-        } catch (e) {
-          console.error(`Storage failed for ${asset.id}:`, e);
+              manifest[asset.id] = {
+                url: permanentUrl,
+                storageId,
+                category: asset.category,
+                purpose: asset.purpose,
+              };
+            } catch (e) {
+              console.error(`Storage failed for ${asset.id}:`, e);
+              manifest[asset.id] = {
+                url: null,
+                storageId: null,
+                category: asset.category,
+                purpose: asset.purpose,
+              };
+            }
+          } else {
+            manifest[asset.id] = {
+              url: null,
+              storageId: null,
+              category: asset.category,
+              purpose: asset.purpose,
+            };
+          }
+        } else {
+          // fal.ai failed — mark as null (SVG fallback will be used)
           manifest[asset.id] = {
             url: null,
             storageId: null,
@@ -55,26 +94,11 @@ export async function runAssetGenerator(
             purpose: asset.purpose,
           };
         }
-      } else {
-        manifest[asset.id] = {
-          url: null,
-          storageId: null,
-          category: asset.category,
-          purpose: asset.purpose,
-        };
       }
-    } else {
-      // fal.ai failed — mark as null (SVG fallback will be used)
-      manifest[asset.id] = {
-        url: null,
-        storageId: null,
-        category: asset.category,
-        purpose: asset.purpose,
-      };
     }
-  });
+  );
 
-  await Promise.all(promises);
+  await Promise.all(workers);
 
   // Debug-Log: Zusammenfassung des Manifests
   const total = Object.keys(manifest).length;
