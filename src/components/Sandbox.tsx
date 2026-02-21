@@ -73,6 +73,7 @@ const INDEX_HTML = `<!DOCTYPE html>
 // ENTRY POINT — Meoluna API + Error Handler + React Mount
 // ============================================================================
 const INDEX_JS = `import { createRoot } from "react-dom/client";
+import React from "react";
 import App from "./App";
 
 // Meoluna API — global für alle generierten Welten
@@ -121,8 +122,33 @@ window.onunhandledrejection = function(event) {
   }, '*');
 };
 
+// Error Boundary — fängt React Render-Fehler und meldet sie via postMessage
+class SandboxErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error) {
+    window.parent.postMessage({
+      type: 'SANDBOX_ERROR',
+      error: error.message || 'Render-Fehler in der Lernwelt'
+    }, '*');
+  }
+  render() {
+    if (this.state.hasError) return null;
+    return this.props.children;
+  }
+}
+
 const root = createRoot(document.getElementById("root"));
-root.render(<App />);
+root.render(
+  <SandboxErrorBoundary>
+    <App />
+  </SandboxErrorBoundary>
+);
 `;
 
 // ============================================================================
@@ -155,7 +181,12 @@ const SandpackBridge: React.FC<{
 
   useEffect(() => {
     if (sandpack.error) {
-      onError?.(sandpack.error.message || 'Sandbox-Fehler', code);
+      // sandpack.error.message kann auf manchen Error-Objekten nicht lesbar sein
+      const msg = (() => {
+        try { return sandpack.error!.message || sandpack.error!.toString() || 'Babel-Fehler'; }
+        catch { return 'Babel-Fehler beim Transpilieren'; }
+      })();
+      onError?.(msg, code);
     }
   }, [sandpack.error]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -195,6 +226,9 @@ export const Sandbox: React.FC<SandboxProps> = ({
       key={sanitized}
       template="react"
       theme="dark"
+      // SandpackThemeProvider rendert einen div mit `all:initial; display:block` ohne height.
+      // Wir müssen height explizit durchreichen, damit der Flex-Chain funktioniert.
+      style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column' }}
       files={{
         '/App.js': { code: sanitized, active: true },
         '/index.js': { code: INDEX_JS, hidden: true },
@@ -224,14 +258,12 @@ export const Sandbox: React.FC<SandboxProps> = ({
       }}
     >
       <SandpackBridge onError={onError} onSuccess={onSuccess} code={code} />
-      <div style={{ height: '100%', width: '100%' }}>
-        <SandpackPreview
-          style={{ height: '100%', width: '100%' }}
-          showOpenInCodeSandbox={false}
-          showNavigator={false}
-          showRefreshButton={true}
-        />
-      </div>
+      <SandpackPreview
+        style={{ flex: 1, minHeight: 0 }}
+        showOpenInCodeSandbox={false}
+        showNavigator={false}
+        showRefreshButton={true}
+      />
     </SandpackProvider>
   );
 };

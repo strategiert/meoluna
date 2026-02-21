@@ -54,6 +54,29 @@ Das Kind soll das Gefühl haben, ein Spiel zu spielen oder ein Experiment durchz
 - Functional components mit Hooks
 - State für: aktuelles Modul, Fortschritt, Punkte, Antworten
 
+### KRITISCH: CODE-QUALITÄT
+
+**NIEMALS denselben Funktions- oder Variablennamen zweimal deklarieren!**
+\`\`\`javascript
+// VERBOTEN — Doppelte Deklaration:
+const renderQuestion = () => { ... };
+// ... später nochmal ...
+const renderQuestion = () => { ... };  // FEHLER: already declared!
+\`\`\`
+
+**NIEMALS reguläre Strings über mehrere Zeilen verteilen — Template-Literals nutzen!**
+\`\`\`javascript
+// VERBOTEN — Zeilenumbruch in normalem String:
+"Parallelschaltung - sie
+verbessert die Helligkeit"  // SyntaxError!
+
+// RICHTIG — Template-Literal mit Backticks:
+\`Parallelschaltung - sie
+verbessert die Helligkeit\`
+\`\`\`
+
+**Der Code MUSS vollständig sein!** Wenn du merkst dass die Datei sehr lang wird, schreibe kompakteren Code — aber beende sie immer ordentlich mit \`export default App;\`
+
 ### KRITISCH: VERBOTENE PATTERNS!
 
 **NIEMALS top-level await verwenden!**
@@ -446,6 +469,15 @@ export const generateWorld = action({
     }
 
     const data = await response.json();
+
+    // Abbruch erkennen: Code wurde durch max_tokens abgeschnitten
+    if (data.stop_reason === "max_tokens") {
+      throw new Error(
+        "Der generierte Code ist zu lang und wurde abgeschnitten. " +
+        "Bitte versuche es mit einem spezifischeren Thema."
+      );
+    }
+
     let code = data.content[0]?.text || "";
 
     // Clean up: Entferne eventuelle Markdown-Codeblöcke
@@ -454,7 +486,7 @@ export const generateWorld = action({
       .replace(/```$/gm, "")
       .trim();
 
-    // Validierung
+    // Validierung: App-Komponente vorhanden?
     if (!code.includes("function App") && !code.includes("const App")) {
       throw new Error("Generated code does not contain an App component");
     }
