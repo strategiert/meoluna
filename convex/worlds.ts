@@ -53,6 +53,21 @@ export const create = mutation({
     prompt: v.optional(v.string()),
     gradeLevel: v.optional(v.string()),
     subject: v.optional(v.string()),
+    // Pipeline v3: Qualitätsstatus
+    status: v.optional(v.union(
+      v.literal("published"),
+      v.literal("quarantined"),
+      v.literal("failed")
+    )),
+    qualityScore: v.optional(v.number()),
+    error: v.optional(v.string()),
+    validationMetadata: v.optional(v.object({
+      validatorSuccess: v.boolean(),
+      validatorIterations: v.number(),
+      gateScore: v.number(),
+      gatePassed: v.boolean(),
+      gateViolations: v.array(v.string()),
+    })),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("worlds", {
@@ -63,6 +78,10 @@ export const create = mutation({
       prompt: args.prompt,
       gradeLevel: args.gradeLevel,
       subject: args.subject,
+      status: args.status ?? "published",
+      qualityScore: args.qualityScore,
+      error: args.error,
+      validationMetadata: args.validationMetadata,
       views: 0,
       likes: 0,
       createdAt: Date.now(),

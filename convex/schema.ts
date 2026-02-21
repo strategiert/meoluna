@@ -46,9 +46,26 @@ export default defineSchema({
     views: v.optional(v.number()),
     likes: v.optional(v.number()),
     createdAt: v.optional(v.number()),
+
+    // Pipeline v3: Qualitätsstatus
+    status: v.optional(v.union(
+      v.literal("published"),
+      v.literal("quarantined"),  // Structural Gate failed → gespeichert aber verborgen
+      v.literal("failed")
+    )),
+    qualityScore: v.optional(v.number()),
+    error: v.optional(v.string()),
+    validationMetadata: v.optional(v.object({
+      validatorSuccess: v.boolean(),
+      validatorIterations: v.number(),
+      gateScore: v.number(),
+      gatePassed: v.boolean(),
+      gateViolations: v.array(v.string()),
+    })),
   })
     .index("by_user", ["userId"])
-    .index("by_public", ["isPublic"]),
+    .index("by_public", ["isPublic"])
+    .index("by_status", ["status"]),
 
   // Generation History (für Chat)
   messages: defineTable({
@@ -335,6 +352,12 @@ export default defineSchema({
     worldId: v.optional(v.id("worlds")),
     startedAt: v.number(),
     completedAt: v.optional(v.number()),
+
+    // Pipeline v3: Telemetrie
+    errorCode: v.optional(v.string()),         // E_GATE, E_NAV_001, E_STRUCT_001, etc.
+    qualityScore: v.optional(v.number()),      // Quality Gate Score 0-10
+    gateViolations: v.optional(v.array(v.string())), // Structural Gate Violations
+    stepOutputs: v.optional(v.any()),          // JSON der Step-Ergebnisse (für Debug)
   })
     .index("by_session", ["sessionId"])
     .index("by_user", ["userId"]),

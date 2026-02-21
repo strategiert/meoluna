@@ -95,6 +95,9 @@ export const failSession = internalMutation({
   args: {
     sessionId: v.string(),
     error: v.string(),
+    errorCode: v.optional(v.string()),
+    gateViolations: v.optional(v.array(v.string())),
+    qualityScore: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const session = await ctx.db
@@ -106,6 +109,9 @@ export const failSession = internalMutation({
       await ctx.db.patch(session._id, {
         status: "failed",
         error: args.error,
+        errorCode: args.errorCode,
+        gateViolations: args.gateViolations,
+        qualityScore: args.qualityScore,
         completedAt: Date.now(),
       });
     }

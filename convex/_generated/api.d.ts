@@ -36,6 +36,7 @@ import type * as pipeline_steps_creativeDirector from "../pipeline/steps/creativ
 import type * as pipeline_steps_gameDesigner from "../pipeline/steps/gameDesigner.js";
 import type * as pipeline_steps_interpreter from "../pipeline/steps/interpreter.js";
 import type * as pipeline_steps_qualityGate from "../pipeline/steps/qualityGate.js";
+import type * as pipeline_steps_structuralGate from "../pipeline/steps/structuralGate.js";
 import type * as pipeline_steps_validator from "../pipeline/steps/validator.js";
 import type * as pipeline_types from "../pipeline/types.js";
 import type * as pipeline_utils_anthropicClient from "../pipeline/utils/anthropicClient.js";
@@ -83,6 +84,7 @@ declare const fullApi: ApiFromModules<{
   "pipeline/steps/gameDesigner": typeof pipeline_steps_gameDesigner;
   "pipeline/steps/interpreter": typeof pipeline_steps_interpreter;
   "pipeline/steps/qualityGate": typeof pipeline_steps_qualityGate;
+  "pipeline/steps/structuralGate": typeof pipeline_steps_structuralGate;
   "pipeline/steps/validator": typeof pipeline_steps_validator;
   "pipeline/types": typeof pipeline_types;
   "pipeline/utils/anthropicClient": typeof pipeline_utils_anthropicClient;

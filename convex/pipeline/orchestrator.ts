@@ -19,6 +19,7 @@ import { runContentArchitect } from "./steps/contentArchitect";
 import { runQualityGate, applyCorrections } from "./steps/qualityGate";
 import { runCodeGenerator } from "./steps/codeGenerator";
 import { runValidator } from "./steps/validator";
+import { runStructuralGate } from "./steps/structuralGate";
 
 import { STEP_LABELS, STEP_ORDER } from "./types";
 import type { AssetManifest } from "./types";
@@ -210,6 +211,29 @@ export const generateWorldV2 = action({
         console.warn("Validation failed after retries. Errors:", validated.errors);
       }
 
+      // ── STEP 9.5: STRUCTURAL GATE ────────────────────────────────
+      const gateResult = runStructuralGate(validated.code);
+      if (!gateResult.passed) {
+        const errorCode = gateResult.violations[0]?.split(":")[0] || "E_GATE";
+        console.error("Structural Gate FAILED:", gateResult.violations);
+
+        // Session als failed markieren mit Telemetrie-Daten (überschreibt failSession im catch)
+        try {
+          await ctx.runMutation(internal.pipeline.status.failSession, {
+            sessionId: args.sessionId,
+            error: `Structural Gate Failed: ${gateResult.violations.join(" | ")}`,
+            errorCode,
+            gateViolations: gateResult.violations,
+            qualityScore: quality.result.overallScore,
+          });
+        } catch {
+          // Ignorieren — catch-Block macht ggf. nochmal failSession
+        }
+
+        // Kein worlds-Insert — direkt Exception
+        throw new Error(`${errorCode}: ${gateResult.violations.join(" | ")}`);
+      }
+
       // ── STEP 10: OUTPUT & STORAGE ────────────────────────────────
       const worldId: Id<"worlds"> = await ctx.runMutation(api.worlds.create, {
         title: creative.result.worldName,
@@ -219,6 +243,15 @@ export const generateWorldV2 = action({
         prompt: args.prompt,
         gradeLevel: args.gradeLevel || String(interpreter.result.gradeLevel),
         subject: args.subject || interpreter.result.subject,
+        status: "published",
+        qualityScore: quality.result.overallScore,
+        validationMetadata: {
+          validatorSuccess: validated.success,
+          validatorIterations: validated.iterations ?? 0,
+          gateScore: gateResult.score,
+          gatePassed: true,
+          gateViolations: [],
+        },
       });
 
       // Mark session as complete
