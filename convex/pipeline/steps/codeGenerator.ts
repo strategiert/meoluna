@@ -1,11 +1,17 @@
 // ============================================================================
-// STEP 8: CODE GENERATION - Plan in React-Code umsetzen
-// Model: Opus (max Tokens) | Temp: 0.2 | Max: 64000
+// STEP 8: CODE GENERATION (v3 — Skeleton-basiert)
+//
+// Statt freier App-Generierung:
+// 1. LLM generiert JSON (worldConfig + modules + challenges)
+// 2. Skeleton-Assembler baut daraus deterministischen React-Code
+//
+// Garantiert: Navigation, Meoluna API Calls, kein kaputtes HTML
 // ============================================================================
 
 import { callAnthropic } from "../utils/anthropicClient";
 import { CODE_GENERATOR_SYSTEM_PROMPT } from "../prompts/codeGenerator";
-import { cleanCodeOutput } from "../utils/validation";
+import { buildWorldCode } from "../skeleton/worldSkeleton";
+import type { WorldData } from "../skeleton/worldSkeleton";
 import type {
   CreativeDirectorOutput,
   GameDesignerOutput,
@@ -14,42 +20,81 @@ import type {
   QualityGateOutput,
 } from "../types";
 
+/**
+ * Extrahiert JSON aus dem LLM-Response (robust gegen Markdown-Wrapper).
+ */
+function extractJson(text: string): WorldData {
+  // Entferne Markdown-Wrapper falls vorhanden
+  const cleaned = text
+    .replace(/^```(?:json)?\s*\n?/gm, "")
+    .replace(/\n?```\s*$/gm, "")
+    .trim();
+
+  // Suche nach dem ersten { ... } Block
+  const start = cleaned.indexOf("{");
+  const end = cleaned.lastIndexOf("}");
+  if (start === -1 || end === -1) {
+    throw new Error("Kein JSON-Objekt im LLM-Response gefunden");
+  }
+
+  const jsonStr = cleaned.slice(start, end + 1);
+  return JSON.parse(jsonStr) as WorldData;
+}
+
 export async function runCodeGenerator(
   concept: CreativeDirectorOutput,
   gameDesign: GameDesignerOutput,
   content: ContentArchitectOutput,
-  assetManifest: AssetManifest,
+  _assetManifest: AssetManifest,
   quality: QualityGateOutput
 ) {
-  const userMessage = `Setze diesen vollständigen Lernwelt-Plan in React-Code um:
+  const userMessage = `Generiere das WorldData-JSON für diese Lernwelt:
 
 === KREATIVES KONZEPT ===
-${JSON.stringify(concept, null, 2)}
+Weltname: ${concept.worldName}
+Setting: ${concept.universe.setting}
+Metapher: ${concept.universe.metaphor}
+Farbpalette: ${concept.visualIdentity.colorPalette.join(", ")}
+Stimmung: ${concept.visualIdentity.mood}
 
-=== SPIELMECHANIKEN & MODULE ===
-${JSON.stringify(gameDesign, null, 2)}
+=== MODULE & SPIELMECHANIKEN ===
+${gameDesign.modules.map((m, i) => `Modul ${i}: ${m.title} (${m.gameplayType})`).join("\n")}
 
-=== AUFGABEN, LÖSUNGEN & FEEDBACK ===
+=== AUFGABEN & CHALLENGES ===
 ${JSON.stringify(content, null, 2)}
 
-=== ASSET-MANIFEST (generierte Bilder) ===
-${JSON.stringify(assetManifest, null, 2)}
+=== QUALITY-GATE HINWEISE ===
+Score: ${quality.overallScore}/10
+Kritische Fehler: ${quality.criticalErrors.map(e => e.description).join("; ") || "keine"}
 
-=== QUALITY-GATE ERGEBNISSE (beachte Fallbacks!) ===
-${JSON.stringify(quality, null, 2)}
-
-Programmiere jetzt die komplette React-App. Folge dem Plan exakt.
-Nutze die Asset-URLs wo verfügbar, SVG-Fallbacks wo nicht.`;
+Generiere jetzt das WorldData-JSON. Gib NUR das JSON zurück, kein Markdown, keine Erklärungen.`;
 
   const response = await callAnthropic({
-    model: "claude-opus-4-20250514",
+    model: "claude-sonnet-4-20250514",
     systemPrompt: CODE_GENERATOR_SYSTEM_PROMPT,
     userMessage,
-    maxTokens: 64000,
-    temperature: 0.2,
+    maxTokens: 16000,
+    temperature: 0.3,
   });
 
-  const code = cleanCodeOutput(response.text);
+  // JSON parsen
+  const worldData = extractJson(response.text);
+
+  // Validierung: Mindeststruktur
+  if (!worldData.config || !worldData.modules || !Array.isArray(worldData.modules)) {
+    throw new Error("Ungültiges WorldData-JSON: config oder modules fehlen");
+  }
+  if (worldData.modules.length === 0) {
+    throw new Error("Ungültiges WorldData-JSON: keine Module");
+  }
+  for (const mod of worldData.modules) {
+    if (!mod.challenges || mod.challenges.length === 0) {
+      throw new Error(`Modul "${mod.title}" hat keine Challenges`);
+    }
+  }
+
+  // Skeleton-Assembler: JSON → React-Code
+  const code = buildWorldCode(worldData);
 
   return {
     code,
