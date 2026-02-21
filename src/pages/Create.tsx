@@ -67,6 +67,7 @@ export default function Create() {
   const [pdfText, setPdfText] = useState<string>('');
   const [isExtracting, setIsExtracting] = useState(false);
   const [pdfError, setPdfError] = useState<string | null>(null);
+  const [isFixing, setIsFixing] = useState(false);
 
   // Auto-scroll zu neuen Nachrichten
   useEffect(() => {
@@ -198,8 +199,6 @@ export default function Create() {
       setIsGenerating(false);
     }
   };
-
-  const [isFixing, setIsFixing] = useState(false);
 
   const handleAutoFix = async (error: string, failedCode: string) => {
     if (isFixing) return;
