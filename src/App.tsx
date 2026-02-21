@@ -29,6 +29,7 @@ import ClassroomDetail from '@/pages/ClassroomDetail';
 import JoinClassroom from '@/pages/JoinClassroom';
 import NotFound from '@/pages/NotFound';
 import BackgroundsDemo from '@/pages/demo/Backgrounds';
+import SandboxLab from '@/pages/demo/SandboxLab';
 
 export default function App() {
   useUserSync();
@@ -60,6 +61,7 @@ export default function App() {
         <Route path="/terms" element={<Terms />} />
         {/* Demo Pages */}
         <Route path="/demo/backgrounds" element={<BackgroundsDemo />} />
+        <Route path="/demo/sandbox" element={<SandboxLab />} />
         {/* Fallback */}
         <Route path="*" element={<NotFound />} />
       </Routes>
