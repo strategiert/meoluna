@@ -57,25 +57,25 @@ Das Kind soll das Gefühl haben, ein Spiel zu spielen oder ein Experiment durchz
 ### KRITISCH: CODE-QUALITÄT
 
 **NIEMALS denselben Funktions- oder Variablennamen zweimal deklarieren!**
-```javascript
+\`\`\`javascript
 // VERBOTEN — Doppelte Deklaration:
 const renderQuestion = () => { ... };
 // ... später nochmal ...
 const renderQuestion = () => { ... };  // FEHLER: already declared!
-```
+\`\`\`
 
 **NIEMALS reguläre Strings über mehrere Zeilen verteilen — Template-Literals nutzen!**
-```javascript
+\`\`\`javascript
 // VERBOTEN — Zeilenumbruch in normalem String:
 "Parallelschaltung - sie
 verbessert die Helligkeit"  // SyntaxError!
 
-// RICHTIG — Template-Literal:
-`Parallelschaltung - sie
-verbessert die Helligkeit`
-```
+// RICHTIG — Template-Literal mit Backticks:
+\`Parallelschaltung - sie
+verbessert die Helligkeit\`
+\`\`\`
 
-**Der Code MUSS vollständig sein!** Wenn du merkst dass die Datei sehr lang wird, schreibe kompakteren Code — aber beende sie immer ordentlich mit `export default App;`
+**Der Code MUSS vollständig sein!** Wenn du merkst dass die Datei sehr lang wird, schreibe kompakteren Code — aber beende sie immer ordentlich mit \`export default App;\`
 
 ### KRITISCH: VERBOTENE PATTERNS!
 
