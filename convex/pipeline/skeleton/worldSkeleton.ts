@@ -192,7 +192,7 @@ export function buildWorldCode(worldData: WorldData): string {
     `      whileTap={{ scale: 0.9 }}`,
     `      animate={{ y: [0, -5, 0] }}`,
     `      transition={{ repeat: Infinity, duration: 2.2, ease: 'easeInOut' }}`,
-    `      className="fixed bottom-4 right-4 w-14 h-14 bg-yellow-400 rounded-full flex items-center justify-center text-2xl shadow-lg z-40 border-2 border-yellow-300 cursor-pointer"`,
+    `      className="fixed bottom-4 right-4 w-14 h-14 bg-yellow-400 rounded-full flex items-center justify-center text-2xl shadow-lg z-[9999] border-2 border-yellow-300 cursor-pointer"`,
     `      title="Luna — klick mich für Hilfe!"`,
     `    >`,
     `      {icons[mood] || '🌙'}`,

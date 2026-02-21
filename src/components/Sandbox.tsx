@@ -204,9 +204,11 @@ const SandpackBridge: React.FC<{
         try { return sandpack.error!.message || sandpack.error!.toString() || 'Babel-Fehler'; }
         catch { return 'Babel-Fehler beim Transpilieren'; }
       })();
-      onError?.(msg, code);
+      // setTimeout(0) defer aus dem Render-Cycle → verhindert React Error #300
+      // "Cannot update a component while rendering a different component"
+      setTimeout(() => onError?.(msg, code), 0);
     }
-  }, [sandpack.error]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [sandpack.error, code, onError]);
 
   useEffect(() => {
     if (sandpack.status === 'idle' && !sandpack.error && !hasFiredSuccess.current) {

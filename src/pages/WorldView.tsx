@@ -56,19 +56,10 @@ export default function WorldView() {
   const [voiceEnabled, setVoiceEnabled] = useState(() =>
     localStorage.getItem('meoluna:voice') !== 'false'
   );
-  const audioCtxRef = useRef<AudioContext | null>(null);
-
   const toggleVoice = () => {
     setVoiceEnabled(v => {
       const next = !v;
       localStorage.setItem('meoluna:voice', String(next));
-      // AudioContext beim User-Gesture initialisieren (entsperrt autoplay)
-      if (next) {
-        if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
-          audioCtxRef.current = new AudioContext();
-        }
-        audioCtxRef.current.resume().catch(() => {});
-      }
       return next;
     });
   };
@@ -116,7 +107,7 @@ export default function WorldView() {
     setShowXPPopup(true);
   };
 
-  // Voice: TTS via /api/speak
+  // Voice: TTS via /api/speak — new Audio() statt AudioContext (kein suspended-State-Problem)
   const handleSpeak = useCallback(async (text: string) => {
     if (!voiceEnabled || !text) return;
     try {
@@ -126,20 +117,11 @@ export default function WorldView() {
         body: JSON.stringify({ text }),
       });
       if (!res.ok) return;
-      const buf = await res.arrayBuffer();
-      if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
-        audioCtxRef.current = new AudioContext();
-      }
-      const ctx = audioCtxRef.current;
-      // Resume falls suspended (Browser blockiert ohne vorherigen User-Gesture)
-      if (ctx.state === 'suspended') {
-        await ctx.resume();
-      }
-      const audio = await ctx.decodeAudioData(buf.slice(0));
-      const src = ctx.createBufferSource();
-      src.buffer = audio;
-      src.connect(ctx.destination);
-      src.start(0);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audio.onended = () => URL.revokeObjectURL(url);
+      await audio.play();
     } catch (e) {
       console.warn('[Meoluna Voice] TTS error:', e);
     }
