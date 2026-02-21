@@ -6,7 +6,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Id } from '../../convex/_generated/dataModel';
-import { Moon, ArrowLeft, Share2, Heart, Star, Check } from 'lucide-react';
+import { Moon, ArrowLeft, Share2, Heart, Star, Check, Volume2, VolumeX } from 'lucide-react';
 import { Navbar } from '@/components/layout/Navbar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -52,6 +52,19 @@ export default function WorldView() {
   const [liked, setLiked] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  // Voice Mode
+  const [voiceEnabled, setVoiceEnabled] = useState(() =>
+    localStorage.getItem('meoluna:voice') !== 'false'
+  );
+  const audioCtxRef = useRef<AudioContext | null>(null);
+
+  const toggleVoice = () => {
+    setVoiceEnabled(v => {
+      localStorage.setItem('meoluna:voice', String(!v));
+      return !v;
+    });
+  };
+
   // Like handler
   const handleLike = async () => {
     if (!worldId || liked) return;
@@ -94,6 +107,31 @@ export default function WorldView() {
     }
     setShowXPPopup(true);
   };
+
+  // Voice: TTS via /api/speak
+  const handleSpeak = useCallback(async (text: string) => {
+    if (!voiceEnabled || !text) return;
+    try {
+      const res = await fetch('/api/speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      });
+      if (!res.ok) return;
+      const buf = await res.arrayBuffer();
+      if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
+        audioCtxRef.current = new AudioContext();
+      }
+      const ctx = audioCtxRef.current;
+      const audio = await ctx.decodeAudioData(buf.slice(0));
+      const src = ctx.createBufferSource();
+      src.buffer = audio;
+      src.connect(ctx.destination);
+      src.start(0);
+    } catch (e) {
+      console.warn('[Meoluna Voice] TTS error:', e);
+    }
+  }, [voiceEnabled]);
 
   // Handler für neue meoluna:progress Events
   const handleProgressEvent = useCallback(async (payload: MeolunaProgressPayload) => {
@@ -145,6 +183,11 @@ export default function WorldView() {
         return;
       }
 
+      if (data.type === 'meoluna:speak' && typeof data.text === 'string') {
+        handleSpeak(data.text);
+        return;
+      }
+
       // ========================================
       // LEGACY PROTOKOLL (für Abwärtskompatibilität)
       // ========================================
@@ -190,7 +233,7 @@ export default function WorldView() {
     } catch (error) {
       console.error('XP tracking error:', error);
     }
-  }, [user?.id, worldId, addXP, reportScore, completeWorldMutation, handleProgressEvent]);
+  }, [user?.id, worldId, addXP, reportScore, completeWorldMutation, handleProgressEvent, handleSpeak]);
 
   // Event Listener für postMessage
   useEffect(() => {
@@ -288,8 +331,16 @@ export default function WorldView() {
                 <span>{progress.xpEarned ?? progress.xp} XP in dieser Welt</span>
               </div>
             )}
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleVoice}
+              title={voiceEnabled ? 'Stimme ausschalten' : 'Stimme einschalten'}
+            >
+              {voiceEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+            </Button>
+            <Button
+              variant="ghost"
               size="icon"
               onClick={handleLike}
               className={liked ? "text-red-500" : ""}

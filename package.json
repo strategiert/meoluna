@@ -8,7 +8,8 @@
     "dev:convex": "convex dev",
     "dev:all": "concurrently \"npm run dev\" \"npm run dev:convex\"",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "golden-check": "node --import tsx/esm scripts/golden-check.mjs"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.60.0",
@@ -69,6 +70,7 @@
     "postcss": "^8.4.32",
     "tailwindcss": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
+    "tsx": "^4.21.0",
     "typescript": "^5.3.3",
     "vite": "^5.0.10"
   }

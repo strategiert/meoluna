@@ -27,6 +27,7 @@ import type * as pipeline_prompts_creativeDirector from "../pipeline/prompts/cre
 import type * as pipeline_prompts_gameDesigner from "../pipeline/prompts/gameDesigner.js";
 import type * as pipeline_prompts_interpreter from "../pipeline/prompts/interpreter.js";
 import type * as pipeline_prompts_qualityGate from "../pipeline/prompts/qualityGate.js";
+import type * as pipeline_skeleton_worldSkeleton from "../pipeline/skeleton/worldSkeleton.js";
 import type * as pipeline_status from "../pipeline/status.js";
 import type * as pipeline_steps_assetGenerator from "../pipeline/steps/assetGenerator.js";
 import type * as pipeline_steps_assetPlanner from "../pipeline/steps/assetPlanner.js";
@@ -75,6 +76,7 @@ declare const fullApi: ApiFromModules<{
   "pipeline/prompts/gameDesigner": typeof pipeline_prompts_gameDesigner;
   "pipeline/prompts/interpreter": typeof pipeline_prompts_interpreter;
   "pipeline/prompts/qualityGate": typeof pipeline_prompts_qualityGate;
+  "pipeline/skeleton/worldSkeleton": typeof pipeline_skeleton_worldSkeleton;
   "pipeline/status": typeof pipeline_status;
   "pipeline/steps/assetGenerator": typeof pipeline_steps_assetGenerator;
   "pipeline/steps/assetPlanner": typeof pipeline_steps_assetPlanner;

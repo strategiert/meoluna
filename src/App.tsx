@@ -30,6 +30,7 @@ import JoinClassroom from '@/pages/JoinClassroom';
 import NotFound from '@/pages/NotFound';
 import BackgroundsDemo from '@/pages/demo/Backgrounds';
 import SandboxLab from '@/pages/demo/SandboxLab';
+import WorldsAdmin from '@/pages/admin/WorldsAdmin';
 
 export default function App() {
   useUserSync();
@@ -62,6 +63,8 @@ export default function App() {
         {/* Demo Pages */}
         <Route path="/demo/backgrounds" element={<BackgroundsDemo />} />
         <Route path="/demo/sandbox" element={<SandboxLab />} />
+        {/* Admin */}
+        <Route path="/admin/worlds" element={<WorldsAdmin />} />
         {/* Fallback */}
         <Route path="*" element={<NotFound />} />
       </Routes>

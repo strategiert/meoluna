@@ -1,0 +1,81 @@
+{
+  "config": {
+    "name": "Bruch-Akademie",
+    "tagline": "Brüche meistern — Stück für Stück!",
+    "emoji": "🍕",
+    "primaryColor": "#f97316",
+    "bgGradient": "from-orange-950 via-orange-900 to-red-950",
+    "cardBg": "bg-orange-900/60 backdrop-blur-sm",
+    "accentClass": "bg-orange-500 hover:bg-orange-400 text-white"
+  },
+  "modules": [
+    {
+      "id": 0,
+      "title": "Was ist ein Bruch?",
+      "emoji": "🍕",
+      "description": "Lerne Zähler, Nenner und Grundbegriffe",
+      "challenges": [
+        {
+          "type": "true-false",
+          "question": "Ein Bruch besteht aus Zähler und Nenner.",
+          "correct": true,
+          "xp": 8,
+          "feedbackCorrect": "Richtig! Zähler oben, Nenner unten.",
+          "feedbackWrong": "Das stimmt. Zähler (oben) und Nenner (unten) sind die zwei Teile."
+        },
+        {
+          "type": "multiple-choice",
+          "question": "Wie heißt die Zahl unter dem Bruchstrich?",
+          "options": ["Zähler", "Nenner", "Quotient", "Dividend"],
+          "correct": 1,
+          "xp": 10,
+          "feedbackCorrect": "Super! Der Nenner steht immer unten.",
+          "feedbackWrong": "Nicht ganz. Der Nenner ist die untere Zahl eines Bruchs."
+        },
+        {
+          "type": "fill-blank",
+          "questionBefore": "Der Bruch 3/4 hat den Zähler",
+          "questionAfter": ".",
+          "answer": "3",
+          "xp": 10,
+          "feedbackCorrect": "Genau! 3 ist der Zähler (die obere Zahl).",
+          "feedbackWrong": "Schau nochmal: Der Zähler ist die Zahl über dem Bruchstrich."
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "title": "Brüche vergleichen",
+      "emoji": "⚖️",
+      "description": "Welcher Bruch ist größer?",
+      "challenges": [
+        {
+          "type": "multiple-choice",
+          "question": "Welcher Bruch ist größer: 1/2 oder 1/4?",
+          "options": ["1/2", "1/4", "Beide gleich", "Kommt drauf an"],
+          "correct": 0,
+          "xp": 10,
+          "feedbackCorrect": "Richtig! 1/2 ist größer, weil der Nenner kleiner ist.",
+          "feedbackWrong": "1/2 ist größer: Je kleiner der Nenner, desto größer der Bruchteil."
+        },
+        {
+          "type": "sorting",
+          "instruction": "Sortiere diese Brüche vom kleinsten zum größten:",
+          "items": ["3/4", "1/4", "1/2"],
+          "correct": ["1/4", "1/2", "3/4"],
+          "xp": 15,
+          "feedbackCorrect": "Perfekt sortiert!",
+          "feedbackWrong": "Nicht ganz — denke daran: gleicher Nenner, größerer Zähler = größer."
+        },
+        {
+          "type": "true-false",
+          "question": "Der Bruch 2/4 ist gleich groß wie 1/2.",
+          "correct": true,
+          "xp": 10,
+          "feedbackCorrect": "Stimmt! 2/4 = 1/2 — das ist ein gleichwertiger Bruch.",
+          "feedbackWrong": "Doch! 2/4 und 1/2 sind gleichwertige Brüche (beide = 0,5)."
+        }
+      ]
+    }
+  ]
+}

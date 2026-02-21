@@ -1,0 +1,61 @@
+{
+  "config": {
+    "name": "Photosynthese-Labor",
+    "tagline": "Wie Pflanzen Licht in Leben verwandeln",
+    "emoji": "🌿",
+    "primaryColor": "#22c55e",
+    "bgGradient": "from-green-950 via-green-900 to-emerald-950",
+    "cardBg": "bg-green-900/60 backdrop-blur-sm",
+    "accentClass": "bg-green-500 hover:bg-green-400 text-white"
+  },
+  "modules": [
+    {
+      "id": 0,
+      "title": "Grundlagen der Photosynthese",
+      "emoji": "☀️",
+      "description": "Zutaten und Produkte der Photosynthese",
+      "challenges": [
+        {
+          "type": "multiple-choice",
+          "question": "Was benötigen Pflanzen für die Photosynthese?",
+          "options": ["Licht, CO₂ und Wasser", "Licht, O₂ und Zucker", "Dunkelheit und Sauerstoff", "Erde und Mineralstoffe"],
+          "correct": 0,
+          "xp": 10,
+          "feedbackCorrect": "Genau! Licht, CO₂ und Wasser sind die drei Zutaten.",
+          "feedbackWrong": "Nicht ganz. Pflanzen brauchen Licht, Kohlendioxid (CO₂) und Wasser."
+        },
+        {
+          "type": "fill-blank",
+          "questionBefore": "Bei der Photosynthese entsteht als Nebenprodukt",
+          "questionAfter": ", das wir zum Atmen brauchen.",
+          "answer": "Sauerstoff",
+          "xp": 10,
+          "feedbackCorrect": "Richtig! Sauerstoff (O₂) ist das lebenswichtige Nebenprodukt.",
+          "feedbackWrong": "Das Nebenprodukt ist Sauerstoff — das atmen Tiere und Menschen ein."
+        },
+        {
+          "type": "true-false",
+          "question": "Photosynthese findet in den Mitochondrien der Pflanzenzelle statt.",
+          "correct": false,
+          "xp": 8,
+          "feedbackCorrect": "Richtig! Photosynthese findet in den Chloroplasten statt.",
+          "feedbackWrong": "Nicht ganz. Photosynthese findet in den Chloroplasten statt, nicht in Mitochondrien."
+        },
+        {
+          "type": "simulation",
+          "instruction": "Stelle die Lichtintensität ein, bei der die Pflanze am meisten Sauerstoff produziert (Optimum bei 75%).",
+          "paramLabel": "Lichtintensität",
+          "paramMin": 0,
+          "paramMax": 100,
+          "paramUnit": "%",
+          "targetValue": 75,
+          "tolerance": 10,
+          "sketchDescription": "Kreis wechselt von dunkel zu leuchtend grün je mehr Licht",
+          "xp": 15,
+          "feedbackCorrect": "Perfekt! Bei ca. 75% Licht ist die Photosynthese am effizientesten.",
+          "feedbackWrong": "Nicht ganz — zu wenig Licht bremst die Photosynthese, zu viel schadet der Pflanze."
+        }
+      ]
+    }
+  ]
+}

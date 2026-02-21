@@ -1,0 +1,85 @@
+{
+  "config": {
+    "name": "Wortarten-Detektion",
+    "tagline": "Finde Nomen, Verben und Adjektive!",
+    "emoji": "🔍",
+    "primaryColor": "#8b5cf6",
+    "bgGradient": "from-violet-950 via-purple-900 to-indigo-950",
+    "cardBg": "bg-violet-900/60 backdrop-blur-sm",
+    "accentClass": "bg-violet-500 hover:bg-violet-400 text-white"
+  },
+  "modules": [
+    {
+      "id": 0,
+      "title": "Nomen erkennen",
+      "emoji": "📦",
+      "description": "Nomen nennen Dinge, Personen und Orte",
+      "challenges": [
+        {
+          "type": "multiple-choice",
+          "question": "Welches Wort ist ein Nomen?",
+          "options": ["laufen", "schnell", "Hund", "weil"],
+          "correct": 2,
+          "xp": 8,
+          "feedbackCorrect": "Richtig! Hund ist ein Nomen — man kann es anfassen (konkret).",
+          "feedbackWrong": "Das Nomen ist Hund. Nomen bezeichnet man am Großschreibung und kann sie anfassen."
+        },
+        {
+          "type": "true-false",
+          "question": "Nomen werden im Deutschen immer großgeschrieben.",
+          "correct": true,
+          "xp": 8,
+          "feedbackCorrect": "Genau! Das ist eine Besonderheit des Deutschen.",
+          "feedbackWrong": "Stimmt — Nomen werden im Deutschen IMMER großgeschrieben."
+        },
+        {
+          "type": "sorting",
+          "instruction": "Sortiere die Wortarten in der richtigen Reihenfolge (häufigste zuerst):",
+          "items": ["Adjektiv", "Nomen", "Verb"],
+          "correct": ["Nomen", "Verb", "Adjektiv"],
+          "xp": 12,
+          "feedbackCorrect": "Richtige Reihenfolge! Nomen sind die häufigste Wortart.",
+          "feedbackWrong": "Die Reihenfolge stimmt nicht ganz — Nomen kommen am häufigsten vor."
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "title": "Verben und Adjektive",
+      "emoji": "⚡",
+      "description": "Tun-Wörter und Wie-Wörter",
+      "challenges": [
+        {
+          "type": "matching",
+          "instruction": "Ordne jedes Wort der richtigen Wortart zu:",
+          "pairs": [
+            { "left": "rennen", "right": "Verb" },
+            { "left": "blau", "right": "Adjektiv" },
+            { "left": "Schule", "right": "Nomen" }
+          ],
+          "xp": 15,
+          "feedbackCorrect": "Alle Wortarten richtig erkannt!",
+          "feedbackWrong": "Nicht alle Paare stimmen. Verben = Tun-Wörter, Adjektive = Wie-Wörter."
+        },
+        {
+          "type": "fill-blank",
+          "questionBefore": "Das Adjektiv beschreibt, wie etwas",
+          "questionAfter": "— zum Beispiel groß, klein, schön.",
+          "answer": "ist",
+          "xp": 8,
+          "feedbackCorrect": "Richtig! Adjektive beschreiben Eigenschaften.",
+          "feedbackWrong": "Adjektive beschreiben wie etwas IST — seine Eigenschaften."
+        },
+        {
+          "type": "multiple-choice",
+          "question": "Was ist das Verb im Satz: Der Hund bellt laut.",
+          "options": ["Hund", "bellt", "laut", "der"],
+          "correct": 1,
+          "xp": 10,
+          "feedbackCorrect": "Genau! Bellen ist das Tun-Wort (Verb).",
+          "feedbackWrong": "Das Verb ist bellt — es beschreibt die Handlung des Hundes."
+        }
+      ]
+    }
+  ]
+}
