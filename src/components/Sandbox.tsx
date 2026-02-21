@@ -192,6 +192,16 @@ const SandpackBridge: React.FC<{
 }> = ({ onError, onSuccess, code }) => {
   const { sandpack } = useSandpack();
   const hasFiredSuccess = useRef(false);
+  const onErrorRef = useRef(onError);
+  const onSuccessRef = useRef(onSuccess);
+
+  useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
+
+  useEffect(() => {
+    onSuccessRef.current = onSuccess;
+  }, [onSuccess]);
 
   // Reset bei neuem Code
   useEffect(() => {
@@ -199,21 +209,22 @@ const SandpackBridge: React.FC<{
   }, [code]);
 
   useEffect(() => {
-    if (sandpack.error) {
-      const msg = (() => {
-        try { return sandpack.error!.message || sandpack.error!.toString() || 'Babel-Fehler'; }
-        catch { return 'Babel-Fehler beim Transpilieren'; }
-      })();
-      // setTimeout(0) defer aus dem Render-Cycle → verhindert React Error #300
-      // "Cannot update a component while rendering a different component"
-      setTimeout(() => onError?.(msg, code), 0);
-    }
-  }, [sandpack.error, code, onError]);
+    if (!sandpack.error) return;
+
+    const msg = (() => {
+      try { return sandpack.error!.message || sandpack.error!.toString() || 'Babel-Fehler'; }
+      catch { return 'Babel-Fehler beim Transpilieren'; }
+    })();
+    // setTimeout(0) defer aus dem Render-Cycle → verhindert React Error #300
+    // "Cannot update a component while rendering a different component"
+    const timeoutId = window.setTimeout(() => onErrorRef.current?.(msg, code), 0);
+    return () => window.clearTimeout(timeoutId);
+  }, [sandpack.error, code]);
 
   useEffect(() => {
     if (sandpack.status === 'idle' && !sandpack.error && !hasFiredSuccess.current) {
       hasFiredSuccess.current = true;
-      onSuccess?.();
+      onSuccessRef.current?.();
     }
   }, [sandpack.status, sandpack.error]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -229,17 +240,27 @@ export const Sandbox: React.FC<SandboxProps> = ({
   onSuccess,
 }) => {
   const sanitized = sanitizeCode(code);
+  const onErrorRef = useRef(onError);
+  const codeRef = useRef(code);
+
+  useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
+
+  useEffect(() => {
+    codeRef.current = code;
+  }, [code]);
 
   // Runtime-Fehler aus iframe abfangen (window.onerror aus INDEX_JS)
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data?.type === 'SANDBOX_ERROR') {
-        onError?.(event.data.error, code);
+        onErrorRef.current?.(event.data.error, codeRef.current);
       }
     };
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [code, onError]);
+  }, []);
 
   return (
     <SandpackProvider

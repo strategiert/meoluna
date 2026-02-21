@@ -2,7 +2,7 @@
  * Create Page - Weltgenerierung mit Chat
  */
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAction, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
@@ -52,6 +52,7 @@ export default function Create() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const isFixingRef = useRef(false);
 
   // Convex Actions
   const generateWorldV2 = useAction(api.pipeline.orchestrator.generateWorldV2);
@@ -67,7 +68,6 @@ export default function Create() {
   const [pdfText, setPdfText] = useState<string>('');
   const [isExtracting, setIsExtracting] = useState(false);
   const [pdfError, setPdfError] = useState<string | null>(null);
-  const [isFixing, setIsFixing] = useState(false);
 
   // Auto-scroll zu neuen Nachrichten
   useEffect(() => {
@@ -200,10 +200,10 @@ export default function Create() {
     }
   };
 
-  const handleAutoFix = async (error: string, failedCode: string) => {
-    if (isFixing) return;
+  const handleAutoFix = useCallback(async (error: string, failedCode: string) => {
+    if (isFixingRef.current) return;
 
-    setIsFixing(true);
+    isFixingRef.current = true;
     try {
       const result = await autoFixCode({ error, code: failedCode });
       if (result.fixedCode) {
@@ -212,9 +212,9 @@ export default function Create() {
     } catch (err) {
       console.error('Auto-fix failed:', err);
     } finally {
-      setIsFixing(false);
+      isFixingRef.current = false;
     }
-  };
+  }, [autoFixCode]);
 
   const handleSaveWorld = async () => {
     if (!currentCode || !user) return;

@@ -4,7 +4,7 @@
  * Vereinfachte Version für Convex - Auto-Fix wird von App.tsx gesteuert
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { Sandbox } from './Sandbox';
 
 interface WorldPreviewProps {
@@ -22,19 +22,22 @@ export const WorldPreview: React.FC<WorldPreviewProps> = ({
   onError
 }) => {
   const [retryCount, setRetryCount] = useState(0);
+  const retryCountRef = useRef(0);
 
   // Reset retry count when code changes
   React.useEffect(() => {
+    retryCountRef.current = 0;
     setRetryCount(0);
   }, [code]);
 
   const handleError = useCallback((error: string, failedCode: string) => {
     // Nur 1 Auto-Fix Versuch um Rate Limits zu vermeiden
-    if (retryCount < 1 && onError) {
-      setRetryCount(r => r + 1);
-      onError(error, failedCode);
-    }
-  }, [onError, retryCount]);
+    if (!onError || retryCountRef.current >= 1) return;
+
+    retryCountRef.current += 1;
+    setRetryCount(retryCountRef.current);
+    onError(error, failedCode);
+  }, [onError]);
 
   const handleSuccess = useCallback(() => {
     // Success - could track analytics here
