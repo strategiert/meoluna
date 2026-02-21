@@ -406,7 +406,15 @@ export default function TeacherDashboard() {
                   Verwalte deine Klassen und verfolge den Lernfortschritt
                 </p>
               </div>
-              {user?.id && <CreateClassroomDialog userId={user.id} />}
+              <div className="flex items-center gap-2">
+                <Link to="/create">
+                  <Button variant="outline" className="gap-2">
+                    <BookOpen className="w-4 h-4" />
+                    Lernwelt erstellen
+                  </Button>
+                </Link>
+                {user?.id && <CreateClassroomDialog userId={user.id} />}
+              </div>
             </div>
 
             {/* Stats */}

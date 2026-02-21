@@ -93,7 +93,7 @@ export const generateWorldV2 = action({
       const creative = await runCreativeDirector(interpreter.result);
       stepTimings.creative_director = {
         durationMs: Date.now() - step2Start,
-        model: "opus",
+        model: "sonnet",
         inputTokens: creative.inputTokens,
         outputTokens: creative.outputTokens,
       };
@@ -104,7 +104,7 @@ export const generateWorldV2 = action({
       const gameDesign = await runGameDesigner(interpreter.result, creative.result);
       stepTimings.game_designer = {
         durationMs: Date.now() - step3Start,
-        model: "opus",
+        model: "sonnet",
         inputTokens: gameDesign.inputTokens,
         outputTokens: gameDesign.outputTokens,
       };
@@ -143,7 +143,7 @@ export const generateWorldV2 = action({
       );
       stepTimings.content_architect = {
         durationMs: Date.now() - step6Start,
-        model: "opus",
+        model: "sonnet",
         inputTokens: content.inputTokens,
         outputTokens: content.outputTokens,
       };
