@@ -181,7 +181,12 @@ const SandpackBridge: React.FC<{
 
   useEffect(() => {
     if (sandpack.error) {
-      onError?.(sandpack.error.message || 'Sandbox-Fehler', code);
+      // sandpack.error.message kann auf manchen Error-Objekten nicht lesbar sein
+      const msg = (() => {
+        try { return sandpack.error!.message || sandpack.error!.toString() || 'Babel-Fehler'; }
+        catch { return 'Babel-Fehler beim Transpilieren'; }
+      })();
+      onError?.(msg, code);
     }
   }, [sandpack.error]); // eslint-disable-line react-hooks/exhaustive-deps
 
