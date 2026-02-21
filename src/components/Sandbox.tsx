@@ -1,16 +1,20 @@
 /**
- * Meoluna Sandbox - Führt beliebigen React-Code im iframe aus
+ * Meoluna Sandbox v3 — Powered by Sandpack
  *
- * Features:
- * - Babel Transpilation (JSX → JS)
- * - esm.sh für npm-Pakete on-the-fly
- * - Tailwind CDN Support
- * - Error Boundary mit "Oops"-Screen
- * - Auto-Fix Trigger bei Fehlern
+ * Ersetzt die fragile Babel+esm.sh Lösung aus v2.
+ * Läuft stabil auf Desktop, iPad und Mobile ohne Client-seitige Transpilation.
  */
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef } from 'react';
+import {
+  SandpackProvider,
+  SandpackPreview,
+  useSandpack,
+} from '@codesandbox/sandpack-react';
 
+// ============================================================================
+// INTERFACE (kompatibel mit v2)
+// ============================================================================
 interface SandboxProps {
   /** Der von Claude generierte React-Code */
   code: string;
@@ -18,597 +22,177 @@ interface SandboxProps {
   onError?: (error: string, code: string) => void;
   /** Wird aufgerufen wenn erfolgreich gerendert */
   onSuccess?: () => void;
-  /** Optionales Theme (CSS-Variablen) */
+  /** API-Kompatibilität mit v2 — aktuell nicht genutzt */
   theme?: Record<string, string>;
 }
 
+// ============================================================================
+// HTML-TEMPLATE — Tailwind CDN + Basis-Styles
+// ============================================================================
+const INDEX_HTML = `<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            animation: {
+              'float': 'float 3s ease-in-out infinite',
+              'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+              'shake': 'shake 0.5s ease-in-out',
+            },
+            keyframes: {
+              float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
+              'pulse-glow': { '0%, 100%': { boxShadow: '0 0 20px rgba(255,255,255,0.3)' }, '50%': { boxShadow: '0 0 40px rgba(255,255,255,0.6)' } },
+              shake: { '0%, 100%': { transform: 'translateX(0)' }, '25%': { transform: 'translateX(-5px)' }, '75%': { transform: 'translateX(5px)' } },
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; overflow-x: hidden; }
+      #root { min-height: 100vh; }
+      ::-webkit-scrollbar { width: 8px; height: 8px; }
+      ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+      ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+      ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.3); }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>`;
+
+// ============================================================================
+// ENTRY POINT — Meoluna API + React Mount
+// ============================================================================
+const INDEX_JS = `import { createRoot } from "react-dom/client";
+import App from "./App";
+
+// Meoluna API — global für alle generierten Welten
+window.Meoluna = {
+  reportScore(score, ctx) {
+    if (typeof score !== 'number' || score <= 0) return;
+    window.parent.postMessage({
+      type: 'meoluna:progress',
+      payload: { event: 'score', amount: score, context: ctx || {} }
+    }, '*');
+  },
+  completeModule(moduleIndex) {
+    window.parent.postMessage({
+      type: 'meoluna:progress',
+      payload: { event: 'module', amount: 0, context: { moduleIndex } }
+    }, '*');
+  },
+  complete(finalScore) {
+    window.parent.postMessage({
+      type: 'meoluna:progress',
+      payload: { event: 'complete', amount: finalScore || 0, context: {} }
+    }, '*');
+  },
+  emit(eventType, amount, ctx) {
+    window.parent.postMessage({
+      type: 'meoluna:progress',
+      payload: { event: eventType, amount: amount || 0, context: ctx || {} }
+    }, '*');
+  },
+  _version: '3.0.0',
+};
+window.meoluna = window.Meoluna;
+
+const root = createRoot(document.getElementById("root"));
+root.render(<App />);
+`;
+
+// ============================================================================
+// SANDPACK BRIDGE — Error/Success Callbacks aus Sandpack-State
+// ============================================================================
+const SandpackBridge: React.FC<{
+  onError?: (error: string, code: string) => void;
+  onSuccess?: () => void;
+  code: string;
+}> = ({ onError, onSuccess, code }) => {
+  const { sandpack } = useSandpack();
+  const hasFiredSuccess = useRef(false);
+
+  // Reset bei neuem Code
+  useEffect(() => {
+    hasFiredSuccess.current = false;
+  }, [code]);
+
+  useEffect(() => {
+    if (sandpack.error) {
+      onError?.(sandpack.error.message || 'Sandbox-Fehler', code);
+    }
+  }, [sandpack.error]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (sandpack.status === 'idle' && !sandpack.error && !hasFiredSuccess.current) {
+      hasFiredSuccess.current = true;
+      onSuccess?.();
+    }
+  }, [sandpack.status, sandpack.error]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return null;
+};
+
+// ============================================================================
+// SANDBOX — Hauptkomponente
+// ============================================================================
 export const Sandbox: React.FC<SandboxProps> = ({
   code,
   onError,
   onSuccess,
-  theme = {}
 }) => {
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
-  const [key, setKey] = useState(0);
-
-  // CSS-Variablen aus Theme generieren
-  const themeCSS = Object.entries(theme)
-    .map(([key, value]) => `--${key}: ${value};`)
-    .join('\n    ');
-
-  const generateHTML = useCallback(() => {
-    // Escape den Code für sicheres Einbetten
-    const escapedCode = code
-      .replace(/\\/g, '\\\\')
-      .replace(/`/g, '\\`')
-      .replace(/\$/g, '\\$');
-
-    return `
-<!DOCTYPE html>
-<html lang="de">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          animation: {
-            'float': 'float 3s ease-in-out infinite',
-            'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
-            'shake': 'shake 0.5s ease-in-out',
-          },
-          keyframes: {
-            float: {
-              '0%, 100%': { transform: 'translateY(0)' },
-              '50%': { transform: 'translateY(-10px)' },
-            },
-            'pulse-glow': {
-              '0%, 100%': { boxShadow: '0 0 20px rgba(255,255,255,0.3)' },
-              '50%': { boxShadow: '0 0 40px rgba(255,255,255,0.6)' },
-            },
-            shake: {
-              '0%, 100%': { transform: 'translateX(0)' },
-              '25%': { transform: 'translateX(-5px)' },
-              '75%': { transform: 'translateX(5px)' },
-            }
-          }
-        }
-      }
-    }
-  </script>
-
-  <!-- Custom Theme Variables -->
-  <style>
-    :root {
-      ${themeCSS}
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    #root {
-      min-height: 100vh;
-    }
-
-    /* Scrollbar Styling */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
-    ::-webkit-scrollbar-track {
-      background: rgba(0,0,0,0.1);
-    }
-    ::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,0.2);
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: rgba(255,255,255,0.3);
-    }
-
-    /* Error Screen Styles */
-    .error-screen {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-      color: white;
-      padding: 2rem;
-      text-align: center;
-    }
-
-    .error-icon {
-      font-size: 4rem;
-      margin-bottom: 1rem;
-      animation: float 3s ease-in-out infinite;
-    }
-
-    .error-title {
-      font-size: 1.5rem;
-      font-weight: bold;
-      margin-bottom: 0.5rem;
-    }
-
-    .error-message {
-      color: #94a3b8;
-      max-width: 400px;
-      margin-bottom: 1.5rem;
-    }
-
-    .error-details {
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      border-radius: 8px;
-      padding: 1rem;
-      font-family: monospace;
-      font-size: 0.75rem;
-      max-width: 500px;
-      max-height: 150px;
-      overflow: auto;
-      text-align: left;
-      color: #fca5a5;
-    }
-
-    .loading-screen {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-      color: white;
-    }
-
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid rgba(255,255,255,0.1);
-      border-top-color: #3b82f6;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-  </style>
-
-  <!-- Babel Standalone für JSX Transpilation -->
-  <script src="https://unpkg.com/@babel/standalone@7.23.5/babel.min.js"></script>
-</head>
-<body>
-  <div id="root">
-    <div class="loading-screen">
-      <div class="spinner"></div>
-      <p style="margin-top: 1rem; color: #94a3b8;">Lernwelt wird geladen...</p>
-    </div>
-  </div>
-
-  <script type="module">
-    // =========================================================================
-    // IMPORT MAP - Alle verfügbaren npm-Pakete via esm.sh
-    // =========================================================================
-    const importMap = {
-      "react": "https://esm.sh/react@18.2.0",
-      "react-dom": "https://esm.sh/react-dom@18.2.0",
-      "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
-      "framer-motion": "https://esm.sh/framer-motion@10.18.0?deps=react@18.2.0",
-      "lucide-react": "https://esm.sh/lucide-react@0.330.0?deps=react@18.2.0",
-      "canvas-confetti": "https://esm.sh/canvas-confetti@1.9.2",
-      "recharts": "https://esm.sh/recharts@2.12.0?deps=react@18.2.0,react-dom@18.2.0",
-      "clsx": "https://esm.sh/clsx@2.1.0",
-      "lodash": "https://esm.sh/lodash@4.17.21",
-      "date-fns": "https://esm.sh/date-fns@3.3.1",
-      "zustand": "https://esm.sh/zustand@4.5.0?deps=react@18.2.0",
-      "@dnd-kit/core": "https://esm.sh/@dnd-kit/core@6.1.0?deps=react@18.2.0",
-      "react-confetti": "https://esm.sh/react-confetti@6.1.0?deps=react@18.2.0",
-      "howler": "https://esm.sh/howler@2.2.4",
-      "p5": "https://esm.sh/p5@1.9.0",
-    };
-
-    // =========================================================================
-    // ERROR HANDLING
-    // =========================================================================
-    function showError(title, message, details = '') {
-      document.getElementById('root').innerHTML = \`
-        <div class="error-screen">
-          <div class="error-icon">🌋</div>
-          <div class="error-title">\${title}</div>
-          <div class="error-message">\${message}</div>
-          \${details ? \`<div class="error-details">\${details}</div>\` : ''}
-        </div>
-      \`;
-
-      // Fehler an Parent-Window senden
-      window.parent.postMessage({
-        type: 'SANDBOX_ERROR',
-        error: details || message
-      }, '*');
-    }
-
-    // =========================================================================
-    // MEOLUNA API - Für generierte Welten
-    // =========================================================================
-    window.Meoluna = {
-      /**
-       * Score/Punkte an Meoluna melden
-       * @param {number} score - Erreichte Punkte (z.B. 10, 50, 100)
-       * @param {object} [context] - Optionaler Kontext
-       * @param {string} [context.action] - Was wurde gemacht (z.B. "quiz_correct")
-       * @param {number} [context.moduleIndex] - Welches Modul (0-basiert)
-       */
-      reportScore: function(score, context) {
-        if (typeof score !== 'number' || score <= 0) return;
-        window.parent.postMessage({
-          type: 'meoluna:progress',
-          payload: {
-            event: 'score',
-            amount: score,
-            context: context || {}
-          }
-        }, '*');
-      },
-
-      /**
-       * Modul als abgeschlossen markieren
-       * @param {number} moduleIndex - Index des abgeschlossenen Moduls
-       */
-      completeModule: function(moduleIndex) {
-        window.parent.postMessage({
-          type: 'meoluna:progress',
-          payload: {
-            event: 'module',
-            amount: 0,
-            context: { moduleIndex: moduleIndex }
-          }
-        }, '*');
-      },
-
-      /**
-       * Gesamte Lernwelt als abgeschlossen markieren
-       * @param {number} [finalScore] - Optionaler Endscore
-       */
-      complete: function(finalScore) {
-        window.parent.postMessage({
-          type: 'meoluna:progress',
-          payload: {
-            event: 'complete',
-            amount: finalScore || 0,
-            context: {}
-          }
-        }, '*');
-      },
-
-      /**
-       * Beliebiges Event senden (für erweiterte Use-Cases)
-       * @param {string} eventType - 'score' | 'module' | 'complete'
-       * @param {number} amount - Punktzahl
-       * @param {object} [context] - Zusätzlicher Kontext
-       */
-      emit: function(eventType, amount, context) {
-        const validEvents = ['score', 'module', 'complete'];
-        if (!validEvents.includes(eventType)) {
-          console.warn('[Meoluna] Invalid event type:', eventType);
-          return;
-        }
-        window.parent.postMessage({
-          type: 'meoluna:progress',
-          payload: {
-            event: eventType,
-            amount: amount || 0,
-            context: context || {}
-          }
-        }, '*');
-      },
-
-      // Version für Debugging
-      _version: '1.0.0'
-    };
-
-    // Auch als globales "meoluna" (lowercase) verfügbar
-    window.meoluna = window.Meoluna;
-
-    // Globaler Error Handler
-    window.onerror = function(msg, url, line, col, error) {
-      showError(
-        'Hoppla! Da ist etwas schiefgelaufen',
-        'Die Lernwelt konnte nicht geladen werden. Wir versuchen, das zu reparieren...',
-        \`\${msg} (Zeile \${line})\`
-      );
-      return true;
-    };
-
-    window.onunhandledrejection = function(event) {
-      showError(
-        'Hoppla! Ein Fehler ist aufgetreten',
-        'Etwas hat nicht funktioniert. Wir kümmern uns darum...',
-        event.reason?.message || String(event.reason)
-      );
-    };
-
-    // =========================================================================
-    // CODE TRANSPILATION & EXECUTION
-    // =========================================================================
-    async function loadAndRun() {
-      try {
-        // 1. User Code
-        const userCode = \`${escapedCode}\`;
-
-        if (!userCode.trim()) {
-          showError(
-            'Keine Lernwelt gefunden',
-            'Es wurde noch kein Code generiert.',
-            ''
-          );
-          return;
-        }
-
-        // 1b. HTML-Legacy-Code erkennen und direkt rendern (ohne Babel)
-        const trimmedCode = userCode.trim();
-        if (trimmedCode.startsWith('<!DOCTYPE') || trimmedCode.startsWith('<html') || trimmedCode.startsWith('<HTML')) {
-          // Legacy HTML: Direkt ins DOM schreiben (DEPRECATED - neue Welten sollten React sein!)
-          console.warn('[Sandbox] Legacy HTML-Welt erkannt. Bitte zu React migrieren!');
-          document.open();
-          document.write(userCode);
-          document.close();
-          window.parent.postMessage({ type: 'SANDBOX_SUCCESS' }, '*');
-          return;
-        }
-
-        // 2. Imports ersetzen mit esm.sh URLs
-        let processedCode = userCode;
-
-        // Standard ES6 imports umwandeln
-        for (const [pkg, url] of Object.entries(importMap)) {
-          // import X from 'pkg'
-          const defaultImportRegex = new RegExp(
-            \`import\\\\s+(\\\\w+)\\\\s+from\\\\s+['\"]\${pkg.replace('/', '\\\\/')}['\"]\\\\s*;?\`,
-            'g'
-          );
-          processedCode = processedCode.replace(defaultImportRegex, \`const \$1 = (await import("\${url}")).default;\`);
-
-          // import { X, Y } from 'pkg'
-          const namedImportRegex = new RegExp(
-            \`import\\\\s+\\\\{([^}]+)\\\\}\\\\s+from\\\\s+['\"]\${pkg.replace('/', '\\\\/')}['\"]\\\\s*;?\`,
-            'g'
-          );
-          processedCode = processedCode.replace(namedImportRegex, (match, names) => {
-            const namedImports = names.split(',').map(n => n.trim()).filter(Boolean);
-            return \`const { \${namedImports.join(', ')} } = await import("\${url}");\`;
-          });
-
-          // import X, { Y, Z } from 'pkg'
-          const mixedImportRegex = new RegExp(
-            \`import\\\\s+(\\\\w+)\\\\s*,\\\\s*\\\\{([^}]+)\\\\}\\\\s+from\\\\s+['\"]\${pkg.replace('/', '\\\\/')}['\"]\\\\s*;?\`,
-            'g'
-          );
-          processedCode = processedCode.replace(mixedImportRegex, (match, defaultName, names) => {
-            const namedImports = names.split(',').map(n => n.trim()).filter(Boolean);
-            return \`const \${defaultName} = (await import("\${url}")).default; const { \${namedImports.join(', ')} } = await import("\${url}");\`;
-          });
-        }
-
-        // 3. Remove export statements (can't be inside async function)
-        processedCode = processedCode
-          .replace(/export\\s+default\\s+App\\s*;?/g, '')
-          .replace(/export\\s+default\\s+function\\s+App/g, 'function App')
-          .replace(/export\\s+\\{[^}]*\\}\\s*;?/g, '');
-
-        // 3b. Strip PI/TWO_PI/HALF_PI redeclarations (conflict with p5.js)
-        processedCode = processedCode
-          .replace(/const\\s+(PI|TWO_PI|HALF_PI)\\s*=\\s*[^;]+;?/g, '// [Sandbox] using Math.$1 instead');
-
-        // 3c. Strip any standalone ReactDOM render calls from generated code (Sandbox wrapper handles rendering)
-        processedCode = processedCode
-          .replace(/const\\s+root\\s*=\\s*createRoot\\([^)]*\\);?/g, '// [Sandbox] render handled by wrapper')
-          .replace(/root\\.render\\([^)]*\\);?/g, '// [Sandbox] render handled by wrapper');
-
-        // 4. Wrap in async function für top-level await
-        const wrappedCode = \`
-          (async () => {
-            // PRE-LOAD: React global verfügbar machen BEVOR der User-Code läuft
-            // Babel transpiliert JSX zu React.createElement() — React MUSS vorher existieren
-            const __preload = await import("https://esm.sh/react@18.2.0");
-            window.React = __preload.default;
-            window.useState = __preload.useState;
-            window.useEffect = __preload.useEffect;
-            window.useRef = __preload.useRef;
-            window.useMemo = __preload.useMemo;
-            window.useCallback = __preload.useCallback;
-            window.useReducer = __preload.useReducer;
-            window.useContext = __preload.useContext;
-            window.createContext = __preload.createContext;
-            window.Fragment = __preload.Fragment;
-            window.createElement = __preload.createElement;
-            window.Component = __preload.Component;
-            window.forwardRef = __preload.forwardRef;
-            window.memo = __preload.memo;
-            window.Suspense = __preload.Suspense;
-            window.Children = __preload.Children;
-            window.cloneElement = __preload.cloneElement;
-
-            // User-Code (kann React re-importieren — const shadowed window.React, kein Konflikt)
-            \${processedCode}
-
-            // Render the App — window.React ist immer definiert
-            const __rdom = await import("https://esm.sh/react-dom@18.2.0/client");
-            const _createRoot = __rdom.createRoot;
-
-            // Error Boundary Component
-            class ErrorBoundary extends window.React.Component {
-              constructor(props) {
-                super(props);
-                this.state = { hasError: false, error: null };
-              }
-
-              static getDerivedStateFromError(error) {
-                return { hasError: true, error };
-              }
-
-              componentDidCatch(error, errorInfo) {
-                console.error('React Error:', error, errorInfo);
-                window.parent.postMessage({
-                  type: 'SANDBOX_ERROR',
-                  error: error.message
-                }, '*');
-              }
-
-              render() {
-                if (this.state.hasError) {
-                  return window.React.createElement('div', { className: 'error-screen' },
-                    window.React.createElement('div', { className: 'error-icon' }, '🌋'),
-                    window.React.createElement('div', { className: 'error-title' }, 'Hoppla! Die Lernwelt hat sich verschluckt'),
-                    window.React.createElement('div', { className: 'error-message' }, 'Keine Sorge, wir reparieren das gerade...'),
-                    window.React.createElement('div', { className: 'error-details' }, this.state.error?.message || 'Unbekannter Fehler')
-                  );
-                }
-                return this.props.children;
-              }
-            }
-
-            // Find the default export (App component)
-            const AppComponent = typeof App !== 'undefined' ? App :
-                                typeof default_1 !== 'undefined' ? default_1 : null;
-
-            if (!AppComponent) {
-              throw new Error('Keine App-Komponente gefunden. Bitte exportiere eine "App" oder "export default" Komponente.');
-            }
-
-            const root = _createRoot(document.getElementById('root'));
-            root.render(
-              window.React.createElement(ErrorBoundary, null,
-                window.React.createElement(AppComponent)
-              )
-            );
-
-            // Erfolg melden
-            window.parent.postMessage({ type: 'SANDBOX_SUCCESS' }, '*');
-          })().catch(err => {
-            showError(
-              'Fehler beim Starten',
-              'Die Lernwelt konnte nicht initialisiert werden.',
-              err.message
-            );
-          });
-        \`;
-
-        // 4. Transpile mit Babel
-        const transpiledCode = Babel.transform(wrappedCode, {
-          presets: ['react'],
-          filename: 'app.jsx'
-        }).code;
-
-        // 5. Execute
-        const script = document.createElement('script');
-        script.type = 'module';
-        script.textContent = transpiledCode;
-        document.body.appendChild(script);
-
-      } catch (err) {
-        showError(
-          'Kompilierungsfehler',
-          'Der Code konnte nicht verarbeitet werden.',
-          err.message
-        );
-      }
-    }
-
-    // Start
-    loadAndRun();
-  </script>
-</body>
-</html>
-    `;
-  }, [code, themeCSS]);
-
-  // Auf Nachrichten vom iframe hören
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data?.type === 'SANDBOX_ERROR') {
-        setStatus('error');
-        onError?.(event.data.error, code);
-      } else if (event.data?.type === 'SANDBOX_SUCCESS') {
-        setStatus('success');
-        onSuccess?.();
-      }
-    };
-
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, [code, onError, onSuccess]);
-
-  // Code-Änderungen debounced anwenden
-  useEffect(() => {
-    setStatus('loading');
-    const timer = setTimeout(() => {
-      setKey(k => k + 1);
-    }, 500); // 500ms debounce
-
-    return () => clearTimeout(timer);
-  }, [code]);
-
   return (
-    <div className="relative w-full h-full bg-slate-900 rounded-lg overflow-hidden">
-      {/* Status Indicator */}
-      <div className="absolute top-2 right-2 z-10">
-        {status === 'loading' && (
-          <div className="flex items-center gap-2 bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-xs">
-            <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
-            Lädt...
-          </div>
-        )}
-        {status === 'success' && (
-          <div className="flex items-center gap-2 bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-xs">
-            <div className="w-2 h-2 bg-green-400 rounded-full" />
-            Bereit
-          </div>
-        )}
-        {status === 'error' && (
-          <div className="flex items-center gap-2 bg-red-500/20 text-red-400 px-3 py-1 rounded-full text-xs">
-            <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse" />
-            Fehler
-          </div>
-        )}
+    <SandpackProvider
+      key={code}
+      template="react"
+      theme="dark"
+      files={{
+        '/App.js': { code, active: true },
+        '/index.js': { code: INDEX_JS, hidden: true },
+        '/public/index.html': { code: INDEX_HTML, hidden: true },
+      }}
+      customSetup={{
+        dependencies: {
+          'framer-motion': '10.18.0',
+          'lucide-react': '0.330.0',
+          'canvas-confetti': '1.9.2',
+          'recharts': '2.12.0',
+          'clsx': '2.1.0',
+          'p5': '1.9.0',
+          '@dnd-kit/core': '6.1.0',
+          '@dnd-kit/sortable': '8.0.0',
+          '@dnd-kit/utilities': '3.2.2',
+          'react-confetti': '6.1.0',
+          'howler': '2.2.4',
+          'zustand': '4.5.0',
+          'lodash': '4.17.21',
+          'date-fns': '3.3.1',
+        },
+      }}
+      options={{
+        recompileMode: 'delayed',
+        recompileDelay: 500,
+      }}
+    >
+      <SandpackBridge onError={onError} onSuccess={onSuccess} code={code} />
+      <div style={{ height: '100%', width: '100%' }}>
+        <SandpackPreview
+          style={{ height: '100%', width: '100%' }}
+          showOpenInCodeSandbox={false}
+          showNavigator={false}
+          showRefreshButton={true}
+        />
       </div>
-
-      {/* Reload Button */}
-      <button
-        onClick={() => setKey(k => k + 1)}
-        className="absolute top-2 left-2 z-10 bg-slate-800 hover:bg-slate-700 text-slate-300 p-2 rounded-lg transition-colors"
-        title="Neu laden"
-      >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-        </svg>
-      </button>
-
-      {/* The Sandbox iframe */}
-      <iframe
-        key={key}
-        ref={iframeRef}
-        srcDoc={generateHTML()}
-        className="w-full h-full border-none"
-        title="Meoluna Lernwelt"
-        sandbox="allow-scripts allow-same-origin allow-modals allow-forms allow-popups"
-      />
-    </div>
+    </SandpackProvider>
   );
 };
 
