@@ -1,6 +1,6 @@
 // ============================================================================
 // STEP 2: CREATIVE DIRECTOR - Einzigartiges Weltkonzept erfinden
-// Model: Opus (maximale Kreativität) | Temp: 1.0 | Max: 4000
+// Model: Sonnet-4.6 (schnell, kreativ) | Temp: 1.0 | Max: 4000
 // ============================================================================
 
 import { callAnthropicJson } from "../utils/anthropicClient";
@@ -19,12 +19,12 @@ Schwierigkeit: ${interpreted.difficulty}
 Erfinde jetzt ein Universum, das noch NIEMAND für dieses Thema verwendet hat.`;
 
   const { result, inputTokens, outputTokens } = await callAnthropicJson<CreativeDirectorOutput>({
-    model: "claude-opus-4-6",
+    model: "claude-sonnet-4-6",
     systemPrompt: CREATIVE_DIRECTOR_SYSTEM_PROMPT,
     userMessage,
     maxTokens: 4000,
     temperature: 1.0,
-    timeoutMs: 180000,
+    timeoutMs: 90000,
   });
 
   // Validate
