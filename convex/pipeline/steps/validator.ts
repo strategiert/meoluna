@@ -61,6 +61,7 @@ Repariere den Code und gib NUR den reparierten Code zurück.`;
           userMessage,
           maxTokens: 64000,
           temperature: 0,
+          timeoutMs: 60000,
         });
 
         totalInputTokens += response.inputTokens;

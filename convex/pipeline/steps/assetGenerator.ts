@@ -40,7 +40,7 @@ export async function runAssetGenerator(
   storage: StorageContext
 ): Promise<AssetManifest> {
   const manifest: AssetManifest = {};
-  const MAX_ASSETS = 8;
+  const MAX_ASSETS = 6;
   const MAX_CONCURRENT = 4;
   const priorityRank: Record<string, number> = {
     critical: 0,

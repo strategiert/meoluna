@@ -129,73 +129,87 @@ export const generateWorldV2 = action({
         outputTokens: gameDesign.outputTokens,
       };
 
-      // ── STEP 4: ASSET PLANNER ────────────────────────────────────
-      await setStatus(3);
-      const step4Start = Date.now();
-      const assetPlan = await runAssetPlanner(creative.result, gameDesign.result);
-      stepTimings.asset_planner = {
-        durationMs: Date.now() - step4Start,
-        model: "sonnet",
-        inputTokens: assetPlan.inputTokens,
-        outputTokens: assetPlan.outputTokens,
-      };
+      // ── STEPS 4-7: PARALLEL BRANCHES ─────────────────────────────
+      // Branch A: Asset Pipeline (Steps 4→5)
+      // Branch B: Content Pipeline (Steps 6→7)
+      // Diese sind unabhängig und laufen parallel für ~45-100s Zeitersparnis
+      const [assetResult, contentResult] = await Promise.all([
+        // Branch A: Asset-Pipeline
+        (async () => {
+          await setStatus(3); // "Plane die Grafiken..."
+          const step4Start = Date.now();
+          const assetPlan = await runAssetPlanner(creative.result, gameDesign.result);
+          stepTimings.asset_planner = {
+            durationMs: Date.now() - step4Start,
+            model: "sonnet",
+            inputTokens: assetPlan.inputTokens,
+            outputTokens: assetPlan.outputTokens,
+          };
 
-      // ── STEP 5: ASSET GENERATION (strict, Gemini SVG) ───────────
-      await setStatus(4);
-      const step5Start = Date.now();
-      const assetManifest: AssetManifest = await (async () => {
-        try {
-          return await runAssetGenerator(assetPlan.result, ctx.storage);
-        } catch (error) {
-          throw withStepError(error, "E_ASSET_GENERATION", "E_ASSET_GENERATION");
-        }
-      })();
-      stepTimings.asset_generation = {
-        durationMs: Date.now() - step5Start,
-      };
+          await setStatus(4); // "Generiere einzigartige Grafiken..."
+          const step5Start = Date.now();
+          const assetManifest: AssetManifest = await (async () => {
+            try {
+              return await runAssetGenerator(assetPlan.result, ctx.storage);
+            } catch (error) {
+              throw withStepError(error, "E_ASSET_GENERATION", "E_ASSET_GENERATION");
+            }
+          })();
+          stepTimings.asset_generation = {
+            durationMs: Date.now() - step5Start,
+          };
 
-      // ── STEP 6: CONTENT ARCHITECT ────────────────────────────────
-      await setStatus(5);
-      const step6Start = Date.now();
-      const content = await (async () => {
-        try {
-          return await runContentArchitect(
-            interpreter.result,
-            creative.result,
-            gameDesign.result
-          );
-        } catch (error) {
-          throw withStepError(error, "E_CONTENT_ARCHITECT", "E_CONTENT_JSON_PARSE");
-        }
-      })();
-      stepTimings.content_architect = {
-        durationMs: Date.now() - step6Start,
-        model: "sonnet",
-        inputTokens: content.inputTokens,
-        outputTokens: content.outputTokens,
-      };
+          return { assetPlan, assetManifest };
+        })(),
+        // Branch B: Content-Pipeline
+        (async () => {
+          await setStatus(5); // "Erstelle die Spiel-Challenges..."
+          const step6Start = Date.now();
+          const content = await (async () => {
+            try {
+              return await runContentArchitect(
+                interpreter.result,
+                creative.result,
+                gameDesign.result
+              );
+            } catch (error) {
+              throw withStepError(error, "E_CONTENT_ARCHITECT", "E_CONTENT_JSON_PARSE");
+            }
+          })();
+          stepTimings.content_architect = {
+            durationMs: Date.now() - step6Start,
+            model: "sonnet",
+            inputTokens: content.inputTokens,
+            outputTokens: content.outputTokens,
+          };
 
-      // ── STEP 7: QUALITY GATE ─────────────────────────────────────
-      await setStatus(6);
-      const step7Start = Date.now();
-      const quality = await (async () => {
-        try {
-          return await runQualityGate(
-            interpreter.result,
-            creative.result,
-            gameDesign.result,
-            content.result
-          );
-        } catch (error) {
-          throw withStepError(error, "E_QUALITY_GATE", "E_QUALITY_JSON_PARSE");
-        }
-      })();
-      stepTimings.quality_gate = {
-        durationMs: Date.now() - step7Start,
-        model: "sonnet",
-        inputTokens: quality.inputTokens,
-        outputTokens: quality.outputTokens,
-      };
+          await setStatus(6); // "Qualitätsprüfung..."
+          const step7Start = Date.now();
+          const quality = await (async () => {
+            try {
+              return await runQualityGate(
+                interpreter.result,
+                creative.result,
+                gameDesign.result,
+                content.result
+              );
+            } catch (error) {
+              throw withStepError(error, "E_QUALITY_GATE", "E_QUALITY_JSON_PARSE");
+            }
+          })();
+          stepTimings.quality_gate = {
+            durationMs: Date.now() - step7Start,
+            model: "sonnet",
+            inputTokens: quality.inputTokens,
+            outputTokens: quality.outputTokens,
+          };
+
+          return { content, quality };
+        })(),
+      ]);
+
+      const { assetManifest } = assetResult;
+      const { content, quality } = contentResult;
 
       // Apply corrections or retry content if score too low
       let finalContent = content.result;
@@ -247,7 +261,7 @@ export const generateWorldV2 = action({
       // ── STEP 9: VALIDATION & FIX LOOP ────────────────────────────
       await setStatus(8);
       const step9Start = Date.now();
-      const validated = await runValidator(codeGen.code);
+      const validated = await runValidator(codeGen.code, 2);
       stepTimings.validation = {
         durationMs: Date.now() - step9Start,
       };
@@ -299,10 +313,11 @@ export const generateWorldV2 = action({
         },
       });
 
-      // Mark session as complete
+      // Mark session as complete (with step timings for debug)
       await ctx.runMutation(internal.pipeline.status.completeSession, {
         sessionId: args.sessionId,
         worldId,
+        stepTimings,
       });
 
       return {
@@ -322,6 +337,7 @@ export const generateWorldV2 = action({
           sessionId: args.sessionId,
           error: errorMsg,
           errorCode,
+          stepTimings,
         });
       } catch {
         // Ignore session update failure
