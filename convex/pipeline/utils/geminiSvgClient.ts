@@ -121,81 +121,174 @@ async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: numbe
   }
 }
 
+// ── SVG-Qualitätsprüfung ────────────────────────────────────────────────────
+
+interface QualityCheck {
+  hasAnimations: boolean;
+  animationCount: number;
+  svgLength: number;
+}
+
+function checkSvgQuality(svg: string): QualityCheck {
+  const smilAnimations = (svg.match(/<animate(?:Transform|Motion)?\b/gi) ?? []).length;
+  const cssKeyframes  = (svg.match(/@keyframes\s/gi) ?? []).length;
+  const cssAnimation  = (svg.match(/\banimation\s*:/gi) ?? []).length;
+
+  const animationCount = smilAnimations + cssKeyframes;
+  const hasAnimations  = animationCount > 0 || cssAnimation > 0;
+
+  return { hasAnimations, animationCount: animationCount + (cssAnimation > 0 ? 1 : 0), svgLength: svg.length };
+}
+
+function buildRetryPrompt(check: QualityCheck, category: string): string {
+  const issues: string[] = [];
+
+  if (!check.hasAnimations) {
+    issues.push(
+      `KRITISCHER FEHLER: Das SVG enthält KEINE Animationen (gefunden: ${check.animationCount})! ` +
+      `Du MUSST mindestens 3 Animationen einbauen. Nutze ENTWEDER CSS @keyframes in <style> ` +
+      `(z.B. @keyframes pulse { 0%,100%{opacity:.7} 50%{opacity:1} } .el{animation:pulse 2s infinite}) ` +
+      `ODER SMIL-Elemente (<animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite"/>). ` +
+      `Kein JavaScript. Jetzt animieren!`
+    );
+  }
+
+  if (check.svgLength < 1500 && (category === "background" || category === "illustration")) {
+    issues.push(
+      `SVG ist zu simpel (${check.svgLength} Zeichen). ` +
+      `Füge mehr Schichten, Texturen, Hintergrundelemente und Details hinzu für eine reichhaltige Szene.`
+    );
+  }
+
+  return issues.join(" ");
+}
+
+// ── Asset-Generierung mit Iterations-Loop ───────────────────────────────────
+
 export async function generateSvgAsset(request: GeminiSvgRequest): Promise<GeminiSvgResult> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return { svg: null, error: "GEMINI_API_KEY not configured" };
   }
 
-  const model = resolveModelId();
-  const apiBase = process.env.GEMINI_API_BASE_URL || "https://generativelanguage.googleapis.com/v1beta";
-  const timeoutMs = request.timeoutMs ?? 30000;
+  const model   = resolveModelId();
+  const apiBase = process.env.GEMINI_API_BASE_URL ?? "https://generativelanguage.googleapis.com/v1beta";
   const { width, height } = getCanvas(request.aspectRatio);
 
-  const prompt = [
-    "Erzeuge genau EIN standalone SVG.",
-    "Antworte NUR mit dem SVG-Markup (kein Markdown, keine Erklaerung).",
-    `Kategorie: ${request.category}`,
-    `Zweck: ${request.purpose}`,
-    `Bildidee: ${request.prompt}`,
-    `Canvas: ${width}x${height}, mit viewBox="0 0 ${width} ${height}"`,
-    "Stil: hochwertig, klar lesbar, 2D vector.",
-    (request.category === "background" || request.category === "illustration")
-      ? "PFLICHT: Animierter SVG! Integriere CSS-@keyframes ODER SMIL-Animationen (z.B. sanft schwingende Elemente, pulsierende Lichter, fließende Partikel, Farbübergänge, Rotation). Mindestens 2 animierte Elemente. Kein JavaScript."
-      : "Empfohlen: Dezente SVG-Animation (SMIL oder CSS-@keyframes im <style>) ohne JavaScript.",
-    "Keine externen Fonts, keine externen Bilder, keine Scripts, kein foreignObject.",
-    "Transparenter Hintergrund, ausser der Prompt beschreibt explizit einen Hintergrund.",
-  ].join("\n");
+  // background + illustration: bis zu 3 Versuche; icon + character: 1 Versuch
+  const needsAnimation = request.category === "background" || request.category === "illustration";
+  const MAX_ATTEMPTS   = needsAnimation ? 3 : 1;
+  const totalBudgetMs  = request.timeoutMs ?? 30000;
+  const deadline       = Date.now() + totalBudgetMs;
 
-  try {
-    const response = await fetchWithTimeout(
-      `${apiBase}/models/${encodeURIComponent(model)}:generateContent`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": apiKey,
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: "user",
-              parts: [{ text: prompt }],
+  const animationInstruction = needsAnimation
+    ? "PFLICHT: Animierter SVG! Baue mindestens 3 CSS-@keyframes oder SMIL-Animationen ein " +
+      "(schwingende Elemente, pulsierende Lichter, fließende Partikel, Farbübergänge, Rotation). " +
+      "Kein JavaScript. Ohne Animationen ist das SVG wertlos."
+    : "Empfohlen: Dezente SVG-Animation (SMIL oder CSS-@keyframes im <style>) ohne JavaScript.";
+
+  let bestSvg: string | null = null;
+  let lastError: string | undefined;
+  let lastQuality: QualityCheck | null = null;
+
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    const remaining = deadline - Date.now();
+    if (remaining < 4000) {
+      console.warn(`[GeminiSVG] Kein Zeit-Budget mehr für Versuch ${attempt}`);
+      break;
+    }
+
+    const attemptTimeout = Math.min(22000, remaining - 2000);
+
+    // Beim Retry-Versuch Feedback aus vorherigem Fehler anhängen
+    const retryNote = attempt > 1 && lastQuality
+      ? `\n\nVERBESSERUNGSBEDARF AUS VORHERIGEM VERSUCH:\n${buildRetryPrompt(lastQuality, request.category)}`
+      : "";
+
+    const promptText = [
+      "Erzeuge genau EIN standalone SVG.",
+      "Antworte NUR mit dem SVG-Markup (kein Markdown, keine Erklaerung).",
+      `Kategorie: ${request.category}`,
+      `Zweck: ${request.purpose}`,
+      `Bildidee: ${request.prompt}`,
+      `Canvas: ${width}x${height}, mit viewBox="0 0 ${width} ${height}"`,
+      "Stil: hochwertig, detailreich, 2D vector.",
+      animationInstruction,
+      "Keine externen Fonts, keine externen Bilder, keine Scripts, kein foreignObject.",
+      "Transparenter Hintergrund, ausser der Prompt beschreibt explizit einen Hintergrund.",
+      retryNote,
+    ].join("\n");
+
+    try {
+      const response = await fetchWithTimeout(
+        `${apiBase}/models/${encodeURIComponent(model)}:generateContent`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+          body: JSON.stringify({
+            contents: [{ role: "user", parts: [{ text: promptText }] }],
+            generationConfig: {
+              temperature: attempt === 1 ? 0.4 : 0.6,  // Versuch 2+ kreativer
+              maxOutputTokens: 8192,
+              responseMimeType: "text/plain",
             },
-          ],
-          generationConfig: {
-            temperature: 0.3,
-            maxOutputTokens: 4096,
-            responseMimeType: "text/plain",
-          },
-        }),
-      },
-      timeoutMs
-    );
+          }),
+        },
+        attemptTimeout
+      );
 
-    if (!response.ok) {
-      const errorText = await response.text().catch(() => "");
-      console.error(`[GeminiSVG] API error ${response.status}: ${errorText}`);
-      return { svg: null, error: `gemini ${response.status}` };
+      if (!response.ok) {
+        const errText = await response.text().catch(() => "");
+        console.error(`[GeminiSVG] Versuch ${attempt} API-Fehler ${response.status}: ${errText}`);
+        lastError = `gemini ${response.status}`;
+        continue;
+      }
+
+      const data   = await response.json();
+      const text   = extractTextFromGeminiResponse(data);
+      const rawSvg = extractSvgMarkup(text);
+
+      if (!rawSvg) {
+        lastError = "Gemini response enthält kein <svg>";
+        console.warn(`[GeminiSVG] Versuch ${attempt}: kein SVG-Markup gefunden`);
+        continue;
+      }
+
+      const sanitized = sanitizeSvg(rawSvg);
+      const quality   = checkSvgQuality(sanitized);
+      lastQuality     = quality;
+      bestSvg         = sanitized; // immer als Fallback merken
+
+      const qualityOk = !needsAnimation || quality.hasAnimations;
+      console.log(
+        `[GeminiSVG] Versuch ${attempt}/${MAX_ATTEMPTS}: ` +
+        `animations=${quality.animationCount}, size=${quality.svgLength}, ok=${qualityOk}`
+      );
+
+      if (qualityOk) {
+        return { svg: sanitized };
+      }
+
+      // Qualität nicht ausreichend → nächster Versuch mit Feedback
+    } catch (error) {
+      const msg =
+        error instanceof Error && error.name === "AbortError"
+          ? `Timeout bei Versuch ${attempt} (${attemptTimeout}ms)`
+          : error instanceof Error ? error.message : String(error);
+      console.error(`[GeminiSVG] Versuch ${attempt} Fehler: ${msg}`);
+      lastError = msg;
     }
-
-    const data = await response.json();
-    const text = extractTextFromGeminiResponse(data);
-    const rawSvg = extractSvgMarkup(text);
-    if (!rawSvg) {
-      return { svg: null, error: "Gemini response enthält kein <svg>" };
-    }
-
-    const sanitized = sanitizeSvg(rawSvg);
-    return { svg: sanitized };
-  } catch (error) {
-    const msg =
-      error instanceof Error && error.name === "AbortError"
-        ? `Gemini SVG timeout after ${timeoutMs}ms`
-        : error instanceof Error
-          ? error.message
-          : String(error);
-    console.error(`[GeminiSVG] ${msg}`);
-    return { svg: null, error: msg };
   }
+
+  // Bestes Ergebnis zurückgeben, auch wenn Qualitätsgrenze nicht erreicht
+  if (bestSvg) {
+    const q = lastQuality;
+    console.warn(
+      `[GeminiSVG] Nutze bestes verfügbares SVG nach ${MAX_ATTEMPTS} Versuchen ` +
+      `(animations=${q?.animationCount ?? 0}, size=${q?.svgLength ?? 0})`
+    );
+    return { svg: bestSvg };
+  }
+
+  return { svg: null, error: lastError ?? "Alle Versuche fehlgeschlagen" };
 }

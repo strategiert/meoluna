@@ -72,12 +72,18 @@ export async function runAssetGenerator(
         const asset = assetsToGenerate[next];
         const fullPrompt = `${asset.prompt}, ${assetPlan.styleBase}`;
 
+        // background + illustration: 3 Versuche à ~22s → 55s Budget
+        // icon + character: 1 Versuch → 25s Budget
+        const assetTimeoutMs = (asset.category === "background" || asset.category === "illustration")
+          ? 55000
+          : 25000;
+
         const svgResult = await generateSvgAsset({
           prompt: fullPrompt,
           category: asset.category,
           purpose: asset.purpose,
           aspectRatio: asset.aspectRatio,
-          timeoutMs: 25000,
+          timeoutMs: assetTimeoutMs,
         });
 
         if (!svgResult.svg) {
