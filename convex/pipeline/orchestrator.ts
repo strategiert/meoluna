@@ -298,8 +298,10 @@ export const runPhase2 = internalAction({
     prompt: v.string(),
     gradeLevel: v.optional(v.string()),
     subject: v.optional(v.string()),
+    retryCount: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    const retry = args.retryCount ?? 0;
     try {
       // Pipeline-State von Phase 1 laden
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -390,6 +392,20 @@ export const runPhase2 = internalAction({
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : "Unknown pipeline error";
       const errorCode = errorMsg.match(/^(E_[A-Z0-9_]+):/)?.[1];
+
+      if (retry < 1) {
+        console.warn(`Phase 2 Versuch ${retry + 1} fehlgeschlagen, retry in 3s: ${errorMsg}`);
+        await ctx.scheduler.runAfter(3000, internal.pipeline.orchestrator.runPhase2, {
+          sessionId: args.sessionId,
+          userId: args.userId,
+          prompt: args.prompt,
+          gradeLevel: args.gradeLevel,
+          subject: args.subject,
+          retryCount: retry + 1,
+        });
+        return;
+      }
+
       console.error("Pipeline Phase 2 failed:", errorMsg);
       try {
         await ctx.runMutation(internal.pipeline.status.failSession, {

@@ -26,6 +26,18 @@ import { P5Background } from '@/components/landing/P5Background';
 
 type Step = 'subject' | 'grade' | 'topic' | 'generating';
 
+function getUserFriendlyError(error: string): string {
+  if (error.includes("timeout") || error.includes("Timeout"))
+    return "Die Generierung hat zu lange gedauert. Bitte versuche es erneut.";
+  if (error.includes("Asset") || error.includes("SVG") || error.includes("Gemini"))
+    return "Die Bildgenerierung ist fehlgeschlagen. Bitte versuche es erneut.";
+  if (error.includes("JSON parse") || error.includes("parse failed"))
+    return "Ein technischer Fehler ist aufgetreten. Bitte versuche es erneut.";
+  if (error.includes("Structural Gate"))
+    return "Der generierte Code erfüllt die Qualitätsanforderungen nicht. Bitte versuche es mit einem anderen Prompt.";
+  return "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut.";
+}
+
 interface WorldCreatorModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -371,9 +383,17 @@ Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
               {/* Generate Button */}
               <div className="p-4 border-t bg-secondary/30">
                 {error && (
-                  <p className="text-sm text-destructive mb-3 text-center">
-                    {error}
-                  </p>
+                  <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 mb-3 text-center">
+                    <p className="text-sm text-destructive mb-3">{getUserFriendlyError(error)}</p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => { setError(null); handleGenerate(); }}
+                      className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                    >
+                      Erneut versuchen
+                    </Button>
+                  </div>
                 )}
                 <Button
                   onClick={handleGenerate}

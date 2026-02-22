@@ -62,6 +62,7 @@ export async function runAssetGenerator(
   );
 
   let svgCount = 0;
+  let failedCount = 0;
   let cursor = 0;
   const workers = Array.from(
     { length: Math.min(MAX_CONCURRENT, assetsToGenerate.length) },
@@ -87,9 +88,9 @@ export async function runAssetGenerator(
         });
 
         if (!svgResult.svg) {
-          throw new Error(
-            `[AssetGenerator] Gemini SVG failed for ${asset.id}: ${svgResult.error ?? "unknown"}`
-          );
+          console.warn(`[AssetGenerator] Asset ${asset.id} übersprungen: ${svgResult.error ?? "unknown"}`);
+          failedCount++;
+          continue;
         }
 
         await persistManifestEntry(manifest, storage, {
@@ -105,6 +106,13 @@ export async function runAssetGenerator(
 
   await Promise.all(workers);
 
+  // Wenn ALLE Assets fehlgeschlagen → dann werfen
+  if (svgCount === 0 && failedCount > 0) {
+    throw new Error(
+      `[AssetGenerator] Alle ${failedCount} Assets fehlgeschlagen — Gemini komplett ausgefallen`
+    );
+  }
+
   // Debug-Log: Zusammenfassung des Manifests
   const total = Object.keys(manifest).length;
   const withUrl = Object.values(manifest).filter(e => e.url).length;
@@ -113,11 +121,8 @@ export async function runAssetGenerator(
     return acc;
   }, {});
   console.log(
-    `[AssetGenerator] ${withUrl}/${total} Assets generiert. Kategorien:`,
+    `[AssetGenerator] ${withUrl}/${total} Assets generiert, ${failedCount} übersprungen. Kategorien:`,
     JSON.stringify(byCategory)
-  );
-  console.log(
-    `[AssetGenerator] Quellen: svg=${svgCount}, geminiFailed=0 (strict mode)`
   );
 
   return manifest;
