@@ -84,7 +84,7 @@ export function SubjectPicker({
     <div className="space-y-6 p-4">
       {/* Header */}
       <div className="text-center">
-        <h2 className="text-2xl font-bold mb-2">🎓 Was möchtest du lernen?</h2>
+        <h2 className="text-xl sm:text-2xl font-bold mb-2 px-2">🎓 Was möchtest du lernen?</h2>
         <p className="text-muted-foreground">Wähle ein Fach aus</p>
       </div>
 
