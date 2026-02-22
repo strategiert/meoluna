@@ -18,8 +18,22 @@ export interface GeminiSvgResult {
   error?: string;
 }
 
-// API model id per Google Gemini API docs (marketing name may be referred to as "Gemini 3.1 Pro").
-const DEFAULT_MODEL = "gemini-3-pro-preview";
+// Official Gemini API model code for "Gemini 3.1 Pro Preview" (Google docs).
+const DEFAULT_MODEL = "gemini-3.1-pro-preview";
+
+function resolveModelId(): string {
+  const configured = process.env.GEMINI_SVG_MODEL?.trim();
+  const model = configured || DEFAULT_MODEL;
+
+  // Enforce Gemini 3.1 Pro for all in-world graphics to avoid silently using older aliases.
+  if (model !== DEFAULT_MODEL) {
+    throw new Error(
+      `Ungültiges GEMINI_SVG_MODEL="${model}". Erlaubt ist nur "${DEFAULT_MODEL}".`
+    );
+  }
+
+  return model;
+}
 
 function getCanvas(aspectRatio: AspectRatio): { width: number; height: number } {
   if (aspectRatio === "16:9") return { width: 1600, height: 900 };
@@ -113,7 +127,7 @@ export async function generateSvgAsset(request: GeminiSvgRequest): Promise<Gemin
     return { svg: null, error: "GEMINI_API_KEY not configured" };
   }
 
-  const model = process.env.GEMINI_SVG_MODEL || DEFAULT_MODEL;
+  const model = resolveModelId();
   const apiBase = process.env.GEMINI_API_BASE_URL || "https://generativelanguage.googleapis.com/v1beta";
   const timeoutMs = request.timeoutMs ?? 30000;
   const { width, height } = getCanvas(request.aspectRatio);

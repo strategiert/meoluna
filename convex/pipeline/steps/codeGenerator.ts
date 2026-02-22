@@ -48,6 +48,38 @@ function normalizeText(value: unknown, fallback: string, maxLen = 120): string {
   return cleaned.slice(0, maxLen);
 }
 
+function sortManifestEntries(assetManifest: AssetManifest) {
+  return Object.entries(assetManifest).sort(([idA], [idB]) => idA.localeCompare(idB));
+}
+
+function buildGeminiGraphics(assetManifest: AssetManifest) {
+  const entries = sortManifestEntries(assetManifest)
+    .map(([id, entry]) => ({ id, ...entry }))
+    .filter((entry) => !!entry.url) as Array<{
+      id: string;
+      url: string;
+      storageId: string | null;
+      category: string;
+      purpose: string;
+    }>;
+
+  const byCategory = (category: string) =>
+    entries
+      .filter((entry) => entry.category === category)
+      .map((entry) => ({
+        id: entry.id,
+        url: entry.url,
+        purpose: entry.purpose,
+      }));
+
+  return {
+    icons: byCategory("icon"),
+    illustrations: byCategory("illustration"),
+    characters: byCategory("character"),
+    backgrounds: byCategory("background"),
+  };
+}
+
 function validateWorldData(worldData: WorldData): void {
   if (!worldData.config || !worldData.modules || !Array.isArray(worldData.modules)) {
     throw new Error("Ungueltiges WorldData-JSON: config oder modules fehlen");
@@ -215,10 +247,12 @@ export async function runCodeGenerator(
   assetManifest: AssetManifest,
   quality: QualityGateOutput
 ) {
-  // Hub-Background URL aus AssetManifest extrahieren (erste Background-Asset mit gültiger URL)
-  const hubBgUrl = Object.values(assetManifest).find(
-    entry => entry.category === 'background' && entry.url
-  )?.url ?? undefined;
+  const sortedManifestEntries = sortManifestEntries(assetManifest);
+  const hubBgUrl =
+    assetManifest["hub_bg"]?.url ??
+    sortedManifestEntries.find(([, entry]) => entry.category === "background" && entry.url)?.[1].url ??
+    undefined;
+  const geminiGraphics = buildGeminiGraphics(assetManifest);
   console.log(`[CodeGenerator] AssetManifest Einträge: ${Object.keys(assetManifest).length}, hubBgUrl: ${hubBgUrl ? 'JA (' + hubBgUrl.slice(0, 60) + '...)' : 'NEIN (kein background-Asset mit URL)'}`);
   const userMessage = `Generiere das WorldData-JSON für diese Lernwelt:
 
@@ -264,7 +298,12 @@ Generiere jetzt das WorldData-JSON. Gib NUR das JSON zurück, kein Markdown, kei
     worldData = buildFallbackWorldData(concept, gameDesign, content);
   }
 
-  // Hub-Background injizieren (fal.ai Asset, falls vorhanden)
+  // Gemini-Asset-Pool fuer deterministic Skeleton einhaengen
+  if (worldData.config) {
+    worldData.config.geminiGraphics = geminiGraphics;
+  }
+
+  // Hub-Background injizieren (Gemini SVG Asset, falls vorhanden)
   if (hubBgUrl && worldData.config) {
     worldData.config.hubBgUrl = hubBgUrl;
   }

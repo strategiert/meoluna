@@ -21,25 +21,18 @@ async function persistManifestEntry(
     blob: Blob;
   }
 ) {
-  try {
-    const storageId = await storage.store(args.blob);
-    const permanentUrl = await storage.getUrl(storageId);
-
-    manifest[args.assetId] = {
-      url: permanentUrl,
-      storageId,
-      category: args.category,
-      purpose: args.purpose,
-    };
-  } catch (e) {
-    console.error(`Storage failed for ${args.assetId}:`, e);
-    manifest[args.assetId] = {
-      url: null,
-      storageId: null,
-      category: args.category,
-      purpose: args.purpose,
-    };
+  const storageId = await storage.store(args.blob);
+  const permanentUrl = await storage.getUrl(storageId);
+  if (!permanentUrl) {
+    throw new Error(`Storage URL fehlt fuer ${args.assetId}`);
   }
+
+  manifest[args.assetId] = {
+    url: permanentUrl,
+    storageId,
+    category: args.category,
+    purpose: args.purpose,
+  };
 }
 
 export async function runAssetGenerator(
@@ -69,8 +62,6 @@ export async function runAssetGenerator(
   );
 
   let svgCount = 0;
-  let geminiFailedCount = 0;
-
   let cursor = 0;
   const workers = Array.from(
     { length: Math.min(MAX_CONCURRENT, assetsToGenerate.length) },
@@ -90,15 +81,9 @@ export async function runAssetGenerator(
         });
 
         if (!svgResult.svg) {
-          console.warn(`[AssetGenerator] Gemini SVG failed for ${asset.id}: ${svgResult.error}`);
-          geminiFailedCount++;
-          manifest[asset.id] = {
-            url: null,
-            storageId: null,
-            category: asset.category,
-            purpose: asset.purpose,
-          };
-          continue;
+          throw new Error(
+            `[AssetGenerator] Gemini SVG failed for ${asset.id}: ${svgResult.error ?? "unknown"}`
+          );
         }
 
         await persistManifestEntry(manifest, storage, {
@@ -126,7 +111,7 @@ export async function runAssetGenerator(
     JSON.stringify(byCategory)
   );
   console.log(
-    `[AssetGenerator] Quellen: svg=${svgCount}, geminiFailed=${geminiFailedCount}`
+    `[AssetGenerator] Quellen: svg=${svgCount}, geminiFailed=0 (strict mode)`
   );
 
   return manifest;
