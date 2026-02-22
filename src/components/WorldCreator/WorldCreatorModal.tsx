@@ -290,7 +290,7 @@ Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
         <DialogDescription className="sr-only">Erstelle eine neue interaktive Lernwelt in wenigen Schritten.</DialogDescription>
 
         {/* Progress Indicator */}
-        <div className="flex items-center gap-2 p-4 border-b bg-secondary/30">
+        <div className="relative flex items-center justify-center gap-2 p-4 border-b bg-secondary/30">
           {['subject', 'grade', 'topic'].map((s, i) => (
             <div key={s} className="flex items-center gap-2">
               <div
@@ -316,7 +316,7 @@ Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
               )}
             </div>
           ))}
-          <span className="ml-auto text-sm text-muted-foreground">
+          <span className="absolute right-4 text-sm text-muted-foreground">
             {step === 'subject' && 'Fach'}
             {step === 'grade' && 'Klasse'}
             {step === 'topic' && 'Thema'}
