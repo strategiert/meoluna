@@ -64,7 +64,6 @@ FUER PERFORMANCE: Kurz und praezise bleiben.`;
       userMessage,
       maxTokens: 3000,
       temperature: 0,
-      timeoutMs: 120000,
     }, 2);
 
     return { result, inputTokens, outputTokens };

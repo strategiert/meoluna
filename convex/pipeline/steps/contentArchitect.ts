@@ -160,8 +160,7 @@ WICHTIG: Korrigiere ALLE criticalErrors aus dem Quality-Gate!`;
       systemPrompt: CONTENT_ARCHITECT_SYSTEM_PROMPT,
       userMessage,
       maxTokens: 8000,
-      temperature: 0.2,
-      timeoutMs: 120000,
+      temperature: 0.5,
     }, 2);
 
     // Validate
