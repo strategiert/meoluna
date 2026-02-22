@@ -388,3 +388,30 @@ export const migrateAllWorlds = action({
     };
   },
 });
+
+// One-shot: fix worlds with const PI/TWO_PI/HALF_PI redeclarations (conflicts with p5.js)
+export const fixPiRedeclarations = mutation({
+  args: { dryRun: v.optional(v.boolean()) },
+  handler: async (ctx, args) => {
+    const dryRun = args.dryRun ?? true;
+    // Match anywhere in the code, not just start-of-line (for PI inside functions/callbacks)
+    const HAS_PI = /\b(const|let|var)\s+(PI|TWO_PI|HALF_PI)\s*=/;
+    const FIX_PI = /\b(const|let|var)\s+(PI|TWO_PI|HALF_PI)\s*=.*/g;
+
+    const all = await ctx.db.query("worlds").collect();
+    const affected: string[] = [];
+    let fixed = 0;
+
+    for (const world of all) {
+      if (!world.code || !HAS_PI.test(world.code)) continue;
+      affected.push(`${world._id} "${world.title}"`);
+      if (!dryRun) {
+        const newCode = world.code.replace(FIX_PI, "/* p5 global: $2 = Math.PI (removed redundant declaration) */");
+        await ctx.db.patch(world._id, { code: newCode });
+        fixed++;
+      }
+    }
+
+    return { dryRun, affected, fixed };
+  },
+});

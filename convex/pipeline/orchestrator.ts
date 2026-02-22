@@ -1,12 +1,17 @@
 "use node";
 
 // ============================================================================
-// PIPELINE V2 ORCHESTRATOR
-// Koordiniert alle 10 Steps der Lernwelt-Generierung
+// PIPELINE V2 ORCHESTRATOR — Phasen-basiert (kein Timeout-Limit)
+//
+// generateWorldV2: Erstellt Session + startet Phase 1 (gibt sofort zurück)
+// runPhase1:       Steps 1-7 + Quality Corrections (eigene 10-Min-Action)
+// runPhase2:       Steps 8-9.5 + Welt speichern   (eigene 10-Min-Action)
+//
+// Gesamtbudget: 20 Minuten statt 10. Pipeline kann so lange laufen wie nötig.
 // ============================================================================
 
 import { v } from "convex/values";
-import { action } from "../_generated/server";
+import { action, internalAction } from "../_generated/server";
 import { internal, api } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 
@@ -24,28 +29,35 @@ import { runStructuralGate } from "./steps/structuralGate";
 import { STEP_LABELS, STEP_ORDER } from "./types";
 import type { AssetManifest } from "./types";
 
-function toErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ActionCtx = { runMutation: (ref: any, args: any) => Promise<any> };
 
 function withStepError(error: unknown, defaultCode: string, jsonCode: string): Error {
-  const message = toErrorMessage(error);
+  const message = error instanceof Error ? error.message : String(error);
   if (/^E_[A-Z0-9_]+:/.test(message)) {
     return new Error(message);
   }
-
   const isJsonError =
     /JSON parse failed/i.test(message) ||
     /Unexpected token/i.test(message) ||
     /Unexpected end of JSON input/i.test(message) ||
     /Kein JSON-Objekt/i.test(message);
-
   const errorCode = isJsonError ? jsonCode : defaultCode;
   return new Error(`${errorCode}: ${message}`);
 }
 
+async function setStatus(ctx: ActionCtx, sessionId: string, stepIndex: number) {
+  const step = STEP_ORDER[stepIndex];
+  const label = STEP_LABELS[step];
+  await ctx.runMutation(internal.pipeline.status.updateSession, {
+    sessionId,
+    currentStep: stepIndex,
+    stepLabel: label,
+  });
+}
+
 // ============================================================================
-// MAIN ACTION: generateWorldV2
+// ENTRY POINT — Erstellt Session, startet Phase 1, gibt sofort zurück
 // ============================================================================
 export const generateWorldV2 = action({
   args: {
@@ -57,14 +69,43 @@ export const generateWorldV2 = action({
     userId: v.string(),
     sessionId: v.string(),
   },
-  handler: async (ctx, args): Promise<{
-    worldId: Id<"worlds">;
-    code: string;
-    worldName: string;
-    duration: number;
-    qualityScore: number;
-  }> => {
-    const startTime = Date.now();
+  handler: async (ctx, args) => {
+    // Session für Progress-Tracking erstellen
+    await ctx.runMutation(internal.pipeline.status.createSession, {
+      sessionId: args.sessionId,
+      userId: args.userId,
+    });
+
+    // Phase 1 sofort starten (eigenes 10-Min-Budget)
+    await ctx.scheduler.runAfter(0, internal.pipeline.orchestrator.runPhase1, {
+      sessionId: args.sessionId,
+      prompt: args.prompt,
+      pdfText: args.pdfText,
+      imageDescription: args.imageDescription,
+      gradeLevel: args.gradeLevel,
+      subject: args.subject,
+      userId: args.userId,
+    });
+
+    return { sessionId: args.sessionId };
+  },
+});
+
+// ============================================================================
+// PHASE 1: Steps 1-7 + Quality Corrections
+// Interpreter → Creative → GameDesigner → [Assets || Content+Quality]
+// ============================================================================
+export const runPhase1 = internalAction({
+  args: {
+    sessionId: v.string(),
+    prompt: v.string(),
+    pdfText: v.optional(v.string()),
+    imageDescription: v.optional(v.string()),
+    gradeLevel: v.optional(v.string()),
+    subject: v.optional(v.string()),
+    userId: v.string(),
+  },
+  handler: async (ctx, args) => {
     const stepTimings: Record<string, {
       durationMs: number;
       model?: string;
@@ -72,27 +113,10 @@ export const generateWorldV2 = action({
       outputTokens?: number;
     }> = {};
 
-    // Helper: update progress status
-    const setStatus = async (stepIndex: number) => {
-      const step = STEP_ORDER[stepIndex];
-      const label = STEP_LABELS[step];
-      await ctx.runMutation(internal.pipeline.status.updateSession, {
-        sessionId: args.sessionId,
-        currentStep: stepIndex,
-        stepLabel: label,
-      });
-    };
-
     try {
-      // Create session for progress tracking
-      await ctx.runMutation(internal.pipeline.status.createSession, {
-        sessionId: args.sessionId,
-        userId: args.userId,
-      });
-
       // ── STEP 1: INTERPRETER ──────────────────────────────────────
-      await setStatus(0);
-      const step1Start = Date.now();
+      await setStatus(ctx, args.sessionId, 0);
+      const s1 = Date.now();
       const interpreter = await runInterpreter({
         prompt: args.prompt,
         pdfText: args.pdfText,
@@ -101,53 +125,50 @@ export const generateWorldV2 = action({
         subject: args.subject,
       });
       stepTimings.interpreter = {
-        durationMs: Date.now() - step1Start,
+        durationMs: Date.now() - s1,
         model: "sonnet",
         inputTokens: interpreter.inputTokens,
         outputTokens: interpreter.outputTokens,
       };
 
       // ── STEP 2: CREATIVE DIRECTOR ────────────────────────────────
-      await setStatus(1);
-      const step2Start = Date.now();
+      await setStatus(ctx, args.sessionId, 1);
+      const s2 = Date.now();
       const creative = await runCreativeDirector(interpreter.result);
       stepTimings.creative_director = {
-        durationMs: Date.now() - step2Start,
+        durationMs: Date.now() - s2,
         model: "sonnet",
         inputTokens: creative.inputTokens,
         outputTokens: creative.outputTokens,
       };
 
       // ── STEP 3: GAME DESIGNER ────────────────────────────────────
-      await setStatus(2);
-      const step3Start = Date.now();
+      await setStatus(ctx, args.sessionId, 2);
+      const s3 = Date.now();
       const gameDesign = await runGameDesigner(interpreter.result, creative.result);
       stepTimings.game_designer = {
-        durationMs: Date.now() - step3Start,
+        durationMs: Date.now() - s3,
         model: "sonnet",
         inputTokens: gameDesign.inputTokens,
         outputTokens: gameDesign.outputTokens,
       };
 
       // ── STEPS 4-7: PARALLEL BRANCHES ─────────────────────────────
-      // Branch A: Asset Pipeline (Steps 4→5)
-      // Branch B: Content Pipeline (Steps 6→7)
-      // Diese sind unabhängig und laufen parallel für ~45-100s Zeitersparnis
       const [assetResult, contentResult] = await Promise.all([
         // Branch A: Asset-Pipeline
         (async () => {
-          await setStatus(3); // "Plane die Grafiken..."
-          const step4Start = Date.now();
+          await setStatus(ctx, args.sessionId, 3);
+          const s4 = Date.now();
           const assetPlan = await runAssetPlanner(creative.result, gameDesign.result);
           stepTimings.asset_planner = {
-            durationMs: Date.now() - step4Start,
+            durationMs: Date.now() - s4,
             model: "sonnet",
             inputTokens: assetPlan.inputTokens,
             outputTokens: assetPlan.outputTokens,
           };
 
-          await setStatus(4); // "Generiere einzigartige Grafiken..."
-          const step5Start = Date.now();
+          await setStatus(ctx, args.sessionId, 4);
+          const s5 = Date.now();
           const assetManifest: AssetManifest = await (async () => {
             try {
               return await runAssetGenerator(assetPlan.result, ctx.storage);
@@ -155,50 +176,44 @@ export const generateWorldV2 = action({
               throw withStepError(error, "E_ASSET_GENERATION", "E_ASSET_GENERATION");
             }
           })();
-          stepTimings.asset_generation = {
-            durationMs: Date.now() - step5Start,
-          };
+          stepTimings.asset_generation = { durationMs: Date.now() - s5 };
 
           return { assetPlan, assetManifest };
         })(),
         // Branch B: Content-Pipeline
         (async () => {
-          await setStatus(5); // "Erstelle die Spiel-Challenges..."
-          const step6Start = Date.now();
+          await setStatus(ctx, args.sessionId, 5);
+          const s6 = Date.now();
           const content = await (async () => {
             try {
               return await runContentArchitect(
-                interpreter.result,
-                creative.result,
-                gameDesign.result
+                interpreter.result, creative.result, gameDesign.result
               );
             } catch (error) {
               throw withStepError(error, "E_CONTENT_ARCHITECT", "E_CONTENT_JSON_PARSE");
             }
           })();
           stepTimings.content_architect = {
-            durationMs: Date.now() - step6Start,
+            durationMs: Date.now() - s6,
             model: "sonnet",
             inputTokens: content.inputTokens,
             outputTokens: content.outputTokens,
           };
 
-          await setStatus(6); // "Qualitätsprüfung..."
-          const step7Start = Date.now();
+          await setStatus(ctx, args.sessionId, 6);
+          const s7 = Date.now();
           const quality = await (async () => {
             try {
               return await runQualityGate(
-                interpreter.result,
-                creative.result,
-                gameDesign.result,
-                content.result
+                interpreter.result, creative.result,
+                gameDesign.result, content.result
               );
             } catch (error) {
               throw withStepError(error, "E_QUALITY_GATE", "E_QUALITY_JSON_PARSE");
             }
           })();
           stepTimings.quality_gate = {
-            durationMs: Date.now() - step7Start,
+            durationMs: Date.now() - s7,
             model: "sonnet",
             inputTokens: quality.inputTokens,
             outputTokens: quality.outputTokens,
@@ -218,10 +233,8 @@ export const generateWorldV2 = action({
         const retry = await (async () => {
           try {
             return await runContentArchitect(
-              interpreter.result,
-              creative.result,
-              gameDesign.result,
-              quality.result
+              interpreter.result, creative.result,
+              gameDesign.result, quality.result
             );
           } catch (error) {
             throw withStepError(error, "E_CONTENT_RETRY", "E_CONTENT_JSON_PARSE");
@@ -235,36 +248,96 @@ export const generateWorldV2 = action({
         finalContent = applyCorrections(content.result, quality.result.correctedContent);
       }
 
+      // Pipeline-State für Phase 2 speichern
+      await ctx.runMutation(internal.pipeline.status.savePipelineState, {
+        sessionId: args.sessionId,
+        pipelineState: {
+          interpreter: interpreter.result,
+          creative: creative.result,
+          gameDesign: gameDesign.result,
+          assetManifest,
+          finalContent,
+          quality: quality.result,
+          stepTimings,
+        },
+      });
+
+      // Phase 2 starten (eigenes 10-Min-Budget)
+      await ctx.scheduler.runAfter(0, internal.pipeline.orchestrator.runPhase2, {
+        sessionId: args.sessionId,
+        userId: args.userId,
+        prompt: args.prompt,
+        gradeLevel: args.gradeLevel,
+        subject: args.subject,
+      });
+
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : "Unknown pipeline error";
+      const errorCode = errorMsg.match(/^(E_[A-Z0-9_]+):/)?.[1];
+      console.error("Pipeline Phase 1 failed:", errorMsg);
+      try {
+        await ctx.runMutation(internal.pipeline.status.failSession, {
+          sessionId: args.sessionId,
+          error: errorMsg,
+          errorCode,
+          stepTimings,
+        });
+      } catch { /* ignore */ }
+    }
+  },
+});
+
+// ============================================================================
+// PHASE 2: Steps 8-9.5 + Welt speichern
+// CodeGenerator → Validator → StructuralGate → Save World
+// ============================================================================
+export const runPhase2 = internalAction({
+  args: {
+    sessionId: v.string(),
+    userId: v.string(),
+    prompt: v.string(),
+    gradeLevel: v.optional(v.string()),
+    subject: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    try {
+      // Pipeline-State von Phase 1 laden
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const state: any = await ctx.runQuery(
+        internal.pipeline.status.loadPipelineState,
+        { sessionId: args.sessionId }
+      );
+
+      if (!state) {
+        throw new Error("Pipeline state not found for session " + args.sessionId);
+      }
+
+      const { creative, gameDesign, assetManifest, finalContent, quality, stepTimings } = state;
+
       // ── STEP 8: CODE GENERATION ──────────────────────────────────
-      await setStatus(7);
-      const step8Start = Date.now();
+      await setStatus(ctx, args.sessionId, 7);
+      const s8 = Date.now();
       const codeGen = await (async () => {
         try {
           return await runCodeGenerator(
-            creative.result,
-            gameDesign.result,
-            finalContent,
-            assetManifest,
-            quality.result
+            creative, gameDesign, finalContent, assetManifest, quality
           );
         } catch (error) {
           throw withStepError(error, "E_CODE_GENERATOR", "E_CODEGEN_JSON_PARSE");
         }
       })();
       stepTimings.code_generator = {
-        durationMs: Date.now() - step8Start,
+        durationMs: Date.now() - s8,
         model: "opus",
         inputTokens: codeGen.inputTokens,
         outputTokens: codeGen.outputTokens,
       };
 
       // ── STEP 9: VALIDATION & FIX LOOP ────────────────────────────
-      await setStatus(8);
-      const step9Start = Date.now();
+      await setStatus(ctx, args.sessionId, 8);
+      const s9 = Date.now();
       const validated = await runValidator(codeGen.code, 2);
-      stepTimings.validation = {
-        durationMs: Date.now() - step9Start,
-      };
+      stepTimings.validation = { durationMs: Date.now() - s9 };
 
       if (!validated.success) {
         console.warn("Validation failed after retries. Errors:", validated.errors);
@@ -275,35 +348,29 @@ export const generateWorldV2 = action({
       if (!gateResult.passed) {
         const errorCode = gateResult.violations[0]?.split(":")[0] || "E_GATE";
         console.error("Structural Gate FAILED:", gateResult.violations);
-
-        // Session als failed markieren mit Telemetrie-Daten (überschreibt failSession im catch)
         try {
           await ctx.runMutation(internal.pipeline.status.failSession, {
             sessionId: args.sessionId,
             error: `Structural Gate Failed: ${gateResult.violations.join(" | ")}`,
             errorCode,
             gateViolations: gateResult.violations,
-            qualityScore: quality.result.overallScore,
+            qualityScore: quality.overallScore,
           });
-        } catch {
-          // Ignorieren — catch-Block macht ggf. nochmal failSession
-        }
-
-        // Kein worlds-Insert — direkt Exception
-        throw new Error(`${errorCode}: ${gateResult.violations.join(" | ")}`);
+        } catch { /* ignore */ }
+        return;
       }
 
       // ── STEP 10: OUTPUT & STORAGE ────────────────────────────────
       const worldId: Id<"worlds"> = await ctx.runMutation(api.worlds.create, {
-        title: creative.result.worldName,
+        title: creative.worldName,
         code: validated.code,
         userId: args.userId,
         isPublic: false,
         prompt: args.prompt,
-        gradeLevel: args.gradeLevel || String(interpreter.result.gradeLevel),
-        subject: args.subject || interpreter.result.subject,
+        gradeLevel: args.gradeLevel || String(state.interpreter.gradeLevel),
+        subject: args.subject || state.interpreter.subject,
         status: "published",
-        qualityScore: quality.result.overallScore,
+        qualityScore: quality.overallScore,
         validationMetadata: {
           validatorSuccess: validated.success,
           validatorIterations: validated.iterations ?? 0,
@@ -313,37 +380,24 @@ export const generateWorldV2 = action({
         },
       });
 
-      // Mark session as complete (with step timings for debug)
+      // Session als fertig markieren
       await ctx.runMutation(internal.pipeline.status.completeSession, {
         sessionId: args.sessionId,
         worldId,
         stepTimings,
       });
 
-      return {
-        worldId,
-        code: validated.code,
-        worldName: creative.result.worldName,
-        duration: Date.now() - startTime,
-        qualityScore: quality.result.overallScore,
-      };
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : "Unknown pipeline error";
       const errorCode = errorMsg.match(/^(E_[A-Z0-9_]+):/)?.[1];
-      console.error("Pipeline V2 failed:", errorMsg);
-
+      console.error("Pipeline Phase 2 failed:", errorMsg);
       try {
         await ctx.runMutation(internal.pipeline.status.failSession, {
           sessionId: args.sessionId,
           error: errorMsg,
           errorCode,
-          stepTimings,
         });
-      } catch {
-        // Ignore session update failure
-      }
-
-      throw new Error(`Pipeline V2 Error: ${errorMsg}`);
+      } catch { /* ignore */ }
     }
   },
 });

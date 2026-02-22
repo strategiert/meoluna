@@ -1,6 +1,6 @@
 // ============================================================================
 // STEP 6: CONTENT ARCHITECT - Spiel-Challenges, Lösungen, Feedback, Hints
-// Model: Opus (pädagogisch) | Temp: 0.5 | Max: 8000
+// Model: Sonnet-4.6 (schnell) | Temp: 0.2 | Max: 8000
 // ============================================================================
 
 import { callAnthropicJson } from "../utils/anthropicClient";
@@ -160,12 +160,12 @@ WICHTIG: Korrigiere ALLE criticalErrors aus dem Quality-Gate!`;
 
   try {
     const { result, inputTokens, outputTokens } = await callAnthropicJson<ContentArchitectOutput>({
-      model: "claude-opus-4-6",
+      model: "claude-sonnet-4-6",
       systemPrompt: CONTENT_ARCHITECT_SYSTEM_PROMPT,
       userMessage,
       maxTokens: 8000,
       temperature: 0.2,
-      timeoutMs: 90000,
+      timeoutMs: 60000,
     }, 0);
 
     // Validate

@@ -42,6 +42,7 @@ import type * as pipeline_steps_validator from "../pipeline/steps/validator.js";
 import type * as pipeline_types from "../pipeline/types.js";
 import type * as pipeline_utils_anthropicClient from "../pipeline/utils/anthropicClient.js";
 import type * as pipeline_utils_falClient from "../pipeline/utils/falClient.js";
+import type * as pipeline_utils_geminiSvgClient from "../pipeline/utils/geminiSvgClient.js";
 import type * as pipeline_utils_validation from "../pipeline/utils/validation.js";
 import type * as progress from "../progress.js";
 import type * as seed from "../seed.js";
@@ -91,6 +92,7 @@ declare const fullApi: ApiFromModules<{
   "pipeline/types": typeof pipeline_types;
   "pipeline/utils/anthropicClient": typeof pipeline_utils_anthropicClient;
   "pipeline/utils/falClient": typeof pipeline_utils_falClient;
+  "pipeline/utils/geminiSvgClient": typeof pipeline_utils_geminiSvgClient;
   "pipeline/utils/validation": typeof pipeline_utils_validation;
   progress: typeof progress;
   seed: typeof seed;

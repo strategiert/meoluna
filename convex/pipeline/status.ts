@@ -3,7 +3,7 @@
 // ============================================================================
 
 import { v } from "convex/values";
-import { query, internalMutation } from "../_generated/server";
+import { query, internalMutation, internalQuery } from "../_generated/server";
 
 // --- Queries ---
 
@@ -130,6 +130,35 @@ export const completeSession = internalMutation({
         completedAt: Date.now(),
       });
     }
+  },
+});
+
+// --- Pipeline State (für Phasen-Verkettung) ---
+
+export const savePipelineState = internalMutation({
+  args: {
+    sessionId: v.string(),
+    pipelineState: v.any(),
+  },
+  handler: async (ctx, args) => {
+    const session = await ctx.db
+      .query("generationSessions")
+      .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
+      .first();
+    if (session) {
+      await ctx.db.patch(session._id, { pipelineState: args.pipelineState });
+    }
+  },
+});
+
+export const loadPipelineState = internalQuery({
+  args: { sessionId: v.string() },
+  handler: async (ctx, args) => {
+    const session = await ctx.db
+      .query("generationSessions")
+      .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
+      .first();
+    return session?.pipelineState ?? null;
   },
 });
 

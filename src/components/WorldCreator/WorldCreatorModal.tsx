@@ -4,7 +4,7 @@
  * So einfach, dass Erstklässler es verstehen
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useAction } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
@@ -54,9 +54,16 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
   // Custom input state
   const [customPrompt, setCustomPrompt] = useState('');
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  // Async pipeline session tracking
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+  const messageIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Convex Queries
   const subjects = useQuery(api.curriculum.getSubjects) as Subject[] | undefined;
+  const pipelineSession = useQuery(
+    api.pipeline.status.getSession,
+    activeSessionId ? { sessionId: activeSessionId } : "skip"
+  );
 
   const topics = useQuery(
     api.curriculum.getTopics,
@@ -72,8 +79,29 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
   const generateWorldV2 = useAction(api.pipeline.orchestrator.generateWorldV2);
   const extractTextFromPDF = useAction(api.documents.extractTextFromPDF);
 
+  // Watch pipeline session for completion/failure
+  useEffect(() => {
+    if (!pipelineSession) return;
+    if (pipelineSession.status === "completed" && pipelineSession.worldId) {
+      if (messageIntervalRef.current) clearInterval(messageIntervalRef.current);
+      messageIntervalRef.current = null;
+      setActiveSessionId(null);
+      handleClose(false);
+      navigate(`/w/${pipelineSession.worldId}`);
+    } else if (pipelineSession.status === "failed") {
+      if (messageIntervalRef.current) clearInterval(messageIntervalRef.current);
+      messageIntervalRef.current = null;
+      setActiveSessionId(null);
+      setError(pipelineSession.error || "Unbekannter Fehler bei der Generierung");
+      setStep('topic');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pipelineSession?.status, pipelineSession?.worldId]);
+
   // Reset modal state
   const resetState = useCallback(() => {
+    if (messageIntervalRef.current) clearInterval(messageIntervalRef.current);
+    messageIntervalRef.current = null;
     setStep('subject');
     setSelectedSubject(null);
     setSelectedGrade(null);
@@ -82,6 +110,7 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
     setGeneratingMessage(0);
     setCustomPrompt('');
     setUploadedFiles([]);
+    setActiveSessionId(null);
   }, []);
 
   // Handle close
@@ -164,7 +193,7 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
     setError(null);
 
     // Progress animation
-    const messageInterval = setInterval(() => {
+    messageIntervalRef.current = setInterval(() => {
       setGeneratingMessage((prev) => (prev + 1) % generatingMessages.length);
     }, 2000);
 
@@ -216,8 +245,10 @@ Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
         : undefined;
 
       const sessionId = `creator_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      setActiveSessionId(sessionId);
 
-      const result = await generateWorldV2({
+      // Startet Pipeline asynchron — gibt sofort zurück
+      await generateWorldV2({
         prompt,
         pdfText: pdfText || undefined,
         imageDescription,
@@ -227,13 +258,12 @@ Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
         sessionId,
       });
 
-      clearInterval(messageInterval);
-      handleClose(false);
-
-      // Navigate to the new world
-      navigate(`/w/${result.worldId}`);
+      // Pipeline läuft im Hintergrund weiter.
+      // Navigation passiert im useEffect wenn session.status === "completed"
     } catch (err) {
-      clearInterval(messageInterval);
+      if (messageIntervalRef.current) clearInterval(messageIntervalRef.current);
+      messageIntervalRef.current = null;
+      setActiveSessionId(null);
       setError(
         err instanceof Error ? err.message : 'Da ist etwas schiefgelaufen'
       );

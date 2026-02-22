@@ -31,6 +31,7 @@ import NotFound from '@/pages/NotFound';
 import BackgroundsDemo from '@/pages/demo/Backgrounds';
 import SandboxLab from '@/pages/demo/SandboxLab';
 import WorldsAdmin from '@/pages/admin/WorldsAdmin';
+import DebugPage from '@/pages/admin/DebugPage';
 
 export default function App() {
   useUserSync();
@@ -65,6 +66,7 @@ export default function App() {
         <Route path="/demo/sandbox" element={<SandboxLab />} />
         {/* Admin */}
         <Route path="/admin/worlds" element={<WorldsAdmin />} />
+        <Route path="/admin/debug" element={<DebugPage />} />
         {/* Fallback */}
         <Route path="*" element={<NotFound />} />
       </Routes>
