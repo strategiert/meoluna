@@ -24,6 +24,7 @@ Erfinde jetzt ein Universum, das noch NIEMAND für dieses Thema verwendet hat.`;
     userMessage,
     maxTokens: 4000,
     temperature: 1.0,
+    timeoutMs: 180000,
   });
 
   // Validate

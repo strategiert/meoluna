@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -244,6 +245,7 @@ Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-[95vw] sm:max-w-[500px] max-h-[90vh] p-0 gap-0 overflow-y-auto">
         <DialogTitle className="sr-only">Neue Lernwelt erstellen</DialogTitle>
+        <DialogDescription className="sr-only">Erstelle eine neue interaktive Lernwelt in wenigen Schritten.</DialogDescription>
 
         {/* Progress Indicator */}
         <div className="flex items-center gap-2 p-4 border-b bg-secondary/30">
