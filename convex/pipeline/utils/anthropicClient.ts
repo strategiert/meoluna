@@ -3,7 +3,7 @@
 // ============================================================================
 
 export interface AnthropicCallOptions {
-  model: "claude-sonnet-4-20250514" | "claude-opus-4-20250514";
+  model: "claude-sonnet-4-6" | "claude-opus-4-6";
   systemPrompt: string;
   userMessage: string;
   maxTokens: number;

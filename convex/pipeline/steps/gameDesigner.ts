@@ -23,7 +23,7 @@ Erfinde jetzt 10-15 Module mit JEWEILS einzigartigen Spielmechaniken.
 Jedes Modul muss sich wie ein eigenständiges Mini-Spiel anfühlen.`;
 
   const { result, inputTokens, outputTokens } = await callAnthropicJson<GameDesignerOutput>({
-    model: "claude-opus-4-20250514",
+    model: "claude-opus-4-6",
     systemPrompt: GAME_DESIGNER_SYSTEM_PROMPT,
     userMessage,
     maxTokens: 6000,

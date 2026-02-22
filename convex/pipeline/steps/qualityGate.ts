@@ -62,7 +62,7 @@ FUER PERFORMANCE: Kurz und praezise bleiben.`;
 
   try {
     const { result, inputTokens, outputTokens } = await callAnthropicJson<QualityGateOutput>({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       systemPrompt: QUALITY_GATE_SYSTEM_PROMPT,
       userMessage,
       maxTokens: 3000,

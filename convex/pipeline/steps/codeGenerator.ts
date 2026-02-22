@@ -284,7 +284,7 @@ Generiere jetzt das WorldData-JSON. Gib NUR das JSON zurück, kein Markdown, kei
 
   try {
     const response = await callAnthropic({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       systemPrompt: CODE_GENERATOR_SYSTEM_PROMPT,
       userMessage,
       maxTokens: 10000,

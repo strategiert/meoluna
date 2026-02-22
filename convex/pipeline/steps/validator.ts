@@ -56,7 +56,7 @@ Repariere den Code und gib NUR den reparierten Code zurück.`;
 
       try {
         const response = await callAnthropic({
-          model: "claude-sonnet-4-20250514",
+          model: "claude-sonnet-4-6",
           systemPrompt: AUTO_FIX_SYSTEM_PROMPT,
           userMessage,
           maxTokens: 64000,
