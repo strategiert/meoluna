@@ -114,6 +114,10 @@ function buildFallbackContent(
   };
 }
 
+// Legacy fallback path intentionally retained for potential future opt-in mode.
+// Strict mode does not call it, but keeping the symbol referenced avoids TS6133.
+void buildFallbackContent;
+
 export async function runContentArchitect(
   interpreted: InterpreterOutput,
   concept: CreativeDirectorOutput,
@@ -175,11 +179,7 @@ WICHTIG: Korrigiere ALLE criticalErrors aus dem Quality-Gate!`;
     return { result, inputTokens, outputTokens };
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
-    console.warn(`[ContentArchitect] Fallback aktiviert: ${msg}`);
-    return {
-      result: buildFallbackContent(interpreted, concept, gameDesign),
-      inputTokens: 0,
-      outputTokens: 0,
-    };
+    console.error(`[ContentArchitect] Strict mode: aborting instead of fallback: ${msg}`);
+    throw error;
   }
 }

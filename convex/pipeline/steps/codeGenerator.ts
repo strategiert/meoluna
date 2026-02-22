@@ -240,6 +240,9 @@ function buildFallbackWorldData(
   };
 }
 
+// Legacy fallback path intentionally retained for potential future opt-in mode.
+void buildFallbackWorldData;
+
 export async function runCodeGenerator(
   concept: CreativeDirectorOutput,
   gameDesign: GameDesignerOutput,
@@ -294,8 +297,8 @@ Generiere jetzt das WorldData-JSON. Gib NUR das JSON zurück, kein Markdown, kei
     validateWorldData(worldData);
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
-    console.warn(`[CodeGenerator] Fallback aktiviert: ${msg}`);
-    worldData = buildFallbackWorldData(concept, gameDesign, content);
+    console.error(`[CodeGenerator] Strict mode: aborting instead of fallback: ${msg}`);
+    throw error;
   }
 
   // Gemini-Asset-Pool fuer deterministic Skeleton einhaengen

@@ -34,6 +34,9 @@ function buildFallbackQualityGate(): QualityGateOutput {
   };
 }
 
+// Legacy fallback path intentionally retained for potential future opt-in mode.
+void buildFallbackQualityGate;
+
 export async function runQualityGate(
   interpreted: InterpreterOutput,
   concept: CreativeDirectorOutput,
@@ -70,12 +73,8 @@ FUER PERFORMANCE: Kurz und praezise bleiben.`;
     return { result, inputTokens, outputTokens };
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
-    console.warn(`[QualityGate] Fallback aktiviert: ${msg}`);
-    return {
-      result: buildFallbackQualityGate(),
-      inputTokens: 0,
-      outputTokens: 0,
-    };
+    console.error(`[QualityGate] Strict mode: aborting instead of fallback: ${msg}`);
+    throw error;
   }
 }
 

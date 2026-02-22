@@ -140,15 +140,16 @@ export const generateWorldV2 = action({
         outputTokens: assetPlan.outputTokens,
       };
 
-      // ── STEP 5: ASSET GENERATION (parallel, fal.ai) ─────────────
+      // ── STEP 5: ASSET GENERATION (strict, Gemini SVG) ───────────
       await setStatus(4);
       const step5Start = Date.now();
-      let assetManifest: AssetManifest = {};
-      try {
-        assetManifest = await runAssetGenerator(assetPlan.result, ctx.storage);
-      } catch (e) {
-        console.error("Asset generation failed, continuing with SVG fallbacks:", e);
-      }
+      const assetManifest: AssetManifest = await (async () => {
+        try {
+          return await runAssetGenerator(assetPlan.result, ctx.storage);
+        } catch (error) {
+          throw withStepError(error, "E_ASSET_GENERATION", "E_ASSET_GENERATION");
+        }
+      })();
       stepTimings.asset_generation = {
         durationMs: Date.now() - step5Start,
       };
