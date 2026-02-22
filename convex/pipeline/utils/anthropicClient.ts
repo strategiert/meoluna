@@ -184,23 +184,23 @@ export async function callAnthropicJson<T>(
   let lastStopReason: string | undefined;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    const message = attempt === 0
-      ? options.userMessage
-      : `${options.userMessage}\n\n` +
-        `WICHTIG FORMATREGELN:\n` +
-        `- Antworte NUR mit validem JSON.\n` +
-        `- Starte direkt mit { und ende mit }.\n` +
-        `- Keine Markdown-Codefences, keine Kommentare, keine Erklärungen.\n` +
-        `- Verwende ausschließlich doppelte Anführungszeichen für Strings.`;
-
-    const response = await callAnthropic({
-      ...options,
-      userMessage: message,
-      maxTokens: currentMaxTokens,
-    });
-    lastStopReason = response.stopReason;
-
     try {
+      const message = attempt === 0
+        ? options.userMessage
+        : `${options.userMessage}\n\n` +
+          `WICHTIG FORMATREGELN:\n` +
+          `- Antworte NUR mit validem JSON.\n` +
+          `- Starte direkt mit { und ende mit }.\n` +
+          `- Keine Markdown-Codefences, keine Kommentare, keine Erklärungen.\n` +
+          `- Verwende ausschließlich doppelte Anführungszeichen für Strings.`;
+
+      const response = await callAnthropic({
+        ...options,
+        userMessage: message,
+        maxTokens: currentMaxTokens,
+      });
+      lastStopReason = response.stopReason;
+
       const result = parseJsonResponse<T>(response.text);
       return {
         result,
@@ -209,18 +209,21 @@ export async function callAnthropicJson<T>(
       };
     } catch (e) {
       const baseError = e instanceof Error ? e : new Error(String(e));
-      const stopReasonSuffix = response.stopReason
-        ? ` (stop_reason=${response.stopReason}, max_tokens=${currentMaxTokens})`
+      const isTimeout = baseError.message.includes("timeout");
+      const isApiError = baseError.message.includes("Anthropic API Error");
+      const stopReasonSuffix = lastStopReason
+        ? ` (stop_reason=${lastStopReason}, max_tokens=${currentMaxTokens})`
         : "";
-      lastError = new Error(`${baseError.message}${stopReasonSuffix}`);
+      lastError = new Error(`${baseError.message}${isTimeout || isApiError ? "" : stopReasonSuffix}`);
 
-      if (response.stopReason === "max_tokens") {
+      if (lastStopReason === "max_tokens") {
         currentMaxTokens = Math.min(Math.ceil(currentMaxTokens * 1.5), 24000);
       }
 
       if (attempt < maxRetries) {
+        const reason = isTimeout ? "timeout" : isApiError ? "API error" : "parse error";
         console.warn(
-          `JSON parse attempt ${attempt + 1} failed, retrying...` +
+          `Attempt ${attempt + 1} failed (${reason}), retrying...` +
           ` (next max_tokens=${currentMaxTokens})`
         );
       }

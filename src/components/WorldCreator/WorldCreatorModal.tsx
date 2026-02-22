@@ -4,7 +4,7 @@
  * So einfach, dass Erstklässler es verstehen
  */
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useAction } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
@@ -43,14 +43,6 @@ interface WorldCreatorModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-// Progress-Nachrichten während der Generierung
-const generatingMessages = [
-  '🌙 Deine Lernwelt wird erschaffen...',
-  '✨ Die Sterne ordnen sich...',
-  '🎨 Farben werden gemischt...',
-  '📚 Wissen wird gesammelt...',
-  '🚀 Fast fertig...',
-];
 
 export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps) {
   const { user } = useUser();
@@ -61,14 +53,12 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
   const [selectedGrade, setSelectedGrade] = useState<number | null>(null);
   const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null);
-  const [generatingMessage, setGeneratingMessage] = useState(0);
   const [error, setError] = useState<string | null>(null);
   // Custom input state
   const [customPrompt, setCustomPrompt] = useState('');
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   // Async pipeline session tracking
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
-  const messageIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Convex Queries
   const subjects = useQuery(api.curriculum.getSubjects) as Subject[] | undefined;
@@ -95,14 +85,10 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
   useEffect(() => {
     if (!pipelineSession) return;
     if (pipelineSession.status === "completed" && pipelineSession.worldId) {
-      if (messageIntervalRef.current) clearInterval(messageIntervalRef.current);
-      messageIntervalRef.current = null;
       setActiveSessionId(null);
       handleClose(false);
       navigate(`/w/${pipelineSession.worldId}`);
     } else if (pipelineSession.status === "failed") {
-      if (messageIntervalRef.current) clearInterval(messageIntervalRef.current);
-      messageIntervalRef.current = null;
       setActiveSessionId(null);
       setError(pipelineSession.error || "Unbekannter Fehler bei der Generierung");
       setStep('topic');
@@ -112,14 +98,11 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
 
   // Reset modal state
   const resetState = useCallback(() => {
-    if (messageIntervalRef.current) clearInterval(messageIntervalRef.current);
-    messageIntervalRef.current = null;
     setStep('subject');
     setSelectedSubject(null);
     setSelectedGrade(null);
     setSelectedTopic(null);
     setError(null);
-    setGeneratingMessage(0);
     setCustomPrompt('');
     setUploadedFiles([]);
     setActiveSessionId(null);
@@ -204,11 +187,6 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
     setStep('generating');
     setError(null);
 
-    // Progress animation
-    messageIntervalRef.current = setInterval(() => {
-      setGeneratingMessage((prev) => (prev + 1) % generatingMessages.length);
-    }, 2000);
-
     try {
       // Generate prompt from selection or custom input
       let prompt: string;
@@ -273,8 +251,6 @@ Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
       // Pipeline läuft im Hintergrund weiter.
       // Navigation passiert im useEffect wenn session.status === "completed"
     } catch (err) {
-      if (messageIntervalRef.current) clearInterval(messageIntervalRef.current);
-      messageIntervalRef.current = null;
       setActiveSessionId(null);
       setError(
         err instanceof Error ? err.message : 'Da ist etwas schiefgelaufen'
@@ -432,20 +408,39 @@ Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
                     rotate: { duration: 20, repeat: Infinity, ease: 'linear' },
                     scale: { duration: 3, repeat: Infinity, ease: 'easeInOut' }
                   }}
-                  className="mb-8"
+                  className="mb-6"
                 >
-                  <Moon className="w-20 h-20 text-amber-200 drop-shadow-[0_0_30px_rgba(251,191,36,0.5)]" />
+                  <Moon className="w-16 h-16 text-amber-200 drop-shadow-[0_0_30px_rgba(251,191,36,0.5)]" />
                 </motion.div>
 
-                <motion.p
-                  key={generatingMessage}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="text-xl font-medium mb-4 text-white drop-shadow-lg"
-                >
-                  {generatingMessages[generatingMessage]}
-                </motion.p>
+                {/* Live Pipeline Status */}
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={pipelineSession?.stepLabel || 'starting'}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="text-lg font-medium mb-4 text-white drop-shadow-lg"
+                  >
+                    {pipelineSession?.stepLabel || 'Verbindung wird hergestellt...'}
+                  </motion.p>
+                </AnimatePresence>
+
+                {/* Step Progress Bar */}
+                <div className="w-full max-w-[280px] mb-4">
+                  <div className="flex justify-between text-xs text-white/50 mb-1.5">
+                    <span>Schritt {Math.min((pipelineSession?.currentStep ?? 0) + 1, 9)} von 9</span>
+                    <span>{Math.round(((pipelineSession?.currentStep ?? 0) / 9) * 100)}%</span>
+                  </div>
+                  <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                    <motion.div
+                      className="h-full bg-amber-400/80 rounded-full"
+                      initial={{ width: '0%' }}
+                      animate={{ width: `${Math.round(((pipelineSession?.currentStep ?? 0) / 9) * 100)}%` }}
+                      transition={{ duration: 0.5, ease: 'easeOut' }}
+                    />
+                  </div>
+                </div>
 
                 <div className="flex items-center gap-3 text-white/70 bg-black/30 px-4 py-2 rounded-full backdrop-blur-sm">
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -453,16 +448,6 @@ Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
                     {customPrompt ? customPrompt.slice(0, 30) + '...' : selectedTopic?.name} · Klasse {selectedGrade}
                   </span>
                 </div>
-
-                {/* Floating particles hint */}
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 2 }}
-                  className="mt-8 text-xs text-white/40"
-                >
-                  Beobachte die Magie im Hintergrund...
-                </motion.p>
               </div>
             </motion.div>
           )}
