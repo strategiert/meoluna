@@ -243,7 +243,7 @@ Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-[95vw] sm:max-w-[500px] max-h-[90vh] p-0 gap-0 overflow-y-auto">
+      <DialogContent className="left-0 top-0 translate-x-0 translate-y-0 w-full h-[100dvh] max-w-none rounded-none sm:left-[50%] sm:top-[50%] sm:translate-x-[-50%] sm:translate-y-[-50%] sm:max-w-[500px] sm:h-auto sm:max-h-[90vh] sm:rounded-lg p-0 gap-0 overflow-y-auto">
         <DialogTitle className="sr-only">Neue Lernwelt erstellen</DialogTitle>
         <DialogDescription className="sr-only">Erstelle eine neue interaktive Lernwelt in wenigen Schritten.</DialogDescription>
 
