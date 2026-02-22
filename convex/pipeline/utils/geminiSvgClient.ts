@@ -140,7 +140,9 @@ export async function generateSvgAsset(request: GeminiSvgRequest): Promise<Gemin
     `Bildidee: ${request.prompt}`,
     `Canvas: ${width}x${height}, mit viewBox="0 0 ${width} ${height}"`,
     "Stil: hochwertig, klar lesbar, 2D vector.",
-    "Optional: dezente SVG-Animation (SMIL oder CSS im <style>) ohne JavaScript.",
+    (request.category === "background" || request.category === "illustration")
+      ? "PFLICHT: Animierter SVG! Integriere CSS-@keyframes ODER SMIL-Animationen (z.B. sanft schwingende Elemente, pulsierende Lichter, fließende Partikel, Farbübergänge, Rotation). Mindestens 2 animierte Elemente. Kein JavaScript."
+      : "Empfohlen: Dezente SVG-Animation (SMIL oder CSS-@keyframes im <style>) ohne JavaScript.",
     "Keine externen Fonts, keine externen Bilder, keine Scripts, kein foreignObject.",
     "Transparenter Hintergrund, ausser der Prompt beschreibt explizit einen Hintergrund.",
   ].join("\n");
