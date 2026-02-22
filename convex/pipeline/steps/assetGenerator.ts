@@ -1,20 +1,14 @@
 // ============================================================================
 // STEP 5: ASSET GENERATION - Hybrid assets
-// - fal.ai for raster backgrounds
-// - Gemini 3.1 Pro for SVG vector assets (icon/illustration/character)
+// - Gemini Pro (3.x) for ALL visual assets as SVG (background/icon/illustration/character)
 // ============================================================================
 
-import { generateImage, downloadImage } from "../utils/falClient";
 import { generateSvgAsset } from "../utils/geminiSvgClient";
 import type { AssetPlannerOutput, AssetManifest } from "../types";
 
 interface StorageContext {
   store: (blob: Blob) => Promise<string>;
   getUrl: (id: string) => Promise<string | null>;
-}
-
-function isSvgAssetCategory(category: string): boolean {
-  return category === "icon" || category === "illustration" || category === "character";
 }
 
 async function persistManifestEntry(
@@ -75,8 +69,7 @@ export async function runAssetGenerator(
   );
 
   let svgCount = 0;
-  let rasterCount = 0;
-  let svgFallbackToRasterCount = 0;
+  let geminiFailedCount = 0;
 
   let cursor = 0;
   const workers = Array.from(
@@ -88,53 +81,17 @@ export async function runAssetGenerator(
         const asset = assetsToGenerate[next];
         const fullPrompt = `${asset.prompt}, ${assetPlan.styleBase}`;
 
-        // Vector assets (icon/illustration/character) via Gemini SVG
-        if (isSvgAssetCategory(asset.category)) {
-          const svgResult = await generateSvgAsset({
-            prompt: fullPrompt,
-            category: asset.category,
-            purpose: asset.purpose,
-            aspectRatio: asset.aspectRatio,
-            timeoutMs: 25000,
-          });
-
-          if (svgResult.svg) {
-            await persistManifestEntry(manifest, storage, {
-              assetId: asset.id,
-              category: asset.category,
-              purpose: asset.purpose,
-              blob: new Blob([svgResult.svg], { type: "image/svg+xml" }),
-            });
-            svgCount++;
-            continue;
-          }
-
-          console.warn(`[AssetGenerator] Gemini SVG failed for ${asset.id}, fallback to raster: ${svgResult.error}`);
-          svgFallbackToRasterCount++;
-        }
-
-        // Raster backgrounds (and SVG fallback) via fal.ai
-        const result = await generateImage({
+        const svgResult = await generateSvgAsset({
           prompt: fullPrompt,
+          category: asset.category,
+          purpose: asset.purpose,
           aspectRatio: asset.aspectRatio,
           timeoutMs: 25000,
         });
 
-        if (!result.url) {
-          // fal.ai failed — mark as null (Skeleton falls back to no image)
-          manifest[asset.id] = {
-            url: null,
-            storageId: null,
-            category: asset.category,
-            purpose: asset.purpose,
-          };
-          continue;
-        }
-
-        // Download and persist to Convex storage (fal.ai URLs are temporary)
-        const blob = await downloadImage(result.url);
-
-        if (!blob) {
+        if (!svgResult.svg) {
+          console.warn(`[AssetGenerator] Gemini SVG failed for ${asset.id}: ${svgResult.error}`);
+          geminiFailedCount++;
           manifest[asset.id] = {
             url: null,
             storageId: null,
@@ -148,9 +105,9 @@ export async function runAssetGenerator(
           assetId: asset.id,
           category: asset.category,
           purpose: asset.purpose,
-          blob,
+          blob: new Blob([svgResult.svg], { type: "image/svg+xml" }),
         });
-        rasterCount++;
+        svgCount++;
       }
     }
   );
@@ -169,7 +126,7 @@ export async function runAssetGenerator(
     JSON.stringify(byCategory)
   );
   console.log(
-    `[AssetGenerator] Quellen: svg=${svgCount}, raster=${rasterCount}, svgFallbackToRaster=${svgFallbackToRasterCount}`
+    `[AssetGenerator] Quellen: svg=${svgCount}, geminiFailed=${geminiFailedCount}`
   );
 
   return manifest;

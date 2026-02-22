@@ -18,7 +18,8 @@ export interface GeminiSvgResult {
   error?: string;
 }
 
-const DEFAULT_MODEL = "gemini-3.1-pro-preview";
+// API model id per Google Gemini API docs (marketing name may be referred to as "Gemini 3.1 Pro").
+const DEFAULT_MODEL = "gemini-3-pro-preview";
 
 function getCanvas(aspectRatio: AspectRatio): { width: number; height: number } {
   if (aspectRatio === "16:9") return { width: 1600, height: 900 };
@@ -182,4 +183,3 @@ export async function generateSvgAsset(request: GeminiSvgRequest): Promise<Gemin
     return { svg: null, error: msg };
   }
 }
-
