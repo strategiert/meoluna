@@ -82,6 +82,11 @@ export default function WorldView() {
   const [earnedXP, setEarnedXP] = useState(0);
   const [levelUp, setLevelUp] = useState(false);
   const [newLevel, setNewLevel] = useState(1);
+  const activeAudioRef = useRef<HTMLAudioElement | null>(null);
+  const activeAudioUrlRef = useRef<string | null>(null);
+  const ttsAbortRef = useRef<AbortController | null>(null);
+  const speakSeqRef = useRef(0);
+  const lastSpokenRef = useRef<{ text: string; ts: number }>({ text: '', ts: 0 });
 
   // Track previous level for level-up detection
   const prevLevelRef = useRef<number | null>(null);
@@ -118,34 +123,103 @@ export default function WorldView() {
     window.speechSynthesis.speak(utterance);
   }, []);
 
+  const stopSpeech = useCallback(() => {
+    speakSeqRef.current += 1;
+
+    if (ttsAbortRef.current) {
+      ttsAbortRef.current.abort();
+      ttsAbortRef.current = null;
+    }
+
+    if (activeAudioRef.current) {
+      try {
+        activeAudioRef.current.pause();
+        activeAudioRef.current.currentTime = 0;
+        activeAudioRef.current.src = '';
+      } catch {
+        // ignore
+      }
+      activeAudioRef.current = null;
+    }
+
+    if (activeAudioUrlRef.current) {
+      URL.revokeObjectURL(activeAudioUrlRef.current);
+      activeAudioUrlRef.current = null;
+    }
+
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+  }, []);
+
   // Voice: TTS via /api/speak — Fallback auf browser-native SpeechSynthesis
   const handleSpeak = useCallback(async (text: string) => {
     if (!voiceEnabled || !text) return;
     const safeText = text.trim().slice(0, 500);
     if (!safeText) return;
+    const now = Date.now();
+    if (
+      lastSpokenRef.current.text === safeText &&
+      now - lastSpokenRef.current.ts < 1200
+    ) {
+      return;
+    }
+    lastSpokenRef.current = { text: safeText, ts: now };
+
+    stopSpeech();
+    const seq = speakSeqRef.current;
+    const abortController = new AbortController();
+    ttsAbortRef.current = abortController;
 
     try {
       const res = await fetch('/api/speak', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: safeText }),
+        signal: abortController.signal,
       });
 
-      if (res.ok) {
+      if (res.ok && seq === speakSeqRef.current && voiceEnabled) {
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
         const audio = new Audio(url);
-        audio.onended = () => URL.revokeObjectURL(url);
-        audio.onerror = () => URL.revokeObjectURL(url);
+        activeAudioUrlRef.current = url;
+        activeAudioRef.current = audio;
+        audio.onended = () => {
+          if (activeAudioUrlRef.current === url) {
+            URL.revokeObjectURL(url);
+            activeAudioUrlRef.current = null;
+          } else {
+            URL.revokeObjectURL(url);
+          }
+          if (activeAudioRef.current === audio) activeAudioRef.current = null;
+        };
+        audio.onerror = () => {
+          if (activeAudioUrlRef.current === url) {
+            URL.revokeObjectURL(url);
+            activeAudioUrlRef.current = null;
+          } else {
+            URL.revokeObjectURL(url);
+          }
+          if (activeAudioRef.current === audio) activeAudioRef.current = null;
+        };
         await audio.play();
         return;
       }
     } catch (e) {
+      if (e instanceof DOMException && e.name === 'AbortError') {
+        return;
+      }
       console.warn('[Meoluna Voice] Server TTS error:', e);
+    } finally {
+      if (ttsAbortRef.current === abortController) {
+        ttsAbortRef.current = null;
+      }
     }
 
+    if (seq !== speakSeqRef.current || !voiceEnabled) return;
     speakWithBrowser(safeText);
-  }, [voiceEnabled, speakWithBrowser]);
+  }, [voiceEnabled, speakWithBrowser, stopSpeech]);
 
   // Handler für neue meoluna:progress Events
   const handleProgressEvent = useCallback(async (payload: MeolunaProgressPayload) => {
@@ -254,6 +328,14 @@ export default function WorldView() {
     window.addEventListener('message', handleWorldMessage);
     return () => window.removeEventListener('message', handleWorldMessage);
   }, [handleWorldMessage]);
+
+  useEffect(() => {
+    if (!voiceEnabled) stopSpeech();
+  }, [voiceEnabled, stopSpeech]);
+
+  useEffect(() => {
+    return () => stopSpeech();
+  }, [stopSpeech]);
 
   // Process queued messages when user becomes available
   useEffect(() => {

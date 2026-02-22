@@ -62,6 +62,71 @@ function validateWorldData(worldData: WorldData): void {
   }
 }
 
+function buildFallbackChallengeVariant(params: {
+  index: number;
+  moduleTitle: string;
+  conceptName: string;
+  answer: string;
+  sourceQuestion: string;
+  feedbackCorrect: string;
+  feedbackWrong: string;
+  hints: { level1: string; level2: string; level3: string };
+}) {
+  const { index, moduleTitle, conceptName, answer, sourceQuestion, feedbackCorrect, feedbackWrong, hints } = params;
+
+  if (index % 3 === 0) {
+    return {
+      type: "multiple-choice" as const,
+      question: normalizeText(sourceQuestion, `Was passt am besten zu ${moduleTitle}?`, 140),
+      options: [
+        answer,
+        `${conceptName} (unpassend in diesem Kontext)`,
+        `Nur eine Nebensache in ${moduleTitle}`,
+        `Keiner der Fachbegriffe`,
+      ].map((v) => normalizeText(v, "Option", 80)),
+      correct: 0,
+      xp: 10 + index,
+      feedbackCorrect: normalizeText(feedbackCorrect, "Richtig! Gute Wahl.", 120),
+      feedbackWrong: normalizeText(feedbackWrong, "Nicht ganz. Lies die Aufgabe nochmal.", 120),
+      hints,
+    };
+  }
+
+  if (index % 3 === 1) {
+    const a = normalizeText(answer, "Kernbegriff", 40);
+    const b = normalizeText(moduleTitle, "Modul", 40);
+    const c = normalizeText(conceptName, "Lernwelt", 40);
+    const correctOrder = [a, b, c];
+    return {
+      type: "sorting" as const,
+      instruction: `Bringe die Begriffe in die Reihenfolge: Kernbegriff → Modul → Lernwelt`,
+      items: [b, c, a],
+      correct: correctOrder,
+      xp: 12 + index,
+      feedbackCorrect: "Starke Reihenfolge! Du hast die Begriffe richtig sortiert.",
+      feedbackWrong: "Die Reihenfolge passt noch nicht. Versuche es erneut.",
+      hints,
+    };
+  }
+
+  const leftA = normalizeText(answer, "Begriff A", 36);
+  const leftB = normalizeText(moduleTitle, "Begriff B", 36);
+  const leftC = normalizeText(conceptName, "Begriff C", 36);
+  return {
+    type: "matching" as const,
+    instruction: `Ordne Begriffe und Beschreibungen zu`,
+    pairs: [
+      { left: leftA, right: "Zentraler Fachbegriff" },
+      { left: leftB, right: "Aktuelles Lernmodul" },
+      { left: leftC, right: "Name der Lernwelt" },
+    ],
+    xp: 13 + index,
+    feedbackCorrect: "Alle Zuordnungen korrekt!",
+    feedbackWrong: "Mindestens eine Zuordnung stimmt noch nicht.",
+    hints,
+  };
+}
+
 function buildFallbackWorldData(
   concept: CreativeDirectorOutput,
   gameDesign: GameDesignerOutput,
@@ -94,24 +159,26 @@ function buildFallbackWorldData(
           ? String(source.correctAnswer)
           : normalizeText(source?.correctAnswer, fallbackAnswer, 40);
 
-      return {
-        type: "fill-blank" as const,
-        questionBefore: normalizeText(
+      const hints = {
+        level1: normalizeText(source?.hints?.level1, `Denk an das Thema ${moduleTitle}.`, 120),
+        level2: normalizeText(source?.hints?.level2, "Suche den zentralen Fachbegriff.", 120),
+        level3: normalizeText(source?.hints?.level3, `Ein passender Begriff ist ${answer}.`, 120),
+      };
+
+      return buildFallbackChallengeVariant({
+        index: j,
+        moduleTitle,
+        conceptName: concept.worldName,
+        answer,
+        sourceQuestion: normalizeText(
           source?.challengeText,
           `Nenne einen wichtigen Begriff aus ${moduleTitle}:`,
           140
         ),
-        questionAfter: "",
-        answer,
-        xp: 10 + j,
         feedbackCorrect: normalizeText(source?.feedbackCorrect, "Richtig! Gute Arbeit.", 120),
         feedbackWrong: normalizeText(source?.feedbackWrong, "Noch nicht ganz. Versuch es erneut.", 120),
-        hints: {
-          level1: normalizeText(source?.hints?.level1, `Denk an das Thema ${moduleTitle}.`, 120),
-          level2: normalizeText(source?.hints?.level2, "Suche den zentralen Fachbegriff.", 120),
-          level3: normalizeText(source?.hints?.level3, `Ein passender Begriff ist ${answer}.`, 120),
-        },
-      };
+        hints,
+      });
     });
 
     return {
