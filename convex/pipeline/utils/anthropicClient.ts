@@ -29,7 +29,7 @@ export async function callAnthropic(options: AnthropicCallOptions): Promise<Anth
     throw new Error("ANTHROPIC_API_KEY nicht konfiguriert");
   }
 
-  const timeoutMs = options.timeoutMs ?? 120000;
+  const timeoutMs = options.timeoutMs ?? 540000;
   const controller = new AbortController();
   const timeoutHandle = setTimeout(() => controller.abort(), timeoutMs);
 
