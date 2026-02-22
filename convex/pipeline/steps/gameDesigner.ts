@@ -28,7 +28,7 @@ Jedes Modul muss sich wie ein eigenständiges Mini-Spiel anfühlen.`;
     userMessage,
     maxTokens: 6000,
     temperature: 0.9,
-    timeoutMs: 90000,
+    timeoutMs: 60000,
   });
 
   // Validate
