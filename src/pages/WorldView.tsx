@@ -30,13 +30,19 @@ interface MeolunaProgressPayload {
   };
 }
 
+// Convex IDs are base62-ish strings, never "undefined"/"null"/empty
+function isValidConvexId(id: string | undefined): id is string {
+  return !!id && id.length > 10 && id !== 'undefined' && id !== 'null';
+}
+
 export default function WorldView() {
   const { worldId } = useParams<{ worldId: string }>();
   const { user } = useUser();
-  const world = useQuery(api.worlds.get, worldId ? { id: worldId as Id<"worlds"> } : 'skip');
+  const validId = isValidConvexId(worldId);
+  const world = useQuery(api.worlds.get, validId ? { id: worldId as Id<"worlds"> } : 'skip');
   const progress = useQuery(
     api.progress.getByWorld,
-    user?.id && worldId ? { userId: user.id, worldId: worldId as Id<"worlds"> } : 'skip'
+    user?.id && validId ? { userId: user.id, worldId: worldId as Id<"worlds"> } : 'skip'
   );
   // userStats für Level-Up Detection
   const userStats = useQuery(api.progress.getUserStats, user?.id ? { userId: user.id } : 'skip');
@@ -371,18 +377,7 @@ export default function WorldView() {
   // Code to render (either fixed code or original)
   const codeToRender = currentCode || world?.code;
 
-  if (world === undefined) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <div className="container mx-auto px-4 pt-24 pb-8">
-          <Skeleton className="h-[600px] w-full rounded-xl" />
-        </div>
-      </div>
-    );
-  }
-
-  if (world === null) {
+  if (!validId || world === null) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
@@ -397,6 +392,17 @@ export default function WorldView() {
               <Button>Andere Welten entdecken</Button>
             </Link>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (world === undefined) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="container mx-auto px-4 pt-24 pb-8">
+          <Skeleton className="h-[600px] w-full rounded-xl" />
         </div>
       </div>
     );

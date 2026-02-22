@@ -57,7 +57,7 @@ export function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="mt-6 text-lg text-white/60 max-w-2xl"
+            className="mt-6 text-lg text-white/80 max-w-2xl"
           >
             Erschaffe magische Lernwelten mit KI. Verwandle Klassenarbeiten und
             Lernmaterialien in interaktive, spielerische Erlebnisse für deine
@@ -104,17 +104,17 @@ export function HeroSection() {
           >
             <div className="text-center">
               <div className="text-3xl md:text-4xl font-bold text-moon">∞</div>
-              <div className="mt-1 text-sm text-white/50">Lernwelten</div>
+              <div className="mt-1 text-sm text-white/70">Lernwelten</div>
             </div>
             <div className="text-center">
               <div className="text-3xl md:text-4xl font-bold text-moon">KI</div>
-              <div className="mt-1 text-sm text-white/50">Generiert</div>
+              <div className="mt-1 text-sm text-white/70">Generiert</div>
             </div>
             <div className="text-center">
               <div className="text-3xl md:text-4xl font-bold text-moon">
                 <Users className="w-8 h-8 md:w-10 md:h-10 mx-auto" />
               </div>
-              <div className="mt-1 text-sm text-white/50">Für Lehrer</div>
+              <div className="mt-1 text-sm text-white/70">Für Lehrer</div>
             </div>
           </motion.div>
         </div>

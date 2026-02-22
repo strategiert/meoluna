@@ -218,7 +218,7 @@ export default function Explore() {
                   className="group"
                 >
                   <Link to={`/w/${world._id}`}>
-                    <Card className="overflow-hidden border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5">
+                    <Card className="overflow-hidden bg-card border-border hover:border-primary/40 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5">
                       {/* Thumbnail */}
                       <div className="h-40 relative overflow-hidden bg-gradient-to-br from-moon/20 via-primary/10 to-aurora/20">
                         <div className="absolute inset-0 flex items-center justify-center">

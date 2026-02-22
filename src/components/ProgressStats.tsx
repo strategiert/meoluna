@@ -67,7 +67,7 @@ export function ProgressStats({ userId, variant = 'full', className = '' }: Prog
 
   if (variant === 'compact') {
     return (
-      <Card className={`bg-gradient-to-br from-card/80 to-card/60 border-moon/20 backdrop-blur-sm ${className}`}>
+      <Card className={`bg-card border-moon/30 backdrop-blur-sm ${className}`}>
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-3">
@@ -76,7 +76,7 @@ export function ProgressStats({ userId, variant = 'full', className = '' }: Prog
               </div>
               <div>
                 <p className="font-bold text-base">Level {stats.level}</p>
-                <p className="text-xs text-moon/70">{getLevelTitle(stats.level)}</p>
+                <p className="text-xs text-moon">{getLevelTitle(stats.level)}</p>
               </div>
             </div>
             <div className="text-right">

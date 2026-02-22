@@ -156,7 +156,7 @@ export default function Dashboard() {
                   placeholder="Welten durchsuchen..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 bg-card/80 border-border/30 focus:border-moon/40"
+                  className="pl-9 bg-card border-border focus:border-moon/50"
                 />
               </div>
               <div className="flex gap-2">
@@ -194,7 +194,7 @@ export default function Dashboard() {
           {!isLoaded || worlds === undefined ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, i) => (
-                <Card key={i} className="bg-card/80 border-border/30">
+                <Card key={i} className="bg-card border-border">
                   <CardHeader>
                     <Skeleton className="h-6 w-3/4" />
                     <Skeleton className="h-4 w-1/2" />
@@ -264,7 +264,7 @@ export default function Dashboard() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
                 >
-                  <Card className="group bg-card/80 border-border/30 hover:border-moon/40 transition-all duration-300 hover:shadow-lg hover:shadow-moon/10 backdrop-blur-sm">
+                  <Card className="group bg-card border-border hover:border-moon/40 transition-all duration-300 hover:shadow-lg hover:shadow-moon/10">
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div className="flex items-start gap-3">
@@ -296,7 +296,7 @@ export default function Dashboard() {
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <div className="h-28 bg-gradient-to-br from-moon/15 via-primary/10 to-aurora/15 rounded-lg flex items-center justify-center mb-4 group-hover:from-moon/25 group-hover:via-primary/15 group-hover:to-aurora/25 transition-colors border border-border/20">
+                      <div className="h-28 bg-gradient-to-br from-moon/15 via-primary/10 to-aurora/15 rounded-lg flex items-center justify-center mb-4 group-hover:from-moon/25 group-hover:via-primary/15 group-hover:to-aurora/25 transition-colors border border-border">
                         <MoonLogo size="lg" animate={false} className="opacity-30 group-hover:opacity-50 transition-opacity" />
                       </div>
                       <Link to={`/w/${world._id}`} className="block">
