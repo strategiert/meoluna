@@ -255,6 +255,11 @@ export default function WorldView() {
       return;
     }
 
+    if (data.type === 'meoluna:stop') {
+      stopSpeech();
+      return;
+    }
+
     // Queue progress messages if user not loaded yet
     if (!user?.id || !worldId) {
       if (data.type === 'meoluna:progress' || data.type === 'xp' || data.type === 'module' || data.type === 'complete') {
