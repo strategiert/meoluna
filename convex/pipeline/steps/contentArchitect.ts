@@ -165,7 +165,7 @@ WICHTIG: Korrigiere ALLE criticalErrors aus dem Quality-Gate!`;
       userMessage,
       maxTokens: 8000,
       temperature: 0.2,
-      timeoutMs: 60000,
+      timeoutMs: 120000,
     }, 0);
 
     // Validate

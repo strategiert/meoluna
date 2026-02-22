@@ -289,7 +289,7 @@ Generiere jetzt das WorldData-JSON. Gib NUR das JSON zurück, kein Markdown, kei
       userMessage,
       maxTokens: 10000,
       temperature: 0.2,
-      timeoutMs: 60000,
+      timeoutMs: 180000,
     });
     inputTokens = response.inputTokens;
     outputTokens = response.outputTokens;
