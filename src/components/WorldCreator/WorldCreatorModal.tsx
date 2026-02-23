@@ -4,15 +4,16 @@
  * So einfach, dass Erstklässler es verstehen
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery, useAction, useMutation } from 'convex/react';
+import { useQuery, useAction } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import { Id } from '../../../convex/_generated/dataModel';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -25,19 +26,23 @@ import { P5Background } from '@/components/landing/P5Background';
 
 type Step = 'subject' | 'grade' | 'topic' | 'generating';
 
+function getUserFriendlyError(error: string): string {
+  if (error.includes("timeout") || error.includes("Timeout"))
+    return "Die Generierung hat zu lange gedauert. Bitte versuche es erneut.";
+  if (error.includes("Asset") || error.includes("SVG") || error.includes("Gemini"))
+    return "Die Bildgenerierung ist fehlgeschlagen. Bitte versuche es erneut.";
+  if (error.includes("JSON parse") || error.includes("parse failed"))
+    return "Ein technischer Fehler ist aufgetreten. Bitte versuche es erneut.";
+  if (error.includes("Structural Gate"))
+    return "Der generierte Code erfüllt die Qualitätsanforderungen nicht. Bitte versuche es mit einem anderen Prompt.";
+  return "Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut.";
+}
+
 interface WorldCreatorModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-// Progress-Nachrichten während der Generierung
-const generatingMessages = [
-  '🌙 Deine Lernwelt wird erschaffen...',
-  '✨ Die Sterne ordnen sich...',
-  '🎨 Farben werden gemischt...',
-  '📚 Wissen wird gesammelt...',
-  '🚀 Fast fertig...',
-];
 
 export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps) {
   const { user } = useUser();
@@ -48,14 +53,19 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
   const [selectedGrade, setSelectedGrade] = useState<number | null>(null);
   const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null);
-  const [generatingMessage, setGeneratingMessage] = useState(0);
   const [error, setError] = useState<string | null>(null);
   // Custom input state
   const [customPrompt, setCustomPrompt] = useState('');
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  // Async pipeline session tracking
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
 
   // Convex Queries
   const subjects = useQuery(api.curriculum.getSubjects) as Subject[] | undefined;
+  const pipelineSession = useQuery(
+    api.pipeline.status.getSession,
+    activeSessionId ? { sessionId: activeSessionId } : "skip"
+  );
 
   const topics = useQuery(
     api.curriculum.getTopics,
@@ -68,11 +78,23 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
   ) as Topic[] | undefined;
 
   // Convex Actions & Mutations
-  const generateWorld = useAction(api.generate.generateWorld);
-  const generateWorldFromPDF = useAction(api.generate.generateWorldFromPDF);
+  const generateWorldV2 = useAction(api.pipeline.orchestrator.generateWorldV2);
   const extractTextFromPDF = useAction(api.documents.extractTextFromPDF);
-  // const generateUploadUrl = useMutation(api.storage.generateUploadUrl); // For future: persistent file storage
-  const saveWorld = useMutation(api.worlds.create);
+
+  // Watch pipeline session for completion/failure
+  useEffect(() => {
+    if (!pipelineSession) return;
+    if (pipelineSession.status === "completed" && pipelineSession.worldId) {
+      setActiveSessionId(null);
+      handleClose(false);
+      navigate(`/w/${pipelineSession.worldId}`);
+    } else if (pipelineSession.status === "failed") {
+      setActiveSessionId(null);
+      setError(pipelineSession.error || "Unbekannter Fehler bei der Generierung");
+      setStep('topic');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pipelineSession?.status, pipelineSession?.worldId]);
 
   // Reset modal state
   const resetState = useCallback(() => {
@@ -81,9 +103,9 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
     setSelectedGrade(null);
     setSelectedTopic(null);
     setError(null);
-    setGeneratingMessage(0);
     setCustomPrompt('');
     setUploadedFiles([]);
+    setActiveSessionId(null);
   }, []);
 
   // Handle close
@@ -165,15 +187,9 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
     setStep('generating');
     setError(null);
 
-    // Progress animation
-    const messageInterval = setInterval(() => {
-      setGeneratingMessage((prev) => (prev + 1) % generatingMessages.length);
-    }, 2000);
-
     try {
       // Generate prompt from selection or custom input
       let prompt: string;
-      let title: string;
 
       if (customPrompt.trim()) {
         // Custom prompt mode
@@ -182,11 +198,9 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
 Der Nutzer wünscht sich: "${customPrompt}"
 
 Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
-        title = customPrompt.slice(0, 50) + (customPrompt.length > 50 ? '...' : '');
       } else if (selectedTopic) {
         // Topic selection mode
         prompt = `Erstelle eine Lernwelt zum Thema "${selectedTopic.name}" für Klasse ${selectedGrade} im Fach ${selectedSubject.name}. Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
-        title = `${selectedTopic.name} - Klasse ${selectedGrade}`;
       } else {
         throw new Error('Kein Thema ausgewählt');
       }
@@ -213,37 +227,31 @@ Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
         }
       }
 
-      // Generate world - use PDF version if we have extracted text
-      let result;
-      if (pdfText) {
-        result = await generateWorldFromPDF({
-          prompt,
-          pdfText,
-          gradeLevel: String(selectedGrade),
-          subject: selectedSubject.slug,
-        });
-      } else {
-        result = await generateWorld({ prompt });
-      }
+      const imageFiles = uploadedFiles
+        .filter((f) => f.type === 'image')
+        .map((f) => f.file.name);
+      const imageDescription = imageFiles.length > 0
+        ? `Hochgeladene Bilder: ${imageFiles.join(', ')}`
+        : undefined;
 
-      // Save the world
-      const worldId = await saveWorld({
-        title,
+      const sessionId = `creator_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      setActiveSessionId(sessionId);
+
+      // Startet Pipeline asynchron — gibt sofort zurück
+      await generateWorldV2({
         prompt,
-        code: result.code,
-        userId: user.id,
+        pdfText: pdfText || undefined,
+        imageDescription,
         gradeLevel: String(selectedGrade),
         subject: selectedSubject.slug,
-        isPublic: false,
+        userId: user.id,
+        sessionId,
       });
 
-      clearInterval(messageInterval);
-      handleClose(false);
-
-      // Navigate to the new world
-      navigate(`/w/${worldId}`);
+      // Pipeline läuft im Hintergrund weiter.
+      // Navigation passiert im useEffect wenn session.status === "completed"
     } catch (err) {
-      clearInterval(messageInterval);
+      setActiveSessionId(null);
       setError(
         err instanceof Error ? err.message : 'Da ist etwas schiefgelaufen'
       );
@@ -253,11 +261,12 @@ Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-[95vw] sm:max-w-[500px] max-h-[90vh] p-0 gap-0 overflow-y-auto">
+      <DialogContent className="left-0 top-0 translate-x-0 translate-y-0 w-full h-[100dvh] max-w-none rounded-none sm:left-[50%] sm:top-[50%] sm:translate-x-[-50%] sm:translate-y-[-50%] sm:max-w-[500px] sm:h-auto sm:max-h-[90vh] sm:rounded-lg p-0 gap-0 overflow-y-auto">
         <DialogTitle className="sr-only">Neue Lernwelt erstellen</DialogTitle>
+        <DialogDescription className="sr-only">Erstelle eine neue interaktive Lernwelt in wenigen Schritten.</DialogDescription>
 
         {/* Progress Indicator */}
-        <div className="flex items-center gap-2 p-4 border-b bg-secondary/30">
+        <div className="relative flex items-center justify-center gap-2 p-4 border-b bg-secondary/30">
           {['subject', 'grade', 'topic'].map((s, i) => (
             <div key={s} className="flex items-center gap-2">
               <div
@@ -283,7 +292,7 @@ Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
               )}
             </div>
           ))}
-          <span className="ml-auto text-sm text-muted-foreground">
+          <span className="absolute right-4 text-sm text-muted-foreground">
             {step === 'subject' && 'Fach'}
             {step === 'grade' && 'Klasse'}
             {step === 'topic' && 'Thema'}
@@ -350,9 +359,17 @@ Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
               {/* Generate Button */}
               <div className="p-4 border-t bg-secondary/30">
                 {error && (
-                  <p className="text-sm text-destructive mb-3 text-center">
-                    {error}
-                  </p>
+                  <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 mb-3 text-center">
+                    <p className="text-sm text-destructive mb-3">{getUserFriendlyError(error)}</p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => { setError(null); handleGenerate(); }}
+                      className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                    >
+                      Erneut versuchen
+                    </Button>
+                  </div>
                 )}
                 <Button
                   onClick={handleGenerate}
@@ -391,20 +408,39 @@ Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
                     rotate: { duration: 20, repeat: Infinity, ease: 'linear' },
                     scale: { duration: 3, repeat: Infinity, ease: 'easeInOut' }
                   }}
-                  className="mb-8"
+                  className="mb-6"
                 >
-                  <Moon className="w-20 h-20 text-amber-200 drop-shadow-[0_0_30px_rgba(251,191,36,0.5)]" />
+                  <Moon className="w-16 h-16 text-amber-200 drop-shadow-[0_0_30px_rgba(251,191,36,0.5)]" />
                 </motion.div>
 
-                <motion.p
-                  key={generatingMessage}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="text-xl font-medium mb-4 text-white drop-shadow-lg"
-                >
-                  {generatingMessages[generatingMessage]}
-                </motion.p>
+                {/* Live Pipeline Status */}
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={pipelineSession?.stepLabel || 'starting'}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="text-lg font-medium mb-4 text-white drop-shadow-lg"
+                  >
+                    {pipelineSession?.stepLabel || 'Verbindung wird hergestellt...'}
+                  </motion.p>
+                </AnimatePresence>
+
+                {/* Step Progress Bar */}
+                <div className="w-full max-w-[280px] mb-4">
+                  <div className="flex justify-between text-xs text-white/50 mb-1.5">
+                    <span>Schritt {Math.min((pipelineSession?.currentStep ?? 0) + 1, 9)} von 9</span>
+                    <span>{Math.round(((pipelineSession?.currentStep ?? 0) / 9) * 100)}%</span>
+                  </div>
+                  <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
+                    <motion.div
+                      className="h-full bg-amber-400/80 rounded-full"
+                      initial={{ width: '0%' }}
+                      animate={{ width: `${Math.round(((pipelineSession?.currentStep ?? 0) / 9) * 100)}%` }}
+                      transition={{ duration: 0.5, ease: 'easeOut' }}
+                    />
+                  </div>
+                </div>
 
                 <div className="flex items-center gap-3 text-white/70 bg-black/30 px-4 py-2 rounded-full backdrop-blur-sm">
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -412,16 +448,6 @@ Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
                     {customPrompt ? customPrompt.slice(0, 30) + '...' : selectedTopic?.name} · Klasse {selectedGrade}
                   </span>
                 </div>
-
-                {/* Floating particles hint */}
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 2 }}
-                  className="mt-8 text-xs text-white/40"
-                >
-                  Beobachte die Magie im Hintergrund...
-                </motion.p>
               </div>
             </motion.div>
           )}

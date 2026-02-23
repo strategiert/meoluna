@@ -30,13 +30,19 @@ interface MeolunaProgressPayload {
   };
 }
 
+// Convex IDs are base62-ish strings, never "undefined"/"null"/empty
+function isValidConvexId(id: string | undefined): id is string {
+  return !!id && id.length > 10 && id !== 'undefined' && id !== 'null';
+}
+
 export default function WorldView() {
   const { worldId } = useParams<{ worldId: string }>();
   const { user } = useUser();
-  const world = useQuery(api.worlds.get, worldId ? { id: worldId as Id<"worlds"> } : 'skip');
+  const validId = isValidConvexId(worldId);
+  const world = useQuery(api.worlds.get, validId ? { id: worldId as Id<"worlds"> } : 'skip');
   const progress = useQuery(
     api.progress.getByWorld,
-    user?.id && worldId ? { userId: user.id, worldId: worldId as Id<"worlds"> } : 'skip'
+    user?.id && validId ? { userId: user.id, worldId: worldId as Id<"worlds"> } : 'skip'
   );
   // userStats für Level-Up Detection
   const userStats = useQuery(api.progress.getUserStats, user?.id ? { userId: user.id } : 'skip');
@@ -48,20 +54,19 @@ export default function WorldView() {
   const toggleLike = useMutation(api.worlds.toggleLike);
   
   const [currentCode, setCurrentCode] = useState<string | null>(null);
-  const [isFixing, setIsFixing] = useState(false);
   const [liked, setLiked] = useState(false);
   const [copied, setCopied] = useState(false);
+  const isFixingRef = useRef(false);
 
   // Voice Mode
   const [voiceEnabled, setVoiceEnabled] = useState(() =>
     localStorage.getItem('meoluna:voice') !== 'false'
   );
-  const audioCtxRef = useRef<AudioContext | null>(null);
-
   const toggleVoice = () => {
     setVoiceEnabled(v => {
-      localStorage.setItem('meoluna:voice', String(!v));
-      return !v;
+      const next = !v;
+      localStorage.setItem('meoluna:voice', String(next));
+      return next;
     });
   };
 
@@ -83,6 +88,11 @@ export default function WorldView() {
   const [earnedXP, setEarnedXP] = useState(0);
   const [levelUp, setLevelUp] = useState(false);
   const [newLevel, setNewLevel] = useState(1);
+  const activeAudioRef = useRef<HTMLAudioElement | null>(null);
+  const activeAudioUrlRef = useRef<string | null>(null);
+  const ttsAbortRef = useRef<AbortController | null>(null);
+  const speakSeqRef = useRef(0);
+  const lastSpokenRef = useRef<{ text: string; ts: number }>({ text: '', ts: 0 });
 
   // Track previous level for level-up detection
   const prevLevelRef = useRef<number | null>(null);
@@ -108,30 +118,114 @@ export default function WorldView() {
     setShowXPPopup(true);
   };
 
-  // Voice: TTS via /api/speak
+  const speakWithBrowser = useCallback((text: string) => {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'de-DE';
+    const voices = window.speechSynthesis.getVoices();
+    const germanVoice = voices.find((v) => v.lang.toLowerCase().startsWith('de'));
+    if (germanVoice) utterance.voice = germanVoice;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+  }, []);
+
+  const stopSpeech = useCallback(() => {
+    speakSeqRef.current += 1;
+
+    if (ttsAbortRef.current) {
+      ttsAbortRef.current.abort();
+      ttsAbortRef.current = null;
+    }
+
+    if (activeAudioRef.current) {
+      try {
+        activeAudioRef.current.pause();
+        activeAudioRef.current.currentTime = 0;
+        activeAudioRef.current.src = '';
+      } catch {
+        // ignore
+      }
+      activeAudioRef.current = null;
+    }
+
+    if (activeAudioUrlRef.current) {
+      URL.revokeObjectURL(activeAudioUrlRef.current);
+      activeAudioUrlRef.current = null;
+    }
+
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+  }, []);
+
+  // Voice: TTS via /api/speak — Fallback auf browser-native SpeechSynthesis
   const handleSpeak = useCallback(async (text: string) => {
     if (!voiceEnabled || !text) return;
+    const safeText = text.trim().slice(0, 500);
+    if (!safeText) return;
+    const now = Date.now();
+    if (
+      lastSpokenRef.current.text === safeText &&
+      now - lastSpokenRef.current.ts < 1200
+    ) {
+      return;
+    }
+    lastSpokenRef.current = { text: safeText, ts: now };
+
+    stopSpeech();
+    const seq = speakSeqRef.current;
+    const abortController = new AbortController();
+    ttsAbortRef.current = abortController;
+
     try {
       const res = await fetch('/api/speak', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text: safeText }),
+        signal: abortController.signal,
       });
-      if (!res.ok) return;
-      const buf = await res.arrayBuffer();
-      if (!audioCtxRef.current || audioCtxRef.current.state === 'closed') {
-        audioCtxRef.current = new AudioContext();
+
+      if (res.ok && seq === speakSeqRef.current && voiceEnabled) {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        activeAudioUrlRef.current = url;
+        activeAudioRef.current = audio;
+        audio.onended = () => {
+          if (activeAudioUrlRef.current === url) {
+            URL.revokeObjectURL(url);
+            activeAudioUrlRef.current = null;
+          } else {
+            URL.revokeObjectURL(url);
+          }
+          if (activeAudioRef.current === audio) activeAudioRef.current = null;
+        };
+        audio.onerror = () => {
+          if (activeAudioUrlRef.current === url) {
+            URL.revokeObjectURL(url);
+            activeAudioUrlRef.current = null;
+          } else {
+            URL.revokeObjectURL(url);
+          }
+          if (activeAudioRef.current === audio) activeAudioRef.current = null;
+        };
+        await audio.play();
+        return;
       }
-      const ctx = audioCtxRef.current;
-      const audio = await ctx.decodeAudioData(buf.slice(0));
-      const src = ctx.createBufferSource();
-      src.buffer = audio;
-      src.connect(ctx.destination);
-      src.start(0);
     } catch (e) {
-      console.warn('[Meoluna Voice] TTS error:', e);
+      if (e instanceof DOMException && e.name === 'AbortError') {
+        return;
+      }
+      console.warn('[Meoluna Voice] Server TTS error:', e);
+    } finally {
+      if (ttsAbortRef.current === abortController) {
+        ttsAbortRef.current = null;
+      }
     }
-  }, [voiceEnabled]);
+
+    if (seq !== speakSeqRef.current || !voiceEnabled) return;
+    speakWithBrowser(safeText);
+  }, [voiceEnabled, speakWithBrowser, stopSpeech]);
 
   // Handler für neue meoluna:progress Events
   const handleProgressEvent = useCallback(async (payload: MeolunaProgressPayload) => {
@@ -162,7 +256,17 @@ export default function WorldView() {
     const data = event.data;
     if (typeof data !== 'object' || !data.type) return;
 
-    // Queue messages if user not loaded yet
+    if (data.type === 'meoluna:speak' && typeof data.text === 'string') {
+      handleSpeak(data.text);
+      return;
+    }
+
+    if (data.type === 'meoluna:stop') {
+      stopSpeech();
+      return;
+    }
+
+    // Queue progress messages if user not loaded yet
     if (!user?.id || !worldId) {
       if (data.type === 'meoluna:progress' || data.type === 'xp' || data.type === 'module' || data.type === 'complete') {
         console.log('[Meoluna] Queuing message - user not ready:', data.type);
@@ -180,11 +284,6 @@ export default function WorldView() {
         if (payload.event && typeof payload.amount === 'number') {
           await handleProgressEvent(payload);
         }
-        return;
-      }
-
-      if (data.type === 'meoluna:speak' && typeof data.text === 'string') {
-        handleSpeak(data.text);
         return;
       }
 
@@ -241,6 +340,14 @@ export default function WorldView() {
     return () => window.removeEventListener('message', handleWorldMessage);
   }, [handleWorldMessage]);
 
+  useEffect(() => {
+    if (!voiceEnabled) stopSpeech();
+  }, [voiceEnabled, stopSpeech]);
+
+  useEffect(() => {
+    return () => stopSpeech();
+  }, [stopSpeech]);
+
   // Process queued messages when user becomes available
   useEffect(() => {
     if (user?.id && worldId && messageQueueRef.current.length > 0) {
@@ -251,9 +358,10 @@ export default function WorldView() {
     }
   }, [user?.id, worldId, handleWorldMessage]);
 
-  const handleAutoFix = async (error: string, failedCode: string) => {
-    if (isFixing) return;
-    setIsFixing(true);
+  const handleAutoFix = useCallback(async (error: string, failedCode: string) => {
+    if (isFixingRef.current) return;
+
+    isFixingRef.current = true;
     try {
       const result = await autoFixCode({ error, code: failedCode });
       if (result.fixedCode) {
@@ -262,25 +370,14 @@ export default function WorldView() {
     } catch (err) {
       console.error('Auto-fix failed:', err);
     } finally {
-      setIsFixing(false);
+      isFixingRef.current = false;
     }
-  };
+  }, [autoFixCode]);
 
   // Code to render (either fixed code or original)
   const codeToRender = currentCode || world?.code;
 
-  if (world === undefined) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <div className="container mx-auto px-4 pt-24 pb-8">
-          <Skeleton className="h-[600px] w-full rounded-xl" />
-        </div>
-      </div>
-    );
-  }
-
-  if (world === null) {
+  if (!validId || world === null) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
@@ -295,6 +392,17 @@ export default function WorldView() {
               <Button>Andere Welten entdecken</Button>
             </Link>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (world === undefined) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="container mx-auto px-4 pt-24 pb-8">
+          <Skeleton className="h-[600px] w-full rounded-xl" />
         </div>
       </div>
     );

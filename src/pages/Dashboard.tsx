@@ -79,9 +79,10 @@ export default function Dashboard() {
       <StarField />
 
       {/* Aurora effects */}
-      <div className="absolute inset-0 opacity-10 pointer-events-none">
+      <div className="absolute inset-0 opacity-15 pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-aurora blur-[150px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-accent blur-[120px]" />
+        <div className="absolute bottom-1/3 right-1/4 w-80 h-80 rounded-full bg-primary blur-[120px]" />
+        <div className="absolute top-1/2 right-1/3 w-64 h-64 rounded-full bg-moon blur-[100px] opacity-30" />
       </div>
 
       {/* Navigation */}
@@ -132,11 +133,12 @@ export default function Dashboard() {
                   Verwalte deine magischen Lernwelten
                 </p>
               </div>
-              <Button 
+              <Button
                 onClick={() => setShowCreator(true)}
-                className="gap-2 bg-gradient-to-r from-moon to-aurora hover:opacity-90 text-background font-medium"
+                size="lg"
+                className="w-full md:w-auto gap-2 bg-gradient-to-r from-moon to-aurora hover:opacity-90 text-background font-semibold shadow-lg shadow-moon/20"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-5 h-5" />
                 Neue Welt erstellen
               </Button>
             </div>
@@ -154,7 +156,7 @@ export default function Dashboard() {
                   placeholder="Welten durchsuchen..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9 bg-card/50 border-border/50"
+                  className="pl-9 bg-card border-border focus:border-moon/50"
                 />
               </div>
               <div className="flex gap-2">
@@ -162,7 +164,7 @@ export default function Dashboard() {
                   variant={filterPublic === null ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setFilterPublic(null)}
-                  className={filterPublic === null ? 'bg-moon/20 text-moon border-moon/30' : ''}
+                  className={filterPublic === null ? 'bg-moon/20 text-moon border-moon/40' : ''}
                 >
                   Alle
                 </Button>
@@ -170,7 +172,7 @@ export default function Dashboard() {
                   variant={filterPublic === true ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setFilterPublic(true)}
-                  className={filterPublic === true ? 'bg-moon/20 text-moon border-moon/30' : ''}
+                  className={filterPublic === true ? 'bg-moon/20 text-moon border-moon/40' : ''}
                 >
                   <Globe className="w-3 h-3 mr-1" />
                   Öffentlich
@@ -179,7 +181,7 @@ export default function Dashboard() {
                   variant={filterPublic === false ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setFilterPublic(false)}
-                  className={filterPublic === false ? 'bg-moon/20 text-moon border-moon/30' : ''}
+                  className={filterPublic === false ? 'bg-moon/20 text-moon border-moon/40' : ''}
                 >
                   <Lock className="w-3 h-3 mr-1" />
                   Privat
@@ -192,7 +194,7 @@ export default function Dashboard() {
           {!isLoaded || worlds === undefined ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, i) => (
-                <Card key={i} className="bg-card/50 border-border/50">
+                <Card key={i} className="bg-card border-border">
                   <CardHeader>
                     <Skeleton className="h-6 w-3/4" />
                     <Skeleton className="h-4 w-1/2" />
@@ -262,7 +264,7 @@ export default function Dashboard() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
                 >
-                  <Card className="group bg-card/50 border-border/50 hover:border-moon/30 transition-all duration-300 hover:shadow-lg hover:shadow-moon/5 backdrop-blur-sm">
+                  <Card className="group bg-card border-border hover:border-moon/40 transition-all duration-300 hover:shadow-lg hover:shadow-moon/10">
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div className="flex items-start gap-3">
@@ -294,7 +296,7 @@ export default function Dashboard() {
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <div className="h-28 bg-gradient-to-br from-moon/10 via-primary/10 to-aurora/10 rounded-lg flex items-center justify-center mb-4 group-hover:from-moon/20 group-hover:via-primary/20 group-hover:to-aurora/20 transition-colors">
+                      <div className="h-28 bg-gradient-to-br from-moon/15 via-primary/10 to-aurora/15 rounded-lg flex items-center justify-center mb-4 group-hover:from-moon/25 group-hover:via-primary/15 group-hover:to-aurora/25 transition-colors border border-border">
                         <MoonLogo size="lg" animate={false} className="opacity-30 group-hover:opacity-50 transition-opacity" />
                       </div>
                       <Link to={`/w/${world._id}`} className="block">

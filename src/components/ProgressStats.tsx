@@ -67,24 +67,29 @@ export function ProgressStats({ userId, variant = 'full', className = '' }: Prog
 
   if (variant === 'compact') {
     return (
-      <Card className={`bg-card/50 border-border/50 ${className}`}>
+      <Card className={`bg-card border-moon/30 backdrop-blur-sm ${className}`}>
         <CardContent className="p-4">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <div className={`p-2 rounded-lg bg-moon/10`}>
-                <Star className={`w-5 h-5 ${getLevelColor(stats.level)}`} />
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-gradient-to-br from-moon/20 to-aurora/10 border border-moon/20">
+                <Star className={`w-5 h-5 ${getLevelColor(stats.level)} fill-current`} />
               </div>
               <div>
-                <p className="font-semibold">Level {stats.level}</p>
-                <p className="text-xs text-muted-foreground">{getLevelTitle(stats.level)}</p>
+                <p className="font-bold text-base">Level {stats.level}</p>
+                <p className="text-xs text-moon">{getLevelTitle(stats.level)}</p>
               </div>
             </div>
             <div className="text-right">
-              <p className="font-bold text-moon">{stats.totalXP} XP</p>
+              <p className="font-bold text-lg text-moon">{stats.totalXP} XP</p>
             </div>
           </div>
-          <div className="space-y-1">
-            <Progress value={stats.levelProgress.progress} className="h-2" />
+          <div className="space-y-1.5">
+            <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-background/40">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-moon to-aurora transition-all"
+                style={{ width: `${stats.levelProgress.progress}%` }}
+              />
+            </div>
             <p className="text-xs text-muted-foreground text-right">
               {stats.levelProgress.current} / {stats.levelProgress.needed} XP zum nächsten Level
             </p>

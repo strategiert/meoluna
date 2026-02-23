@@ -2,7 +2,7 @@ import { v } from "convex/values";
 import { action } from "./_generated/server";
 
 // ============================================================================
-// PDF TEXT EXTRACTION ACTION
+// PDF TEXT EXTRACTION — via Claude API (kein PaddleOCR mehr nötig)
 // ============================================================================
 
 export const extractTextFromPDF = action({
@@ -11,80 +11,81 @@ export const extractTextFromPDF = action({
     fileName: v.string(),
   },
   handler: async (_ctx, args) => {
-    const PADDLEOCR_URL = process.env.PADDLEOCR_URL;
-
-    if (!PADDLEOCR_URL) {
-      throw new Error(
-        "PADDLEOCR_URL nicht konfiguriert. Bitte im Convex Dashboard unter Environment Variables setzen."
-      );
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      throw new Error("ANTHROPIC_API_KEY nicht konfiguriert.");
     }
 
-    // Call PaddleOCR service
-    const response = await fetch(`${PADDLEOCR_URL}/extract-base64`, {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+        "anthropic-beta": "pdfs-2024-09-25",
       },
       body: JSON.stringify({
-        pdf: args.pdfBase64,
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 4096,
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "document",
+                source: {
+                  type: "base64",
+                  media_type: "application/pdf",
+                  data: args.pdfBase64,
+                },
+              },
+              {
+                type: "text",
+                text: `Extrahiere den gesamten Inhalt aus diesem Dokument "${args.fileName}" als sauberes Markdown.
+
+Regeln:
+- Text vollständig übernehmen, Struktur (Überschriften, Listen, Tabellen) beibehalten
+- Bilder, Diagramme und Abbildungen beschreiben: "[Bild: kurze Beschreibung was zu sehen ist]"
+- Aufgaben, Lücken, Felder zum Ausfüllen als solche kennzeichnen: "[Aufgabe: ...]" oder "[Lücke]"
+- Keine Einleitung, kein Kommentar — nur der extrahierte Inhalt.`,
+              },
+            ],
+          },
+        ],
       }),
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`OCR service error (${response.status}): ${errorText}`);
+      const error = await response.text();
+      throw new Error(`Claude API Fehler (${response.status}): ${error}`);
     }
 
-    const result = await response.json();
+    const data = await response.json();
+    const text = data.content?.[0]?.text || "";
 
-    if (!result.success) {
-      throw new Error("OCR extraction failed");
+    if (!text) {
+      throw new Error("Kein Text aus PDF extrahiert.");
     }
 
     return {
-      text: result.markdown,
-      pages: result.pages,
+      text,
+      pages: 1, // Claude gibt keine Seitenzahl zurück
       fileName: args.fileName,
     };
   },
 });
 
 // ============================================================================
-// HEALTH CHECK FOR OCR SERVICE
+// HEALTH CHECK — prüft ob Claude API erreichbar ist
 // ============================================================================
 
 export const checkOCRService = action({
   args: {},
   handler: async () => {
-    const PADDLEOCR_URL = process.env.PADDLEOCR_URL;
-
-    if (!PADDLEOCR_URL) {
-      return {
-        available: false,
-        error: "PADDLEOCR_URL nicht konfiguriert",
-      };
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      return { available: false, error: "ANTHROPIC_API_KEY nicht konfiguriert" };
     }
-
-    try {
-      const response = await fetch(`${PADDLEOCR_URL}/health`, {
-        method: "GET",
-      });
-
-      if (!response.ok) {
-        return { available: false, error: `Status: ${response.status}` };
-      }
-
-      const data = await response.json();
-      return {
-        available: data.status === "ok",
-        language: data.language,
-        url: PADDLEOCR_URL,
-      };
-    } catch (error) {
-      return {
-        available: false,
-        error: error instanceof Error ? error.message : "Connection failed",
-      };
-    }
+    return { available: true, language: "Claude API", url: "https://api.anthropic.com" };
   },
 });

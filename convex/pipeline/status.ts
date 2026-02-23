@@ -3,7 +3,7 @@
 // ============================================================================
 
 import { v } from "convex/values";
-import { query, internalMutation } from "../_generated/server";
+import { query, internalMutation, internalQuery } from "../_generated/server";
 
 // --- Queries ---
 
@@ -25,6 +25,46 @@ export const getActiveSession = query({
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
       .filter((q) => q.eq(q.field("status"), "running"))
       .first();
+  },
+});
+
+// Letzte 5 fehlgeschlagenen Sessions (für CLI-Debug: npx convex run pipeline/status:listRecentFailed)
+export const listRecentFailed = query({
+  args: {},
+  handler: async (ctx) => {
+    const sessions = await ctx.db.query("generationSessions").order("desc").take(20);
+    return sessions.filter((s) => s.status === "failed").slice(0, 5).map((s) => ({
+      sessionId: s.sessionId,
+      error: s.error,
+      errorCode: s.errorCode,
+      startedAt: s.startedAt,
+      completedAt: s.completedAt,
+      durationMs: s.completedAt ? s.completedAt - s.startedAt : null,
+      stepTimings: s.stepOutputs,
+    }));
+  },
+});
+
+// Letzte 30 Sessions (für Debug-Page: /admin/debug)
+export const listAllRecent = query({
+  args: {},
+  handler: async (ctx) => {
+    const sessions = await ctx.db.query("generationSessions").order("desc").take(30);
+    return sessions.map((s) => ({
+      sessionId: s.sessionId,
+      userId: s.userId,
+      status: s.status,
+      currentStep: s.currentStep,
+      stepLabel: s.stepLabel,
+      error: s.error,
+      errorCode: s.errorCode,
+      startedAt: s.startedAt,
+      completedAt: s.completedAt,
+      durationMs: s.completedAt
+        ? s.completedAt - s.startedAt
+        : Date.now() - s.startedAt,
+      stepTimings: s.stepOutputs,
+    }));
   },
 });
 
@@ -59,7 +99,7 @@ export const updateSession = internalMutation({
       .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
       .first();
 
-    if (session) {
+    if (session && args.currentStep >= (session.currentStep ?? 0)) {
       await ctx.db.patch(session._id, {
         currentStep: args.currentStep,
         stepLabel: args.stepLabel,
@@ -72,6 +112,7 @@ export const completeSession = internalMutation({
   args: {
     sessionId: v.string(),
     worldId: v.optional(v.id("worlds")),
+    stepTimings: v.optional(v.any()),
   },
   handler: async (ctx, args) => {
     const session = await ctx.db
@@ -85,9 +126,39 @@ export const completeSession = internalMutation({
         currentStep: 9,
         stepLabel: "Fertig! Deine Spielwelt ist bereit!",
         worldId: args.worldId,
+        stepOutputs: args.stepTimings,
         completedAt: Date.now(),
       });
     }
+  },
+});
+
+// --- Pipeline State (für Phasen-Verkettung) ---
+
+export const savePipelineState = internalMutation({
+  args: {
+    sessionId: v.string(),
+    pipelineState: v.any(),
+  },
+  handler: async (ctx, args) => {
+    const session = await ctx.db
+      .query("generationSessions")
+      .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
+      .first();
+    if (session) {
+      await ctx.db.patch(session._id, { pipelineState: args.pipelineState });
+    }
+  },
+});
+
+export const loadPipelineState = internalQuery({
+  args: { sessionId: v.string() },
+  handler: async (ctx, args) => {
+    const session = await ctx.db
+      .query("generationSessions")
+      .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
+      .first();
+    return session?.pipelineState ?? null;
   },
 });
 
@@ -98,6 +169,7 @@ export const failSession = internalMutation({
     errorCode: v.optional(v.string()),
     gateViolations: v.optional(v.array(v.string())),
     qualityScore: v.optional(v.number()),
+    stepTimings: v.optional(v.any()),
   },
   handler: async (ctx, args) => {
     const session = await ctx.db
@@ -112,6 +184,7 @@ export const failSession = internalMutation({
         errorCode: args.errorCode,
         gateViolations: args.gateViolations,
         qualityScore: args.qualityScore,
+        stepOutputs: args.stepTimings,
         completedAt: Date.now(),
       });
     }

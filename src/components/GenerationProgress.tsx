@@ -15,10 +15,10 @@ const V2_STAGES = [
   { step: 0, label: "Analysiere dein Thema...", icon: Brain, message: "Thema, Lernziele und Schwierigkeit werden erkannt..." },
   { step: 1, label: "Erfinde einzigartiges Universum...", icon: Sparkles, message: "Ein kreatives Spielwelt-Konzept wird erschaffen..." },
   { step: 2, label: "Designe die Minigames...", icon: Gamepad2, message: "Einzigartige Spielmechaniken für jedes Level..." },
-  { step: 3, label: "Plane Grafiken...", icon: Palette, message: "Bild-Prompts und visuelle Identität werden erstellt..." },
-  { step: 4, label: "Generiere Bilder...", icon: Image, message: "KI-Bilder werden parallel generiert..." },
-  { step: 5, label: "Erstelle Spiel-Challenges...", icon: Brain, message: "Challenges, Lösungen und Feedback werden designt..." },
-  { step: 6, label: "Qualitätsprüfung...", icon: ShieldCheck, message: "Alle Inhalte werden auf Korrektheit geprüft..." },
+  { step: 3, label: "Plane Grafiken...", icon: Palette, message: "Bild-Prompts und visuelle Identität werden erstellt...", parallel: true },
+  { step: 4, label: "Generiere Bilder...", icon: Image, message: "KI-Bilder werden parallel generiert...", parallel: true },
+  { step: 5, label: "Erstelle Spiel-Challenges...", icon: Brain, message: "Challenges, Lösungen und Feedback werden designt...", parallel: true },
+  { step: 6, label: "Qualitätsprüfung...", icon: ShieldCheck, message: "Alle Inhalte werden auf Korrektheit geprüft...", parallel: true },
   { step: 7, label: "Baue deine Spielwelt...", icon: Code, message: "React-Code wird aus dem Plan generiert..." },
   { step: 8, label: "Teste und optimiere...", icon: Wrench, message: "Code wird validiert und Fehler automatisch gefixt..." },
 ];
@@ -63,6 +63,45 @@ export function GenerationProgress({
   );
 
   const isV2 = !!sessionId && !!session;
+  const [internalStage, setInternalStage] = useState<LegacyStage>(isPdfBased ? "uploading" : "analyzing");
+  const [internalProgress, setInternalProgress] = useState(0);
+
+  const activeStages = isPdfBased ? LEGACY_STAGES : LEGACY_STAGES_NO_PDF;
+  const stage = externalStage ?? internalStage;
+  const legacyProgress = externalProgress ?? internalProgress;
+  const currentIndex = activeStages.findIndex((s) => s.id === stage);
+
+  useEffect(() => {
+    if (isV2 || externalStage || !isGenerating) return;
+
+    let elapsed = 0;
+    const interval = setInterval(() => {
+      elapsed += 1;
+      let cumulativeTime = 0;
+      let newStageIndex = 0;
+
+      for (let i = 0; i < activeStages.length - 1; i++) {
+        cumulativeTime += activeStages[i].duration;
+        if (elapsed < cumulativeTime) { newStageIndex = i; break; }
+        newStageIndex = i + 1;
+      }
+
+      newStageIndex = Math.min(newStageIndex, activeStages.length - 2);
+      setInternalStage(activeStages[newStageIndex].id as LegacyStage);
+      const totalDuration = activeStages.slice(0, -1).reduce((sum, s) => sum + s.duration, 0);
+      setInternalProgress(Math.min(Math.floor((elapsed / totalDuration) * 100), 95));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [isV2, externalStage, isGenerating, activeStages]);
+
+  useEffect(() => {
+    if (isV2) return;
+    if (isGenerating) {
+      setInternalStage(isPdfBased ? "uploading" : "analyzing");
+      setInternalProgress(0);
+    }
+  }, [isV2, isGenerating, isPdfBased]);
 
   // V2 rendering
   if (isV2) {
@@ -120,8 +159,11 @@ export function GenerationProgress({
         {/* V2 Pipeline stages */}
         <div className="space-y-2">
           {V2_STAGES.map((s, index) => {
-            const isCompleted = index < currentStep;
-            const isCurrent = index === currentStep && !isComplete;
+            // Steps 3-6 laufen parallel — alle als "aktiv" zeigen solange wir in diesem Block sind
+            const inParallelBlock = currentStep >= 3 && currentStep <= 6 && !isComplete;
+            const isParallelStep = 'parallel' in s && s.parallel;
+            const isCompleted = (inParallelBlock && isParallelStep) ? false : index < currentStep;
+            const isCurrent = (inParallelBlock && isParallelStep) || (index === currentStep && !isComplete);
             const Icon = s.icon;
 
             return (
@@ -190,46 +232,6 @@ export function GenerationProgress({
       </div>
     );
   }
-
-  // ── V1 LEGACY FALLBACK ──────────────────────────────────────────
-  const [internalStage, setInternalStage] = useState<LegacyStage>(isPdfBased ? "uploading" : "analyzing");
-  const [internalProgress, setInternalProgress] = useState(0);
-
-  const activeStages = isPdfBased ? LEGACY_STAGES : LEGACY_STAGES_NO_PDF;
-  const stage = externalStage ?? internalStage;
-  const legacyProgress = externalProgress ?? internalProgress;
-  const currentIndex = activeStages.findIndex((s) => s.id === stage);
-
-  useEffect(() => {
-    if (externalStage || !isGenerating) return;
-
-    let elapsed = 0;
-    const interval = setInterval(() => {
-      elapsed += 1;
-      let cumulativeTime = 0;
-      let newStageIndex = 0;
-
-      for (let i = 0; i < activeStages.length - 1; i++) {
-        cumulativeTime += activeStages[i].duration;
-        if (elapsed < cumulativeTime) { newStageIndex = i; break; }
-        newStageIndex = i + 1;
-      }
-
-      newStageIndex = Math.min(newStageIndex, activeStages.length - 2);
-      setInternalStage(activeStages[newStageIndex].id as LegacyStage);
-      const totalDuration = activeStages.slice(0, -1).reduce((sum, s) => sum + s.duration, 0);
-      setInternalProgress(Math.min(Math.floor((elapsed / totalDuration) * 100), 95));
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [externalStage, isGenerating, activeStages]);
-
-  useEffect(() => {
-    if (isGenerating) {
-      setInternalStage(isPdfBased ? "uploading" : "analyzing");
-      setInternalProgress(0);
-    }
-  }, [isGenerating, isPdfBased]);
 
   return (
     <div className="space-y-6">

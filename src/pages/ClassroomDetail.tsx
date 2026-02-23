@@ -233,6 +233,15 @@ function AssignWorldDialog({
                   )}
                 </SelectContent>
               </Select>
+              {availableWorlds.length === 0 && (
+                <p className="text-xs text-muted-foreground">
+                  Noch keine Welten verfügbar.
+                  {' '}
+                  <Link to="/create" className="text-primary hover:underline">
+                    Jetzt Lernwelt erstellen
+                  </Link>
+                </p>
+              )}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="instructions">Anweisungen für Schüler</Label>
@@ -524,13 +533,21 @@ export default function ClassroomDetail() {
                     Lernwelten, die dieser Klasse zugewiesen wurden
                   </CardDescription>
                 </div>
-                {user?.id && (
-                  <AssignWorldDialog
-                    classroomId={classroom._id}
-                    userId={user.id}
-                    existingWorldIds={existingWorldIds}
-                  />
-                )}
+                <div className="flex items-center gap-2">
+                  <Link to="/create">
+                    <Button variant="outline" className="gap-2">
+                      <BookOpen className="w-4 h-4" />
+                      Neue Lernwelt
+                    </Button>
+                  </Link>
+                  {user?.id && (
+                    <AssignWorldDialog
+                      classroomId={classroom._id}
+                      userId={user.id}
+                      existingWorldIds={existingWorldIds}
+                    />
+                  )}
+                </div>
               </CardHeader>
               <CardContent>
                 {classroom.assignments && classroom.assignments.length > 0 ? (

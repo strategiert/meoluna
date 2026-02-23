@@ -75,15 +75,5 @@ export async function runAssetGenerator(
   });
 
   await Promise.all(promises);
-
-  // Debug-Log: Zusammenfassung des Manifests
-  const total = Object.keys(manifest).length;
-  const withUrl = Object.values(manifest).filter(e => e.url).length;
-  const byCategory = Object.values(manifest).reduce<Record<string, number>>((acc, e) => {
-    acc[e.category] = (acc[e.category] || 0) + 1;
-    return acc;
-  }, {});
-  console.log(`[AssetGenerator] ${withUrl}/${total} Assets generiert. Kategorien:`, JSON.stringify(byCategory));
-
   return manifest;
 }

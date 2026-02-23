@@ -2,9 +2,9 @@
  * Create Page - Weltgenerierung mit Chat
  */
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAction, useMutation } from 'convex/react';
+import { useAction, useMutation, useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -48,10 +48,11 @@ export default function Create() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [worldTitle, setWorldTitle] = useState('');
-  const [worldId, setWorldId] = useState<string | null>(null);
+  const [worldId] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const isFixingRef = useRef(false);
 
   // Convex Actions
   const generateWorldV2 = useAction(api.pipeline.orchestrator.generateWorldV2);
@@ -62,11 +63,39 @@ export default function Create() {
   // V2 Pipeline Session
   const [sessionId, setSessionId] = useState<string | null>(null);
 
+  // Subscribe to pipeline session for async completion
+  const pipelineSession = useQuery(
+    api.pipeline.status.getSession,
+    sessionId ? { sessionId } : "skip"
+  );
+
   // PDF State
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [pdfText, setPdfText] = useState<string>('');
   const [isExtracting, setIsExtracting] = useState(false);
   const [pdfError, setPdfError] = useState<string | null>(null);
+
+  // Watch pipeline session for async completion
+  useEffect(() => {
+    if (!pipelineSession) return;
+    if (pipelineSession.status === "completed" && pipelineSession.worldId) {
+      setIsGenerating(false);
+      setSessionId(null);
+      // Navigate to the completed world
+      navigate(`/w/${pipelineSession.worldId}`);
+    } else if (pipelineSession.status === "failed") {
+      setIsGenerating(false);
+      setSessionId(null);
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: `Hoppla, da ist etwas schiefgelaufen: ${pipelineSession.error || 'Unbekannter Fehler'}`,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pipelineSession?.status, pipelineSession?.worldId]);
 
   // Auto-scroll zu neuen Nachrichten
   useEffect(() => {
@@ -156,37 +185,25 @@ export default function Create() {
       const newSessionId = `gen_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
       setSessionId(newSessionId);
 
-      // Pipeline V2: 10-step orchestration
-      const result = await generateWorldV2({
+      // Pipeline V2: Startet asynchron, gibt sofort zurück
+      await generateWorldV2({
         prompt: input.trim(),
         pdfText: pdfText || undefined,
         userId: user.id,
         sessionId: newSessionId,
       });
 
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: pdfText
-          ? `${result.worldName} — basierend auf dem PDF! 🌙📄✨`
-          : `${result.worldName} — deine einzigartige Lernwelt! 🌙✨`,
-        code: result.code,
-        worldId: result.worldId,
-        timestamp: new Date()
-      };
+      // Pipeline läuft im Hintergrund weiter.
+      // Completion/Failure wird im useEffect oben behandelt.
 
-      setMessages(prev => [...prev, assistantMessage]);
-      setCurrentCode(result.code);
-      setWorldId(result.worldId);
-      setSessionId(null);
-
-      // Clear PDF after successful generation
+      // Clear PDF after starting generation
       if (pdfText) {
         handlePdfClear();
       }
 
     } catch (err) {
       setSessionId(null);
+      setIsGenerating(false);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
@@ -194,17 +211,13 @@ export default function Create() {
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsGenerating(false);
     }
   };
 
-  const [isFixing, setIsFixing] = useState(false);
+  const handleAutoFix = useCallback(async (error: string, failedCode: string) => {
+    if (isFixingRef.current) return;
 
-  const handleAutoFix = async (error: string, failedCode: string) => {
-    if (isFixing) return;
-
-    setIsFixing(true);
+    isFixingRef.current = true;
     try {
       const result = await autoFixCode({ error, code: failedCode });
       if (result.fixedCode) {
@@ -213,9 +226,9 @@ export default function Create() {
     } catch (err) {
       console.error('Auto-fix failed:', err);
     } finally {
-      setIsFixing(false);
+      isFixingRef.current = false;
     }
-  };
+  }, [autoFixCode]);
 
   const handleSaveWorld = async () => {
     if (!currentCode || !user) return;

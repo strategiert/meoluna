@@ -176,7 +176,8 @@ root.render(
 function sanitizeCode(code: string): string {
   return code
     // PI/TWO_PI/HALF_PI redeclarations — Konflikt mit p5.js globals
-    .replace(/\bconst\s+(PI|TWO_PI|HALF_PI)\s*=\s*[^;]+;?/g, '/* p5 constant, nicht neu deklarieren */')
+    .replace(/^\s*(?:const|let|var)\s+(PI|TWO_PI|HALF_PI)\s*=.*$/gm, '/* p5 constant, nicht neu deklarieren */')
+    .replace(/\b(?:const|let|var)\s+(PI|TWO_PI|HALF_PI)\s*=\s*[^;]+;?/g, '/* p5 constant, nicht neu deklarieren */')
     // ReactDOM render calls — Rendering übernimmt index.js
     .replace(/\bconst\s+root\s*=\s*createRoot\([^)]*\);?/g, '/* handled by sandbox */')
     .replace(/\broot\.render\([^)]*\);?/g, '/* handled by sandbox */');
@@ -192,26 +193,45 @@ const SandpackBridge: React.FC<{
 }> = ({ onError, onSuccess, code }) => {
   const { sandpack } = useSandpack();
   const hasFiredSuccess = useRef(false);
+  const lastBridgeErrorKeyRef = useRef<string | null>(null);
+  const onErrorRef = useRef(onError);
+  const onSuccessRef = useRef(onSuccess);
+
+  useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
+
+  useEffect(() => {
+    onSuccessRef.current = onSuccess;
+  }, [onSuccess]);
 
   // Reset bei neuem Code
   useEffect(() => {
     hasFiredSuccess.current = false;
+    lastBridgeErrorKeyRef.current = null;
   }, [code]);
 
   useEffect(() => {
-    if (sandpack.error) {
-      const msg = (() => {
-        try { return sandpack.error!.message || sandpack.error!.toString() || 'Babel-Fehler'; }
-        catch { return 'Babel-Fehler beim Transpilieren'; }
-      })();
-      onError?.(msg, code);
-    }
-  }, [sandpack.error]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (!sandpack.error) return;
+
+    const msg = (() => {
+      try { return sandpack.error!.message || sandpack.error!.toString() || 'Babel-Fehler'; }
+      catch { return 'Babel-Fehler beim Transpilieren'; }
+    })();
+    const errorKey = `${msg}::${code}`;
+    if (lastBridgeErrorKeyRef.current === errorKey) return;
+    lastBridgeErrorKeyRef.current = errorKey;
+
+    // setTimeout(0) defer aus dem Render-Cycle → verhindert React Error #300
+    // "Cannot update a component while rendering a different component"
+    const timeoutId = window.setTimeout(() => onErrorRef.current?.(msg, code), 0);
+    return () => window.clearTimeout(timeoutId);
+  }, [sandpack.error, code]);
 
   useEffect(() => {
     if (sandpack.status === 'idle' && !sandpack.error && !hasFiredSuccess.current) {
       hasFiredSuccess.current = true;
-      onSuccess?.();
+      onSuccessRef.current?.();
     }
   }, [sandpack.status, sandpack.error]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -227,17 +247,33 @@ export const Sandbox: React.FC<SandboxProps> = ({
   onSuccess,
 }) => {
   const sanitized = sanitizeCode(code);
+  const onErrorRef = useRef(onError);
+  const codeRef = useRef(code);
+  const lastRuntimeErrorKeyRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
+
+  useEffect(() => {
+    codeRef.current = code;
+    lastRuntimeErrorKeyRef.current = null;
+  }, [code]);
 
   // Runtime-Fehler aus iframe abfangen (window.onerror aus INDEX_JS)
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data?.type === 'SANDBOX_ERROR') {
-        onError?.(event.data.error, code);
+        const runtimeError = String(event.data.error || 'Render-Fehler in der Lernwelt');
+        const errorKey = `${runtimeError}::${codeRef.current}`;
+        if (lastRuntimeErrorKeyRef.current === errorKey) return;
+        lastRuntimeErrorKeyRef.current = errorKey;
+        window.setTimeout(() => onErrorRef.current?.(runtimeError, codeRef.current), 0);
       }
     };
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [code, onError]);
+  }, []);
 
   return (
     <SandpackProvider

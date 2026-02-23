@@ -8,10 +8,9 @@ export const ASSET_PLANNER_SYSTEM_PROMPT = `Du erstellst eine Asset-Liste für d
 3. KEINE Markennamen in Prompts (kein Pixar, Disney, Marvel, etc.)
 4. KEINE Texte/Buchstaben in Bildern (AI kann das nicht gut)
 5. Jedes Asset hat einen klaren Zweck (Hintergrund, Charakter, Icon, etc.)
-6. **PFLICHT:** Das erste Asset MUSS immer ein Hub-Hintergrund sein (id: "hub_bg", category: "background", aspectRatio: "16:9", priority: "critical"). IMMER. Keine Ausnahme.
 
 ## Asset-Kategorien (wähle die wichtigsten):
-- "background": Hub-Hintergrund (IMMER critical, id: "hub_bg"), Modul-Hintergründe (max 1-2 weitere)
+- "background": Hub-Hintergrund, Modul-Hintergründe (max 2-3)
 - "character": Guide/Maskottchen, NPCs (max 2)
 - "icon": Modul-Icons, Achievement-Badges (max 4-5)
 - "illustration": Szenen-Illustrationen für spezifische Module (max 3)

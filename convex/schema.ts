@@ -358,6 +358,7 @@ export default defineSchema({
     qualityScore: v.optional(v.number()),      // Quality Gate Score 0-10
     gateViolations: v.optional(v.array(v.string())), // Structural Gate Violations
     stepOutputs: v.optional(v.any()),          // JSON der Step-Ergebnisse (für Debug)
+    pipelineState: v.optional(v.any()),       // Zwischenzustand zwischen Pipeline-Phasen
   })
     .index("by_session", ["sessionId"])
     .index("by_user", ["userId"]),
