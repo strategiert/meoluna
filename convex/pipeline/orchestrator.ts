@@ -169,13 +169,14 @@ export const runPhase1 = internalAction({
 
           await setStatus(ctx, args.sessionId, 4);
           const s5 = Date.now();
-          const assetManifest: AssetManifest = await (async () => {
-            try {
-              return await runAssetGenerator(assetPlan.result, ctx.storage);
-            } catch (error) {
-              throw withStepError(error, "E_ASSET_GENERATION", "E_ASSET_GENERATION");
-            }
-          })();
+          let assetManifest: AssetManifest;
+          try {
+            assetManifest = await runAssetGenerator(assetPlan.result, ctx.storage);
+          } catch (error) {
+            const msg = error instanceof Error ? error.message : String(error);
+            console.warn(`[Phase1] Asset-Generierung fehlgeschlagen, fahre ohne Assets fort: ${msg}`);
+            assetManifest = {};
+          }
           stepTimings.asset_generation = { durationMs: Date.now() - s5 };
 
           return { assetPlan, assetManifest };
