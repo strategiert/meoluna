@@ -30,13 +30,7 @@ Gib ein JSON-Objekt zurück das diesem Schema entspricht:
 
 ## CHALLENGE-TYPEN
 
-Wähle den passenden Typ für jede Aufgabe.
-
-**WICHTIG: Das hints-Feld ist PFLICHT für jede Challenge!**
-Formuliere Hints altersgerecht (Kita/Grundschule, max. 1 Satz pro Level):
-- **level1**: Gibt eine Denkrichtung ohne direkt zu helfen
-- **level2**: Gibt einen konkreten Tipp ohne die Lösung zu nennen
-- **level3**: Gibt fast die Antwort (ohne sie explizit zu nennen)
+Wähle den passenden Typ für jede Aufgabe:
 
 **multiple-choice** (4 Optionen, 1 richtig):
 \`\`\`json
@@ -47,12 +41,7 @@ Formuliere Hints altersgerecht (Kita/Grundschule, max. 1 Satz pro Level):
   "correct": 2,
   "xp": 10,
   "feedbackCorrect": "Richtig! Seit 2006 zählt Pluto nicht mehr dazu.",
-  "feedbackWrong": "Nicht ganz. Seit der IAU-Entscheidung 2006 sind es 8.",
-  "hints": {
-    "level1": "Schau dir die Zahlen an — welche ist eine bekannte Anzahl aus dem Weltraum?",
-    "level2": "Merkur, Venus, Erde, Mars, Jupiter, Saturn, Uranus, Neptun — zähl mal!",
-    "level3": "Es sind genau 8 Planeten — die Antwort C."
-  }
+  "feedbackWrong": "Nicht ganz. Seit der IAU-Entscheidung 2006 sind es 8."
 }
 \`\`\`
 
@@ -64,12 +53,7 @@ Formuliere Hints altersgerecht (Kita/Grundschule, max. 1 Satz pro Level):
   "correct": false,
   "xp": 8,
   "feedbackCorrect": "Richtig! Um die Sonne dauert es 365 Tage.",
-  "feedbackWrong": "Das stimmt leider nicht. 24h = eine Eigenrotation der Erde.",
-  "hints": {
-    "level1": "Denk daran: Was passiert in 24 Stunden — Tag und Nacht oder ein ganzes Jahr?",
-    "level2": "24 Stunden ist ein Tag. Die Reise um die Sonne dauert viel länger.",
-    "level3": "Die Aussage ist FALSCH — 24h ist die Drehung um sich selbst, nicht um die Sonne."
-  }
+  "feedbackWrong": "Das stimmt leider nicht. 24h = eine Eigenrotation der Erde."
 }
 \`\`\`
 
@@ -82,12 +66,7 @@ Formuliere Hints altersgerecht (Kita/Grundschule, max. 1 Satz pro Level):
   "answer": "Paris",
   "xp": 10,
   "feedbackCorrect": "Genau! Paris liegt an der Seine.",
-  "feedbackWrong": "Das war leider nicht richtig.",
-  "hints": {
-    "level1": "Diese Stadt ist sehr bekannt für einen Turm aus Eisen.",
-    "level2": "Der Eiffelturm steht in dieser Stadt — sie beginnt mit P.",
-    "level3": "Die Antwort ist Paris — die Stadt mit dem Eiffelturm."
-  }
+  "feedbackWrong": "Das war leider nicht richtig."
 }
 \`\`\`
 
@@ -101,12 +80,7 @@ Formuliere Hints altersgerecht (Kita/Grundschule, max. 1 Satz pro Level):
   "unit": "°",
   "xp": 10,
   "feedbackCorrect": "Perfekt! 90° ist der rechte Winkel.",
-  "feedbackWrong": "Nicht ganz. Denk an die Ecke eines Blattes Papier.",
-  "hints": {
-    "level1": "Schau dir die Ecke deines Tisches an — wie viele Grad hat so eine Ecke?",
-    "level2": "Ein Kreis hat 360 Grad. Ein rechter Winkel ist ein Viertel davon.",
-    "level3": "360 geteilt durch 4 ist 90 — also 90 Grad."
-  }
+  "feedbackWrong": "Nicht ganz. Denk an die Ecke eines Blattes Papier."
 }
 \`\`\`
 
@@ -119,12 +93,7 @@ Formuliere Hints altersgerecht (Kita/Grundschule, max. 1 Satz pro Level):
   "correct": ["Merkur", "Venus", "Mars", "Saturn"],
   "xp": 15,
   "feedbackCorrect": "Richtige Reihenfolge! Merkur ist der sonnennächste Planet.",
-  "feedbackWrong": "Nicht ganz — versuche es nochmal.",
-  "hints": {
-    "level1": "Welcher Planet ist am nächsten zur Sonne? Er ist auch der kleinste.",
-    "level2": "Merkur ist der erste, dann kommt Venus. Saturn mit den Ringen ist am weitesten.",
-    "level3": "Die Reihenfolge ist: Merkur → Venus → Mars → Saturn."
-  }
+  "feedbackWrong": "Nicht ganz — versuche es nochmal."
 }
 \`\`\`
 
@@ -140,12 +109,7 @@ Formuliere Hints altersgerecht (Kita/Grundschule, max. 1 Satz pro Level):
   ],
   "xp": 15,
   "feedbackCorrect": "Alle Paare richtig!",
-  "feedbackWrong": "Ein paar Zuordnungen stimmen noch nicht.",
-  "hints": {
-    "level1": "Welches Land spricht Deutsch? Dort steht das Brandenburger Tor.",
-    "level2": "Deutschland → Berlin, Frankreich → Paris mit Eiffelturm.",
-    "level3": "Deutschland=Berlin, Frankreich=Paris, Spanien=Madrid."
-  }
+  "feedbackWrong": "Ein paar Zuordnungen stimmen noch nicht."
 }
 \`\`\`
 
@@ -163,12 +127,7 @@ Formuliere Hints altersgerecht (Kita/Grundschule, max. 1 Satz pro Level):
   "sketchDescription": "Kreis wechselt von blau (kalt) zu rot (heiß) je nach Slider-Position",
   "xp": 15,
   "feedbackCorrect": "Genau! Bei ~40% CO₂ liegt die Durchschnittstemperatur bei 15°C.",
-  "feedbackWrong": "Nicht ganz — zu heiß oder zu kalt. Probiere einen anderen Wert.",
-  "hints": {
-    "level1": "Schau auf die Farbe — blau ist zu kalt, rot ist zu heiß. Was wäre grün?",
-    "level2": "15°C ist in der Mitte. Der Slider sollte ungefähr bei 40% liegen.",
-    "level3": "Schiebe den Regler auf etwa 40% — dort liegt die richtige Temperatur."
-  }
+  "feedbackWrong": "Nicht ganz — zu heiß oder zu kalt. Probiere einen anderen Wert."
 }
 \`\`\`
 
@@ -184,7 +143,6 @@ Formuliere Hints altersgerecht (Kita/Grundschule, max. 1 Satz pro Level):
 8. **xp**: 8-15 pro Challenge (schwieriger = mehr XP)
 9. **simulation**: Maximal 1x pro Modul — nur für Naturwissenschaften/Technik geeignet
 10. **targetValue** muss immer innerhalb [paramMin, paramMax] liegen
-11. **hints PFLICHT**: Jede Challenge MUSS hints mit level1, level2, level3 haben!
 
 ## OUTPUT
 

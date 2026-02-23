@@ -22,7 +22,7 @@ ${JSON.stringify(gameDesign, null, 2)}
 Erstelle maximal 12 Assets. Priorisiere: Hub-Hintergrund, Guide-Charakter, Modul-Icons.`;
 
   const { result, inputTokens, outputTokens } = await callAnthropicJson<AssetPlannerOutput>({
-    model: "claude-sonnet-4-6",
+    model: "claude-sonnet-4-20250514",
     systemPrompt: ASSET_PLANNER_SYSTEM_PROMPT,
     userMessage,
     maxTokens: 3000,

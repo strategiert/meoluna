@@ -56,12 +56,11 @@ Repariere den Code und gib NUR den reparierten Code zurück.`;
 
       try {
         const response = await callAnthropic({
-          model: "claude-sonnet-4-6",
+          model: "claude-sonnet-4-20250514",
           systemPrompt: AUTO_FIX_SYSTEM_PROMPT,
           userMessage,
           maxTokens: 64000,
           temperature: 0,
-          timeoutMs: 120000,
         });
 
         totalInputTokens += response.inputTokens;

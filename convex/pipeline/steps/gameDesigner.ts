@@ -1,6 +1,6 @@
 // ============================================================================
 // STEP 3: GAME DESIGNER - Spielmechaniken & Modulstruktur erfinden
-// Model: Sonnet-4.6 (schnell, kreativ) | Temp: 0.9 | Max: 6000
+// Model: Opus (kreativ + strukturiert) | Temp: 0.9 | Max: 6000
 // ============================================================================
 
 import { callAnthropicJson } from "../utils/anthropicClient";
@@ -23,7 +23,7 @@ Erfinde jetzt 10-15 Module mit JEWEILS einzigartigen Spielmechaniken.
 Jedes Modul muss sich wie ein eigenständiges Mini-Spiel anfühlen.`;
 
   const { result, inputTokens, outputTokens } = await callAnthropicJson<GameDesignerOutput>({
-    model: "claude-sonnet-4-6",
+    model: "claude-opus-4-20250514",
     systemPrompt: GAME_DESIGNER_SYSTEM_PROMPT,
     userMessage,
     maxTokens: 6000,

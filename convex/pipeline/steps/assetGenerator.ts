@@ -1,9 +1,9 @@
 // ============================================================================
-// STEP 5: ASSET GENERATION - Hybrid assets
-// - Gemini Pro (3.x) for ALL visual assets as SVG (background/icon/illustration/character)
+// STEP 5: ASSET GENERATION - Bilder via fal.ai generieren (PARALLEL)
+// Kein LLM-Call, rein programmatisch
 // ============================================================================
 
-import { generateSvgAsset } from "../utils/geminiSvgClient";
+import { generateImage, downloadImage } from "../utils/falClient";
 import type { AssetPlannerOutput, AssetManifest } from "../types";
 
 interface StorageContext {
@@ -11,119 +11,69 @@ interface StorageContext {
   getUrl: (id: string) => Promise<string | null>;
 }
 
-async function persistManifestEntry(
-  manifest: AssetManifest,
-  storage: StorageContext,
-  args: {
-    assetId: string;
-    category: string;
-    purpose: string;
-    blob: Blob;
-  }
-) {
-  const storageId = await storage.store(args.blob);
-  const permanentUrl = await storage.getUrl(storageId);
-  if (!permanentUrl) {
-    throw new Error(`Storage URL fehlt fuer ${args.assetId}`);
-  }
-
-  manifest[args.assetId] = {
-    url: permanentUrl,
-    storageId,
-    category: args.category,
-    purpose: args.purpose,
-  };
-}
-
 export async function runAssetGenerator(
   assetPlan: AssetPlannerOutput,
   storage: StorageContext
 ): Promise<AssetManifest> {
   const manifest: AssetManifest = {};
-  const MAX_ASSETS = 6;
-  const MAX_CONCURRENT = 4;
-  const priorityRank: Record<string, number> = {
-    critical: 0,
-    important: 1,
-    "nice-to-have": 2,
-  };
 
-  const assetsToGenerate = [...assetPlan.assets]
-    .sort((a, b) => {
-      const rankA = priorityRank[a.priority] ?? 9;
-      const rankB = priorityRank[b.priority] ?? 9;
-      return rankA - rankB;
-    })
-    .slice(0, MAX_ASSETS);
-
-  console.log(
-    `[AssetGenerator] Plane ${assetsToGenerate.length}/${assetPlan.assets.length} Assets ` +
-    `(concurrency=${MAX_CONCURRENT})`
+  // Filter: skip nice-to-have if we have > 8 assets
+  const assetsToGenerate = assetPlan.assets.filter(
+    (asset) => asset.priority !== "nice-to-have" || assetPlan.assets.length <= 8
   );
 
-  let svgCount = 0;
-  let failedCount = 0;
-  let cursor = 0;
-  const workers = Array.from(
-    { length: Math.min(MAX_CONCURRENT, assetsToGenerate.length) },
-    async () => {
-      while (true) {
-        const next = cursor++;
-        if (next >= assetsToGenerate.length) break;
-        const asset = assetsToGenerate[next];
-        const fullPrompt = `${asset.prompt}, ${assetPlan.styleBase}`;
+  // Generate all images in PARALLEL
+  const promises = assetsToGenerate.map(async (asset) => {
+    const fullPrompt = `${asset.prompt}, ${assetPlan.styleBase}`;
 
-        // background + illustration: 3 Versuche à ~22s → 55s Budget
-        // icon + character: 1 Versuch → 25s Budget
-        const assetTimeoutMs = (asset.category === "background" || asset.category === "illustration")
-          ? 55000
-          : 25000;
+    const result = await generateImage({
+      prompt: fullPrompt,
+      aspectRatio: asset.aspectRatio,
+    });
 
-        const svgResult = await generateSvgAsset({
-          prompt: fullPrompt,
-          category: asset.category,
-          purpose: asset.purpose,
-          aspectRatio: asset.aspectRatio,
-          timeoutMs: assetTimeoutMs,
-        });
+    if (result.url) {
+      // Download and persist to Convex storage (fal.ai URLs are temporary)
+      const blob = await downloadImage(result.url);
 
-        if (!svgResult.svg) {
-          console.warn(`[AssetGenerator] Asset ${asset.id} übersprungen: ${svgResult.error ?? "unknown"}`);
-          failedCount++;
-          continue;
+      if (blob) {
+        try {
+          const storageId = await storage.store(blob);
+          const permanentUrl = await storage.getUrl(storageId);
+
+          manifest[asset.id] = {
+            url: permanentUrl,
+            storageId,
+            category: asset.category,
+            purpose: asset.purpose,
+          };
+        } catch (e) {
+          console.error(`Storage failed for ${asset.id}:`, e);
+          manifest[asset.id] = {
+            url: null,
+            storageId: null,
+            category: asset.category,
+            purpose: asset.purpose,
+          };
         }
-
-        await persistManifestEntry(manifest, storage, {
-          assetId: asset.id,
+      } else {
+        manifest[asset.id] = {
+          url: null,
+          storageId: null,
           category: asset.category,
           purpose: asset.purpose,
-          blob: new Blob([svgResult.svg], { type: "image/svg+xml" }),
-        });
-        svgCount++;
+        };
       }
+    } else {
+      // fal.ai failed — mark as null (SVG fallback will be used)
+      manifest[asset.id] = {
+        url: null,
+        storageId: null,
+        category: asset.category,
+        purpose: asset.purpose,
+      };
     }
-  );
+  });
 
-  await Promise.all(workers);
-
-  // Wenn ALLE Assets fehlgeschlagen → dann werfen
-  if (svgCount === 0 && failedCount > 0) {
-    throw new Error(
-      `[AssetGenerator] Alle ${failedCount} Assets fehlgeschlagen — Gemini komplett ausgefallen`
-    );
-  }
-
-  // Debug-Log: Zusammenfassung des Manifests
-  const total = Object.keys(manifest).length;
-  const withUrl = Object.values(manifest).filter(e => e.url).length;
-  const byCategory = Object.values(manifest).reduce<Record<string, number>>((acc, e) => {
-    acc[e.category] = (acc[e.category] || 0) + 1;
-    return acc;
-  }, {});
-  console.log(
-    `[AssetGenerator] ${withUrl}/${total} Assets generiert, ${failedCount} übersprungen. Kategorien:`,
-    JSON.stringify(byCategory)
-  );
-
+  await Promise.all(promises);
   return manifest;
 }

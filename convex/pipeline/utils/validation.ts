@@ -50,7 +50,7 @@ export function validateCode(code: string): string[] {
   }
 
   // 3. Forbidden: PI/TWO_PI/HALF_PI redeclaration
-  if (/^\s*(const|let|var)\s+(PI|TWO_PI|HALF_PI)\s*=/m.test(code)) {
+  if (/^(const|let|var)\s+(PI|TWO_PI|HALF_PI)\s*=/m.test(code)) {
     errors.push("FORBIDDEN: PI/TWO_PI/HALF_PI redeclaration (conflicts with p5.js)");
   }
 
@@ -143,7 +143,7 @@ export function quickFix(code: string, errors: string[]): { code: string; fixed:
   let fixed = false;
 
   // Auto-add export default if missing
-  if (errors.some((e) => e.includes("MISSING export default statement"))) {
+  if (errors.includes("MISSING: export default statement")) {
     if (!result.includes("export default")) {
       result += "\n\nexport default App;";
       fixed = true;
@@ -161,7 +161,7 @@ export function quickFix(code: string, errors: string[]): { code: string; fixed:
 
   // Remove PI redeclarations
   if (errors.some((e) => e.includes("PI/TWO_PI/HALF_PI"))) {
-    result = result.replace(/^\s*(const|let|var)\s+(PI|TWO_PI|HALF_PI)\s*=.*$/gm, "// Removed: $2 redeclaration (using Math.PI instead)");
+    result = result.replace(/^(const|let|var)\s+(PI|TWO_PI|HALF_PI)\s*=.*$/gm, "// Removed: $2 redeclaration (using Math.PI instead)");
     fixed = true;
   }
 

@@ -32,7 +32,7 @@ export async function runInterpreter(args: InterpreterArgs) {
   if (args.subject) userContent += `\nFach: ${args.subject}`;
 
   const { result, inputTokens, outputTokens } = await callAnthropicJson<InterpreterOutput>({
-    model: "claude-sonnet-4-6",
+    model: "claude-sonnet-4-20250514",
     systemPrompt: INTERPRETER_SYSTEM_PROMPT,
     userMessage: userContent,
     maxTokens: 2000,
