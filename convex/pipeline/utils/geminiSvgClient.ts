@@ -229,8 +229,9 @@ export async function generateSvgAsset(request: GeminiSvgRequest): Promise<Gemin
             contents: [{ role: "user", parts: [{ text: promptText }] }],
             generationConfig: {
               temperature: attempt === 1 ? 0.4 : 0.6,  // Versuch 2+ kreativer
-              maxOutputTokens: 8192,
+              maxOutputTokens: 16384,
               responseMimeType: "text/plain",
+              thinkingConfig: { thinkingLevel: "LOW" },
             },
           }),
         },
