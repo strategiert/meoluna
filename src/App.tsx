@@ -31,6 +31,9 @@ import NotFound from '@/pages/NotFound';
 import BackgroundsDemo from '@/pages/demo/Backgrounds';
 import SandboxLab from '@/pages/demo/SandboxLab';
 import WorldsAdmin from '@/pages/admin/WorldsAdmin';
+import SiteStudio from '@/pages/admin/SiteStudio';
+import SiteStudioEditor from '@/pages/admin/SiteStudioEditor';
+import PublishedSitePage from '@/pages/site/PublishedSitePage';
 
 export default function App() {
   useUserSync();
@@ -65,6 +68,10 @@ export default function App() {
         <Route path="/demo/sandbox" element={<SandboxLab />} />
         {/* Admin */}
         <Route path="/admin/worlds" element={<WorldsAdmin />} />
+        <Route path="/admin/site-studio" element={<SiteStudio />} />
+        <Route path="/admin/site-studio/:pageId" element={<SiteStudioEditor />} />
+        {/* Published Site Pages */}
+        <Route path="/s/:projectSlug/:pageSlug" element={<PublishedSitePage />} />
         {/* Fallback */}
         <Route path="*" element={<NotFound />} />
       </Routes>
