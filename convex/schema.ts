@@ -229,6 +229,148 @@ export default defineSchema({
     .index("by_category", ["category", "isPublished"]),
 
   // ============================================================================
+  // SITE STUDIO - Lovable-style website assistant
+  // ============================================================================
+
+  siteProjects: defineTable({
+    name: v.string(),
+    slug: v.string(),
+    defaultThemeId: v.optional(v.id("themeTokens")),
+    createdBy: v.string(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_created_by", ["createdBy"]),
+
+  sitePages: defineTable({
+    projectId: v.id("siteProjects"),
+    slug: v.string(),
+    title: v.string(),
+    status: v.union(
+      v.literal("draft"),
+      v.literal("review"),
+      v.literal("published"),
+      v.literal("archived")
+    ),
+    currentRevisionId: v.optional(v.id("pageRevisions")),
+    seoMeta: v.optional(v.any()),
+    createdBy: v.string(),
+    updatedBy: v.string(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    publishedAt: v.optional(v.number()),
+  })
+    .index("by_project", ["projectId"])
+    .index("by_project_slug", ["projectId", "slug"])
+    .index("by_status", ["status"]),
+
+  pageRevisions: defineTable({
+    pageId: v.id("sitePages"),
+    revisionNumber: v.number(),
+    dslDocument: v.any(),
+    themeOverrides: v.optional(v.any()),
+    changeSummary: v.optional(v.string()),
+    createdBy: v.string(),
+    source: v.union(
+      v.literal("chat"),
+      v.literal("visual"),
+      v.literal("theme"),
+      v.literal("rollback"),
+      v.literal("publish")
+    ),
+    baseRevisionId: v.optional(v.id("pageRevisions")),
+    createdAt: v.number(),
+  })
+    .index("by_page", ["pageId"])
+    .index("by_page_revision", ["pageId", "revisionNumber"]),
+
+  themeTokens: defineTable({
+    projectId: v.id("siteProjects"),
+    name: v.string(),
+    tokens: v.any(),
+    isDefault: v.boolean(),
+    createdBy: v.string(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_project", ["projectId"])
+    .index("by_project_default", ["projectId", "isDefault"]),
+
+  editorSessions: defineTable({
+    pageId: v.id("sitePages"),
+    userId: v.string(),
+    mode: v.union(v.literal("chat"), v.literal("visual"), v.literal("theme")),
+    selectedBlockId: v.optional(v.string()),
+    lastPrompt: v.optional(v.string()),
+    contextWindowRef: v.optional(v.string()),
+    updatedAt: v.number(),
+  })
+    .index("by_page_user", ["pageId", "userId"])
+    .index("by_user", ["userId"]),
+
+  assistantRuns: defineTable({
+    pageId: v.id("sitePages"),
+    revisionId: v.optional(v.id("pageRevisions")),
+    userId: v.string(),
+    prompt: v.string(),
+    mode: v.union(v.literal("chat"), v.literal("visual"), v.literal("theme")),
+    planJson: v.optional(v.any()),
+    operationsJson: v.optional(v.any()),
+    resultStatus: v.union(
+      v.literal("running"),
+      v.literal("completed"),
+      v.literal("failed")
+    ),
+    errors: v.optional(v.array(v.string())),
+    provider: v.optional(v.string()),
+    model: v.optional(v.string()),
+    tokenUsage: v.optional(
+      v.object({
+        prompt: v.optional(v.number()),
+        completion: v.optional(v.number()),
+        total: v.optional(v.number()),
+      })
+    ),
+    costUsd: v.optional(v.number()),
+    previewRevisionId: v.optional(v.id("pageRevisions")),
+    createdAt: v.number(),
+    completedAt: v.optional(v.number()),
+  })
+    .index("by_page", ["pageId"])
+    .index("by_page_created", ["pageId", "createdAt"])
+    .index("by_user", ["userId"]),
+
+  publishLogs: defineTable({
+    pageId: v.id("sitePages"),
+    revisionId: v.id("pageRevisions"),
+    publishedBy: v.string(),
+    commitSha: v.optional(v.string()),
+    paths: v.array(v.string()),
+    status: v.union(v.literal("success"), v.literal("failed")),
+    error: v.optional(v.string()),
+    publishedAt: v.number(),
+  })
+    .index("by_page", ["pageId"])
+    .index("by_page_published", ["pageId", "publishedAt"]),
+
+  revisionSnapshots: defineTable({
+    pageId: v.id("sitePages"),
+    revisionId: v.id("pageRevisions"),
+    snapshotType: v.union(
+      v.literal("auto"),
+      v.literal("manual"),
+      v.literal("pre_publish")
+    ),
+    dslDocument: v.any(),
+    themeTokens: v.any(),
+    createdBy: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_page", ["pageId"])
+    .index("by_page_created", ["pageId", "createdAt"]),
+
+  // ============================================================================
   // ANALYTICS - Server-Side Tracking Engine
   // ============================================================================
 

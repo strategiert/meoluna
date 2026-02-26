@@ -47,3 +47,41 @@ export const getUser = query({
       .first();
   },
 });
+
+// Admin bootstrap (optional): Setzt Rolle eines Users über Secret.
+export const setRole = mutation({
+  args: {
+    clerkId: v.string(),
+    role: v.union(
+      v.literal("student"),
+      v.literal("creator"),
+      v.literal("teacher"),
+      v.literal("admin"),
+    ),
+    adminSecret: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const expectedSecret = process.env.ADMIN_ROLE_SECRET;
+    if (!expectedSecret || args.adminSecret !== expectedSecret) {
+      throw new Error("Invalid admin secret.");
+    }
+
+    const existing = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
+      .first();
+
+    if (!existing) {
+      return await ctx.db.insert("users", {
+        clerkId: args.clerkId,
+        role: args.role,
+        createdAt: Date.now(),
+      });
+    }
+
+    await ctx.db.patch(existing._id, {
+      role: args.role,
+    });
+    return existing._id;
+  },
+});

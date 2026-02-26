@@ -44,7 +44,7 @@ import type * as pipeline_utils_anthropicClient from "../pipeline/utils/anthropi
 import type * as pipeline_utils_falClient from "../pipeline/utils/falClient.js";
 import type * as pipeline_utils_validation from "../pipeline/utils/validation.js";
 import type * as progress from "../progress.js";
-import type * as seed from "../seed.js";
+import type * as siteStudio from "../siteStudio.js";
 import type * as storage from "../storage.js";
 import type * as users from "../users.js";
 import type * as worldConfig from "../worldConfig.js";
@@ -93,7 +93,7 @@ declare const fullApi: ApiFromModules<{
   "pipeline/utils/falClient": typeof pipeline_utils_falClient;
   "pipeline/utils/validation": typeof pipeline_utils_validation;
   progress: typeof progress;
-  seed: typeof seed;
+  siteStudio: typeof siteStudio;
   storage: typeof storage;
   users: typeof users;
   worldConfig: typeof worldConfig;
