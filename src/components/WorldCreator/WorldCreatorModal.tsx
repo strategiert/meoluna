@@ -70,10 +70,8 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
   ) as Topic[] | undefined;
 
   // Convex Actions & Mutations
-  const generateWorld = useAction(api.generate.generateWorld);
-  const generateWorldFromPDF = useAction(api.generate.generateWorldFromPDF);
+  const generateWorldV2 = useAction(api.pipeline.orchestrator.generateWorldV2);
   const extractTextFromPDF = useAction(api.documents.extractTextFromPDF);
-  const saveWorld = useMutation(api.worlds.create);
   const generateUploadUrl = useMutation(api.storage.generateUploadUrl);
   const saveUploadedFile = useMutation(api.storage.saveFile);
 
@@ -163,7 +161,6 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
     try {
       // Generate prompt from selection or custom input
       let prompt: string;
-      let title: string;
 
       if (customPrompt.trim()) {
         // Custom prompt mode
@@ -172,17 +169,13 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
 Der Nutzer wünscht sich: "${customPrompt}"
 
 Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
-        title = customPrompt.slice(0, 50) + (customPrompt.length > 50 ? '...' : '');
       } else if (selectedTopic) {
         // Topic selection mode
         prompt = `Erstelle eine Lernwelt zum Thema "${selectedTopic.name}" für Klasse ${selectedGrade} im Fach ${selectedSubject.name}. Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
-        title = `${selectedTopic.name} - Klasse ${selectedGrade}`;
       } else if (uploadedFiles.length > 0) {
-        const firstFileName = uploadedFiles[0].file.name.replace(/\.[^/.]+$/, '');
         prompt = `Erstelle eine Lernwelt für Klasse ${selectedGrade} im Fach ${selectedSubject.name}.
 
 Nutze die hochgeladene Datei als Grundlage. Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
-        title = firstFileName.slice(0, 50) + (firstFileName.length > 50 ? '...' : '');
       } else {
         throw new Error('Kein Thema ausgewählt');
       }
@@ -222,35 +215,21 @@ Nutze die hochgeladene Datei als Grundlage. Die Welt soll kindgerecht, interakti
         }
       }
 
-      // Generate world - use PDF version if we have extracted text
-      let result;
-      if (pdfText) {
-        result = await generateWorldFromPDF({
-          prompt,
-          pdfText,
-          gradeLevel: String(selectedGrade),
-          subject: selectedSubject.slug,
-        });
-      } else {
-        result = await generateWorld({ prompt });
-      }
-
-      // Save the world
-      const worldId = await saveWorld({
-        title,
+      const sessionId = `modal_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      const result = await generateWorldV2({
         prompt,
-        code: result.code,
+        pdfText: pdfText || undefined,
         userId: user.id,
+        sessionId,
         gradeLevel: String(selectedGrade),
         subject: selectedSubject.slug,
-        isPublic: false,
       });
 
       clearInterval(messageInterval);
       handleClose(false);
 
       // Navigate to the new world
-      navigate(`/w/${worldId}`);
+      navigate(`/w/${result.worldId}`);
     } catch (err) {
       clearInterval(messageInterval);
       setError(

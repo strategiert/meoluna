@@ -12,6 +12,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "golden-check": "node --import tsx/esm scripts/golden-check.mjs",
+    "modal-route-check": "node scripts/modal-pipeline-route-check.mjs",
     "movement-golden-check": "node --import tsx/esm scripts/movement-space-golden-check.mjs"
   },
   "dependencies": {
