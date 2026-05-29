@@ -7,6 +7,7 @@
     "dev": "vite",
     "dev:convex": "convex dev",
     "dev:all": "concurrently \"npm run dev\" \"npm run dev:convex\"",
+    "deploy:convex:prod": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/deploy-convex-prod.ps1",
     "site-publish:webhook": "node scripts/site_publish_webhook.mjs",
     "build": "tsc && vite build",
     "preview": "vite preview",
