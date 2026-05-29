@@ -132,8 +132,10 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
     }
   };
 
-  // Check if we can generate (either topic selected or custom prompt)
-  const canGenerate = selectedSubject && selectedGrade && (selectedTopic || customPrompt.trim().length > 10);
+  // Check if we can generate: topic, custom prompt, or uploaded context file.
+  const hasCustomPrompt = customPrompt.trim().length > 10;
+  const hasUploadedFiles = uploadedFiles.length > 0;
+  const canGenerate = selectedSubject && selectedGrade && (selectedTopic || hasCustomPrompt || hasUploadedFiles);
 
   // Helper: File to Base64
   const fileToBase64 = (file: File): Promise<string> => {
@@ -157,8 +159,8 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
       return;
     }
 
-    if (!selectedTopic && !customPrompt.trim()) {
-      setError('Bitte wähle ein Thema oder beschreibe dein eigenes');
+    if (!selectedTopic && !customPrompt.trim() && uploadedFiles.length === 0) {
+      setError('Bitte wähle ein Thema, beschreibe dein eigenes oder lade eine Datei hoch');
       return;
     }
 
@@ -187,6 +189,12 @@ Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
         // Topic selection mode
         prompt = `Erstelle eine Lernwelt zum Thema "${selectedTopic.name}" für Klasse ${selectedGrade} im Fach ${selectedSubject.name}. Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
         title = `${selectedTopic.name} - Klasse ${selectedGrade}`;
+      } else if (uploadedFiles.length > 0) {
+        const firstFileName = uploadedFiles[0].file.name.replace(/\.[^/.]+$/, '');
+        prompt = `Erstelle eine Lernwelt für Klasse ${selectedGrade} im Fach ${selectedSubject.name}.
+
+Nutze die hochgeladene Datei als Grundlage. Die Welt soll kindgerecht, interaktiv und spielerisch sein.`;
+        title = firstFileName.slice(0, 50) + (firstFileName.length > 50 ? '...' : '');
       } else {
         throw new Error('Kein Thema ausgewählt');
       }
