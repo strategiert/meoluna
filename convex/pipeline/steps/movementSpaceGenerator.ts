@@ -1,0 +1,34 @@
+import { callAnthropicJson } from "../utils/anthropicClient";
+import { MOVEMENT_SPACE_SYSTEM_PROMPT } from "../prompts/movementSpace";
+import type { LearningBrief, MovementEngineSpec } from "../engines/movementSpaceTypes";
+import { validateMovementEngineSpec } from "../engines/movementSpaceValidator";
+import { buildMovementSpaceWorldCode } from "../engines/movementSpaceRenderer";
+
+export async function runMovementSpaceGenerator(input: {
+  brief: LearningBrief;
+}): Promise<{
+  spec: MovementEngineSpec;
+  code: string;
+  inputTokens: number;
+  outputTokens: number;
+}> {
+  const response = await callAnthropicJson<MovementEngineSpec>({
+    model: "claude-opus-4-20250514",
+    systemPrompt: MOVEMENT_SPACE_SYSTEM_PROMPT,
+    userMessage: JSON.stringify(input.brief),
+    maxTokens: 10000,
+    temperature: 0.4,
+  });
+
+  const validation = validateMovementEngineSpec(response.result);
+  if (!validation.passed) {
+    throw new Error(`Movement spec failed validation: ${validation.violations.join(" | ")}`);
+  }
+
+  return {
+    spec: response.result,
+    code: buildMovementSpaceWorldCode(response.result),
+    inputTokens: response.inputTokens,
+    outputTokens: response.outputTokens,
+  };
+}
