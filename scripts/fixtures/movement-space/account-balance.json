@@ -1,0 +1,71 @@
+{
+  "engine": "movement-space",
+  "learningBrief": {
+    "inputMode": "material",
+    "subject": "Mathematik",
+    "gradeLevel": "6",
+    "rawTopic": "Kontostand 12 Euro, Ausgabe 20 Euro",
+    "extractedTasks": ["12 - 20"],
+    "learningGoals": ["Schulden als negative Position auf einer Kontoskala verstehen"],
+    "likelyMisconceptions": ["Bei 0 aufhören statt in Schulden weiterzurechnen"],
+    "focus": "understand",
+    "confidence": "low"
+  },
+  "world": {
+    "worldName": "Tresorlinie der Saldo-Agenten",
+    "coreMetaphor": "Guthaben und Schulden liegen auf einer durchgehenden Kontolinie.",
+    "setting": "Ein Tresorraum zeigt Guthaben rechts von 0 und Schulden links von 0.",
+    "visualStyle": {
+      "palette": ["#111827", "#22c55e", "#ef4444", "#facc15", "#e5e7eb"],
+      "mood": "präzise und spannend",
+      "shapes": "Tresorfächer entlang einer Zahlenskala",
+      "effects": "grüne und rote Saldo-Lichter"
+    },
+    "guide": {
+      "name": "Saldo",
+      "role": "Tresor-Agent",
+      "personality": "Direkt und sachlich. Saldo macht sichtbar, wann Guthaben in Schulden kippt."
+    },
+    "rooms": [
+      {
+        "id": "saldo-line",
+        "title": "Die Saldo-Linie",
+        "purpose": "Verstehen, dass Ausgaben größer als Guthaben zu negativem Saldo führen.",
+        "scene": "Ein Tresorwagen bewegt sich über die Kontolinie.",
+        "reward": "Das Schuldenfach wird korrekt markiert."
+      }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Ausgaben über das Guthaben hinaus werden nicht als negative Position verstanden.",
+    "embodiedMetaphor": "Geld ausgeben bewegt den Saldo nach links.",
+    "successInsight": "12 Euro Guthaben minus 20 Euro Ausgabe endet bei 8 Euro Schulden."
+  },
+  "coordinateSystem": {
+    "dimensions": "1d-horizontal",
+    "min": -30,
+    "max": 30,
+    "unitLabel": "Euro",
+    "negativeDirectionLabel": "Schulden",
+    "positiveDirectionLabel": "Guthaben"
+  },
+  "rooms": [
+    {
+      "roomId": "saldo-line",
+      "objective": "Bewege den Saldo von 12 Euro um 20 Euro Ausgabe.",
+      "startPosition": 12,
+      "moves": [
+        { "value": -20, "label": "20 Euro Ausgabe", "meaning": "-20 Euro" }
+      ],
+      "targetPosition": -8,
+      "interaction": "step-sequencer",
+      "feedback": {
+        "correct": "Genau. Die Ausgabe bewegt den Saldo bis -8 Euro.",
+        "wrongDirection": "Eine Ausgabe erhöht das Guthaben nicht, sie bewegt nach links.",
+        "wrongDistance": "Die Richtung stimmt, aber die Ausgabe beträgt 20 Euro.",
+        "signConfusion": "Wenn die Ausgabe größer als das Guthaben ist, geht die Skala links von 0 weiter."
+      },
+      "explanationAfterSuccess": "12 - 20 bedeutet: Von 12 zwanzig Schritte nach links. Nach 12 Schritten bist du bei 0, danach 8 Schritte in den Schulden."
+    }
+  ]
+}

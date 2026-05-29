@@ -1,0 +1,71 @@
+{
+  "engine": "movement-space",
+  "learningBrief": {
+    "inputMode": "material",
+    "subject": "Mathematik",
+    "gradeLevel": "5",
+    "rawTopic": "Ein Taucher ist bei -12 m und steigt 7 m auf",
+    "extractedTasks": ["-12 + 7"],
+    "learningGoals": ["Höhe und Tiefe als Positionen auf einer vertikalen Skala verstehen"],
+    "likelyMisconceptions": ["Aufsteigen und positive Richtung nicht verbinden"],
+    "focus": "understand",
+    "confidence": "medium"
+  },
+  "world": {
+    "worldName": "Tiefenstation Nautilus",
+    "coreMetaphor": "Tiefe ist eine vertikale Position unter der Wasseroberfläche.",
+    "setting": "Eine Unterwasserstation zeigt die Oberfläche bei 0 und Tiefen darunter.",
+    "visualStyle": {
+      "palette": ["#020617", "#0ea5e9", "#22d3ee", "#f8fafc", "#14b8a6"],
+      "mood": "ruhig und konzentriert",
+      "shapes": "vertikale Tiefenmarken und runde Bullaugen",
+      "effects": "Lichtstrahlen und Luftblasen"
+    },
+    "guide": {
+      "name": "Mira",
+      "role": "Tiefen-Navigatorin",
+      "personality": "Geduldig und präzise. Mira verbindet Aufsteigen mit positiver Bewegung."
+    },
+    "rooms": [
+      {
+        "id": "depth-shaft",
+        "title": "Der Tiefenschacht",
+        "purpose": "Verstehen, dass Aufsteigen eine positive Bewegung ist.",
+        "scene": "Ein Tauchboot bewegt sich auf einer Tiefenskala.",
+        "reward": "Ein Bullauge öffnet den Blick zur Oberfläche."
+      }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Von einer negativen Tiefe aus wird eine positive Bewegung falsch eingeordnet.",
+    "embodiedMetaphor": "Aufsteigen bedeutet auf der Skala nach oben, also in positive Richtung.",
+    "successInsight": "Von -12 sieben Meter aufsteigen endet bei -5."
+  },
+  "coordinateSystem": {
+    "dimensions": "1d-vertical",
+    "min": -30,
+    "max": 5,
+    "unitLabel": "Meter",
+    "negativeDirectionLabel": "tiefer",
+    "positiveDirectionLabel": "höher"
+  },
+  "rooms": [
+    {
+      "roomId": "depth-shaft",
+      "objective": "Steige vom Punkt -12 m um 7 m auf.",
+      "startPosition": -12,
+      "moves": [
+        { "value": 7, "label": "7 Meter aufsteigen", "meaning": "+7 m" }
+      ],
+      "targetPosition": -5,
+      "interaction": "drag-marker",
+      "feedback": {
+        "correct": "Richtig. Aufsteigen bewegt dich nach oben bis -5 m.",
+        "wrongDirection": "Du bist tiefer getaucht, aber aufsteigen geht nach oben.",
+        "wrongDistance": "Du bewegst dich nach oben, aber nicht genau 7 Meter.",
+        "signConfusion": "Plus 7 bedeutet hier: 7 Meter in positive Richtung, also näher zur Oberfläche."
+      },
+      "explanationAfterSuccess": "-12 + 7 heißt: Du startest 12 Meter unter 0 und steigst 7 Meter auf. Du bleibst noch 5 Meter unter der Oberfläche, also bei -5."
+    }
+  ]
+}
