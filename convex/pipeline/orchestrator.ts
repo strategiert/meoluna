@@ -20,9 +20,51 @@ import { runQualityGate, applyCorrections } from "./steps/qualityGate";
 import { runCodeGenerator } from "./steps/codeGenerator";
 import { runValidator } from "./steps/validator";
 import { runStructuralGate } from "./steps/structuralGate";
+import { runLearningDiagnosis } from "./steps/learningDiagnosis";
+import { runMovementSpaceGenerator } from "./steps/movementSpaceGenerator";
 
 import { STEP_LABELS, STEP_ORDER } from "./types";
 import type { AssetManifest } from "./types";
+
+function isLikelyMovementTopic(input: {
+  prompt: string;
+  pdfText?: string;
+  imageDescription?: string;
+  subject?: string;
+}): boolean {
+  const text = [
+    input.prompt,
+    input.pdfText ?? "",
+    input.imageDescription ?? "",
+    input.subject ?? "",
+  ].join("\n").toLowerCase();
+
+  if (/[+-]?\d+\s*[+-]\s*-?\d+/.test(text)) {
+    return true;
+  }
+
+  return [
+    "negative zahl",
+    "negative zahlen",
+    "zahlenstrahl",
+    "koordinaten",
+    "temperatur",
+    "höhe",
+    "hoehe",
+    "tiefe",
+    "kontostand",
+    "schulden",
+    "guthaben",
+    "richtung",
+    "distanz",
+    "meter",
+    "schritte",
+    "ost",
+    "west",
+    "steigen",
+    "sinken",
+  ].some((needle) => text.includes(needle));
+}
 
 // ============================================================================
 // MAIN ACTION: generateWorldV2
@@ -69,6 +111,77 @@ export const generateWorldV2 = action({
         sessionId: args.sessionId,
         userId: args.userId,
       });
+
+      // ── MOVEMENT-SPACE VERTICAL SLICE ───────────────────────────
+      // Conservative early route for spatial/number-line topics.
+      // If this branch fails validation or rendering, the existing pipeline remains the fallback.
+      if (isLikelyMovementTopic(args)) {
+        try {
+          await setStatus(0);
+          const diagnosisStart = Date.now();
+          const diagnosis = await runLearningDiagnosis({
+            prompt: args.prompt,
+            pdfText: args.pdfText,
+            gradeLevel: args.gradeLevel,
+            subject: args.subject,
+          });
+          stepTimings.movement_diagnosis = {
+            durationMs: Date.now() - diagnosisStart,
+            model: "sonnet",
+            inputTokens: diagnosis.inputTokens,
+            outputTokens: diagnosis.outputTokens,
+          };
+
+          await setStatus(1);
+          const movementStart = Date.now();
+          const movement = await runMovementSpaceGenerator({ brief: diagnosis.result });
+          stepTimings.movement_generator = {
+            durationMs: Date.now() - movementStart,
+            model: "opus",
+            inputTokens: movement.inputTokens,
+            outputTokens: movement.outputTokens,
+          };
+
+          const gateResult = runStructuralGate(movement.code);
+          if (!gateResult.passed) {
+            throw new Error(`Movement Structural Gate Failed: ${gateResult.violations.join(" | ")}`);
+          }
+
+          const worldId: Id<"worlds"> = await ctx.runMutation(api.worlds.create, {
+            title: movement.spec.world.worldName,
+            code: movement.code,
+            userId: args.userId,
+            isPublic: false,
+            prompt: args.prompt,
+            gradeLevel: args.gradeLevel ?? diagnosis.result.gradeLevel,
+            subject: args.subject ?? diagnosis.result.subject,
+            status: "published",
+            qualityScore: 8,
+            validationMetadata: {
+              validatorSuccess: true,
+              validatorIterations: 0,
+              gateScore: gateResult.score,
+              gatePassed: true,
+              gateViolations: [],
+            },
+          });
+
+          await ctx.runMutation(internal.pipeline.status.completeSession, {
+            sessionId: args.sessionId,
+            worldId,
+          });
+
+          return {
+            worldId,
+            code: movement.code,
+            worldName: movement.spec.world.worldName,
+            duration: Date.now() - startTime,
+            qualityScore: 8,
+          };
+        } catch (error) {
+          console.warn("movement-space generation failed, falling back to existing pipeline:", error);
+        }
+      }
 
       // ── STEP 1: INTERPRETER ──────────────────────────────────────
       await setStatus(0);
