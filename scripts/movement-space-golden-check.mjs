@@ -11,12 +11,7 @@ async function loadMovementModules() {
   const rendererPath = join(ROOT, "convex", "pipeline", "engines", "movementSpaceRenderer.ts");
 
   const validator = await import(pathToFileURL(validatorPath).href);
-  let renderer = null;
-  try {
-    renderer = await import(pathToFileURL(rendererPath).href);
-  } catch {
-    // Renderer is added after the first validator checks exist.
-  }
+  const renderer = await import(pathToFileURL(rendererPath).href);
 
   return {
     validateMovementEngineSpec: validator.validateMovementEngineSpec,
@@ -58,19 +53,15 @@ async function main() {
       continue;
     }
 
-    if (buildMovementSpaceWorldCode) {
-      const code = buildMovementSpaceWorldCode(spec);
-      const gate = structuralGate(code);
-      if (!gate.passed) {
-        failed += 1;
-        console.error(`FAIL ${file}`);
-        for (const violation of gate.violations) console.error(`  - ${violation}`);
-        continue;
-      }
-      console.log(`PASS ${file} (${code.split("\n").length} lines)`);
-    } else {
-      console.log(`PASS ${file}`);
+    const code = buildMovementSpaceWorldCode(spec);
+    const gate = structuralGate(code);
+    if (!gate.passed) {
+      failed += 1;
+      console.error(`FAIL ${file}`);
+      for (const violation of gate.violations) console.error(`  - ${violation}`);
+      continue;
     }
+    console.log(`PASS ${file} (${code.split("\n").length} lines)`);
   }
 
   if (failed > 0) {
