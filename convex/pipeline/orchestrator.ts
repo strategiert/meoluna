@@ -22,49 +22,10 @@ import { runValidator } from "./steps/validator";
 import { runStructuralGate } from "./steps/structuralGate";
 import { runLearningDiagnosis } from "./steps/learningDiagnosis";
 import { runMovementSpaceGenerator } from "./steps/movementSpaceGenerator";
+import { isLikelyMovementTopic } from "./engines/movementTopicRouter";
 
 import { STEP_LABELS, STEP_ORDER } from "./types";
 import type { AssetManifest } from "./types";
-
-function isLikelyMovementTopic(input: {
-  prompt: string;
-  pdfText?: string;
-  imageDescription?: string;
-  subject?: string;
-}): boolean {
-  const text = [
-    input.prompt,
-    input.pdfText ?? "",
-    input.imageDescription ?? "",
-    input.subject ?? "",
-  ].join("\n").toLowerCase();
-
-  if (/[+-]?\d+\s*[+-]\s*-?\d+/.test(text)) {
-    return true;
-  }
-
-  return [
-    "negative zahl",
-    "negative zahlen",
-    "zahlenstrahl",
-    "koordinaten",
-    "temperatur",
-    "höhe",
-    "hoehe",
-    "tiefe",
-    "kontostand",
-    "schulden",
-    "guthaben",
-    "richtung",
-    "distanz",
-    "meter",
-    "schritte",
-    "ost",
-    "west",
-    "steigen",
-    "sinken",
-  ].some((needle) => text.includes(needle));
-}
 
 // ============================================================================
 // MAIN ACTION: generateWorldV2

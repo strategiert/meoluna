@@ -18,6 +18,10 @@ import type * as documents from "../documents.js";
 import type * as generate from "../generate.js";
 import type * as http from "../http.js";
 import type * as messages from "../messages.js";
+import type * as pipeline_engines_movementSpaceRenderer from "../pipeline/engines/movementSpaceRenderer.js";
+import type * as pipeline_engines_movementSpaceTypes from "../pipeline/engines/movementSpaceTypes.js";
+import type * as pipeline_engines_movementSpaceValidator from "../pipeline/engines/movementSpaceValidator.js";
+import type * as pipeline_engines_movementTopicRouter from "../pipeline/engines/movementTopicRouter.js";
 import type * as pipeline_orchestrator from "../pipeline/orchestrator.js";
 import type * as pipeline_prompts_assetPlanner from "../pipeline/prompts/assetPlanner.js";
 import type * as pipeline_prompts_autoFix from "../pipeline/prompts/autoFix.js";
@@ -26,6 +30,8 @@ import type * as pipeline_prompts_contentArchitect from "../pipeline/prompts/con
 import type * as pipeline_prompts_creativeDirector from "../pipeline/prompts/creativeDirector.js";
 import type * as pipeline_prompts_gameDesigner from "../pipeline/prompts/gameDesigner.js";
 import type * as pipeline_prompts_interpreter from "../pipeline/prompts/interpreter.js";
+import type * as pipeline_prompts_learningDiagnosis from "../pipeline/prompts/learningDiagnosis.js";
+import type * as pipeline_prompts_movementSpace from "../pipeline/prompts/movementSpace.js";
 import type * as pipeline_prompts_qualityGate from "../pipeline/prompts/qualityGate.js";
 import type * as pipeline_skeleton_worldSkeleton from "../pipeline/skeleton/worldSkeleton.js";
 import type * as pipeline_status from "../pipeline/status.js";
@@ -36,6 +42,8 @@ import type * as pipeline_steps_contentArchitect from "../pipeline/steps/content
 import type * as pipeline_steps_creativeDirector from "../pipeline/steps/creativeDirector.js";
 import type * as pipeline_steps_gameDesigner from "../pipeline/steps/gameDesigner.js";
 import type * as pipeline_steps_interpreter from "../pipeline/steps/interpreter.js";
+import type * as pipeline_steps_learningDiagnosis from "../pipeline/steps/learningDiagnosis.js";
+import type * as pipeline_steps_movementSpaceGenerator from "../pipeline/steps/movementSpaceGenerator.js";
 import type * as pipeline_steps_qualityGate from "../pipeline/steps/qualityGate.js";
 import type * as pipeline_steps_structuralGate from "../pipeline/steps/structuralGate.js";
 import type * as pipeline_steps_validator from "../pipeline/steps/validator.js";
@@ -67,6 +75,10 @@ declare const fullApi: ApiFromModules<{
   generate: typeof generate;
   http: typeof http;
   messages: typeof messages;
+  "pipeline/engines/movementSpaceRenderer": typeof pipeline_engines_movementSpaceRenderer;
+  "pipeline/engines/movementSpaceTypes": typeof pipeline_engines_movementSpaceTypes;
+  "pipeline/engines/movementSpaceValidator": typeof pipeline_engines_movementSpaceValidator;
+  "pipeline/engines/movementTopicRouter": typeof pipeline_engines_movementTopicRouter;
   "pipeline/orchestrator": typeof pipeline_orchestrator;
   "pipeline/prompts/assetPlanner": typeof pipeline_prompts_assetPlanner;
   "pipeline/prompts/autoFix": typeof pipeline_prompts_autoFix;
@@ -75,6 +87,8 @@ declare const fullApi: ApiFromModules<{
   "pipeline/prompts/creativeDirector": typeof pipeline_prompts_creativeDirector;
   "pipeline/prompts/gameDesigner": typeof pipeline_prompts_gameDesigner;
   "pipeline/prompts/interpreter": typeof pipeline_prompts_interpreter;
+  "pipeline/prompts/learningDiagnosis": typeof pipeline_prompts_learningDiagnosis;
+  "pipeline/prompts/movementSpace": typeof pipeline_prompts_movementSpace;
   "pipeline/prompts/qualityGate": typeof pipeline_prompts_qualityGate;
   "pipeline/skeleton/worldSkeleton": typeof pipeline_skeleton_worldSkeleton;
   "pipeline/status": typeof pipeline_status;
@@ -85,6 +99,8 @@ declare const fullApi: ApiFromModules<{
   "pipeline/steps/creativeDirector": typeof pipeline_steps_creativeDirector;
   "pipeline/steps/gameDesigner": typeof pipeline_steps_gameDesigner;
   "pipeline/steps/interpreter": typeof pipeline_steps_interpreter;
+  "pipeline/steps/learningDiagnosis": typeof pipeline_steps_learningDiagnosis;
+  "pipeline/steps/movementSpaceGenerator": typeof pipeline_steps_movementSpaceGenerator;
   "pipeline/steps/qualityGate": typeof pipeline_steps_qualityGate;
   "pipeline/steps/structuralGate": typeof pipeline_steps_structuralGate;
   "pipeline/steps/validator": typeof pipeline_steps_validator;

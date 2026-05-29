@@ -1,5 +1,9 @@
 import { v } from "convex/values";
 import { action } from "./_generated/server";
+import { isLikelyMovementTopic } from "./pipeline/engines/movementTopicRouter";
+import { runLearningDiagnosis } from "./pipeline/steps/learningDiagnosis";
+import { runMovementSpaceGenerator } from "./pipeline/steps/movementSpaceGenerator";
+import { runStructuralGate } from "./pipeline/steps/structuralGate";
 
 // ============================================================================
 // DER SYSTEM-PROMPT - Das Herz von Meoluna
@@ -416,6 +420,37 @@ Bevor du antwortest, prüfe:
 
 Du erschaffst kein Arbeitsblatt. Du erschaffst ein Erlebnis.`;
 
+async function tryGenerateMovementSpaceLegacy(args: {
+  prompt: string;
+  pdfText?: string;
+  gradeLevel?: string;
+  subject?: string;
+}): Promise<{ code: string } | null> {
+  if (!isLikelyMovementTopic(args)) {
+    return null;
+  }
+
+  try {
+    const diagnosis = await runLearningDiagnosis({
+      prompt: args.prompt,
+      pdfText: args.pdfText,
+      gradeLevel: args.gradeLevel,
+      subject: args.subject,
+    });
+    const movement = await runMovementSpaceGenerator({ brief: diagnosis.result });
+    const gateResult = runStructuralGate(movement.code);
+
+    if (!gateResult.passed) {
+      throw new Error(`Movement Structural Gate Failed: ${gateResult.violations.join(" | ")}`);
+    }
+
+    return { code: movement.code };
+  } catch (error) {
+    console.warn("legacy movement-space route failed, falling back to legacy generator:", error);
+    return null;
+  }
+}
+
 // ============================================================================
 // GENERATE WORLD ACTION
 // ============================================================================
@@ -431,6 +466,15 @@ export const generateWorld = action({
 
     if (!apiKey) {
       throw new Error("ANTHROPIC_API_KEY nicht konfiguriert");
+    }
+
+    const movementResult = await tryGenerateMovementSpaceLegacy({
+      prompt: args.prompt,
+      gradeLevel: args.gradeLevel,
+      subject: args.subject,
+    });
+    if (movementResult) {
+      return movementResult;
     }
 
     // User-Prompt zusammenbauen
@@ -515,6 +559,16 @@ export const generateWorldFromPDF = action({
 
     if (!apiKey) {
       throw new Error("ANTHROPIC_API_KEY nicht konfiguriert");
+    }
+
+    const movementResult = await tryGenerateMovementSpaceLegacy({
+      prompt: args.prompt,
+      pdfText: args.pdfText,
+      gradeLevel: args.gradeLevel,
+      subject: args.subject,
+    });
+    if (movementResult) {
+      return movementResult;
     }
 
     // Enhanced system prompt for PDF-based generation
