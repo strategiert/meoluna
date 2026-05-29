@@ -11,6 +11,7 @@ interface PdfUploadProps {
   isExtracting: boolean;
   extractedText: string;
   error: string | null;
+  statusLabel?: string;
   onFileSelect: (file: File) => void;
   onFileClear: () => void;
 }
@@ -20,6 +21,7 @@ export function PdfUpload({
   isExtracting,
   extractedText,
   error,
+  statusLabel,
   onFileSelect,
   onFileClear,
 }: PdfUploadProps) {
@@ -142,7 +144,7 @@ export function PdfUpload({
                   <p className="text-sm font-medium truncate">{file.name}</p>
                   <p className="text-xs text-muted-foreground">
                     {formatSize(file.size)}
-                    {isExtracting && ' • Text wird extrahiert...'}
+                    {isExtracting && ` • ${statusLabel ?? 'Text wird extrahiert...'}`}
                     {extractedText && !isExtracting && ' • Bereit'}
                     {error && ' • Fehler'}
                   </p>

@@ -23,6 +23,7 @@ import { GradePicker } from './GradePicker';
 import { TopicPicker, Topic, UploadedFile } from './TopicPicker';
 import { useUser } from '@clerk/clerk-react';
 import { P5Background } from '@/components/landing/P5Background';
+import { uploadFileToConvexStorage } from '@/lib/convexStorageUpload';
 
 type Step = 'subject' | 'grade' | 'topic' | 'generating';
 
@@ -72,8 +73,9 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
   const generateWorld = useAction(api.generate.generateWorld);
   const generateWorldFromPDF = useAction(api.generate.generateWorldFromPDF);
   const extractTextFromPDF = useAction(api.documents.extractTextFromPDF);
-  // const generateUploadUrl = useMutation(api.storage.generateUploadUrl); // For future: persistent file storage
   const saveWorld = useMutation(api.worlds.create);
+  const generateUploadUrl = useMutation(api.storage.generateUploadUrl);
+  const saveUploadedFile = useMutation(api.storage.saveFile);
 
   // Reset modal state
   const resetState = useCallback(() => {
@@ -138,21 +140,6 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
   const hasUploadedFiles = uploadedFiles.length > 0;
   const canGenerate = selectedSubject && selectedGrade && (selectedTopic || hasCustomPrompt || hasUploadedFiles);
 
-  // Helper: File to Base64
-  const fileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        const result = reader.result as string;
-        // Remove data URL prefix (e.g., "data:application/pdf;base64,")
-        const base64 = result.split(',')[1];
-        resolve(base64);
-      };
-      reader.onerror = reject;
-    });
-  };
-
   // Generate World
   const handleGenerate = async () => {
     if (!selectedSubject || !selectedGrade || !user) {
@@ -204,21 +191,34 @@ Nutze die hochgeladene Datei als Grundlage. Die Welt soll kindgerecht, interakti
       let pdfText: string | null = null;
 
       if (uploadedFiles.length > 0) {
+        const extractedPdfTexts: string[] = [];
+
         for (const uploadedFile of uploadedFiles) {
+          const storedFile = await uploadFileToConvexStorage({
+            file: uploadedFile.file,
+            generateUploadUrl,
+            saveFileMetadata: saveUploadedFile,
+            userId: user.id,
+          });
+
           if (uploadedFile.type === 'pdf') {
-            // Extract text from PDF using OCR
-            const base64 = await fileToBase64(uploadedFile.file);
             const extractResult = await extractTextFromPDF({
-              pdfBase64: base64,
+              storageId: storedFile.storageId,
               fileName: uploadedFile.file.name,
             });
-            pdfText = extractResult.text;
+            extractedPdfTexts.push(
+              `# Dokument: ${uploadedFile.file.name}\n\n${extractResult.text}`
+            );
             prompt += `\n\nDer Nutzer hat ein Dokument hochgeladen: "${uploadedFile.file.name}"`;
           } else if (uploadedFile.type === 'image') {
-            // For images, we mention them in the prompt
-            // The actual image could be uploaded to storage for future Vision API use
-            prompt += `\n\nDer Nutzer hat ein Bild hochgeladen: "${uploadedFile.file.name}" - Bitte beziehe dich thematisch darauf.`;
+            prompt += `\n\nDer Nutzer hat ein Bild hochgeladen: "${uploadedFile.file.name}"${
+              storedFile.url ? ` - Referenzdatei: ${storedFile.url}` : ''
+            }`;
           }
+        }
+
+        if (extractedPdfTexts.length > 0) {
+          pdfText = extractedPdfTexts.join('\n\n---\n\n');
         }
       }
 

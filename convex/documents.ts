@@ -7,10 +7,11 @@ import { action } from "./_generated/server";
 
 export const extractTextFromPDF = action({
   args: {
-    pdfBase64: v.string(),
+    pdfBase64: v.optional(v.string()),
+    storageId: v.optional(v.id("_storage")),
     fileName: v.string(),
   },
-  handler: async (_ctx, args) => {
+  handler: async (ctx, args) => {
     const PADDLEOCR_URL = process.env.PADDLEOCR_URL;
 
     if (!PADDLEOCR_URL) {
@@ -19,16 +20,41 @@ export const extractTextFromPDF = action({
       );
     }
 
-    // Call PaddleOCR service
-    const response = await fetch(`${PADDLEOCR_URL}/extract-base64`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        pdf: args.pdfBase64,
-      }),
-    });
+    if (!args.pdfBase64 && !args.storageId) {
+      throw new Error("pdfBase64 oder storageId ist erforderlich");
+    }
+
+    let response: Response;
+
+    if (args.storageId) {
+      const storedFile = await ctx.storage.get(args.storageId);
+      if (!storedFile) {
+        throw new Error("Datei wurde im Convex Storage nicht gefunden.");
+      }
+
+      const fileBytes = await storedFile.arrayBuffer();
+      const formData = new FormData();
+      formData.append(
+        "file",
+        new Blob([fileBytes], { type: "application/pdf" }),
+        args.fileName,
+      );
+
+      response = await fetch(`${PADDLEOCR_URL}/extract-pdf`, {
+        method: "POST",
+        body: formData,
+      });
+    } else {
+      response = await fetch(`${PADDLEOCR_URL}/extract-base64`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          pdf: args.pdfBase64,
+        }),
+      });
+    }
 
     if (!response.ok) {
       const errorText = await response.text();

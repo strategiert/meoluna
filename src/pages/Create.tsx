@@ -25,6 +25,7 @@ import { Button } from '@/components/ui/button';
 import { WorldPreview } from '@/components/WorldPreview';
 import { PdfUpload } from '@/components/PdfUpload';
 import { GenerationProgress } from '@/components/GenerationProgress';
+import { uploadFileToConvexStorage } from '@/lib/convexStorageUpload';
 import { SignedIn, SignedOut, SignInButton, useUser } from '@clerk/clerk-react';
 
 interface Message {
@@ -58,6 +59,8 @@ export default function Create() {
   const extractPDF = useAction(api.documents.extractTextFromPDF);
   const autoFixCode = useAction(api.generate.autoFixCode);
   const saveWorld = useMutation(api.worlds.create);
+  const generateUploadUrl = useMutation(api.storage.generateUploadUrl);
+  const saveUploadedFile = useMutation(api.storage.saveFile);
 
   // V2 Pipeline Session
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -65,7 +68,8 @@ export default function Create() {
   // PDF State
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [pdfText, setPdfText] = useState<string>('');
-  const [isExtracting, setIsExtracting] = useState(false);
+  const [pdfStatus, setPdfStatus] = useState<'idle' | 'uploading' | 'extracting'>('idle');
+  const [pdfUploadProgress, setPdfUploadProgress] = useState(0);
   const [pdfError, setPdfError] = useState<string | null>(null);
 
   // Auto-scroll zu neuen Nachrichten
@@ -81,32 +85,26 @@ export default function Create() {
     }
   }, [input]);
 
-  // Helper: Convert file to base64
-  const fileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const result = reader.result as string;
-        // Remove data URL prefix (data:application/pdf;base64,)
-        const base64 = result.split(',')[1];
-        resolve(base64);
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  };
-
   // PDF Upload Handler
   const handlePdfSelect = async (file: File) => {
     setPdfFile(file);
     setPdfError(null);
     setPdfText('');
-    setIsExtracting(true);
+    setPdfUploadProgress(0);
+    setPdfStatus('uploading');
 
     try {
-      const base64 = await fileToBase64(file);
+      const uploadedFile = await uploadFileToConvexStorage({
+        file,
+        generateUploadUrl,
+        saveFileMetadata: saveUploadedFile,
+        userId: user?.id,
+      });
+      setPdfUploadProgress(100);
+      setPdfStatus('extracting');
+
       const result = await extractPDF({
-        pdfBase64: base64,
+        storageId: uploadedFile.storageId,
         fileName: file.name,
       });
       setPdfText(result.text);
@@ -115,10 +113,10 @@ export default function Create() {
       setPdfError(
         err instanceof Error
           ? err.message
-          : 'Text konnte nicht extrahiert werden. Ist der OCR-Service aktiv?'
+          : 'Upload oder OCR-Extraktion fehlgeschlagen.'
       );
     } finally {
-      setIsExtracting(false);
+      setPdfStatus('idle');
     }
   };
 
@@ -127,7 +125,19 @@ export default function Create() {
     setPdfFile(null);
     setPdfText('');
     setPdfError(null);
+    setPdfUploadProgress(0);
+    setPdfStatus('idle');
   };
+
+  const isPdfProcessing = pdfStatus !== 'idle';
+  const pdfStatusLabel =
+    pdfStatus === 'uploading'
+      ? pdfUploadProgress > 0
+        ? `Wird hochgeladen (${pdfUploadProgress}%)`
+        : 'Wird hochgeladen...'
+      : pdfStatus === 'extracting'
+        ? 'Text wird extrahiert...'
+        : undefined;
 
   const handleGenerate = async () => {
     if (!input.trim() || isGenerating) return;
@@ -305,9 +315,10 @@ export default function Create() {
               <div className="w-full mb-6">
                 <PdfUpload
                   file={pdfFile}
-                  isExtracting={isExtracting}
+                  isExtracting={isPdfProcessing}
                   extractedText={pdfText}
                   error={pdfError}
+                  statusLabel={pdfStatusLabel}
                   onFileSelect={handlePdfSelect}
                   onFileClear={handlePdfClear}
                 />
@@ -421,7 +432,7 @@ export default function Create() {
               />
               <Button
                 onClick={handleGenerate}
-                disabled={isGenerating || !input.trim()}
+                disabled={isGenerating || isPdfProcessing || !input.trim()}
                 size="icon"
                 className="h-auto aspect-square"
               >
