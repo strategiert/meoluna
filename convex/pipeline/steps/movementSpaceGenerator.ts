@@ -3,6 +3,7 @@ import { MOVEMENT_SPACE_SYSTEM_PROMPT } from "../prompts/movementSpace";
 import type { LearningBrief, MovementEngineSpec } from "../engines/movementSpaceTypes";
 import { validateMovementEngineSpec } from "../engines/movementSpaceValidator";
 import { buildMovementSpaceWorldCode } from "../engines/movementSpaceRenderer";
+import { tryBuildArithmeticMovementSpec } from "../engines/arithmeticMovementSpec";
 
 export async function runMovementSpaceGenerator(input: {
   brief: LearningBrief;
@@ -12,6 +13,21 @@ export async function runMovementSpaceGenerator(input: {
   inputTokens: number;
   outputTokens: number;
 }> {
+  const arithmeticSpec = tryBuildArithmeticMovementSpec(input.brief);
+  if (arithmeticSpec) {
+    const validation = validateMovementEngineSpec(arithmeticSpec);
+    if (!validation.passed) {
+      throw new Error(`Arithmetic movement spec failed validation: ${validation.violations.join(" | ")}`);
+    }
+
+    return {
+      spec: arithmeticSpec,
+      code: buildMovementSpaceWorldCode(arithmeticSpec),
+      inputTokens: 0,
+      outputTokens: 0,
+    };
+  }
+
   const response = await callAnthropicJson<MovementEngineSpec>({
     model: "claude-opus-4-20250514",
     systemPrompt: MOVEMENT_SPACE_SYSTEM_PROMPT,

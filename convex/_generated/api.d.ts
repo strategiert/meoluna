@@ -18,6 +18,7 @@ import type * as documents from "../documents.js";
 import type * as generate from "../generate.js";
 import type * as http from "../http.js";
 import type * as messages from "../messages.js";
+import type * as pipeline_engines_arithmeticMovementSpec from "../pipeline/engines/arithmeticMovementSpec.js";
 import type * as pipeline_engines_movementSpaceRenderer from "../pipeline/engines/movementSpaceRenderer.js";
 import type * as pipeline_engines_movementSpaceTypes from "../pipeline/engines/movementSpaceTypes.js";
 import type * as pipeline_engines_movementSpaceValidator from "../pipeline/engines/movementSpaceValidator.js";
@@ -75,6 +76,7 @@ declare const fullApi: ApiFromModules<{
   generate: typeof generate;
   http: typeof http;
   messages: typeof messages;
+  "pipeline/engines/arithmeticMovementSpec": typeof pipeline_engines_arithmeticMovementSpec;
   "pipeline/engines/movementSpaceRenderer": typeof pipeline_engines_movementSpaceRenderer;
   "pipeline/engines/movementSpaceTypes": typeof pipeline_engines_movementSpaceTypes;
   "pipeline/engines/movementSpaceValidator": typeof pipeline_engines_movementSpaceValidator;
