@@ -1,6 +1,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { transform } from "esbuild";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
@@ -59,6 +60,18 @@ async function main() {
       failed += 1;
       console.error(`FAIL ${file}`);
       for (const violation of gate.violations) console.error(`  - ${violation}`);
+      continue;
+    }
+    try {
+      await transform(code, {
+        loader: "jsx",
+        jsx: "automatic",
+        format: "esm",
+      });
+    } catch (error) {
+      failed += 1;
+      console.error(`FAIL ${file}`);
+      console.error(`  - E_CODE_002: JSX compile failed: ${error instanceof Error ? error.message : String(error)}`);
       continue;
     }
     console.log(`PASS ${file} (${code.split("\n").length} lines)`);
