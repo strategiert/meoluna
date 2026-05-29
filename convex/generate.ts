@@ -623,7 +623,7 @@ REGELN:
 2. Behalte die gesamte Funktionalität bei
 3. Fixe nur den spezifischen Fehler
 4. Der Code muss eine "App" Komponente exportieren
-5. Nutze nur diese Imports: react, framer-motion, lucide-react, canvas-confetti, recharts, clsx
+5. Nutze nur diese Imports: react, framer-motion, lucide-react, canvas-confetti, recharts, clsx, p5
 6. Verwende Tailwind CSS Klassen für Styling
 
 ## HÄUFIGE FEHLER UND FIXES:
@@ -672,6 +672,21 @@ Mögliche Ursachen:
 2. Ein Array von Objekten wird ohne .map() gerendert: {items} statt {items.map(item => <div>{item.name}</div>)}
 3. Ein Objekt mit numerischen Keys (0, 1, 2, 3) wird als Array behandelt
 4. Object.keys() oder Object.values() Ergebnis wird direkt gerendert ohne .map()
+
+Original-Fehler: ${args.error}`;
+    }
+
+    if (args.error.includes("p5.fill") || args.error.includes("p5.stroke") || args.error.includes("Too many properties to enumerate")) {
+      errorDescription = `p5 Farbwert-Fehler:
+
+Der Code ruft p5.fill() oder p5.stroke() mit einem komplexen Objekt auf. p5 akzeptiert dort nur:
+1. Zahlen: p.fill(255), p.fill(255, 0, 0)
+2. CSS-Farbstrings: p.fill("#ff0000"), p.fill("rgba(255,0,0,0.5)")
+3. p5.Color-Werte aus p.color(...)
+
+Fixe alle fill/stroke-Aufrufe, die Objekte, React-State-Objekte, Arrays von Objekten, Komponenten oder ganze Datenstrukturen übergeben.
+
+Zusätzlich: Deklariere NIEMALS const/let/var PI, TWO_PI oder HALF_PI. Nutze Math.PI oder p.PI.
 
 Original-Fehler: ${args.error}`;
     }

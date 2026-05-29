@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -263,6 +264,9 @@ Nutze die hochgeladene Datei als Grundlage. Die Welt soll kindgerecht, interakti
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-[95vw] sm:max-w-[500px] max-h-[90vh] p-0 gap-0 overflow-y-auto">
         <DialogTitle className="sr-only">Neue Lernwelt erstellen</DialogTitle>
+        <DialogDescription className="sr-only">
+          Erstelle eine neue Lernwelt aus Fach, Klassenstufe, Thema, Beschreibung oder hochgeladenen Dateien.
+        </DialogDescription>
 
         {/* Progress Indicator */}
         <div className="flex items-center gap-2 p-4 border-b bg-secondary/30">

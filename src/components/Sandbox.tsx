@@ -86,59 +86,103 @@ const INDEX_HTML = `<!DOCTYPE html>
 // ============================================================================
 const INDEX_JS = `import { createRoot } from "react-dom/client";
 import React from "react";
+import p5 from "p5";
 import App from "./App";
+
+const reportedSandboxErrors = new Set();
+
+function postSandboxMessage(message) {
+  window.parent.postMessage(message, '*');
+}
+
+function postSandboxErrorOnce(key, error) {
+  if (reportedSandboxErrors.has(key)) return;
+  reportedSandboxErrors.add(key);
+  postSandboxMessage({
+    type: 'SANDBOX_ERROR',
+    error,
+  });
+}
 
 // Meoluna API — global für alle generierten Welten
 window.Meoluna = {
   reportScore(score, ctx) {
     if (typeof score !== 'number' || score <= 0) return;
-    window.parent.postMessage({
+    postSandboxMessage({
       type: 'meoluna:progress',
       payload: { event: 'score', amount: score, context: ctx || {} }
-    }, '*');
+    });
   },
   completeModule(moduleIndex) {
-    window.parent.postMessage({
+    postSandboxMessage({
       type: 'meoluna:progress',
       payload: { event: 'module', amount: 0, context: { moduleIndex } }
-    }, '*');
+    });
   },
   complete(finalScore) {
-    window.parent.postMessage({
+    postSandboxMessage({
       type: 'meoluna:progress',
       payload: { event: 'complete', amount: finalScore || 0, context: {} }
-    }, '*');
+    });
   },
   emit(eventType, amount, ctx) {
-    window.parent.postMessage({
+    postSandboxMessage({
       type: 'meoluna:progress',
       payload: { event: eventType, amount: amount || 0, context: ctx || {} }
-    }, '*');
+    });
   },
   speak(text) {
     if (!text || typeof text !== 'string') return;
-    window.parent.postMessage({
+    postSandboxMessage({
       type: 'meoluna:speak',
       text: String(text).slice(0, 500)
-    }, '*');
+    });
   },
   _version: '3.1.0',
 };
 window.meoluna = window.Meoluna;
 
+// Guard p5 drawing APIs against invalid generated values.
+// p5.fill/stroke can throw deep RangeErrors when a complex object is passed.
+const originalP5Fill = p5.prototype.fill;
+p5.prototype.fill = function guardedFill(...args) {
+  try {
+    return originalP5Fill.apply(this, args);
+  } catch (error) {
+    postSandboxErrorOnce(
+      'p5-fill-invalid-args',
+      'p5.fill wurde mit einem ungültigen Farbwert aufgerufen. Nutze Zahlen, CSS-Farbstrings oder p5.Color statt komplexer Objekte.'
+    );
+    return this;
+  }
+};
+
+const originalP5Stroke = p5.prototype.stroke;
+p5.prototype.stroke = function guardedStroke(...args) {
+  try {
+    return originalP5Stroke.apply(this, args);
+  } catch (error) {
+    postSandboxErrorOnce(
+      'p5-stroke-invalid-args',
+      'p5.stroke wurde mit einem ungültigen Farbwert aufgerufen. Nutze Zahlen, CSS-Farbstrings oder p5.Color statt komplexer Objekte.'
+    );
+    return this;
+  }
+};
+
 // Runtime-Fehler an Parent melden (für AutoFix)
 window.onerror = function(msg, _url, line) {
-  window.parent.postMessage({
+  postSandboxMessage({
     type: 'SANDBOX_ERROR',
     error: msg + (line ? ' (Zeile ' + line + ')' : '')
-  }, '*');
+  });
   return false;
 };
 window.onunhandledrejection = function(event) {
-  window.parent.postMessage({
+  postSandboxMessage({
     type: 'SANDBOX_ERROR',
     error: event.reason?.message || String(event.reason)
-  }, '*');
+  });
 };
 
 // Error Boundary — fängt React Render-Fehler und meldet sie via postMessage
@@ -151,10 +195,10 @@ class SandboxErrorBoundary extends React.Component {
     return { hasError: true };
   }
   componentDidCatch(error) {
-    window.parent.postMessage({
+    postSandboxMessage({
       type: 'SANDBOX_ERROR',
       error: error.message || 'Render-Fehler in der Lernwelt'
-    }, '*');
+    });
   }
   render() {
     if (this.state.hasError) return null;
@@ -176,7 +220,7 @@ root.render(
 function sanitizeCode(code: string): string {
   return code
     // PI/TWO_PI/HALF_PI redeclarations — Konflikt mit p5.js globals
-    .replace(/\bconst\s+(PI|TWO_PI|HALF_PI)\s*=\s*[^;]+;?/g, '/* p5 constant, nicht neu deklarieren */')
+    .replace(/^\s*(const|let|var)\s+(PI|TWO_PI|HALF_PI)\b[^\n;]*(?:;)?/gm, '/* p5 constant, nicht neu deklarieren */')
     // ReactDOM render calls — Rendering übernimmt index.js
     .replace(/\bconst\s+root\s*=\s*createRoot\([^)]*\);?/g, '/* handled by sandbox */')
     .replace(/\broot\.render\([^)]*\);?/g, '/* handled by sandbox */');
