@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as admin from "../admin.js";
 import type * as analytics_eventTracking from "../analytics/eventTracking.js";
 import type * as analytics_identityResolution from "../analytics/identityResolution.js";
 import type * as analytics_serverSideCollector from "../analytics/serverSideCollector.js";
@@ -71,6 +72,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  admin: typeof admin;
   "analytics/eventTracking": typeof analytics_eventTracking;
   "analytics/identityResolution": typeof analytics_identityResolution;
   "analytics/serverSideCollector": typeof analytics_serverSideCollector;
