@@ -3,7 +3,7 @@
  * App mit Routing
  */
 
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -30,6 +30,7 @@ import JoinClassroom from '@/pages/JoinClassroom';
 import NotFound from '@/pages/NotFound';
 import BackgroundsDemo from '@/pages/demo/Backgrounds';
 import SandboxLab from '@/pages/demo/SandboxLab';
+import AdminHome from '@/pages/admin/AdminHome';
 import WorldsAdmin from '@/pages/admin/WorldsAdmin';
 import SiteStudio from '@/pages/admin/SiteStudio';
 import SiteStudioEditor from '@/pages/admin/SiteStudioEditor';
@@ -67,6 +68,8 @@ export default function App() {
         <Route path="/demo/backgrounds" element={<BackgroundsDemo />} />
         <Route path="/demo/sandbox" element={<SandboxLab />} />
         {/* Admin */}
+        <Route path="/admin" element={<AdminHome />} />
+        <Route path="/backend" element={<Navigate to="/admin" replace />} />
         <Route path="/admin/worlds" element={<WorldsAdmin />} />
         <Route path="/admin/site-studio" element={<SiteStudio />} />
         <Route path="/admin/site-studio/:pageId" element={<SiteStudioEditor />} />

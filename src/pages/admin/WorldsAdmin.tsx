@@ -4,6 +4,8 @@
  */
 
 import { useQuery } from "convex/react";
+import { useUser } from "@clerk/clerk-react";
+import { Link } from "react-router-dom";
 import { api } from "../../../convex/_generated/api";
 
 const STATUS_STYLE: Record<string, string> = {
@@ -19,9 +21,17 @@ function ScoreBadge({ score }: { score?: number | null }) {
 }
 
 export default function WorldsAdmin() {
-  const worlds = useQuery(api.worlds.listForAdmin);
+  const { user, isLoaded } = useUser();
+  const convexUser = useQuery(
+    api.users.getUser,
+    user?.id ? { clerkId: user.id } : "skip",
+  );
+  const worlds = useQuery(
+    api.worlds.listForAdmin,
+    user?.id && convexUser?.role === "admin" ? { userId: user.id } : "skip",
+  );
 
-  if (!worlds) {
+  if (!isLoaded || (user && convexUser === undefined) || (convexUser?.role === "admin" && worlds === undefined)) {
     return (
       <div className="min-h-screen bg-gray-950 flex items-center justify-center text-white/50">
         Lade…
@@ -29,17 +39,37 @@ export default function WorldsAdmin() {
     );
   }
 
-  const published = worlds.filter(w => (w.status ?? "published") === "published").length;
-  const failed = worlds.filter(w => w.status === "failed").length;
-  const quarantined = worlds.filter(w => w.status === "quarantined").length;
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-950 p-10 text-center text-gray-300">
+        Bitte anmelden, um den Welten Admin zu öffnen.
+      </div>
+    );
+  }
+
+  if (!convexUser || convexUser.role !== "admin") {
+    return (
+      <div className="min-h-screen bg-gray-950 p-10 text-center text-gray-300">
+        Nur Admins dürfen diese Ansicht nutzen.
+      </div>
+    );
+  }
+
+  const adminWorlds = worlds ?? [];
+  const published = adminWorlds.filter(w => (w.status ?? "published") === "published").length;
+  const failed = adminWorlds.filter(w => w.status === "failed").length;
+  const quarantined = adminWorlds.filter(w => w.status === "quarantined").length;
 
   return (
     <div className="min-h-screen bg-gray-950 text-white p-6">
       {/* Header */}
       <div className="mb-6">
+        <Link to="/admin" className="mb-4 inline-flex text-sm text-gray-500 hover:text-white">
+          ← Admin Übersicht
+        </Link>
         <h1 className="text-2xl font-bold mb-1">Welten Admin</h1>
         <div className="flex gap-4 text-sm text-gray-400">
-          <span>Gesamt: <strong className="text-white">{worlds.length}</strong></span>
+          <span>Gesamt: <strong className="text-white">{adminWorlds.length}</strong></span>
           <span>✅ Published: <strong className="text-green-400">{published}</strong></span>
           {quarantined > 0 && <span>⚠️ Quarantined: <strong className="text-yellow-400">{quarantined}</strong></span>}
           {failed > 0 && <span>❌ Failed: <strong className="text-red-400">{failed}</strong></span>}
@@ -61,7 +91,7 @@ export default function WorldsAdmin() {
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
-            {worlds.map(w => (
+            {adminWorlds.map(w => (
               <tr key={w._id} className="hover:bg-white/[0.03] transition-colors">
                 {/* Titel */}
                 <td className="p-3 max-w-56">
@@ -126,7 +156,7 @@ export default function WorldsAdmin() {
           </tbody>
         </table>
 
-        {worlds.length === 0 && (
+        {adminWorlds.length === 0 && (
           <div className="p-12 text-center text-gray-500">Noch keine Welten vorhanden.</div>
         )}
       </div>

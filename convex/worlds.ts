@@ -155,8 +155,17 @@ export const togglePublic = mutation({
 // ADMIN: Alle Welten mit Status/Qualitätsinfo für Debug-View
 // ============================================================================
 export const listForAdmin = query({
-  args: {},
-  handler: async (ctx) => {
+  args: { userId: v.string() },
+  handler: async (ctx, args) => {
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", args.userId))
+      .first();
+
+    if (!user || user.role !== "admin") {
+      throw new Error("Admin access required.");
+    }
+
     const worlds = await ctx.db
       .query("worlds")
       .order("desc")
