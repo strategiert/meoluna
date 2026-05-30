@@ -14,6 +14,8 @@
     "golden-check": "node --import tsx/esm scripts/golden-check.mjs",
     "modal-route-check": "node scripts/modal-pipeline-route-check.mjs",
     "legacy-route-check": "node scripts/legacy-movement-route-check.mjs",
+    "focused-intervention-check": "node --import tsx/esm scripts/focused-intervention-check.mjs",
+    "world-creator-questions-check": "node scripts/world-creator-questions-check.mjs",
     "arithmetic-movement-check": "node --import tsx/esm scripts/arithmetic-movement-check.mjs",
     "movement-golden-check": "node --import tsx/esm scripts/movement-space-golden-check.mjs"
   },

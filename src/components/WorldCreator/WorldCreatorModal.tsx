@@ -20,7 +20,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2, Sparkles, Moon } from 'lucide-react';
 import { SubjectPicker, Subject } from './SubjectPicker';
 import { GradePicker } from './GradePicker';
-import { TopicPicker, Topic, UploadedFile } from './TopicPicker';
+import { TopicPicker, Topic, UploadedFile, ClarificationAnswers } from './TopicPicker';
 import { useUser } from '@clerk/clerk-react';
 import { P5Background } from '@/components/landing/P5Background';
 import { uploadFileToConvexStorage } from '@/lib/convexStorageUpload';
@@ -55,6 +55,11 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
   // Custom input state
   const [customPrompt, setCustomPrompt] = useState('');
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const [clarificationAnswers, setClarificationAnswers] = useState<ClarificationAnswers>({
+    intent: 'understand-now',
+    audience: 'student',
+    guidance: 'guided',
+  });
 
   // Convex Queries
   const subjects = useQuery(api.curriculum.getSubjects) as Subject[] | undefined;
@@ -85,6 +90,11 @@ export function WorldCreatorModal({ open, onOpenChange }: WorldCreatorModalProps
     setGeneratingMessage(0);
     setCustomPrompt('');
     setUploadedFiles([]);
+    setClarificationAnswers({
+      intent: 'understand-now',
+      audience: 'student',
+      guidance: 'guided',
+    });
   }, []);
 
   // Handle close
@@ -223,6 +233,7 @@ Nutze die hochgeladene Datei als Grundlage. Die Welt soll kindgerecht, interakti
         sessionId,
         gradeLevel: String(selectedGrade),
         subject: selectedSubject.slug,
+        contextAnswers: clarificationAnswers,
       });
 
       clearInterval(messageInterval);
@@ -336,6 +347,8 @@ Nutze die hochgeladene Datei als Grundlage. Die Welt soll kindgerecht, interakti
                 onCustomPromptChange={setCustomPrompt}
                 uploadedFiles={uploadedFiles}
                 onFilesChange={setUploadedFiles}
+                clarificationAnswers={clarificationAnswers}
+                onClarificationAnswersChange={setClarificationAnswers}
               />
 
               {/* Generate Button */}

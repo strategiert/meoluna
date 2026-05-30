@@ -1,5 +1,7 @@
 import { v } from "convex/values";
 import { action } from "./_generated/server";
+import { shouldUseFocusedIntervention } from "./pipeline/engines/focusedInterventionRouter";
+import { runFocusedInterventionGenerator } from "./pipeline/steps/focusedInterventionGenerator";
 import { isLikelyMovementTopic } from "./pipeline/engines/movementTopicRouter";
 import { runLearningDiagnosis } from "./pipeline/steps/learningDiagnosis";
 import { runMovementSpaceGenerator } from "./pipeline/steps/movementSpaceGenerator";
@@ -420,6 +422,36 @@ Bevor du antwortest, prüfe:
 
 Du erschaffst kein Arbeitsblatt. Du erschaffst ein Erlebnis.`;
 
+async function tryGenerateFocusedInterventionLegacy(args: {
+  prompt: string;
+  pdfText?: string;
+  gradeLevel?: string;
+  subject?: string;
+}): Promise<{ code: string } | null> {
+  if (!shouldUseFocusedIntervention(args)) {
+    return null;
+  }
+
+  try {
+    const focused = await runFocusedInterventionGenerator({
+      prompt: args.prompt,
+      pdfText: args.pdfText,
+      gradeLevel: args.gradeLevel,
+      subject: args.subject,
+    });
+    const gateResult = runStructuralGate(focused.code);
+
+    if (!gateResult.passed) {
+      throw new Error(`Focused Structural Gate Failed: ${gateResult.violations.join(" | ")}`);
+    }
+
+    return { code: focused.code };
+  } catch (error) {
+    console.warn("legacy focused-intervention route failed, falling back to legacy generator:", error);
+    return null;
+  }
+}
+
 async function tryGenerateMovementSpaceLegacy(args: {
   prompt: string;
   pdfText?: string;
@@ -466,6 +498,15 @@ export const generateWorld = action({
 
     if (!apiKey) {
       throw new Error("ANTHROPIC_API_KEY nicht konfiguriert");
+    }
+
+    const focusedResult = await tryGenerateFocusedInterventionLegacy({
+      prompt: args.prompt,
+      gradeLevel: args.gradeLevel,
+      subject: args.subject,
+    });
+    if (focusedResult) {
+      return focusedResult;
     }
 
     const movementResult = await tryGenerateMovementSpaceLegacy({
@@ -559,6 +600,16 @@ export const generateWorldFromPDF = action({
 
     if (!apiKey) {
       throw new Error("ANTHROPIC_API_KEY nicht konfiguriert");
+    }
+
+    const focusedResult = await tryGenerateFocusedInterventionLegacy({
+      prompt: args.prompt,
+      pdfText: args.pdfText,
+      gradeLevel: args.gradeLevel,
+      subject: args.subject,
+    });
+    if (focusedResult) {
+      return focusedResult;
     }
 
     const movementResult = await tryGenerateMovementSpaceLegacy({

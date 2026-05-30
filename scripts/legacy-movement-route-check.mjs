@@ -6,6 +6,18 @@ const source = readFileSync(legacyGeneratePath, "utf8");
 
 const checks = [
   {
+    ok: source.includes("tryGenerateFocusedInterventionLegacy"),
+    message: "Legacy generate actions must route acute help prompts through focused intervention first.",
+  },
+  {
+    ok: /tryGenerateFocusedInterventionLegacy\(\{[\s\S]*prompt:\s*args\.prompt[\s\S]*\}\)/.test(source),
+    message: "generateWorld must try focused intervention before movement or legacy freeform generation.",
+  },
+  {
+    ok: /tryGenerateFocusedInterventionLegacy\(\{[\s\S]*pdfText:\s*args\.pdfText[\s\S]*\}\)/.test(source),
+    message: "generateWorldFromPDF must forward PDF text to the focused intervention legacy route.",
+  },
+  {
     ok: source.includes("isLikelyMovementTopic"),
     message: "Legacy generate actions must detect movement-space topics.",
   },

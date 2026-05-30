@@ -24,6 +24,12 @@ export interface UploadedFile {
   type: 'image' | 'pdf';
 }
 
+export interface ClarificationAnswers {
+  intent: 'understand-now' | 'practice' | 'prepare-test';
+  audience: 'student' | 'parent' | 'teacher';
+  guidance: 'guided' | 'normal' | 'challenge';
+}
+
 interface TopicPickerProps {
   topics: Topic[];
   selectedTopic: Topic | null;
@@ -38,7 +44,43 @@ interface TopicPickerProps {
   onCustomPromptChange?: (prompt: string) => void;
   uploadedFiles?: UploadedFile[];
   onFilesChange?: (files: UploadedFile[]) => void;
+  clarificationAnswers: ClarificationAnswers;
+  onClarificationAnswersChange: (answers: ClarificationAnswers) => void;
 }
+
+const clarificationQuestions = [
+  {
+    id: 'intent' as const,
+    label: 'Was soll zuerst passieren?',
+    options: [
+      { value: 'understand-now', label: 'Sofort verstehen' },
+      { value: 'practice', label: 'Üben' },
+      { value: 'prepare-test', label: 'Klassenarbeit vorbereiten' },
+    ],
+  },
+  {
+    id: 'audience' as const,
+    label: 'Für wen ist es gerade?',
+    options: [
+      { value: 'student', label: 'Kind / Schüler' },
+      { value: 'parent', label: 'Elternteil hilft' },
+      { value: 'teacher', label: 'Lehrkraft' },
+    ],
+  },
+  {
+    id: 'guidance' as const,
+    label: 'Wie stark führen?',
+    options: [
+      { value: 'guided', label: 'Sehr geführt' },
+      { value: 'normal', label: 'Normal' },
+      { value: 'challenge', label: 'Mehr Herausforderung' },
+    ],
+  },
+] satisfies Array<{
+  id: keyof ClarificationAnswers;
+  label: string;
+  options: Array<{ value: ClarificationAnswers[keyof ClarificationAnswers]; label: string }>;
+}>;
 
 export function TopicPicker({
   topics,
@@ -53,6 +95,8 @@ export function TopicPicker({
   onCustomPromptChange,
   uploadedFiles = [],
   onFilesChange,
+  clarificationAnswers,
+  onClarificationAnswersChange,
 }: TopicPickerProps) {
   const [showCustomInput, setShowCustomInput] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -280,6 +324,50 @@ export function TopicPicker({
               </div>
             )}
           </div>
+
+          {(customPrompt.trim().length > 0 || uploadedFiles.length > 0) && (
+            <div className="space-y-3 rounded-xl border bg-secondary/30 p-3">
+              <div>
+                <p className="text-sm font-medium">Kurz feinjustieren</p>
+                <p className="text-xs text-muted-foreground">
+                  Optional. Die App nutzt Standardwerte, wenn du nichts änderst.
+                </p>
+              </div>
+              {clarificationQuestions.map((question) => (
+                <div key={question.id} className="space-y-2">
+                  <p className="text-xs font-medium text-muted-foreground">
+                    {question.label}
+                  </p>
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                    {question.options.map((option) => {
+                      const isActive = clarificationAnswers[question.id] === option.value;
+
+                      return (
+                        <button
+                          key={option.value}
+                          type="button"
+                          onClick={() =>
+                            onClarificationAnswersChange({
+                              ...clarificationAnswers,
+                              [question.id]: option.value,
+                            })
+                          }
+                          className={cn(
+                            'rounded-lg border px-3 py-2 text-left text-xs font-medium transition-colors',
+                            isActive
+                              ? 'border-primary bg-primary/10 text-primary'
+                              : 'border-border bg-background hover:bg-secondary'
+                          )}
+                        >
+                          {option.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Back to Topics */}
           <Button

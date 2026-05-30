@@ -20,8 +20,11 @@ import { runQualityGate, applyCorrections } from "./steps/qualityGate";
 import { runCodeGenerator } from "./steps/codeGenerator";
 import { runValidator } from "./steps/validator";
 import { runStructuralGate } from "./steps/structuralGate";
+import { runFocusedInterventionGenerator } from "./steps/focusedInterventionGenerator";
 import { runLearningDiagnosis } from "./steps/learningDiagnosis";
 import { runMovementSpaceGenerator } from "./steps/movementSpaceGenerator";
+import { runFocusedInterventionGate } from "./engines/focusedInterventionGate";
+import { shouldUseFocusedIntervention } from "./engines/focusedInterventionRouter";
 import { isLikelyMovementTopic } from "./engines/movementTopicRouter";
 
 import { STEP_LABELS, STEP_ORDER } from "./types";
@@ -37,6 +40,11 @@ export const generateWorldV2 = action({
     imageDescription: v.optional(v.string()),
     gradeLevel: v.optional(v.string()),
     subject: v.optional(v.string()),
+    contextAnswers: v.optional(v.object({
+      intent: v.optional(v.string()),
+      audience: v.optional(v.string()),
+      guidance: v.optional(v.string()),
+    })),
     userId: v.string(),
     sessionId: v.string(),
   },
@@ -72,6 +80,75 @@ export const generateWorldV2 = action({
         sessionId: args.sessionId,
         userId: args.userId,
       });
+
+      // ── FOCUSED INTERVENTION ────────────────────────────────────
+      // Acute help requests should become compact, complete mini-apps.
+      // This route runs before movement-space and the broad world pipeline.
+      if (shouldUseFocusedIntervention(args)) {
+        try {
+          await setStatus(0);
+          const focusStart = Date.now();
+          const focused = await runFocusedInterventionGenerator({
+            prompt: args.prompt,
+            pdfText: args.pdfText,
+            imageDescription: args.imageDescription,
+            gradeLevel: args.gradeLevel,
+            subject: args.subject,
+            contextAnswers: args.contextAnswers,
+          });
+          stepTimings.focused_intervention = {
+            durationMs: Date.now() - focusStart,
+            model: focused.inputTokens > 0 ? "opus" : "deterministic",
+            inputTokens: focused.inputTokens,
+            outputTokens: focused.outputTokens,
+          };
+
+          await setStatus(8);
+          const validated = await runValidator(focused.code);
+          const structuralGate = runStructuralGate(validated.code);
+          if (!structuralGate.passed) {
+            throw new Error(`Focused Structural Gate Failed: ${structuralGate.violations.join(" | ")}`);
+          }
+          const focusedGate = runFocusedInterventionGate(validated.code);
+          if (!focusedGate.passed) {
+            throw new Error(`Focused Intervention Gate Failed: ${focusedGate.violations.join(" | ")}`);
+          }
+
+          const worldId: Id<"worlds"> = await ctx.runMutation(api.worlds.create, {
+            title: focused.worldName,
+            code: validated.code,
+            userId: args.userId,
+            isPublic: false,
+            prompt: args.prompt,
+            gradeLevel: args.gradeLevel,
+            subject: args.subject,
+            status: "published",
+            qualityScore: Math.max(8, focusedGate.score),
+            validationMetadata: {
+              validatorSuccess: validated.success,
+              validatorIterations: validated.iterations ?? 0,
+              gateScore: Math.min(structuralGate.score, focusedGate.score),
+              gatePassed: true,
+              gateViolations: [],
+            },
+          });
+
+          await ctx.runMutation(internal.pipeline.status.completeSession, {
+            sessionId: args.sessionId,
+            worldId,
+          });
+
+          return {
+            worldId,
+            code: validated.code,
+            worldName: focused.worldName,
+            duration: Date.now() - startTime,
+            qualityScore: Math.max(8, focusedGate.score),
+          };
+        } catch (error) {
+          console.warn("focused intervention generation failed, falling back to other routes:", error);
+        }
+      }
 
       // ── MOVEMENT-SPACE VERTICAL SLICE ───────────────────────────
       // Conservative early route for spatial/number-line topics.
