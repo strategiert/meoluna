@@ -5,9 +5,15 @@
     "subject": "Mathematik",
     "gradeLevel": "5",
     "rawTopic": "Ein Taucher ist bei -12 m und steigt 7 m auf",
-    "extractedTasks": ["-12 + 7"],
-    "learningGoals": ["Höhe und Tiefe als Positionen auf einer vertikalen Skala verstehen"],
-    "likelyMisconceptions": ["Aufsteigen und positive Richtung nicht verbinden"],
+    "extractedTasks": [
+      "-12 + 7"
+    ],
+    "learningGoals": [
+      "Höhe und Tiefe als Positionen auf einer vertikalen Skala verstehen"
+    ],
+    "likelyMisconceptions": [
+      "Aufsteigen und positive Richtung nicht verbinden"
+    ],
     "focus": "understand",
     "confidence": "medium"
   },
@@ -16,7 +22,13 @@
     "coreMetaphor": "Tiefe ist eine vertikale Position unter der Wasseroberfläche.",
     "setting": "Eine Unterwasserstation zeigt die Oberfläche bei 0 und Tiefen darunter.",
     "visualStyle": {
-      "palette": ["#020617", "#0ea5e9", "#22d3ee", "#f8fafc", "#14b8a6"],
+      "palette": [
+        "#020617",
+        "#0ea5e9",
+        "#22d3ee",
+        "#f8fafc",
+        "#14b8a6"
+      ],
       "mood": "ruhig und konzentriert",
       "shapes": "vertikale Tiefenmarken und runde Bullaugen",
       "effects": "Lichtstrahlen und Luftblasen"
@@ -28,11 +40,25 @@
     },
     "rooms": [
       {
+        "id": "depth-shaft-aufwaermen",
+        "title": "Aufwärmen",
+        "purpose": "Mit kleinen Zahlen warm werden.",
+        "scene": "Kurze Wege zum Eingewöhnen.",
+        "reward": "Warmgehüpft"
+      },
+      {
         "id": "depth-shaft",
         "title": "Der Tiefenschacht",
         "purpose": "Verstehen, dass Aufsteigen eine positive Bewegung ist.",
         "scene": "Ein Tauchboot bewegt sich auf einer Tiefenskala.",
         "reward": "Ein Bullauge öffnet den Blick zur Oberfläche."
+      },
+      {
+        "id": "depth-shaft-meister",
+        "title": "Meisterprüfung",
+        "purpose": "Wege selbst aus Chips bauen.",
+        "scene": "Drei Prüfungs-Wege mit Chips.",
+        "reward": "Wege-Meister"
       }
     ]
   },
@@ -44,21 +70,112 @@
   "coordinateSystem": {
     "dimensions": "1d-vertical",
     "min": -30,
-    "max": 5,
+    "max": 10,
     "unitLabel": "Meter",
     "negativeDirectionLabel": "tiefer",
     "positiveDirectionLabel": "höher"
   },
   "rooms": [
     {
+      "roomId": "depth-shaft-aufwaermen",
+      "objective": "Zwei kurze Wege zum Warmwerden.",
+      "rounds": [
+        {
+          "startPosition": -12,
+          "moves": [
+            {
+              "value": 2,
+              "label": "2 Schritte",
+              "meaning": "+7 m"
+            }
+          ],
+          "targetPosition": -10
+        },
+        {
+          "startPosition": -12,
+          "moves": [
+            {
+              "value": 4,
+              "label": "4 Schritte",
+              "meaning": "+7 m"
+            }
+          ],
+          "targetPosition": -8
+        }
+      ],
+      "interaction": "choose-direction",
+      "feedback": {
+        "correct": "Richtig. Aufsteigen bewegt dich nach oben bis -5 m.",
+        "wrongDirection": "Du bist tiefer getaucht, aber aufsteigen geht nach oben.",
+        "wrongDistance": "Du bewegst dich nach oben, aber nicht genau 7 Meter.",
+        "signConfusion": "Plus 7 bedeutet hier: 7 Meter in positive Richtung, also näher zur Oberfläche."
+      },
+      "explanationAfterSuccess": "-12 + 7 heißt: Du startest 12 Meter unter 0 und steigst 7 Meter auf. Du bleibst noch 5 Meter unter der Oberfläche, also bei -5."
+    },
+    {
       "roomId": "depth-shaft",
       "objective": "Steige vom Punkt -12 m um 7 m auf.",
-      "startPosition": -12,
-      "moves": [
-        { "value": 7, "label": "7 Meter aufsteigen", "meaning": "+7 m" }
+      "feedback": {
+        "correct": "Richtig. Aufsteigen bewegt dich nach oben bis -5 m.",
+        "wrongDirection": "Du bist tiefer getaucht, aber aufsteigen geht nach oben.",
+        "wrongDistance": "Du bewegst dich nach oben, aber nicht genau 7 Meter.",
+        "signConfusion": "Plus 7 bedeutet hier: 7 Meter in positive Richtung, also näher zur Oberfläche."
+      },
+      "explanationAfterSuccess": "-12 + 7 heißt: Du startest 12 Meter unter 0 und steigst 7 Meter auf. Du bleibst noch 5 Meter unter der Oberfläche, also bei -5.",
+      "rounds": [
+        {
+          "startPosition": -12,
+          "moves": [
+            {
+              "value": 7,
+              "label": "7 Meter aufsteigen",
+              "meaning": "+7 m"
+            }
+          ],
+          "targetPosition": -5
+        }
       ],
-      "targetPosition": -5,
-      "interaction": "drag-marker",
+      "interaction": "choose-direction"
+    },
+    {
+      "roomId": "depth-shaft-meister",
+      "objective": "Meisterprüfung: Baue die Wege selbst aus den Chips.",
+      "rounds": [
+        {
+          "startPosition": -12,
+          "moves": [
+            {
+              "value": 5,
+              "label": "5 Schritte",
+              "meaning": "+7 m"
+            }
+          ],
+          "targetPosition": -7
+        },
+        {
+          "startPosition": -12,
+          "moves": [
+            {
+              "value": 9,
+              "label": "9 Schritte",
+              "meaning": "+7 m"
+            }
+          ],
+          "targetPosition": -3
+        },
+        {
+          "startPosition": -12,
+          "moves": [
+            {
+              "value": 11,
+              "label": "11 Schritte",
+              "meaning": "+7 m"
+            }
+          ],
+          "targetPosition": -1
+        }
+      ],
+      "interaction": "step-sequencer",
       "feedback": {
         "correct": "Richtig. Aufsteigen bewegt dich nach oben bis -5 m.",
         "wrongDirection": "Du bist tiefer getaucht, aber aufsteigen geht nach oben.",

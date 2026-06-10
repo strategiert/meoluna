@@ -16,6 +16,7 @@ import confetti from 'canvas-confetti';
 const SPEC = ${dataJson};
 
 // "Bilderbuch-Tag": helle, freundliche Spielwelt für Kinder ab 5.
+// Session-Format v2: Räume enthalten mehrere Runden mit steigender Schwierigkeit.
 const KID = {
   skyTop: '#79c7f5',
   skyBottom: '#e9f8ff',
@@ -51,8 +52,8 @@ function sumOf(values) {
   return values.reduce((sum, value) => sum + value, 0);
 }
 
-function totalParts(room) {
-  return Object.values(room.targetParts).reduce((sum, value) => sum + value, 0);
+function totalParts(round) {
+  return Object.values(round.targetParts).reduce((sum, value) => sum + value, 0);
 }
 
 function KidStyles() {
@@ -140,14 +141,24 @@ function StarRow({ stars }) {
   );
 }
 
-function RecipeCard({ room }) {
+function RoundDots({ total, current }) {
+  return (
+    <div className="flex items-center gap-1.5 rounded-full border-2 px-3 py-1.5" style={{ background: KID.card, borderColor: KID.ink }}>
+      {Array.from({ length: total }).map((entry, index) => (
+        <div key={index} className="h-3.5 w-3.5 rounded-full border-2" style={{ background: index < current ? KID.green : index === current ? KID.sun : '#e3e8f0', borderColor: KID.ink }} />
+      ))}
+    </div>
+  );
+}
+
+function RecipeCard({ ingredients, round }) {
   return (
     <div className="kid-font rounded-2xl border-4 px-4 py-2" style={{ background: '#fff8e6', borderColor: KID.ink }}>
       <p className="text-sm font-extrabold uppercase tracking-wide" style={{ color: '#8a93a6' }}>Das Rezept</p>
       <div className="mt-1 flex flex-wrap items-center gap-3">
-        {room.ingredients.filter((ingredient) => room.targetParts[ingredient.id]).map((ingredient) => (
-          <span key={ingredient.id} className="text-2xl sm:text-3xl" aria-label={room.targetParts[ingredient.id] + ' mal ' + ingredient.label}>
-            {Array.from({ length: room.targetParts[ingredient.id] }).map(() => ingredient.emoji).join('')}
+        {ingredients.filter((ingredient) => round.targetParts[ingredient.id]).map((ingredient) => (
+          <span key={ingredient.id} className="text-2xl sm:text-3xl" aria-label={round.targetParts[ingredient.id] + ' mal ' + ingredient.label}>
+            {Array.from({ length: round.targetParts[ingredient.id] }).map(() => ingredient.emoji).join('')}
           </span>
         ))}
       </div>
@@ -155,7 +166,7 @@ function RecipeCard({ room }) {
   );
 }
 
-function Cauldron({ room, added, bubbling }) {
+function Cauldron({ added, bubbling }) {
   return (
     <div className="relative mx-auto flex h-56 w-64 flex-col items-center justify-end sm:h-64 sm:w-80">
       <AnimatePresence>
@@ -167,7 +178,7 @@ function Cauldron({ room, added, bubbling }) {
             exit={{ opacity: 0 }}
             transition={{ duration: 1.1, repeat: Infinity, delay: index * 0.3 }}
             className="absolute top-10 h-6 w-6 rounded-full"
-            style={{ left: 40 + index * 26 + '%', background: 'rgba(255,255,255,0.75)' }}
+            style={{ left: 40 + index * 22 + '%', background: 'rgba(255,255,255,0.75)' }}
           />
         ))}
       </AnimatePresence>
@@ -194,13 +205,13 @@ function Cauldron({ room, added, bubbling }) {
   );
 }
 
-function RecipeScene({ room, added, bubbling }) {
+function RecipeScene({ ingredients, round, added, bubbling }) {
   return (
     <div className="relative w-full overflow-hidden rounded-[2rem] border-4" style={{ minHeight: '20rem', borderColor: KID.ink, background: 'linear-gradient(180deg, ' + KID.skyTop + ', ' + KID.skyBottom + ' 70%)' }}>
       <Sky />
       <div className="relative z-10 flex flex-col items-center gap-3 p-4">
-        <RecipeCard room={room} />
-        <Cauldron room={room} added={added} bubbling={bubbling} />
+        <RecipeCard ingredients={ingredients} round={round} />
+        <Cauldron added={added} bubbling={bubbling} />
       </div>
     </div>
   );
@@ -218,9 +229,9 @@ function WeightBlock({ value, color, onClick }) {
   );
 }
 
-function BalanceScene({ room, addedWeights, onRemoveAddedWeight }) {
-  const left = sumOf(room.leftWeights);
-  const right = sumOf(room.rightWeights) + sumOf(addedWeights);
+function BalanceScene({ round, addedWeights, onRemoveAddedWeight }) {
+  const left = sumOf(round.leftWeights);
+  const right = sumOf(round.rightWeights) + sumOf(addedWeights);
   const angle = Math.max(-12, Math.min(12, (right - left) * 2.2));
   return (
     <div className="relative w-full overflow-hidden rounded-[2rem] border-4" style={{ minHeight: '21rem', borderColor: KID.ink, background: 'linear-gradient(180deg, ' + KID.skyTop + ', ' + KID.skyBottom + ' 70%)' }}>
@@ -230,12 +241,12 @@ function BalanceScene({ room, addedWeights, onRemoveAddedWeight }) {
           <div className="h-4 w-full rounded-full border-4" style={{ background: KID.wood, borderColor: KID.ink }} />
           <div className="absolute -top-2 left-0 w-32 -translate-x-1/2 sm:w-36" style={{ transform: 'translateX(-50%) rotate(' + -angle + 'deg)' }}>
             <div className="flex min-h-[3rem] flex-wrap items-end justify-center gap-1 rounded-2xl border-4 p-1.5" style={{ background: '#ffe8df', borderColor: KID.ink }}>
-              {room.leftWeights.map((value, index) => <WeightBlock key={'l' + index} value={value} color={KID.coral} />)}
+              {round.leftWeights.map((value, index) => <WeightBlock key={'l' + index} value={value} color={KID.coral} />)}
             </div>
           </div>
           <div className="absolute -top-2 right-0 w-32 translate-x-1/2 sm:w-36" style={{ transform: 'translateX(50%) rotate(' + -angle + 'deg)' }}>
             <div className="flex min-h-[3rem] flex-wrap items-end justify-center gap-1 rounded-2xl border-4 p-1.5" style={{ background: '#dceeff', borderColor: KID.ink }}>
-              {room.rightWeights.map((value, index) => <WeightBlock key={'r' + index} value={value} color={KID.blue} />)}
+              {round.rightWeights.map((value, index) => <WeightBlock key={'r' + index} value={value} color={KID.blue} />)}
               {addedWeights.map((value, index) => <WeightBlock key={'a' + index} value={value} color={KID.green} onClick={() => onRemoveAddedWeight(index)} />)}
             </div>
           </div>
@@ -249,15 +260,15 @@ function BalanceScene({ room, addedWeights, onRemoveAddedWeight }) {
   );
 }
 
-function RecipeEquation({ room, solved }) {
-  const total = totalParts(room);
+function RecipeEquation({ ingredients, round, solved }) {
+  const total = totalParts(round);
   return (
     <div className="rounded-3xl border-4 p-4" style={{ background: KID.card, borderColor: KID.ink }}>
       <p className="kid-font text-sm font-extrabold uppercase tracking-wide" style={{ color: '#8a93a6' }}>Aus dem Rezept wird</p>
       <div className="mt-2 flex flex-wrap items-center gap-2">
-        {room.ingredients.filter((ingredient) => room.targetParts[ingredient.id]).map((ingredient) => (
+        {ingredients.filter((ingredient) => round.targetParts[ingredient.id]).map((ingredient) => (
           <span key={ingredient.id} className="kid-font rounded-2xl border-2 px-3 py-1.5 text-xl font-extrabold sm:text-2xl" style={{ background: solved ? '#dcf5e1' : '#eef1f6', borderColor: solved ? KID.ink : '#c6cdd9', color: solved ? KID.ink : '#9aa3b5' }}>
-            {solved ? room.targetParts[ingredient.id] + '/' + total + ' ' + ingredient.emoji : '?/' + total + ' ' + ingredient.emoji}
+            {solved ? round.targetParts[ingredient.id] + '/' + total + ' ' + ingredient.emoji : '?/' + total + ' ' + ingredient.emoji}
           </span>
         ))}
       </div>
@@ -265,11 +276,11 @@ function RecipeEquation({ room, solved }) {
   );
 }
 
-function BalanceEquation({ room, addedWeights, solved }) {
-  const left = sumOf(room.leftWeights);
-  const right = sumOf(room.rightWeights);
+function BalanceEquation({ round, addedWeights, solved }) {
+  const left = sumOf(round.leftWeights);
+  const right = sumOf(round.rightWeights);
   const added = sumOf(addedWeights);
-  const rightText = room.rightWeights.length > 0 ? String(right) + ' + ' : '';
+  const rightText = round.rightWeights.length > 0 ? String(right) + ' + ' : '';
   return (
     <div className="rounded-3xl border-4 p-4" style={{ background: KID.card, borderColor: KID.ink }}>
       <p className="kid-font text-sm font-extrabold uppercase tracking-wide" style={{ color: '#8a93a6' }}>Aus der Waage wird</p>
@@ -284,10 +295,17 @@ function BalanceEquation({ room, addedWeights, solved }) {
   );
 }
 
-function RecipeRoom({ room, onSolved, setBubble, setMood }) {
+function RecipeRoom({ room, roundIndex, onRoundWin, setBubble, setMood }) {
+  const round = room.rounds[roundIndex];
   const [added, setAdded] = useState([]);
   const [bubbling, setBubbling] = useState(false);
   const [solved, setSolved] = useState(false);
+
+  useEffect(() => {
+    setAdded([]);
+    setSolved(false);
+    setBubble(round.objective || room.objective);
+  }, [roundIndex]);
 
   function countsById() {
     const counts = {};
@@ -309,18 +327,14 @@ function RecipeRoom({ room, onSolved, setBubble, setMood }) {
   function mixPotion() {
     if (solved || added.length === 0) return;
     const counts = countsById();
-    const targetTotal = totalParts(room);
-    const anyTooMuch = room.ingredients.some((ingredient) => (counts[ingredient.id] || 0) > (room.targetParts[ingredient.id] || 0));
-    const exact = room.ingredients.every((ingredient) => (counts[ingredient.id] || 0) === (room.targetParts[ingredient.id] || 0));
+    const targetTotal = totalParts(round);
+    const anyTooMuch = room.ingredients.some((ingredient) => (counts[ingredient.id] || 0) > (round.targetParts[ingredient.id] || 0));
+    const exact = room.ingredients.every((ingredient) => (counts[ingredient.id] || 0) === (round.targetParts[ingredient.id] || 0));
     setBubbling(true);
     setTimeout(() => setBubbling(false), 1400);
     if (exact) {
       setSolved(true);
-      setMood('cheer');
-      setBubble(room.feedback.correct + ' ' + room.explanationAfterSuccess);
-      confetti({ particleCount: 100, spread: 75, origin: { y: 0.6 } });
-      setTimeout(() => setMood('happy'), 1200);
-      onSolved();
+      onRoundWin();
       return;
     }
     setMood('sad');
@@ -336,7 +350,7 @@ function RecipeRoom({ room, onSolved, setBubble, setMood }) {
 
   return (
     <>
-      <RecipeScene room={room} added={added} bubbling={bubbling} />
+      <RecipeScene ingredients={room.ingredients} round={round} added={added} bubbling={bubbling} />
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {room.ingredients.map((ingredient) => (
           <BigButton key={ingredient.id} onClick={() => addIngredient(ingredient)} color={KID.blue} colorDark={KID.blueDark} disabled={solved}>
@@ -348,18 +362,25 @@ function RecipeRoom({ room, onSolved, setBubble, setMood }) {
         <BigButton onClick={removeLastIngredient} color={KID.coral} colorDark={KID.coralDark} disabled={solved || added.length === 0}>↩️ Eins zurück</BigButton>
         <BigButton onClick={mixPotion} color={KID.green} colorDark={KID.greenDark} disabled={solved || added.length === 0}>🥄 Mischen!</BigButton>
       </div>
-      <RecipeEquation room={room} solved={solved} />
+      <RecipeEquation ingredients={room.ingredients} round={round} solved={solved} />
     </>
   );
 }
 
-function BalanceRoom({ room, onSolved, setBubble, setMood }) {
+function BalanceRoom({ room, roundIndex, onRoundWin, setBubble, setMood }) {
+  const round = room.rounds[roundIndex];
   const [addedWeights, setAddedWeights] = useState([]);
   const [solved, setSolved] = useState(false);
   const solveTimer = useRef(null);
 
-  const left = sumOf(room.leftWeights);
-  const right = sumOf(room.rightWeights) + sumOf(addedWeights);
+  const left = sumOf(round.leftWeights);
+  const right = sumOf(round.rightWeights) + sumOf(addedWeights);
+
+  useEffect(() => {
+    setAddedWeights([]);
+    setSolved(false);
+    setBubble(round.objective || room.objective);
+  }, [roundIndex]);
 
   useEffect(() => {
     if (solved) return;
@@ -367,11 +388,7 @@ function BalanceRoom({ room, onSolved, setBubble, setMood }) {
     if (right === left && addedWeights.length > 0) {
       solveTimer.current = setTimeout(() => {
         setSolved(true);
-        setMood('cheer');
-        setBubble(room.feedback.correct + ' ' + room.explanationAfterSuccess);
-        confetti({ particleCount: 100, spread: 75, origin: { y: 0.6 } });
-        setTimeout(() => setMood('happy'), 1200);
-        onSolved();
+        onRoundWin();
       }, 600);
     } else if (right > left) {
       setMood('sad');
@@ -394,7 +411,7 @@ function BalanceRoom({ room, onSolved, setBubble, setMood }) {
 
   return (
     <>
-      <BalanceScene room={room} addedWeights={addedWeights} onRemoveAddedWeight={removeAddedWeight} />
+      <BalanceScene round={round} addedWeights={addedWeights} onRemoveAddedWeight={removeAddedWeight} />
       <div className="grid grid-cols-3 gap-3">
         {room.chips.map((chip) => (
           <BigButton key={chip} onClick={() => addChip(chip)} color={KID.green} colorDark={KID.greenDark} disabled={solved}>
@@ -403,7 +420,7 @@ function BalanceRoom({ room, onSolved, setBubble, setMood }) {
         ))}
       </div>
       <p className="kid-font text-center text-base font-bold" style={{ color: '#5d6b85' }}>Tippe auf einen grünen Stein auf der Waage, um ihn wieder herunterzunehmen.</p>
-      <BalanceEquation room={room} addedWeights={addedWeights} solved={solved} />
+      <BalanceEquation round={round} addedWeights={addedWeights} solved={solved} />
     </>
   );
 }
@@ -411,14 +428,30 @@ function BalanceRoom({ room, onSolved, setBubble, setMood }) {
 function RoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
   const [bubble, setBubble] = useState(room.objective);
   const [mood, setMood] = useState('happy');
-  const [done, setDone] = useState(false);
+  const [roundIndex, setRoundIndex] = useState(0);
+  const [phase, setPhase] = useState('play');
 
-  function handleSolved() {
-    if (done) return;
-    setDone(true);
-    Meoluna.reportScore(25, { action: 'mixing-room-complete', roomId: room.roomId });
-    Meoluna.completeModule(room.roomId, 25);
+  function handleRoundWin() {
+    setMood('cheer');
+    Meoluna.reportScore(10, { action: 'mixing-round-correct', roomId: room.roomId, roundIndex });
     onStar();
+    if (roundIndex + 1 >= room.rounds.length) {
+      setPhase('done');
+      setBubble(room.feedback.correct + ' ' + room.explanationAfterSuccess);
+      Meoluna.reportScore(25, { action: 'mixing-room-complete', roomId: room.roomId });
+      Meoluna.completeModule(room.roomId, 25);
+      confetti({ particleCount: 100, spread: 75, origin: { y: 0.6 } });
+    } else {
+      setPhase('roundDone');
+      setBubble(room.feedback.correct + ' Bereit für die nächste Aufgabe?');
+      confetti({ particleCount: 50, spread: 60, origin: { y: 0.65 } });
+    }
+    setTimeout(() => setMood('happy'), 1200);
+  }
+
+  function nextRound() {
+    setPhase('play');
+    setRoundIndex(roundIndex + 1);
   }
 
   return (
@@ -431,16 +464,23 @@ function RoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
             <div className="rounded-2xl border-2 px-4 py-2 text-lg font-extrabold" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink }}>{roomMeta.title || room.roomId}</div>
             <Luno mood={mood} />
           </div>
-          <StarRow stars={stars} />
+          <div className="flex items-center gap-2">
+            <RoundDots total={room.rounds.length} current={phase === 'done' ? room.rounds.length : roundIndex} />
+            <StarRow stars={stars} />
+          </div>
         </div>
 
         <SpeechBubble text={bubble} />
 
-        {room.mode === 'recipe'
-          ? <RecipeRoom room={room} onSolved={handleSolved} setBubble={setBubble} setMood={setMood} />
-          : <BalanceRoom room={room} onSolved={handleSolved} setBubble={setBubble} setMood={setMood} />}
+        {phase !== 'done' && (room.mode === 'recipe'
+          ? <RecipeRoom room={room} roundIndex={roundIndex} onRoundWin={handleRoundWin} setBubble={setBubble} setMood={setMood} />
+          : <BalanceRoom room={room} roundIndex={roundIndex} onRoundWin={handleRoundWin} setBubble={setBubble} setMood={setMood} />)}
 
-        {done && (
+        {phase === 'roundDone' && (
+          <BigButton onClick={nextRound} color={KID.blue} colorDark={KID.blueDark}>➡️ Nächste Aufgabe!</BigButton>
+        )}
+
+        {phase === 'done' && (
           <BigButton onClick={onComplete} color={KID.green} colorDark={KID.greenDark}>🎉 Weiter!</BigButton>
         )}
       </div>
@@ -459,11 +499,12 @@ function Hub({ completedRooms, stars, onStart }) {
           <p className="mx-auto mt-2 max-w-xl text-lg font-bold" style={{ color: '#5d6b85' }}>{SPEC.concept.embodiedMetaphor}</p>
           <div className="mx-auto mt-3 w-fit"><StarRow stars={stars} /></div>
         </div>
-        <div className="relative mt-6 grid gap-4 sm:grid-cols-3">
+        <div className="relative mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {SPEC.rooms.map((room, index) => {
             const meta = SPEC.world.rooms.find((entry) => entry.id === room.roomId) || {};
             const done = completedRooms.includes(room.roomId);
             const locked = index > 0 && !completedRooms.includes(SPEC.rooms[index - 1].roomId);
+            const isLast = index === SPEC.rooms.length - 1;
             return (
               <button
                 key={room.roomId}
@@ -474,10 +515,11 @@ function Hub({ completedRooms, stars, onStart }) {
                 style={{ background: done ? '#e8f9e4' : KID.card, borderColor: KID.ink, boxShadow: '0 6px 0 ' + KID.woodDark }}
               >
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full text-3xl" style={{ background: done ? KID.green : locked ? '#dde3ec' : KID.sun }}>
-                  {done ? '⭐' : locked ? '🔒' : room.mode === 'recipe' ? '🍲' : '⚖️'}
+                  {done ? '⭐' : locked ? '🔒' : isLast ? '🏆' : room.mode === 'recipe' ? '🍲' : '⚖️'}
                 </div>
                 <p className="mt-3 text-xl font-extrabold" style={{ color: KID.ink }}>{meta.title || 'Welt ' + (index + 1)}</p>
                 <p className="mt-1 text-sm font-bold" style={{ color: '#5d6b85' }}>{meta.purpose || room.objective}</p>
+                <p className="mt-2 text-sm font-extrabold" style={{ color: '#8a93a6' }}>{room.rounds.length} Aufgaben</p>
               </button>
             );
           })}

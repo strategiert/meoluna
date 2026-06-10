@@ -5,9 +5,15 @@
     "subject": "Mathematik",
     "gradeLevel": "6",
     "rawTopic": "Kontostand 12 Euro, Ausgabe 20 Euro",
-    "extractedTasks": ["12 - 20"],
-    "learningGoals": ["Schulden als negative Position auf einer Kontoskala verstehen"],
-    "likelyMisconceptions": ["Bei 0 aufhören statt in Schulden weiterzurechnen"],
+    "extractedTasks": [
+      "12 - 20"
+    ],
+    "learningGoals": [
+      "Schulden als negative Position auf einer Kontoskala verstehen"
+    ],
+    "likelyMisconceptions": [
+      "Bei 0 aufhören statt in Schulden weiterzurechnen"
+    ],
     "focus": "understand",
     "confidence": "low"
   },
@@ -16,7 +22,13 @@
     "coreMetaphor": "Guthaben und Schulden liegen auf einer durchgehenden Kontolinie.",
     "setting": "Ein Tresorraum zeigt Guthaben rechts von 0 und Schulden links von 0.",
     "visualStyle": {
-      "palette": ["#111827", "#22c55e", "#ef4444", "#facc15", "#e5e7eb"],
+      "palette": [
+        "#111827",
+        "#22c55e",
+        "#ef4444",
+        "#facc15",
+        "#e5e7eb"
+      ],
       "mood": "präzise und spannend",
       "shapes": "Tresorfächer entlang einer Zahlenskala",
       "effects": "grüne und rote Saldo-Lichter"
@@ -28,11 +40,25 @@
     },
     "rooms": [
       {
+        "id": "saldo-line-aufwaermen",
+        "title": "Aufwärmen",
+        "purpose": "Mit kleinen Zahlen warm werden.",
+        "scene": "Kurze Wege zum Eingewöhnen.",
+        "reward": "Warmgehüpft"
+      },
+      {
         "id": "saldo-line",
         "title": "Die Saldo-Linie",
         "purpose": "Verstehen, dass Ausgaben größer als Guthaben zu negativem Saldo führen.",
         "scene": "Ein Tresorwagen bewegt sich über die Kontolinie.",
         "reward": "Das Schuldenfach wird korrekt markiert."
+      },
+      {
+        "id": "saldo-line-meister",
+        "title": "Meisterprüfung",
+        "purpose": "Wege selbst aus Chips bauen.",
+        "scene": "Drei Prüfungs-Wege mit Chips.",
+        "reward": "Wege-Meister"
       }
     ]
   },
@@ -51,13 +77,104 @@
   },
   "rooms": [
     {
+      "roomId": "saldo-line-aufwaermen",
+      "objective": "Zwei kurze Wege zum Warmwerden.",
+      "rounds": [
+        {
+          "startPosition": 12,
+          "moves": [
+            {
+              "value": -5,
+              "label": "5 Schritte",
+              "meaning": "-20 Euro"
+            }
+          ],
+          "targetPosition": 7
+        },
+        {
+          "startPosition": 12,
+          "moves": [
+            {
+              "value": -10,
+              "label": "10 Schritte",
+              "meaning": "-20 Euro"
+            }
+          ],
+          "targetPosition": 2
+        }
+      ],
+      "interaction": "choose-direction",
+      "feedback": {
+        "correct": "Genau. Die Ausgabe bewegt den Saldo bis -8 Euro.",
+        "wrongDirection": "Eine Ausgabe erhöht das Guthaben nicht, sie bewegt nach links.",
+        "wrongDistance": "Die Richtung stimmt, aber die Ausgabe beträgt 20 Euro.",
+        "signConfusion": "Wenn die Ausgabe größer als das Guthaben ist, geht die Skala links von 0 weiter."
+      },
+      "explanationAfterSuccess": "12 - 20 bedeutet: Von 12 zwanzig Schritte nach links. Nach 12 Schritten bist du bei 0, danach 8 Schritte in den Schulden."
+    },
+    {
       "roomId": "saldo-line",
       "objective": "Bewege den Saldo von 12 Euro um 20 Euro Ausgabe.",
-      "startPosition": 12,
-      "moves": [
-        { "value": -20, "label": "20 Euro Ausgabe", "meaning": "-20 Euro" }
+      "feedback": {
+        "correct": "Genau. Die Ausgabe bewegt den Saldo bis -8 Euro.",
+        "wrongDirection": "Eine Ausgabe erhöht das Guthaben nicht, sie bewegt nach links.",
+        "wrongDistance": "Die Richtung stimmt, aber die Ausgabe beträgt 20 Euro.",
+        "signConfusion": "Wenn die Ausgabe größer als das Guthaben ist, geht die Skala links von 0 weiter."
+      },
+      "explanationAfterSuccess": "12 - 20 bedeutet: Von 12 zwanzig Schritte nach links. Nach 12 Schritten bist du bei 0, danach 8 Schritte in den Schulden.",
+      "rounds": [
+        {
+          "startPosition": 12,
+          "moves": [
+            {
+              "value": -20,
+              "label": "20 Euro Ausgabe",
+              "meaning": "-20 Euro"
+            }
+          ],
+          "targetPosition": -8
+        }
       ],
-      "targetPosition": -8,
+      "interaction": "choose-direction"
+    },
+    {
+      "roomId": "saldo-line-meister",
+      "objective": "Meisterprüfung: Baue die Wege selbst aus den Chips.",
+      "rounds": [
+        {
+          "startPosition": 12,
+          "moves": [
+            {
+              "value": -15,
+              "label": "15 Schritte",
+              "meaning": "-20 Euro"
+            }
+          ],
+          "targetPosition": -3
+        },
+        {
+          "startPosition": 12,
+          "moves": [
+            {
+              "value": -25,
+              "label": "25 Schritte",
+              "meaning": "-20 Euro"
+            }
+          ],
+          "targetPosition": -13
+        },
+        {
+          "startPosition": 12,
+          "moves": [
+            {
+              "value": -30,
+              "label": "30 Schritte",
+              "meaning": "-20 Euro"
+            }
+          ],
+          "targetPosition": -18
+        }
+      ],
       "interaction": "step-sequencer",
       "feedback": {
         "correct": "Genau. Die Ausgabe bewegt den Saldo bis -8 Euro.",

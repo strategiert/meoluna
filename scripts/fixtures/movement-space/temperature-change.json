@@ -5,9 +5,15 @@
     "subject": "Mathematik",
     "gradeLevel": "5",
     "rawTopic": "Temperatur fällt von 4°C um 9°C",
-    "extractedTasks": ["4 - 9"],
-    "learningGoals": ["Temperaturänderungen über Null hinaus verstehen"],
-    "likelyMisconceptions": ["Unter 0°C als Sonderfall statt als Fortsetzung der Skala sehen"],
+    "extractedTasks": [
+      "4 - 9"
+    ],
+    "learningGoals": [
+      "Temperaturänderungen über Null hinaus verstehen"
+    ],
+    "likelyMisconceptions": [
+      "Unter 0°C als Sonderfall statt als Fortsetzung der Skala sehen"
+    ],
     "focus": "understand",
     "confidence": "medium"
   },
@@ -16,7 +22,13 @@
     "coreMetaphor": "Temperatur ist eine vertikale Reise auf einer Skala.",
     "setting": "Ein gläserner Wetterturm führt von warmen Etagen in frostige Tiefen.",
     "visualStyle": {
-      "palette": ["#082f49", "#38bdf8", "#e0f2fe", "#f97316", "#f8fafc"],
+      "palette": [
+        "#082f49",
+        "#38bdf8",
+        "#e0f2fe",
+        "#f97316",
+        "#f8fafc"
+      ],
       "mood": "klar und frostig",
       "shapes": "vertikale Skala mit Eisplattformen",
       "effects": "Atemwolken und leuchtende Thermometerlinien"
@@ -28,11 +40,25 @@
     },
     "rooms": [
       {
+        "id": "frostlift-aufwaermen",
+        "title": "Aufwärmen",
+        "purpose": "Mit kleinen Zahlen warm werden.",
+        "scene": "Kurze Wege zum Eingewöhnen.",
+        "reward": "Warmgehüpft"
+      },
+      {
         "id": "frostlift",
         "title": "Der Frostlift",
         "purpose": "Den Übergang über 0°C nach unten erleben.",
         "scene": "Ein Lift fährt auf einer Thermometerskala.",
         "reward": "Ein Eiskristallmuster erscheint auf dem Glas."
+      },
+      {
+        "id": "frostlift-meister",
+        "title": "Meisterprüfung",
+        "purpose": "Wege selbst aus Chips bauen.",
+        "scene": "Drei Prüfungs-Wege mit Chips.",
+        "reward": "Wege-Meister"
       }
     ]
   },
@@ -51,14 +77,105 @@
   },
   "rooms": [
     {
+      "roomId": "frostlift-aufwaermen",
+      "objective": "Zwei kurze Wege zum Warmwerden.",
+      "rounds": [
+        {
+          "startPosition": 4,
+          "moves": [
+            {
+              "value": -2,
+              "label": "2 Schritte",
+              "meaning": "-9°C"
+            }
+          ],
+          "targetPosition": 2
+        },
+        {
+          "startPosition": 4,
+          "moves": [
+            {
+              "value": -5,
+              "label": "5 Schritte",
+              "meaning": "-9°C"
+            }
+          ],
+          "targetPosition": -1
+        }
+      ],
+      "interaction": "choose-direction",
+      "feedback": {
+        "correct": "Richtig. Der Lift fährt unter 0 weiter bis -5°C.",
+        "wrongDirection": "Du bist wärmer statt kälter geworden.",
+        "wrongDistance": "Du bist nach unten gefahren, aber noch nicht genau 9 Grad.",
+        "signConfusion": "Minus bedeutet bei Temperatur: weiter nach unten auf der Skala."
+      },
+      "explanationAfterSuccess": "4°C minus 9°C heißt: Von 4 neun Schritte nach unten. Nach 4 Schritten bist du bei 0, nach 5 weiteren bei -5."
+    },
+    {
       "roomId": "frostlift",
       "objective": "Fahre den Wetterlift von 4°C um 9°C nach unten.",
-      "startPosition": 4,
-      "moves": [
-        { "value": -9, "label": "9 Grad kälter", "meaning": "-9°C" }
+      "feedback": {
+        "correct": "Richtig. Der Lift fährt unter 0 weiter bis -5°C.",
+        "wrongDirection": "Du bist wärmer statt kälter geworden.",
+        "wrongDistance": "Du bist nach unten gefahren, aber noch nicht genau 9 Grad.",
+        "signConfusion": "Minus bedeutet bei Temperatur: weiter nach unten auf der Skala."
+      },
+      "explanationAfterSuccess": "4°C minus 9°C heißt: Von 4 neun Schritte nach unten. Nach 4 Schritten bist du bei 0, nach 5 weiteren bei -5.",
+      "rounds": [
+        {
+          "startPosition": 4,
+          "moves": [
+            {
+              "value": -9,
+              "label": "9 Grad kälter",
+              "meaning": "-9°C"
+            }
+          ],
+          "targetPosition": -5
+        }
       ],
-      "targetPosition": -5,
-      "interaction": "drag-marker",
+      "interaction": "choose-direction"
+    },
+    {
+      "roomId": "frostlift-meister",
+      "objective": "Meisterprüfung: Baue die Wege selbst aus den Chips.",
+      "rounds": [
+        {
+          "startPosition": 4,
+          "moves": [
+            {
+              "value": -7,
+              "label": "7 Schritte",
+              "meaning": "-9°C"
+            }
+          ],
+          "targetPosition": -3
+        },
+        {
+          "startPosition": 4,
+          "moves": [
+            {
+              "value": -11,
+              "label": "11 Schritte",
+              "meaning": "-9°C"
+            }
+          ],
+          "targetPosition": -7
+        },
+        {
+          "startPosition": 4,
+          "moves": [
+            {
+              "value": -14,
+              "label": "14 Schritte",
+              "meaning": "-9°C"
+            }
+          ],
+          "targetPosition": -10
+        }
+      ],
+      "interaction": "step-sequencer",
       "feedback": {
         "correct": "Richtig. Der Lift fährt unter 0 weiter bis -5°C.",
         "wrongDirection": "Du bist wärmer statt kälter geworden.",

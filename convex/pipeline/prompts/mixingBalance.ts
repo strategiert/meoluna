@@ -60,12 +60,17 @@ Antworte ausschließlich als valides MixingEngineSpec JSON:
   "rooms": [
     {
       "roomId": "string",
-      "objective": "string (kurzer Auftrag in Kindersprache, nennt das Ziel konkret)",
+      "objective": "string (kurzer Auftrag in Kindersprache)",
       "mode": "recipe",
       "ingredients": [
         { "id": "string", "label": "string", "emoji": "ein Emoji", "color": "#hex" }
       ],
-      "targetParts": { "ingredientId": number },
+      "rounds": [
+        {
+          "objective": "string (Auftrag dieser Runde, nennt das Rezept konkret)",
+          "targetParts": { "ingredientId": number }
+        }
+      ],
       "feedback": {
         "correct": "string",
         "tooMuch": "string",
@@ -78,9 +83,14 @@ Antworte ausschließlich als valides MixingEngineSpec JSON:
       "roomId": "string",
       "objective": "string",
       "mode": "balance",
-      "leftWeights": [number],
-      "rightWeights": [number],
       "chips": [number],
+      "rounds": [
+        {
+          "objective": "string",
+          "leftWeights": [number],
+          "rightWeights": [number]
+        }
+      ],
       "feedback": {
         "correct": "string",
         "tooMuch": "string",
@@ -93,18 +103,22 @@ Antworte ausschließlich als valides MixingEngineSpec JSON:
 }
 
 Regeln für recipe-Räume:
-- 2 bis 3 Zutaten, jede mit eindeutiger id, kindgerechtem Label, genau einem Emoji und einer Hex-Farbe.
-- targetParts: jede genannte Zutat 1 bis 9 Teile, Gesamtsumme aller Teile zwischen 2 und 12.
-- Das objective muss das Rezept nennen (z.B. "3 Teile Rotbeeren und 1 Teil Blaubeere").
+- 2 bis 3 Zutaten pro Raum, jede mit eindeutiger id, kindgerechtem Label, genau einem Emoji und einer Hex-Farbe.
+- Jede Runde hat targetParts: jede genannte Zutat 1 bis 9 Teile, Gesamtsumme aller Teile zwischen 2 und 12.
+- Das Runden-objective muss das Rezept nennen (z.B. "3 Teile Rotbeeren und 1 Teil Blaubeere").
 
 Regeln für balance-Räume:
-- leftWeights: feste Gewichte links, Summe maximal 50.
-- rightWeights: feste Startgewichte rechts (darf leer sein []).
-- Die linke Summe muss um 1 bis 30 größer sein als die rechte Startsumme.
-- chips: 1 bis 3 Steinwerte, mit denen die Differenz exakt legbar ist (im Zweifel die 1 aufnehmen).
+- chips: 1 bis 3 Steinwerte pro Raum, mit denen jede Runden-Differenz exakt legbar ist (im Zweifel die 1 aufnehmen).
+- Jede Runde: leftWeights = feste Gewichte links (Summe maximal 50), rightWeights = feste Startgewichte rechts (darf leer sein []).
+- Pro Runde muss die linke Summe um 1 bis 30 größer sein als die rechte Startsumme.
+
+Session-Format (10-15 Minuten Spielzeit):
+- 3 bis 6 Räume, vom Aufwärmen mit kleinen Mengen bis zur Meisterprüfung als letztem Raum.
+- Jeder Raum hat 2 bis 4 Runden (rounds), insgesamt mindestens 8 Runden in der Welt.
+- Schwierigkeit steigt von Runde zu Runde und von Raum zu Raum.
+- Wechsle die Modi: mindestens ein recipe-Raum UND ein balance-Raum, wenn das Thema beides hergibt.
 
 Qualitätsregeln:
-- 2 bis 4 Räume, vom einfachsten zum schwersten.
 - Jeder Raum muss eine Handlung sein, keine Fragekarte.
 - Feedback benennt typische Denkfehler konkret und freundlich (kein "Falsch!").
 - explanationAfterSuccess übersetzt die Handlung in das mathematische Bild (z.B. "3 von 4 Teilen sind Rotbeeren, das ist 3/4").

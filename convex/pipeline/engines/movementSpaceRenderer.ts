@@ -16,6 +16,7 @@ import confetti from 'canvas-confetti';
 const SPEC = ${dataJson};
 
 // "Bilderbuch-Tag": helle, freundliche Spielwelt für Kinder ab 5.
+// Session-Format v2: Räume enthalten mehrere Runden mit steigender Schwierigkeit.
 const KID = {
   skyTop: '#79c7f5',
   skyBottom: '#e9f8ff',
@@ -42,12 +43,12 @@ function addMoves(start, moves) {
   return moves.reduce((sum, move) => sum + valueOf(move.value), valueOf(start));
 }
 
-function stepStartPosition(room, stepIndex) {
-  return addMoves(room.startPosition, room.moves.slice(0, stepIndex));
+function stepStartPosition(round, stepIndex) {
+  return addMoves(round.startPosition, round.moves.slice(0, stepIndex));
 }
 
-function stepTargetPosition(room, stepIndex) {
-  return addMoves(room.startPosition, room.moves.slice(0, stepIndex + 1));
+function stepTargetPosition(round, stepIndex) {
+  return addMoves(round.startPosition, round.moves.slice(0, stepIndex + 1));
 }
 
 function axisPercent(value, cs) {
@@ -73,14 +74,6 @@ function negativeWord() {
 
 function positiveWord() {
   return SPEC.coordinateSystem.positiveDirectionLabel || 'Nach Osten';
-}
-
-function equationText(room, uptoStep) {
-  const moves = room.moves.slice(0, uptoStep + 1).map((move) => valueOf(move.value));
-  const start = valueOf(room.startPosition);
-  let left = String(start);
-  for (const value of moves) left += value < 0 ? ' + (' + value + ')' : ' + ' + value;
-  return left + ' = ' + addMoves(room.startPosition, room.moves.slice(0, uptoStep + 1));
 }
 
 function speak(text) {
@@ -184,13 +177,40 @@ function StarRow({ stars }) {
   );
 }
 
-function PathScene({ room, stepIndex, phase, displayPos, hopping, hopCount, landingOptions, selectedPosition, onPickLanding, mood }) {
+function RoundDots({ total, current }) {
+  return (
+    <div className="flex items-center gap-1.5 rounded-full border-2 px-3 py-1.5" style={{ background: KID.card, borderColor: KID.ink }}>
+      {Array.from({ length: total }).map((entry, index) => (
+        <div key={index} className="h-3.5 w-3.5 rounded-full border-2" style={{ background: index < current ? KID.green : index === current ? KID.sun : '#e3e8f0', borderColor: KID.ink }} />
+      ))}
+    </div>
+  );
+}
+
+// Antwort-Steine dürfen sich nie überlappen, auch wenn die Werte nah beieinander liegen.
+function landingStonePositions(options, cs) {
+  const sorted = [...options].sort((a, b) => a - b);
+  const lefts = sorted.map((option) => Math.max(7, Math.min(93, axisPercent(option, cs))));
+  for (let i = 1; i < lefts.length; i += 1) {
+    if (lefts[i] - lefts[i - 1] < 10) lefts[i] = lefts[i - 1] + 10;
+  }
+  for (let i = lefts.length - 1; i >= 0; i -= 1) {
+    if (lefts[i] > 93) lefts[i] = 93;
+    if (i > 0 && lefts[i] - lefts[i - 1] < 10) lefts[i - 1] = lefts[i] - 10;
+  }
+  const map = {};
+  sorted.forEach((option, index) => { map[option] = lefts[index]; });
+  return map;
+}
+
+function PathScene({ round, stepIndex, phase, displayPos, hopping, hopCount, landingOptions, selectedPosition, onPickLanding, mood }) {
   const cs = SPEC.coordinateSystem;
   const horizontal = cs.dimensions !== '1d-vertical';
+  const stonePositions = landingStonePositions(landingOptions, cs);
   const ticks = niceTicks(cs);
-  const startValue = valueOf(room.startPosition);
-  const stepFrom = stepStartPosition(room, stepIndex);
-  const moveValue = room.moves[stepIndex] ? valueOf(room.moves[stepIndex].value) : 0;
+  const startValue = valueOf(round.startPosition);
+  const currentMove = round.moves[stepIndex];
+  const moveValue = currentMove ? valueOf(currentMove.value) : 0;
   const dir = Math.sign(moveValue);
 
   function handleTrackClick(event) {
@@ -266,13 +286,13 @@ function PathScene({ room, stepIndex, phase, displayPos, hopping, hopCount, land
               onClick={(event) => { event.stopPropagation(); onPickLanding(option); }}
               className="kid-font pointer-events-auto absolute z-30 flex h-16 w-16 -translate-x-1/2 items-center justify-center rounded-full border-4 text-xl font-extrabold transition-transform active:scale-90 sm:h-20 sm:w-20 sm:text-2xl"
               style={horizontal
-                ? { left: Math.max(7, Math.min(93, axisPercent(option, cs))) + '%', bottom: '3%', background: selectedPosition === option ? KID.sun : KID.card, borderColor: KID.ink, color: KID.ink, boxShadow: '0 5px 0 ' + KID.pathEdge }
-                : { left: '68%', bottom: Math.max(6, Math.min(92, axisPercent(option, cs))) + '%', background: selectedPosition === option ? KID.sun : KID.card, borderColor: KID.ink, color: KID.ink, boxShadow: '0 5px 0 ' + KID.pathEdge }}
+                ? { left: stonePositions[option] + '%', bottom: '3%', background: selectedPosition === option ? KID.sun : KID.card, borderColor: KID.ink, color: KID.ink, boxShadow: '0 5px 0 ' + KID.pathEdge }
+                : { left: '68%', bottom: Math.max(6, Math.min(80, stonePositions[option])) + '%', background: selectedPosition === option ? KID.sun : KID.card, borderColor: KID.ink, color: KID.ink, boxShadow: '0 5px 0 ' + KID.pathEdge }}
             >{option}</motion.button>
           ))}
         </AnimatePresence>
 
-        <motion.div className="absolute z-20 -translate-x-1/2" animate={charStyle} transition={{ duration: hopping ? Math.min(2.4, 0.8 + Math.abs(moveValue) / 40) : 0.4, ease: 'easeInOut' }}>
+        <motion.div className="absolute z-20 -translate-x-1/2" animate={charStyle} transition={{ duration: hopping ? Math.min(2.4, 0.8 + Math.abs(moveValue || 10) / 40) : 0.4, ease: 'easeInOut' }}>
           <Luno mood={mood} hopping={hopping} dir={hopping ? dir : 0} />
           <div className="kid-font mx-auto -mt-1 w-fit rounded-full border-2 px-3 py-0.5 text-base font-extrabold" style={{ background: phase === 'land' ? KID.sun : KID.card, borderColor: KID.ink, color: KID.ink }}>
             {hopping ? hopCount : phase === 'land' ? '?' : displayPos}
@@ -295,15 +315,15 @@ function PathScene({ room, stepIndex, phase, displayPos, hopping, hopCount, land
   );
 }
 
-function EquationCards({ room, revealedSteps }) {
-  const startValue = valueOf(room.startPosition);
+function EquationCards({ round, revealedSteps }) {
+  const startValue = valueOf(round.startPosition);
   const chips = [{ text: String(startValue), color: KID.card }];
-  room.moves.forEach((move, index) => {
+  round.moves.forEach((move, index) => {
     const value = valueOf(move.value);
     chips.push({ text: value < 0 ? '+ (' + value + ')' : '+ ' + value, color: index < revealedSteps ? (value < 0 ? '#dceeff' : '#ffe8df') : '#eef1f6', dim: index >= revealedSteps });
   });
-  const done = revealedSteps >= room.moves.length;
-  chips.push({ text: done ? '= ' + valueOf(room.targetPosition) : '= ?', color: done ? '#dcf5e1' : '#eef1f6', dim: !done });
+  const done = revealedSteps >= round.moves.length;
+  chips.push({ text: done ? '= ' + valueOf(round.targetPosition) : '= ?', color: done ? '#dcf5e1' : '#eef1f6', dim: !done });
   return (
     <div className="rounded-3xl border-4 p-4" style={{ background: KID.card, borderColor: KID.ink }}>
       <p className="kid-font text-sm font-extrabold uppercase tracking-wide" style={{ color: '#8a93a6' }}>Aus der Bewegung wird</p>
@@ -316,10 +336,10 @@ function EquationCards({ room, revealedSteps }) {
   );
 }
 
-function buildLandingOptions(room, stepIndex) {
+function buildLandingOptions(round, stepIndex) {
   const cs = SPEC.coordinateSystem;
-  const from = stepStartPosition(room, stepIndex);
-  const target = stepTargetPosition(room, stepIndex);
+  const from = stepStartPosition(round, stepIndex);
+  const target = stepTargetPosition(round, stepIndex);
   const value = target - from;
   const clamp = (v) => Math.max(cs.min, Math.min(cs.max, v));
   const wrongDirection = clamp(from - value);
@@ -337,26 +357,119 @@ function buildLandingOptions(room, stepIndex) {
   return { options: options.slice(0, 3).sort((a, b) => a - b), wrongDirection };
 }
 
+function chipText(value) {
+  const abs = Math.abs(value);
+  return value < 0 ? '⬅️ ' + abs : abs + ' ➡️';
+}
+
+function buildSequencerPool(round) {
+  const pool = round.moves.map((move, index) => ({ poolId: 'm' + index, value: valueOf(move.value) }));
+  round.moves.forEach((move, index) => {
+    const mirrored = -valueOf(move.value);
+    if (mirrored !== 0 && !pool.some((chip) => chip.value === mirrored)) {
+      pool.push({ poolId: 'd' + index, value: mirrored });
+    }
+  });
+  return pool.sort(() => Math.random() - 0.5);
+}
+
+// Mechanik "Weg bauen": Bewegungs-Chips in der richtigen Reihenfolge in
+// die Lücken legen, dann läuft die Figur die Kette ab.
+function SequencerPanel({ round, slots, onPickChip, onClearSlot, onRun, running, pool }) {
+  const usedPoolIds = slots.filter(Boolean).map((entry) => entry.poolId);
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-center justify-center gap-3">
+        {slots.map((slot, index) => (
+          <button
+            key={index}
+            type="button"
+            onClick={() => onClearSlot(index)}
+            className="kid-font flex h-16 min-w-[6rem] items-center justify-center rounded-2xl border-4 border-dashed px-3 text-xl font-extrabold transition-transform active:scale-95"
+            style={{ background: slot ? '#dceeff' : '#f2f5fa', borderColor: slot ? KID.ink : '#b9c3d4', color: KID.ink, borderStyle: slot ? 'solid' : 'dashed' }}
+          >{slot ? chipText(slot.value) : index + 1 + '.'}</button>
+        ))}
+      </div>
+      <div className="flex flex-wrap items-center justify-center gap-3">
+        {pool.map((chip) => (
+          <button
+            key={chip.poolId}
+            type="button"
+            disabled={usedPoolIds.includes(chip.poolId) || running}
+            onClick={() => onPickChip(chip)}
+            className="kid-font flex h-16 min-w-[6rem] items-center justify-center rounded-2xl border-4 px-3 text-xl font-extrabold transition-all active:translate-y-1 disabled:opacity-30"
+            style={{ background: KID.card, borderColor: KID.ink, color: KID.ink, boxShadow: '0 5px 0 ' + KID.pathEdge }}
+          >{chipText(chip.value)}</button>
+        ))}
+      </div>
+      <BigButton onClick={onRun} color={KID.green} colorDark={KID.greenDark} disabled={running || slots.some((slot) => !slot)}>🐾 Los, lauf den Weg!</BigButton>
+    </div>
+  );
+}
+
 function RoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
+  const isSequencer = room.interaction === 'step-sequencer';
+  const [roundIndex, setRoundIndex] = useState(0);
+  const round = room.rounds[roundIndex];
   const [stepIndex, setStepIndex] = useState(0);
-  const [phase, setPhase] = useState('direction');
-  const [displayPos, setDisplayPos] = useState(valueOf(room.startPosition));
+  const [phase, setPhase] = useState(isSequencer ? 'build' : 'direction');
+  const [displayPos, setDisplayPos] = useState(valueOf(round.startPosition));
   const [hopping, setHopping] = useState(false);
   const [hopCount, setHopCount] = useState(0);
   const [mood, setMood] = useState('happy');
   const [selectedPosition, setSelectedPosition] = useState(null);
   const [bubble, setBubble] = useState('');
   const [landing, setLanding] = useState({ options: [], wrongDirection: null });
+  const [pool, setPool] = useState(() => isSequencer ? buildSequencerPool(round) : []);
+  const [slots, setSlots] = useState(() => round.moves.map(() => null));
+  const [revealed, setRevealed] = useState(0);
   const hopTimer = useRef(null);
 
-  const currentMove = room.moves[stepIndex];
+  const currentMove = round.moves[stepIndex];
   const moveValue = currentMove ? valueOf(currentMove.value) : 0;
-  const cs = SPEC.coordinateSystem;
 
   useEffect(() => {
-    if (currentMove) setBubble('Dein Auftrag: ' + currentMove.label + '! Wohin geht es?');
+    if (isSequencer) {
+      setBubble(room.objective + ' Lege die Wege in die richtige Reihenfolge!');
+    } else if (currentMove) {
+      setBubble('Dein Auftrag: ' + currentMove.label + '! Wohin geht es?');
+    }
     return () => { if (hopTimer.current) clearInterval(hopTimer.current); };
-  }, [stepIndex]);
+  }, [roundIndex, stepIndex]);
+
+  function resetForRound(nextIndex) {
+    const nextRound = room.rounds[nextIndex];
+    setRoundIndex(nextIndex);
+    setStepIndex(0);
+    setPhase(isSequencer ? 'build' : 'direction');
+    setDisplayPos(valueOf(nextRound.startPosition));
+    setSelectedPosition(null);
+    setRevealed(0);
+    setLanding({ options: [], wrongDirection: null });
+    if (isSequencer) {
+      setPool(buildSequencerPool(nextRound));
+      setSlots(nextRound.moves.map(() => null));
+    }
+  }
+
+  function finishRound() {
+    setRevealed(round.moves.length);
+    setMood('cheer');
+    Meoluna.reportScore(10, { action: 'movement-round-correct', roomId: room.roomId, roundIndex });
+    onStar();
+    if (roundIndex + 1 >= room.rounds.length) {
+      setPhase('done');
+      setBubble(room.feedback.correct + ' ' + room.explanationAfterSuccess);
+      Meoluna.reportScore(25, { action: 'movement-room-complete', roomId: room.roomId });
+      Meoluna.completeModule(room.roomId, 25);
+      confetti({ particleCount: 110, spread: 75, origin: { y: 0.6 } });
+    } else {
+      setPhase('roundDone');
+      setBubble(room.feedback.correct + ' Bereit für die nächste Aufgabe?');
+      confetti({ particleCount: 50, spread: 60, origin: { y: 0.65 } });
+    }
+    setTimeout(() => setMood('happy'), 1200);
+  }
 
   function chooseDirection(dir) {
     if (phase !== 'direction') return;
@@ -371,10 +484,7 @@ function RoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
     }
   }
 
-  function startHop() {
-    if (phase !== 'hop' || hopping) return;
-    const from = stepStartPosition(room, stepIndex);
-    const target = stepTargetPosition(room, stepIndex);
+  function animateHop(from, target, after) {
     const total = Math.abs(target - from);
     const duration = Math.min(2400, 800 + total * 25);
     setHopping(true);
@@ -387,30 +497,36 @@ function RoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
       if (ratio >= 1) {
         clearInterval(hopTimer.current);
         setHopping(false);
-        setPhase('land');
-        setLanding(buildLandingOptions(room, stepIndex));
-        setBubble('Wo bist du gelandet? Tippe auf die richtige Zahl!');
+        after();
       }
     }, 40);
   }
 
+  function startHop() {
+    if (phase !== 'hop' || hopping) return;
+    const from = stepStartPosition(round, stepIndex);
+    const target = stepTargetPosition(round, stepIndex);
+    animateHop(from, target, () => {
+      setPhase('land');
+      setLanding(buildLandingOptions(round, stepIndex));
+      setBubble('Wo bist du gelandet? Tippe auf die richtige Zahl!');
+    });
+  }
+
   function commitSelectedPosition(option) {
-    const target = stepTargetPosition(room, stepIndex);
+    const target = stepTargetPosition(round, stepIndex);
     setSelectedPosition(option);
     if (option === target) {
-      setMood('cheer');
-      Meoluna.reportScore(10, { action: 'movement-step-correct', roomId: room.roomId, stepIndex });
-      onStar();
-      if (stepIndex + 1 >= room.moves.length) {
-        setPhase('done');
-        setBubble(room.feedback.correct + ' ' + room.explanationAfterSuccess);
-        Meoluna.reportScore(25, { action: 'movement-room-complete', roomId: room.roomId });
-        Meoluna.completeModule(room.roomId, 25);
-        confetti({ particleCount: 110, spread: 75, origin: { y: 0.6 } });
+      Meoluna.reportScore(5, { action: 'movement-step-correct', roomId: room.roomId, roundIndex, stepIndex });
+      if (stepIndex + 1 >= round.moves.length) {
+        finishRound();
       } else {
+        setMood('cheer');
+        setRevealed(stepIndex + 1);
         setPhase('direction');
         setStepIndex(stepIndex + 1);
         setSelectedPosition(null);
+        setTimeout(() => setMood('happy'), 700);
       }
     } else {
       setMood('sad');
@@ -426,6 +542,39 @@ function RoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
     commitSelectedPosition(option);
   }
 
+  function pickChip(chip) {
+    const firstEmpty = slots.findIndex((slot) => !slot);
+    if (firstEmpty === -1) return;
+    setSlots((list) => list.map((slot, index) => index === firstEmpty ? chip : slot));
+  }
+
+  function clearSlot(index) {
+    setSlots((list) => list.map((slot, i) => i === index ? null : slot));
+  }
+
+  function runSequence() {
+    if (slots.some((slot) => !slot) || hopping) return;
+    const expected = round.moves.map((move) => valueOf(move.value));
+    const chosen = slots.map((slot) => slot.value);
+    const wrongIndex = expected.findIndex((value, index) => chosen[index] !== value);
+    if (wrongIndex !== -1) {
+      setMood('sad');
+      setBubble(chosen[wrongIndex] === -expected[wrongIndex] ? room.feedback.signConfusion : room.feedback.wrongDistance);
+      setTimeout(() => setMood('happy'), 700);
+      return;
+    }
+    setPhase('run');
+    function runStep(index) {
+      if (index >= round.moves.length) {
+        finishRound();
+        return;
+      }
+      setRevealed(index);
+      animateHop(stepStartPosition(round, index), stepTargetPosition(round, index), () => runStep(index + 1));
+    }
+    runStep(0);
+  }
+
   return (
     <div className="kid-font min-h-screen p-3 sm:p-6" style={{ background: 'linear-gradient(180deg, ' + KID.skyBottom + ', #f8fdf2)' }}>
       <KidStyles />
@@ -433,13 +582,16 @@ function RoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
         <div className="flex items-center justify-between gap-3">
           <button type="button" onClick={onBack} className="rounded-2xl border-2 px-4 py-2 text-lg font-extrabold transition-all active:translate-y-0.5" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink, boxShadow: '0 4px 0 ' + KID.pathEdge }}>← Karte</button>
           <div className="rounded-2xl border-2 px-4 py-2 text-lg font-extrabold" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink }}>{roomMeta.title || room.roomId}</div>
-          <StarRow stars={stars} />
+          <div className="flex items-center gap-2">
+            <RoundDots total={room.rounds.length} current={phase === 'done' ? room.rounds.length : roundIndex} />
+            <StarRow stars={stars} />
+          </div>
         </div>
 
         <SpeechBubble text={bubble || room.objective} />
 
         <PathScene
-          room={room}
+          round={round}
           stepIndex={stepIndex}
           phase={phase}
           displayPos={displayPos}
@@ -462,11 +614,19 @@ function RoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
           <BigButton onClick={startHop} color={KID.green} colorDark={KID.greenDark}>🐾 Hüpfen!</BigButton>
         )}
 
+        {phase === 'build' && (
+          <SequencerPanel round={round} slots={slots} onPickChip={pickChip} onClearSlot={clearSlot} onRun={runSequence} running={hopping} pool={pool} />
+        )}
+
+        {phase === 'roundDone' && (
+          <BigButton onClick={() => resetForRound(roundIndex + 1)} color={KID.blue} colorDark={KID.blueDark}>➡️ Nächste Aufgabe!</BigButton>
+        )}
+
         {phase === 'done' && (
           <BigButton onClick={onComplete} color={KID.green} colorDark={KID.greenDark}>🎉 Weiter!</BigButton>
         )}
 
-        <EquationCards room={room} revealedSteps={phase === 'done' ? room.moves.length : stepIndex} />
+        <EquationCards round={round} revealedSteps={phase === 'done' || phase === 'roundDone' ? round.moves.length : isSequencer ? revealed : stepIndex} />
       </div>
     </div>
   );
@@ -484,11 +644,12 @@ function Hub({ completedRooms, stars, onStart }) {
           <p className="mx-auto mt-2 max-w-xl text-lg font-bold" style={{ color: '#5d6b85' }}>{SPEC.concept.embodiedMetaphor}</p>
           <div className="mx-auto mt-3 w-fit"><StarRow stars={stars} /></div>
         </div>
-        <div className="relative mt-6 grid gap-4 sm:grid-cols-3">
+        <div className="relative mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {SPEC.rooms.map((room, index) => {
             const meta = SPEC.world.rooms.find((entry) => entry.id === room.roomId) || {};
             const done = completedRooms.includes(room.roomId);
             const locked = index > 0 && !completedRooms.includes(SPEC.rooms[index - 1].roomId);
+            const isLast = index === SPEC.rooms.length - 1;
             return (
               <button
                 key={room.roomId}
@@ -499,10 +660,11 @@ function Hub({ completedRooms, stars, onStart }) {
                 style={{ background: done ? '#e8f9e4' : KID.card, borderColor: KID.ink, boxShadow: '0 6px 0 ' + KID.pathEdge }}
               >
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full text-3xl" style={{ background: done ? KID.green : locked ? '#dde3ec' : KID.sun }}>
-                  {done ? '⭐' : locked ? '🔒' : index + 1}
+                  {done ? '⭐' : locked ? '🔒' : isLast ? '🏆' : index + 1}
                 </div>
                 <p className="mt-3 text-xl font-extrabold" style={{ color: KID.ink }}>{meta.title || 'Welt ' + (index + 1)}</p>
                 <p className="mt-1 text-sm font-bold" style={{ color: '#5d6b85' }}>{meta.purpose || room.objective}</p>
+                <p className="mt-2 text-sm font-extrabold" style={{ color: '#8a93a6' }}>{room.rounds.length} Aufgaben</p>
               </button>
             );
           })}
@@ -531,6 +693,7 @@ export default function App() {
     const roomMeta = SPEC.world.rooms.find((entry) => entry.id === room.roomId) || {};
     return (
       <RoomScene
+        key={room.roomId}
         room={room}
         roomMeta={roomMeta}
         stars={stars}

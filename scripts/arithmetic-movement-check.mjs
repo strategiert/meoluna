@@ -27,21 +27,34 @@ const failures = [];
 if (!spec) {
   failures.push("Expected deterministic arithmetic movement spec.");
 } else {
-  const firstRoom = spec.rooms[0];
-  const firstMove = firstRoom?.moves?.[0]?.value;
-  const secondMove = firstRoom?.moves?.[1]?.value;
+  const mainRoom = spec.rooms.find((room) => room.roomId === "westweg");
+  const mainRound = mainRoom?.rounds?.[0];
+  const firstMove = mainRound?.moves?.[0]?.value;
+  const secondMove = mainRound?.moves?.[1]?.value;
 
   if (!/west/i.test(spec.world.worldName + " " + spec.world.coreMetaphor + " " + spec.world.setting)) {
     failures.push("Expected a west/east block-world metaphor for plain negative addition.");
   }
-  if (firstRoom?.startPosition !== 0) {
-    failures.push("Expected first room to start at 0.");
+  if (mainRound?.startPosition !== 0) {
+    failures.push("Expected main round to start at 0.");
   }
   if (firstMove !== -66 || secondMove !== -33) {
-    failures.push(`Expected first room moves [-66, -33], got [${firstMove}, ${secondMove}].`);
+    failures.push(`Expected main round moves [-66, -33], got [${firstMove}, ${secondMove}].`);
   }
-  if (firstRoom?.targetPosition !== -99) {
-    failures.push(`Expected first room target -99, got ${firstRoom?.targetPosition}.`);
+  if (mainRound?.targetPosition !== -99) {
+    failures.push(`Expected main round target -99, got ${mainRound?.targetPosition}.`);
+  }
+
+  // Session-Format v2: genug Aufgaben für 10-15 Minuten
+  const totalRounds = spec.rooms.reduce((sum, room) => sum + (room.rounds?.length ?? 0), 0);
+  if (spec.rooms.length < 4) {
+    failures.push(`Expected at least 4 rooms for a full session, got ${spec.rooms.length}.`);
+  }
+  if (totalRounds < 8) {
+    failures.push(`Expected at least 8 total rounds for a full session, got ${totalRounds}.`);
+  }
+  if (!spec.rooms.some((room) => room.interaction === "step-sequencer")) {
+    failures.push("Expected at least one step-sequencer room for mechanic variety.");
   }
 
   const code = buildMovementSpaceWorldCode(spec);

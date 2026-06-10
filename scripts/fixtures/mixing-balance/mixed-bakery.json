@@ -5,9 +5,17 @@
     "subject": "mathematik",
     "gradeLevel": "4",
     "rawTopic": "Mengen ausgleichen und Anteile in der Backstube",
-    "extractedTasks": ["Teig im Verhältnis 3:1 mischen", "9 = 6 + _"],
-    "learningGoals": ["Anteile mischen", "Mengen ausgleichen"],
-    "likelyMisconceptions": ["Mehr Zutaten machen das Rezept automatisch besser"],
+    "extractedTasks": [
+      "Teig im Verhältnis 3:1 mischen",
+      "9 = 6 + _"
+    ],
+    "learningGoals": [
+      "Anteile mischen",
+      "Mengen ausgleichen"
+    ],
+    "likelyMisconceptions": [
+      "Mehr Zutaten machen das Rezept automatisch besser"
+    ],
     "focus": "practice",
     "confidence": "medium"
   },
@@ -16,7 +24,13 @@
     "coreMetaphor": "Backen ist Mischen nach Rezept und Abwiegen im Gleichgewicht.",
     "setting": "Eine warme Backstube: erst wird der Teig gemischt, dann wird abgewogen.",
     "visualStyle": {
-      "palette": ["#79c7f5", "#d9a05e", "#ff7a59", "#ffd84d", "#27324a"],
+      "palette": [
+        "#79c7f5",
+        "#d9a05e",
+        "#ff7a59",
+        "#ffd84d",
+        "#27324a"
+      ],
       "mood": "warm, gemütlich, fleißig",
       "shapes": "Schüssel, Waage, Mehlsäcke",
       "effects": "Mehlstaub, Wippen der Waage"
@@ -54,32 +68,92 @@
       "objective": "Mische den Teig: 3 Becher Mehl und 1 Becher Zucker!",
       "mode": "recipe",
       "ingredients": [
-        { "id": "mehl", "label": "Mehl", "emoji": "🌾", "color": "#f3e3c3" },
-        { "id": "zucker", "label": "Zucker", "emoji": "🍬", "color": "#ffd1ea" }
+        {
+          "id": "mehl",
+          "label": "Mehl",
+          "emoji": "🌾",
+          "color": "#f3e3c3"
+        },
+        {
+          "id": "zucker",
+          "label": "Zucker",
+          "emoji": "🍬",
+          "color": "#ffd1ea"
+        }
       ],
-      "targetParts": { "mehl": 3, "zucker": 1 },
       "feedback": {
         "correct": "Der Teig ist perfekt!",
         "tooMuch": "Zu viel von einer Zutat! Nimm einen Becher wieder heraus.",
         "tooLittle": "Da fehlt noch was. 4 Becher gehören in die Schüssel.",
         "wrongMix": "4 Becher sind drin, aber falsch verteilt. 3 Mehl auf 1 Zucker!"
       },
-      "explanationAfterSuccess": "3 von 4 Bechern sind Mehl. Das ist das Verhältnis 3 zu 1 und der Bruch 3/4."
+      "explanationAfterSuccess": "3 von 4 Bechern sind Mehl. Das ist das Verhältnis 3 zu 1 und der Bruch 3/4.",
+      "rounds": [
+        {
+          "objective": "Erst ein kleineres Rezept zum Üben!",
+          "targetParts": {
+            "mehl": 2,
+            "zucker": 1
+          }
+        },
+        {
+          "targetParts": {
+            "mehl": 3,
+            "zucker": 1
+          }
+        },
+        {
+          "objective": "Jetzt das große Rezept!",
+          "targetParts": {
+            "mehl": 4,
+            "zucker": 2
+          }
+        }
+      ]
     },
     {
       "roomId": "mehlwaage",
       "objective": "Links liegen 9. Rechts liegen erst 6. Mach die Waage gerade!",
       "mode": "balance",
-      "leftWeights": [9],
-      "rightWeights": [6],
-      "chips": [1, 2],
+      "chips": [
+        1,
+        2
+      ],
       "feedback": {
         "correct": "Die Waage steht perfekt!",
         "tooMuch": "Rechts ist jetzt zu schwer. Nimm einen Stein herunter.",
         "tooLittle": "Rechts ist noch zu leicht. Leg noch Gewicht dazu.",
         "wrongMix": "Vergleiche beide Seiten: sie müssen gleich schwer sein."
       },
-      "explanationAfterSuccess": "Du hast 3 dazugelegt. 6 + 3 = 9, beide Seiten sind gleich schwer."
+      "explanationAfterSuccess": "Du hast 3 dazugelegt. 6 + 3 = 9, beide Seiten sind gleich schwer.",
+      "rounds": [
+        {
+          "objective": "Erst eine leichte Waage zum Üben!",
+          "leftWeights": [
+            5
+          ],
+          "rightWeights": [
+            3
+          ]
+        },
+        {
+          "leftWeights": [
+            9
+          ],
+          "rightWeights": [
+            6
+          ]
+        },
+        {
+          "objective": "Jetzt die schwere Waage!",
+          "leftWeights": [
+            13
+          ],
+          "rightWeights": [
+            8
+          ]
+        }
+      ]
     }
   ]
 }

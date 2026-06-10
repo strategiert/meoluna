@@ -5,9 +5,15 @@
     "subject": "Mathematik",
     "gradeLevel": "6",
     "rawTopic": "-66 + -33",
-    "extractedTasks": ["-66 + -33"],
-    "learningGoals": ["Negative Summanden als Bewegung in negativer Richtung verstehen"],
-    "likelyMisconceptions": ["Plus vor einer negativen Zahl als Richtungswechsel lesen"],
+    "extractedTasks": [
+      "-66 + -33"
+    ],
+    "learningGoals": [
+      "Negative Summanden als Bewegung in negativer Richtung verstehen"
+    ],
+    "likelyMisconceptions": [
+      "Plus vor einer negativen Zahl als Richtungswechsel lesen"
+    ],
     "focus": "understand",
     "confidence": "low"
   },
@@ -16,7 +22,13 @@
     "coreMetaphor": "Negative Zahlen sind Schritte nach Westen.",
     "setting": "Eine Blockmine mit einem Eingang bei 0 und Kristallen tief im Westen.",
     "visualStyle": {
-      "palette": ["#0f172a", "#334155", "#f59e0b", "#38bdf8", "#f8fafc"],
+      "palette": [
+        "#0f172a",
+        "#334155",
+        "#f59e0b",
+        "#38bdf8",
+        "#f8fafc"
+      ],
       "mood": "abenteuerlich",
       "shapes": "blockige Höhlenformen und klare Achsen",
       "effects": "Kristallglühen und Staubpartikel"
@@ -28,11 +40,25 @@
     },
     "rooms": [
       {
+        "id": "west-tunnel-aufwaermen",
+        "title": "Aufwärmen",
+        "purpose": "Mit kleinen Zahlen warm werden.",
+        "scene": "Kurze Wege zum Eingewöhnen.",
+        "reward": "Warmgehüpft"
+      },
+      {
         "id": "west-tunnel",
         "title": "Der Westtunnel",
         "purpose": "Verstehen, dass + -33 weiter nach Westen führt.",
         "scene": "Ein Tunnel von 0 bis -100 mit Markierungen.",
         "reward": "Ein Minus-Kristall leuchtet auf."
+      },
+      {
+        "id": "west-tunnel-meister",
+        "title": "Meisterprüfung",
+        "purpose": "Wege selbst aus Chips bauen.",
+        "scene": "Drei Prüfungs-Wege mit Chips.",
+        "reward": "Wege-Meister"
       }
     ]
   },
@@ -43,22 +69,142 @@
   },
   "coordinateSystem": {
     "dimensions": "1d-horizontal",
-    "min": -120,
-    "max": 20,
+    "min": -180,
+    "max": 30,
     "unitLabel": "Schritte",
     "negativeDirectionLabel": "Westen",
     "positiveDirectionLabel": "Osten"
   },
   "rooms": [
     {
+      "roomId": "west-tunnel-aufwaermen",
+      "objective": "Zwei kurze Wege zum Warmwerden.",
+      "rounds": [
+        {
+          "startPosition": 0,
+          "moves": [
+            {
+              "value": -17,
+              "label": "17 Schritte",
+              "meaning": "-66"
+            },
+            {
+              "value": -8,
+              "label": "8 Schritte",
+              "meaning": "+ -33"
+            }
+          ],
+          "targetPosition": -25
+        },
+        {
+          "startPosition": 0,
+          "moves": [
+            {
+              "value": -33,
+              "label": "33 Schritte",
+              "meaning": "-66"
+            },
+            {
+              "value": -17,
+              "label": "17 Schritte",
+              "meaning": "+ -33"
+            }
+          ],
+          "targetPosition": -50
+        }
+      ],
+      "interaction": "choose-direction",
+      "feedback": {
+        "correct": "Genau. Du bist weiter nach Westen gegangen und landest bei -99.",
+        "wrongDirection": "Du hast die zweite Bewegung in die falsche Richtung gesetzt.",
+        "wrongDistance": "Die Richtung stimmt, aber die Anzahl der Schritte passt noch nicht.",
+        "signConfusion": "Plus minus 33 bedeutet nicht zurück nach Osten, sondern noch eine negative Bewegung dazu."
+      },
+      "explanationAfterSuccess": "-66 + -33 heißt: Du startest bei 0, gehst 66 nach Westen und dann noch 33 nach Westen. Deshalb bist du bei -99."
+    },
+    {
       "roomId": "west-tunnel",
       "objective": "Erreiche den Kristall bei -99.",
-      "startPosition": 0,
-      "moves": [
-        { "value": -66, "label": "66 Schritte nach Westen", "meaning": "-66" },
-        { "value": -33, "label": "33 weitere Schritte nach Westen", "meaning": "+ -33" }
+      "feedback": {
+        "correct": "Genau. Du bist weiter nach Westen gegangen und landest bei -99.",
+        "wrongDirection": "Du hast die zweite Bewegung in die falsche Richtung gesetzt.",
+        "wrongDistance": "Die Richtung stimmt, aber die Anzahl der Schritte passt noch nicht.",
+        "signConfusion": "Plus minus 33 bedeutet nicht zurück nach Osten, sondern noch eine negative Bewegung dazu."
+      },
+      "explanationAfterSuccess": "-66 + -33 heißt: Du startest bei 0, gehst 66 nach Westen und dann noch 33 nach Westen. Deshalb bist du bei -99.",
+      "rounds": [
+        {
+          "startPosition": 0,
+          "moves": [
+            {
+              "value": -66,
+              "label": "66 Schritte nach Westen",
+              "meaning": "-66"
+            },
+            {
+              "value": -33,
+              "label": "33 weitere Schritte nach Westen",
+              "meaning": "+ -33"
+            }
+          ],
+          "targetPosition": -99
+        }
       ],
-      "targetPosition": -99,
+      "interaction": "choose-direction"
+    },
+    {
+      "roomId": "west-tunnel-meister",
+      "objective": "Meisterprüfung: Baue die Wege selbst aus den Chips.",
+      "rounds": [
+        {
+          "startPosition": 0,
+          "moves": [
+            {
+              "value": -50,
+              "label": "50 Schritte",
+              "meaning": "-66"
+            },
+            {
+              "value": -25,
+              "label": "25 Schritte",
+              "meaning": "+ -33"
+            }
+          ],
+          "targetPosition": -75
+        },
+        {
+          "startPosition": 0,
+          "moves": [
+            {
+              "value": -83,
+              "label": "83 Schritte",
+              "meaning": "-66"
+            },
+            {
+              "value": -41,
+              "label": "41 Schritte",
+              "meaning": "+ -33"
+            }
+          ],
+          "targetPosition": -124
+        },
+        {
+          "startPosition": 0,
+          "moves": [
+            {
+              "value": -99,
+              "label": "99 Schritte",
+              "meaning": "-66"
+            },
+            {
+              "value": -50,
+              "label": "50 Schritte",
+              "meaning": "+ -33"
+            }
+          ],
+          "targetPosition": -149
+        }
+      ],
       "interaction": "step-sequencer",
       "feedback": {
         "correct": "Genau. Du bist weiter nach Westen gegangen und landest bei -99.",

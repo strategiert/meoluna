@@ -6,6 +6,12 @@ export type MixingValidationResult = {
   violations: string[];
 };
 
+// Session-Format v2: genug Aufgaben für eine 10-15-Minuten-Session.
+const MIN_ROOMS = 2;
+const MAX_ROOMS = 6;
+const MAX_ROUNDS_PER_ROOM = 4;
+const MIN_TOTAL_ROUNDS = 6;
+
 function hasText(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
@@ -64,9 +70,14 @@ export function validateMixingEngineSpec(spec: MixingEngineSpec): MixingValidati
     violations.push("E_ROOMS: at least one room is required");
     return { passed: false, violations };
   }
-  if (spec.rooms.length > 6) {
-    violations.push("E_ROOMS: at most 6 rooms are allowed");
+  if (spec.rooms.length < MIN_ROOMS) {
+    violations.push(`E_ROOMS: at least ${MIN_ROOMS} rooms are required for a full session`);
   }
+  if (spec.rooms.length > MAX_ROOMS) {
+    violations.push(`E_ROOMS: at most ${MAX_ROOMS} rooms are allowed`);
+  }
+
+  let totalRounds = 0;
 
   for (const room of spec.rooms) {
     const label = roomLabel(room);
@@ -74,12 +85,20 @@ export function validateMixingEngineSpec(spec: MixingEngineSpec): MixingValidati
     if (!hasText(room.objective)) {
       violations.push(`E_ROOM_${label}: objective is required`);
     }
+    if (!Array.isArray(room.rounds) || room.rounds.length === 0) {
+      violations.push(`E_ROOM_${label}: at least one round is required`);
+      continue;
+    }
+    if (room.rounds.length > MAX_ROUNDS_PER_ROOM) {
+      violations.push(`E_ROOM_${label}: at most ${MAX_ROUNDS_PER_ROOM} rounds per room`);
+    }
+    totalRounds += room.rounds.length;
 
     if (isRecipeRoom(room)) {
+      const ids = new Set<string>();
       if (!Array.isArray(room.ingredients) || room.ingredients.length < 2 || room.ingredients.length > 3) {
         violations.push(`E_ROOM_${label}: recipe needs 2-3 ingredients`);
       } else {
-        const ids = new Set<string>();
         for (const ingredient of room.ingredients) {
           if (!hasText(ingredient.id) || !hasText(ingredient.label) || !hasText(ingredient.emoji) || !hasText(ingredient.color)) {
             violations.push(`E_ROOM_${label}: ingredient needs id, label, emoji, color`);
@@ -89,55 +108,68 @@ export function validateMixingEngineSpec(spec: MixingEngineSpec): MixingValidati
           }
           ids.add(ingredient.id);
         }
+      }
 
-        const targetEntries = Object.entries(room.targetParts ?? {});
+      room.rounds.forEach((round, roundIndex) => {
+        const roundLabel = `${label}[${roundIndex}]`;
+        const targetEntries = Object.entries(round.targetParts ?? {});
         if (targetEntries.length === 0) {
-          violations.push(`E_ROOM_${label}: targetParts is required`);
+          violations.push(`E_ROOM_${roundLabel}: targetParts is required`);
+          return;
         }
         for (const [id, parts] of targetEntries) {
           if (!ids.has(id)) {
-            violations.push(`E_ROOM_${label}: targetParts references unknown ingredient ${id}`);
+            violations.push(`E_ROOM_${roundLabel}: targetParts references unknown ingredient ${id}`);
           }
           if (!isPositiveInt(parts) || parts > 9) {
-            violations.push(`E_ROOM_${label}: targetParts.${id} must be an integer between 1 and 9`);
+            violations.push(`E_ROOM_${roundLabel}: targetParts.${id} must be an integer between 1 and 9`);
           }
         }
-        const total = totalTargetParts(room);
+        const total = totalTargetParts(round);
         if (total < 2 || total > 12) {
-          violations.push(`E_ROOM_${label}: total target parts must be between 2 and 12 (got ${total})`);
+          violations.push(`E_ROOM_${roundLabel}: total target parts must be between 2 and 12 (got ${total})`);
         }
-      }
+      });
     } else if (isBalanceRoom(room)) {
-      if (!Array.isArray(room.leftWeights) || room.leftWeights.length === 0 || !room.leftWeights.every(isPositiveInt)) {
-        violations.push(`E_ROOM_${label}: leftWeights must be a non-empty list of positive integers`);
-      }
-      if (!Array.isArray(room.rightWeights) || !room.rightWeights.every(isPositiveInt)) {
-        violations.push(`E_ROOM_${label}: rightWeights must be a list of positive integers`);
-      }
       if (!Array.isArray(room.chips) || room.chips.length === 0 || !room.chips.every(isPositiveInt)) {
         violations.push(`E_ROOM_${label}: chips must be a non-empty list of positive integers`);
       }
 
-      if (Array.isArray(room.leftWeights) && Array.isArray(room.rightWeights) && Array.isArray(room.chips)) {
-        const left = sumWeights(room.leftWeights);
-        const right = sumWeights(room.rightWeights);
+      room.rounds.forEach((round, roundIndex) => {
+        const roundLabel = `${label}[${roundIndex}]`;
+        if (!Array.isArray(round.leftWeights) || round.leftWeights.length === 0 || !round.leftWeights.every(isPositiveInt)) {
+          violations.push(`E_ROOM_${roundLabel}: leftWeights must be a non-empty list of positive integers`);
+          return;
+        }
+        if (!Array.isArray(round.rightWeights) || !round.rightWeights.every(isPositiveInt)) {
+          violations.push(`E_ROOM_${roundLabel}: rightWeights must be a list of positive integers`);
+          return;
+        }
+        if (!Array.isArray(room.chips) || room.chips.length === 0) return;
+
+        const left = sumWeights(round.leftWeights);
+        const right = sumWeights(round.rightWeights);
         const diff = left - right;
         if (left > 50) {
-          violations.push(`E_ROOM_${label}: left side too heavy for counting (max 50, got ${left})`);
+          violations.push(`E_ROOM_${roundLabel}: left side too heavy for counting (max 50, got ${left})`);
         }
         if (diff < 1) {
-          violations.push(`E_ROOM_${label}: left side must be heavier than right start (diff ${diff})`);
+          violations.push(`E_ROOM_${roundLabel}: left side must be heavier than right start (diff ${diff})`);
         } else if (diff > 30) {
-          violations.push(`E_ROOM_${label}: missing amount too large for counting (max 30, got ${diff})`);
+          violations.push(`E_ROOM_${roundLabel}: missing amount too large for counting (max 30, got ${diff})`);
         } else if (!diffReachable(diff, room.chips)) {
-          violations.push(`E_ROOM_${label}: missing amount ${diff} cannot be built from chips ${room.chips.join(",")}`);
+          violations.push(`E_ROOM_${roundLabel}: missing amount ${diff} cannot be built from chips ${room.chips.join(",")}`);
         }
-      }
+      });
     } else {
       violations.push(`E_ROOM_${label}: mode must be recipe or balance`);
     }
 
     validateFeedback(room, violations);
+  }
+
+  if (totalRounds < MIN_TOTAL_ROUNDS) {
+    violations.push(`E_SESSION: world has only ${totalRounds} rounds, needs at least ${MIN_TOTAL_ROUNDS} for a 10-15 minute session`);
   }
 
   return { passed: violations.length === 0, violations };

@@ -47,6 +47,34 @@ export type WorldSpec = {
   }>;
 };
 
+export type MovementMove = {
+  value: Position;
+  label: string;
+  meaning: string;
+};
+
+// Eine Runde = eine spielbare Aufgabe. Räume enthalten 1-4 Runden
+// mit gleicher Mechanik und steigender Schwierigkeit (Session-Format v2).
+export type MovementRound = {
+  startPosition: Position;
+  moves: MovementMove[];
+  targetPosition: Position;
+};
+
+export type MovementRoom = {
+  roomId: string;
+  objective: string;
+  rounds: MovementRound[];
+  interaction: MovementInteraction;
+  feedback: {
+    correct: string;
+    wrongDirection: string;
+    wrongDistance: string;
+    signConfusion: string;
+  };
+  explanationAfterSuccess: string;
+};
+
 export type MovementEngineSpec = {
   engine: "movement-space";
   learningBrief: LearningBrief;
@@ -64,25 +92,7 @@ export type MovementEngineSpec = {
     negativeDirectionLabel?: string;
     positiveDirectionLabel?: string;
   };
-  rooms: Array<{
-    roomId: string;
-    objective: string;
-    startPosition: Position;
-    moves: Array<{
-      value: Position;
-      label: string;
-      meaning: string;
-    }>;
-    targetPosition: Position;
-    interaction: MovementInteraction;
-    feedback: {
-      correct: string;
-      wrongDirection: string;
-      wrongDistance: string;
-      signConfusion: string;
-    };
-    explanationAfterSuccess: string;
-  }>;
+  rooms: MovementRoom[];
 };
 
 export function is2DPosition(position: Position): position is { x: number; y: number } {

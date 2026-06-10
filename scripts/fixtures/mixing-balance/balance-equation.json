@@ -5,9 +5,17 @@
     "subject": "mathematik",
     "gradeLevel": "2",
     "rawTopic": "Mein Kind versteht Gleichungen mit Lücke nicht: 4 + _ = 7",
-    "extractedTasks": ["4 + _ = 7", "5 + _ = 12"],
-    "learningGoals": ["Fehlende Summanden durch Ausgleichen finden"],
-    "likelyMisconceptions": ["Das Gleichheitszeichen heißt 'jetzt kommt das Ergebnis'", "Man darf nur von links nach rechts rechnen"],
+    "extractedTasks": [
+      "4 + _ = 7",
+      "5 + _ = 12"
+    ],
+    "learningGoals": [
+      "Fehlende Summanden durch Ausgleichen finden"
+    ],
+    "likelyMisconceptions": [
+      "Das Gleichheitszeichen heißt 'jetzt kommt das Ergebnis'",
+      "Man darf nur von links nach rechts rechnen"
+    ],
     "focus": "understand",
     "confidence": "high"
   },
@@ -16,7 +24,13 @@
     "coreMetaphor": "Eine Gleichung ist eine Wippe: beide Seiten müssen gleich schwer sein.",
     "setting": "Eine Werkstatt auf dem Spielplatz. Steine machen die Wippe gerade.",
     "visualStyle": {
-      "palette": ["#79c7f5", "#54b865", "#ff7a59", "#ffd84d", "#27324a"],
+      "palette": [
+        "#79c7f5",
+        "#54b865",
+        "#ff7a59",
+        "#ffd84d",
+        "#27324a"
+      ],
       "mood": "hell, verspielt, handfest",
       "shapes": "Wippe, Steine, Holz",
       "effects": "Wippe kippt und pendelt sich ein"
@@ -53,31 +67,90 @@
       "roomId": "wippe-sieben",
       "objective": "Links liegen 7. Rechts liegen erst 4. Lege Steine dazu, bis die Wippe gerade ist!",
       "mode": "balance",
-      "leftWeights": [7],
-      "rightWeights": [4],
-      "chips": [1, 2],
+      "chips": [
+        1,
+        2
+      ],
       "feedback": {
         "correct": "Die Wippe ist gerade!",
         "tooMuch": "Jetzt ist rechts zu schwer. Nimm einen Stein wieder herunter.",
         "tooLittle": "Rechts ist noch zu leicht. Leg noch etwas dazu.",
         "wrongMix": "Schau auf beide Seiten: gleich schwer heißt gleich viel."
       },
-      "explanationAfterSuccess": "Du hast 3 dazugelegt. 4 + 3 = 7, beide Seiten sind gleich."
+      "explanationAfterSuccess": "Du hast 3 dazugelegt. 4 + 3 = 7, beide Seiten sind gleich.",
+      "rounds": [
+        {
+          "objective": "Erst eine leichte Waage zum Üben!",
+          "leftWeights": [
+            4
+          ],
+          "rightWeights": [
+            2
+          ]
+        },
+        {
+          "leftWeights": [
+            7
+          ],
+          "rightWeights": [
+            4
+          ]
+        },
+        {
+          "objective": "Jetzt die schwere Waage!",
+          "leftWeights": [
+            11
+          ],
+          "rightWeights": [
+            6
+          ]
+        }
+      ]
     },
     {
       "roomId": "wippe-zwoelf",
       "objective": "Links liegen 12. Rechts liegen erst 5. Mach die Wippe gerade!",
       "mode": "balance",
-      "leftWeights": [12],
-      "rightWeights": [5],
-      "chips": [1, 2, 5],
+      "chips": [
+        1,
+        2,
+        5
+      ],
       "feedback": {
         "correct": "Stark, die Wippe steht still!",
         "tooMuch": "Rechts kippt nach unten, da ist zu viel. Nimm einen Stein herunter.",
         "tooLittle": "Links kippt noch nach unten. Es fehlt noch Gewicht rechts.",
         "wrongMix": "Zähle die Steine auf beiden Seiten zusammen und vergleiche."
       },
-      "explanationAfterSuccess": "Du hast 7 dazugelegt. 5 + 7 = 12, die Wippe ist im Gleichgewicht."
+      "explanationAfterSuccess": "Du hast 7 dazugelegt. 5 + 7 = 12, die Wippe ist im Gleichgewicht.",
+      "rounds": [
+        {
+          "objective": "Erst eine leichte Waage zum Üben!",
+          "leftWeights": [
+            6
+          ],
+          "rightWeights": [
+            3
+          ]
+        },
+        {
+          "leftWeights": [
+            12
+          ],
+          "rightWeights": [
+            5
+          ]
+        },
+        {
+          "objective": "Jetzt die schwere Waage!",
+          "leftWeights": [
+            16
+          ],
+          "rightWeights": [
+            7
+          ]
+        }
+      ]
     }
   ]
 }

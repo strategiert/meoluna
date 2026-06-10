@@ -5,9 +5,15 @@
     "subject": "mathematik",
     "gradeLevel": "5",
     "rawTopic": "Verhältnisse: Saft im Verhältnis 2:3 mischen",
-    "extractedTasks": ["Saft 2:3 mischen"],
-    "learningGoals": ["Verhältnisse als Teile-zu-Teile verstehen"],
-    "likelyMisconceptions": ["2:3 heißt 2 Liter und 3 Liter, egal wie groß das Ganze ist"],
+    "extractedTasks": [
+      "Saft 2:3 mischen"
+    ],
+    "learningGoals": [
+      "Verhältnisse als Teile-zu-Teile verstehen"
+    ],
+    "likelyMisconceptions": [
+      "2:3 heißt 2 Liter und 3 Liter, egal wie groß das Ganze ist"
+    ],
     "focus": "practice",
     "confidence": "medium"
   },
@@ -16,7 +22,13 @@
     "coreMetaphor": "Ein Verhältnis ist ein Mischrezept: 2 Becher Orange auf 3 Becher Apfel.",
     "setting": "Eine kleine Saftbar mit großen Krügen. Gäste bestellen nach Rezept.",
     "visualStyle": {
-      "palette": ["#79c7f5", "#ffd84d", "#ff7a59", "#54b865", "#27324a"],
+      "palette": [
+        "#79c7f5",
+        "#ffd84d",
+        "#ff7a59",
+        "#54b865",
+        "#27324a"
+      ],
       "mood": "sommerlich, frisch, fröhlich",
       "shapes": "Krüge, Becher, Früchte",
       "effects": "Spritzer und Blubbern beim Mischen"
@@ -54,35 +66,105 @@
       "objective": "Mische den Sonnensaft: 2 Becher Orange und 3 Becher Apfel!",
       "mode": "recipe",
       "ingredients": [
-        { "id": "orange", "label": "Orange", "emoji": "🍊", "color": "#ffd9a8" },
-        { "id": "apfel", "label": "Apfel", "emoji": "🍎", "color": "#c9f0c0" }
+        {
+          "id": "orange",
+          "label": "Orange",
+          "emoji": "🍊",
+          "color": "#ffd9a8"
+        },
+        {
+          "id": "apfel",
+          "label": "Apfel",
+          "emoji": "🍎",
+          "color": "#c9f0c0"
+        }
       ],
-      "targetParts": { "orange": 2, "apfel": 3 },
       "feedback": {
         "correct": "Der Sonnensaft schmeckt perfekt!",
         "tooMuch": "Von einer Sorte ist zu viel im Krug. Nimm einen Becher heraus.",
         "tooLittle": "Der Krug ist noch nicht voll. Zähle die Becher im Rezept.",
         "wrongMix": "5 Becher sind drin, aber das Verhältnis stimmt nicht. 2 Orange auf 3 Apfel!"
       },
-      "explanationAfterSuccess": "2 Becher Orange auf 3 Becher Apfel: das ist das Verhältnis 2 zu 3."
+      "explanationAfterSuccess": "2 Becher Orange auf 3 Becher Apfel: das ist das Verhältnis 2 zu 3.",
+      "rounds": [
+        {
+          "objective": "Erst ein kleineres Rezept zum Üben!",
+          "targetParts": {
+            "orange": 1,
+            "apfel": 2
+          }
+        },
+        {
+          "targetParts": {
+            "orange": 2,
+            "apfel": 3
+          }
+        },
+        {
+          "objective": "Jetzt das große Rezept!",
+          "targetParts": {
+            "orange": 3,
+            "apfel": 4
+          }
+        }
+      ]
     },
     {
       "roomId": "regenbogensaft",
       "objective": "Der Regenbogensaft braucht 1 Becher Kirsche, 2 Becher Orange und 3 Becher Apfel!",
       "mode": "recipe",
       "ingredients": [
-        { "id": "kirsche", "label": "Kirsche", "emoji": "🍒", "color": "#ffc2cd" },
-        { "id": "orange", "label": "Orange", "emoji": "🍊", "color": "#ffd9a8" },
-        { "id": "apfel", "label": "Apfel", "emoji": "🍎", "color": "#c9f0c0" }
+        {
+          "id": "kirsche",
+          "label": "Kirsche",
+          "emoji": "🍒",
+          "color": "#ffc2cd"
+        },
+        {
+          "id": "orange",
+          "label": "Orange",
+          "emoji": "🍊",
+          "color": "#ffd9a8"
+        },
+        {
+          "id": "apfel",
+          "label": "Apfel",
+          "emoji": "🍎",
+          "color": "#c9f0c0"
+        }
       ],
-      "targetParts": { "kirsche": 1, "orange": 2, "apfel": 3 },
       "feedback": {
         "correct": "Ein perfekter Regenbogensaft!",
         "tooMuch": "Eine Sorte ist zu oft im Krug. Vergleiche mit dem Rezept.",
         "tooLittle": "Es fehlen noch Becher. Das Rezept hat 6 Becher insgesamt.",
         "wrongMix": "6 Becher sind drin, aber die Mischung stimmt nicht. 1 zu 2 zu 3!"
       },
-      "explanationAfterSuccess": "1 zu 2 zu 3: von 6 Bechern ist 1 Kirsche, 2 sind Orange, 3 sind Apfel."
+      "explanationAfterSuccess": "1 zu 2 zu 3: von 6 Bechern ist 1 Kirsche, 2 sind Orange, 3 sind Apfel.",
+      "rounds": [
+        {
+          "objective": "Erst ein kleineres Rezept zum Üben!",
+          "targetParts": {
+            "kirsche": 1,
+            "orange": 1,
+            "apfel": 2
+          }
+        },
+        {
+          "targetParts": {
+            "kirsche": 1,
+            "orange": 2,
+            "apfel": 3
+          }
+        },
+        {
+          "objective": "Jetzt das große Rezept!",
+          "targetParts": {
+            "kirsche": 2,
+            "orange": 3,
+            "apfel": 4
+          }
+        }
+      ]
     }
   ]
 }

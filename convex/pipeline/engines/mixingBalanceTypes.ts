@@ -9,12 +9,24 @@ export type MixingIngredient = {
   color: string;
 };
 
+// Eine Runde = eine spielbare Aufgabe (Session-Format v2).
+export type MixingRecipeRound = {
+  objective?: string;
+  targetParts: Record<string, number>;
+};
+
+export type MixingBalanceRound = {
+  objective?: string;
+  leftWeights: number[];
+  rightWeights: number[];
+};
+
 export type MixingRecipeRoom = {
   roomId: string;
   objective: string;
   mode: "recipe";
   ingredients: MixingIngredient[];
-  targetParts: Record<string, number>;
+  rounds: MixingRecipeRound[];
   feedback: {
     correct: string;
     tooMuch: string;
@@ -28,9 +40,8 @@ export type MixingBalanceRoom = {
   roomId: string;
   objective: string;
   mode: "balance";
-  leftWeights: number[];
-  rightWeights: number[];
   chips: number[];
+  rounds: MixingBalanceRound[];
   feedback: {
     correct: string;
     tooMuch: string;
@@ -66,6 +77,6 @@ export function sumWeights(values: number[]): number {
   return values.reduce((sum, value) => sum + value, 0);
 }
 
-export function totalTargetParts(room: MixingRecipeRoom): number {
-  return Object.values(room.targetParts).reduce((sum, value) => sum + value, 0);
+export function totalTargetParts(round: MixingRecipeRound): number {
+  return Object.values(round.targetParts).reduce((sum, value) => sum + value, 0);
 }

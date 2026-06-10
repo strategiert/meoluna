@@ -96,13 +96,27 @@ async function main() {
 
   // Negativ-Check: kaputte Specs müssen abgelehnt werden
   const broken = JSON.parse(readFileSync(join(FIXTURE_DIR, "balance-equation.json"), "utf8"));
-  broken.rooms[0].leftWeights = [3];
+  const brokenBalanceRoom = broken.rooms.find((room) => room.mode === "balance");
+  brokenBalanceRoom.rounds[0].leftWeights = [1];
+  brokenBalanceRoom.rounds[0].rightWeights = [4];
   const brokenResult = validateMixingEngineSpec(broken);
   if (brokenResult.passed) {
     failed += 1;
     console.error("FAIL negative: unbalanced spec (left lighter than right) must be rejected");
   } else {
     console.log("PASS negative (unreachable balance rejected)");
+  }
+
+  // Session-Check: zu kleine Welten müssen abgelehnt werden
+  const tiny = JSON.parse(readFileSync(join(FIXTURE_DIR, "balance-equation.json"), "utf8"));
+  tiny.rooms = [tiny.rooms[0]];
+  tiny.rooms[0].rounds = tiny.rooms[0].rounds.slice(0, 1);
+  const tinyResult = validateMixingEngineSpec(tiny);
+  if (tinyResult.passed) {
+    failed += 1;
+    console.error("FAIL negative: 1-room/1-round world must be rejected (session size)");
+  } else {
+    console.log("PASS negative (tiny world rejected)");
   }
 
   if (failed > 0) process.exit(1);

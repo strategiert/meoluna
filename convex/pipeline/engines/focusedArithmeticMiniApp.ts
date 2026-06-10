@@ -22,10 +22,12 @@ export function buildFocusedArithmeticMiniAppCode(input: {
   const result = a + b;
   const absA = Math.abs(a);
   const absB = Math.abs(b);
-  const min = Math.floor((Math.min(0, a, b, result) - 20) / 10) * 10;
-  const max = Math.ceil((Math.max(0, a, b, result) + 20) / 10) * 10;
   const practiceA = -Math.max(4, Math.round(absA * 0.65));
   const practiceB = -Math.max(3, Math.round(absB * 0.55));
+  // Bonus-Level rechnet mit verdoppelten Übungswerten — Zahlengerade muss sie fassen.
+  const bonusMin = (practiceA - 9) * 2 + (practiceB - 9) * 2;
+  const min = Math.floor((Math.min(0, a, b, result, bonusMin) - 20) / 10) * 10;
+  const max = Math.ceil((Math.max(0, a, b, result) + 20) / 10) * 10;
   const prompt = escapeJs(input.prompt);
 
   return `import { useEffect, useRef, useState } from 'react';
@@ -71,14 +73,18 @@ function speak(text) {
   } catch (error) {}
 }
 
-function makePractice(seed) {
-  const first = ${practiceA} - seed;
-  const second = ${practiceB} - seed;
+function makePractice(seed, factor) {
+  const scale = factor || 1;
+  const first = (${practiceA} - seed) * scale;
+  const second = (${practiceB} - seed) * scale;
   const result = first + second;
   const turnedAround = first - second;
   const choices = [result, Math.abs(result), turnedAround === result ? result - 10 : turnedAround];
   return { first, second, result, choices: choices.sort(() => Math.random() - 0.5) };
 }
+
+const PRACTICE_GOAL = 5;
+const BONUS_GOAL = 3;
 
 function KidStyles() {
   return (
@@ -232,6 +238,9 @@ export default function App() {
   const [attempts, setAttempts] = useState([]);
   const [doPhase, setDoPhase] = useState('direction');
   const [challenge, setChallenge] = useState(() => makePractice(0));
+  const [wins, setWins] = useState(0);
+  const [bonusLevel, setBonusLevel] = useState(false);
+  const [finished, setFinished] = useState(false);
   const timer = useRef(null);
 
   useEffect(() => () => { if (timer.current) clearInterval(timer.current); }, []);
@@ -350,6 +359,7 @@ export default function App() {
   }
 
   function checkPractice(choice) {
+    if (finished) return;
     setAttempts((list) => [...list, choice]);
     if (choice === challenge.result) {
       const nextStreak = streak + 1;
@@ -361,13 +371,28 @@ export default function App() {
       hop(0, challenge.result, () => {
         setTimeout(() => setMood('happy'), 600);
       });
-      if (nextStreak >= 3) {
+      const nextWins = wins + 1;
+      if (!bonusLevel && nextWins >= PRACTICE_GOAL) {
         Meoluna.completeModule('uebung', 30);
-        Meoluna.complete(45);
-        setTimeout(() => setBubble('Du hast es geschafft! Westen + Westen bleibt Westen. 🏆'), 1500);
-      } else {
+        setBonusLevel(true);
+        setWins(0);
         setTimeout(() => {
-          const next = makePractice(nextStreak);
+          const next = makePractice(nextWins, 2);
+          setChallenge(next);
+          setPosition(0);
+          setTrail({ from: 0, to: null });
+          setBubble('💎 Bonus-Level! Jetzt mit großen Zahlen: ' + next.first + ' + (' + next.second + '). Du schaffst das!');
+        }, 1800);
+      } else if (bonusLevel && nextWins >= BONUS_GOAL) {
+        setWins(nextWins);
+        setFinished(true);
+        Meoluna.completeModule('bonus', 20);
+        Meoluna.complete(65);
+        setTimeout(() => setBubble('Du hast alles geschafft! Westen + Westen bleibt Westen. 🏆'), 1500);
+      } else {
+        setWins(nextWins);
+        setTimeout(() => {
+          const next = makePractice(nextWins + (bonusLevel ? 7 : 0), bonusLevel ? 2 : 1);
           setChallenge(next);
           setPosition(0);
           setTrail({ from: 0, to: null });
@@ -433,15 +458,20 @@ export default function App() {
           <BigButton onClick={startPractice} color={KID.green} colorDark={KID.greenDark}>🎯 Jetzt üben!</BigButton>
         )}
 
-        {act === 'practice' && streak < 3 && (
-          <div className="grid grid-cols-3 gap-3">
-            {challenge.choices.map((choice) => (
-              <button key={choice} type="button" onClick={() => checkPractice(choice)} className="kid-font min-h-[64px] rounded-3xl border-4 text-2xl font-extrabold transition-all active:translate-y-1" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink, boxShadow: '0 6px 0 ' + KID.pathEdge }}>{choice}</button>
-            ))}
+        {act === 'practice' && !finished && (
+          <div className="flex flex-col gap-3">
+            <div className="kid-font mx-auto rounded-full border-2 px-4 py-1 text-lg font-extrabold" style={{ background: bonusLevel ? '#e6f2ff' : KID.card, borderColor: KID.ink, color: KID.ink }}>
+              {bonusLevel ? '💎 Bonus' : '🎯 Übung'}: {wins}/{bonusLevel ? BONUS_GOAL : PRACTICE_GOAL}
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              {challenge.choices.map((choice) => (
+                <button key={choice} type="button" onClick={() => checkPractice(choice)} className="kid-font min-h-[64px] rounded-3xl border-4 text-2xl font-extrabold transition-all active:translate-y-1" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink, boxShadow: '0 6px 0 ' + KID.pathEdge }}>{choice}</button>
+              ))}
+            </div>
           </div>
         )}
 
-        {act === 'practice' && streak >= 3 && (
+        {act === 'practice' && finished && (
           <div className="rounded-3xl border-4 p-5 text-center" style={{ background: '#e8f9e4', borderColor: KID.ink }}>
             <p className="text-2xl font-extrabold" style={{ color: KID.ink }}>🏆 Alle Abzeichen geschafft!</p>
             <div className="mt-3 flex flex-wrap justify-center gap-2">
