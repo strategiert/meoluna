@@ -1,0 +1,87 @@
+{
+  "engine": "mixing-balance",
+  "learningBrief": {
+    "inputMode": "material",
+    "subject": "mathematik",
+    "gradeLevel": "3",
+    "rawTopic": "Mein Kind versteht Brüche nicht. Was bedeutet 3/4?",
+    "extractedTasks": ["3/4 darstellen"],
+    "learningGoals": ["Brüche als Teile eines Ganzen verstehen"],
+    "likelyMisconceptions": ["3/4 heißt 3 und 4", "Der Nenner ist eine eigene Zahl ohne Bedeutung"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Die Zaubertrank-Küche",
+    "coreMetaphor": "Brüche sind Teile eines Tranks: 3 von 4 Bechern sind Rotbeerensaft.",
+    "setting": "Eine kleine Hexenküche auf einer Sommerwiese. Im Topf entsteht aus Teilen ein Ganzes.",
+    "visualStyle": {
+      "palette": ["#79c7f5", "#ff7a59", "#54b865", "#ffd84d", "#27324a"],
+      "mood": "hell, freundlich, märchenhaft",
+      "shapes": "runder Topf, Beeren, Becher",
+      "effects": "Blubberblasen, Funkeln beim Gelingen"
+    },
+    "guide": {
+      "name": "Luno",
+      "role": "Trankmeister",
+      "personality": "kurz, warm, ermutigend"
+    },
+    "rooms": [
+      {
+        "id": "dreiviertel",
+        "title": "Der Rotbeeren-Trank",
+        "purpose": "3/4 als 3 von 4 Teilen erleben.",
+        "scene": "Vier Becher passen in den Topf. Drei davon sollen Rotbeeren sein.",
+        "reward": "Trank-Lehrling"
+      },
+      {
+        "id": "halbehalbe",
+        "title": "Halbe-halbe",
+        "purpose": "1/2 als gleich viele Teile von beiden erleben.",
+        "scene": "Der Schlummertrunk braucht von beiden Zutaten gleich viel.",
+        "reward": "Trank-Meister"
+      }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Das Kind liest 3/4 als zwei getrennte Zahlen statt als 3 von 4 Teilen.",
+    "embodiedMetaphor": "Ein Trank besteht aus Bechern. Der Nenner sagt, wie viele Becher der Topf braucht. Der Zähler sagt, wie viele davon eine Zutat sind.",
+    "successInsight": "3/4 heißt: 4 Teile machen das Ganze, 3 davon sind meine Zutat."
+  },
+  "rooms": [
+    {
+      "roomId": "dreiviertel",
+      "objective": "Fülle den Topf mit 3 Bechern Rotbeeren und 1 Becher Blaubeeren!",
+      "mode": "recipe",
+      "ingredients": [
+        { "id": "rot", "label": "Rotbeeren", "emoji": "🍓", "color": "#ffb3c1" },
+        { "id": "blau", "label": "Blaubeeren", "emoji": "🫐", "color": "#bcd8ff" }
+      ],
+      "targetParts": { "rot": 3, "blau": 1 },
+      "feedback": {
+        "correct": "Genau richtig gemischt!",
+        "tooMuch": "Jetzt ist von einer Zutat zu viel im Topf. Nimm welche heraus und zähle nochmal.",
+        "tooLittle": "Da fehlt noch etwas. Zähle die Becher im Rezept und im Topf.",
+        "wrongMix": "Die Menge stimmt, aber die Mischung nicht. Schau, wie viele Becher von jeder Zutat das Rezept will."
+      },
+      "explanationAfterSuccess": "Im Topf sind 4 Becher. 3 davon sind Rotbeeren. Das schreibt man 3/4."
+    },
+    {
+      "roomId": "halbehalbe",
+      "objective": "Der Schlummertrunk braucht 2 Becher Mondtau und 2 Becher Sternenstaub!",
+      "mode": "recipe",
+      "ingredients": [
+        { "id": "mond", "label": "Mondtau", "emoji": "💧", "color": "#c9ecff" },
+        { "id": "stern", "label": "Sternenstaub", "emoji": "⭐", "color": "#ffe9a8" }
+      ],
+      "targetParts": { "mond": 2, "stern": 2 },
+      "feedback": {
+        "correct": "Wunderbar, genau halbe-halbe!",
+        "tooMuch": "Eine Zutat ist zu oft im Topf. Halbe-halbe heißt: von beiden gleich viel.",
+        "tooLittle": "Noch nicht voll. Beide Zutaten brauchen 2 Becher.",
+        "wrongMix": "Die Becherzahl stimmt, aber nicht die Verteilung. Gleich viel von beiden!"
+      },
+      "explanationAfterSuccess": "4 Becher im Topf, 2 davon sind Mondtau. 2 von 4 ist dasselbe wie 1/2, die Hälfte."
+    }
+  ]
+}

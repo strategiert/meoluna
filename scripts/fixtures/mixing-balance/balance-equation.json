@@ -1,0 +1,83 @@
+{
+  "engine": "mixing-balance",
+  "learningBrief": {
+    "inputMode": "material",
+    "subject": "mathematik",
+    "gradeLevel": "2",
+    "rawTopic": "Mein Kind versteht Gleichungen mit Lücke nicht: 4 + _ = 7",
+    "extractedTasks": ["4 + _ = 7", "5 + _ = 12"],
+    "learningGoals": ["Fehlende Summanden durch Ausgleichen finden"],
+    "likelyMisconceptions": ["Das Gleichheitszeichen heißt 'jetzt kommt das Ergebnis'", "Man darf nur von links nach rechts rechnen"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Die Wippen-Werkstatt",
+    "coreMetaphor": "Eine Gleichung ist eine Wippe: beide Seiten müssen gleich schwer sein.",
+    "setting": "Eine Werkstatt auf dem Spielplatz. Steine machen die Wippe gerade.",
+    "visualStyle": {
+      "palette": ["#79c7f5", "#54b865", "#ff7a59", "#ffd84d", "#27324a"],
+      "mood": "hell, verspielt, handfest",
+      "shapes": "Wippe, Steine, Holz",
+      "effects": "Wippe kippt und pendelt sich ein"
+    },
+    "guide": {
+      "name": "Luno",
+      "role": "Wippen-Meister",
+      "personality": "kurz, warm, ermutigend"
+    },
+    "rooms": [
+      {
+        "id": "wippe-sieben",
+        "title": "Die Sieben-Wippe",
+        "purpose": "4 + ? = 7 durch Ausgleichen erleben.",
+        "scene": "Links liegt ein 7er-Stein. Rechts liegt erst ein 4er-Stein.",
+        "reward": "Wippen-Lehrling"
+      },
+      {
+        "id": "wippe-zwoelf",
+        "title": "Die Zwölfer-Wippe",
+        "purpose": "5 + ? = 12 mit größeren Steinen lösen.",
+        "scene": "Links liegt ein 12er-Stein. Rechts liegt erst ein 5er-Stein.",
+        "reward": "Wippen-Meister"
+      }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Das Kind sieht 4 + _ = 7 als unlösbare Aufgabe statt als Ausgleichs-Frage.",
+    "embodiedMetaphor": "Beide Seiten der Wippe müssen gleich schwer sein. Die Lücke ist das Gewicht, das noch fehlt.",
+    "successInsight": "Das Gleichheitszeichen heißt: links und rechts ist gleich viel."
+  },
+  "rooms": [
+    {
+      "roomId": "wippe-sieben",
+      "objective": "Links liegen 7. Rechts liegen erst 4. Lege Steine dazu, bis die Wippe gerade ist!",
+      "mode": "balance",
+      "leftWeights": [7],
+      "rightWeights": [4],
+      "chips": [1, 2],
+      "feedback": {
+        "correct": "Die Wippe ist gerade!",
+        "tooMuch": "Jetzt ist rechts zu schwer. Nimm einen Stein wieder herunter.",
+        "tooLittle": "Rechts ist noch zu leicht. Leg noch etwas dazu.",
+        "wrongMix": "Schau auf beide Seiten: gleich schwer heißt gleich viel."
+      },
+      "explanationAfterSuccess": "Du hast 3 dazugelegt. 4 + 3 = 7, beide Seiten sind gleich."
+    },
+    {
+      "roomId": "wippe-zwoelf",
+      "objective": "Links liegen 12. Rechts liegen erst 5. Mach die Wippe gerade!",
+      "mode": "balance",
+      "leftWeights": [12],
+      "rightWeights": [5],
+      "chips": [1, 2, 5],
+      "feedback": {
+        "correct": "Stark, die Wippe steht still!",
+        "tooMuch": "Rechts kippt nach unten, da ist zu viel. Nimm einen Stein herunter.",
+        "tooLittle": "Links kippt noch nach unten. Es fehlt noch Gewicht rechts.",
+        "wrongMix": "Zähle die Steine auf beiden Seiten zusammen und vergleiche."
+      },
+      "explanationAfterSuccess": "Du hast 7 dazugelegt. 5 + 7 = 12, die Wippe ist im Gleichgewicht."
+    }
+  ]
+}

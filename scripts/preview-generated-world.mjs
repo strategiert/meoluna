@@ -1,7 +1,7 @@
 // Baut lokale HTML-Previews der deterministisch generierten Engine-Welten.
 // Aufruf: node --import tsx/esm scripts/preview-generated-world.mjs
 // Output: preview-out/movement.html + preview-out/focused.html
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { build } from "esbuild";
@@ -18,6 +18,9 @@ const { buildMovementSpaceWorldCode } = await import(
 );
 const { buildFocusedArithmeticMiniAppCode, parseSignedIntegerAddition } = await import(
   pathToFileURL(join(root, "convex", "pipeline", "engines", "focusedArithmeticMiniApp.ts")).href
+);
+const { buildMixingBalanceWorldCode } = await import(
+  pathToFileURL(join(root, "convex", "pipeline", "engines", "mixingBalanceRenderer.ts")).href
 );
 
 const brief = {
@@ -83,5 +86,11 @@ async function bundle(name, worldCode) {
   console.log("written", join(outDir, name + ".html"));
 }
 
+const mixingSpec = JSON.parse(
+  readFileSync(join(root, "scripts", "fixtures", "mixing-balance", "mixed-bakery.json"), "utf8")
+);
+const mixingCode = buildMixingBalanceWorldCode(mixingSpec);
+
 await bundle("movement", movementCode);
 await bundle("focused", focusedCode);
+await bundle("mixing", mixingCode);
