@@ -4,7 +4,7 @@ export type ParsedSignedAddition = {
 };
 
 export function parseSignedIntegerAddition(text: string): ParsedSignedAddition | null {
-  const normalised = text.replace(/\u2212/g, "-").replace(/\s+/g, " ");
+  const normalised = text.replace(/−/g, "-").replace(/\s+/g, " ");
   const match = normalised.match(/([+-]?\d+)\s*\+\s*\(?\s*([+-]\d+)\s*\)?/);
   if (!match) return null;
   return { a: Number(match[1]), b: Number(match[2]) };
@@ -28,8 +28,8 @@ export function buildFocusedArithmeticMiniAppCode(input: {
   const practiceB = -Math.max(3, Math.round(absB * 0.55));
   const prompt = escapeJs(input.prompt);
 
-  return `import { useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+  return `import { useEffect, useRef, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 
 const MIN = ${min};
@@ -37,182 +37,422 @@ const MAX = ${max};
 const MAIN = { a: ${a}, b: ${b}, result: ${result}, absA: ${absA}, absB: ${absB} };
 const ORIGINAL_PROMPT = ${prompt};
 
+// "Bilderbuch-Tag": helle, freundliche Spielwelt für Kinder.
+const KID = {
+  skyTop: '#79c7f5',
+  skyBottom: '#e9f8ff',
+  hillBack: '#a8dd8a',
+  hillFront: '#7ec463',
+  path: '#fbe3b2',
+  pathEdge: '#d9b178',
+  ink: '#27324a',
+  coral: '#ff7a59',
+  coralDark: '#c95a3f',
+  blue: '#3f9bf0',
+  blueDark: '#2c79c2',
+  green: '#54b865',
+  greenDark: '#3c8f4b',
+  sun: '#ffd84d',
+  card: '#ffffff',
+};
+
 function pct(value) {
-  return ((value - MIN) / (MAX - MIN)) * 100;
+  return Math.max(5, Math.min(95, ((value - MIN) / (MAX - MIN)) * 100));
+}
+
+function speak(text) {
+  try {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'de-DE';
+    utterance.rate = 0.92;
+    window.speechSynthesis.speak(utterance);
+  } catch (error) {}
 }
 
 function makePractice(seed) {
   const first = ${practiceA} - seed;
   const second = ${practiceB} - seed;
   const result = first + second;
-  return { first, second, result, choices: [result, Math.abs(result), first - second, result + 10].sort(() => Math.random() - 0.5) };
+  const turnedAround = first - second;
+  const choices = [result, Math.abs(result), turnedAround === result ? result - 10 : turnedAround];
+  return { first, second, result, choices: choices.sort(() => Math.random() - 0.5) };
+}
+
+function KidStyles() {
+  return (
+    <style>{"@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap'); .kid-font{font-family:'Baloo 2','Comic Sans MS','Segoe UI',sans-serif;}"}</style>
+  );
+}
+
+function Luno({ mood, hopping, dir }) {
+  const eyeShift = dir < 0 ? -2.4 : dir > 0 ? 2.4 : 0;
+  return (
+    <motion.div
+      animate={hopping ? { y: [0, -24, 0], scaleY: [1, 1.08, 0.92], scaleX: [1, 0.94, 1.06] } : mood === 'sad' ? { x: [0, -7, 7, -5, 5, 0] } : mood === 'cheer' ? { y: [0, -16, 0] } : { y: [0, -3, 0] }}
+      transition={hopping ? { duration: 0.34, repeat: Infinity } : mood === 'cheer' ? { duration: 0.5, repeat: 2 } : mood === 'sad' ? { duration: 0.5 } : { duration: 2.4, repeat: Infinity }}
+    >
+      <svg width="68" height="72" viewBox="0 0 74 78" aria-hidden="true">
+        <ellipse cx="37" cy="74" rx="20" ry="4" fill="rgba(39,50,74,0.18)" />
+        <ellipse cx="26" cy="68" rx="7" ry="6" fill="#f3b34c" />
+        <ellipse cx="48" cy="68" rx="7" ry="6" fill="#f3b34c" />
+        <circle cx="37" cy="38" r="30" fill="#fff6e0" stroke="#27324a" strokeWidth="3.5" />
+        <circle cx={27 + eyeShift} cy="36" r="5.6" fill="#27324a" />
+        <circle cx={47 + eyeShift} cy="36" r="5.6" fill="#27324a" />
+        <circle cx={29 + eyeShift} cy="34" r="1.8" fill="#ffffff" />
+        <circle cx={49 + eyeShift} cy="34" r="1.8" fill="#ffffff" />
+        <circle cx="19" cy="46" r="4.6" fill="#ffb3a0" opacity="0.85" />
+        <circle cx="55" cy="46" r="4.6" fill="#ffb3a0" opacity="0.85" />
+        {mood === 'sad'
+          ? <path d="M 30 54 Q 37 49 44 54" fill="none" stroke="#27324a" strokeWidth="3.5" strokeLinecap="round" />
+          : <path d="M 29 51 Q 37 59 45 51" fill="none" stroke="#27324a" strokeWidth="3.5" strokeLinecap="round" />}
+        <path d="M 52 12 Q 60 6 64 14 Q 58 14 56 20 Z" fill="#ffd84d" stroke="#27324a" strokeWidth="2.5" />
+      </svg>
+    </motion.div>
+  );
+}
+
+function SpeechBubble({ text }) {
+  return (
+    <div className="relative mx-auto w-full max-w-3xl">
+      <div className="flex items-center gap-3 rounded-3xl border-4 px-4 py-3 shadow-lg sm:px-6 sm:py-4" style={{ background: KID.card, borderColor: KID.ink }}>
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-2xl" style={{ background: '#fff1c4' }}>🌙</div>
+        <p className="grow text-lg font-bold leading-snug sm:text-2xl" style={{ color: KID.ink }}>{text}</p>
+        <button
+          type="button"
+          onClick={() => speak(text)}
+          aria-label="Vorlesen"
+          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-2xl transition-transform active:scale-90"
+          style={{ background: KID.blue, boxShadow: '0 4px 0 ' + KID.blueDark }}
+        >🔊</button>
+      </div>
+      <div className="absolute -bottom-3 left-10 h-6 w-6 rotate-45 border-b-4 border-r-4" style={{ background: KID.card, borderColor: KID.ink }} />
+    </div>
+  );
+}
+
+function BigButton({ onClick, color, colorDark, children, disabled }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="kid-font min-h-[64px] rounded-3xl px-6 py-3 text-xl font-extrabold text-white transition-all active:translate-y-1 disabled:opacity-40 sm:text-2xl"
+      style={{ background: color, boxShadow: '0 6px 0 ' + colorDark, textShadow: '0 1px 2px rgba(0,0,0,0.25)' }}
+    >{children}</button>
+  );
+}
+
+function Scene({ position, hopping, hopCount, mood, dir, trailFrom, trailTo, secret }) {
+  let ticks = [];
+  const step = Math.max(10, Math.ceil((MAX - MIN) / 7 / 10) * 10);
+  for (let value = Math.ceil(MIN / step) * step; value <= MAX; value += step) ticks.push(value);
+  for (const special of secret ? [0] : [0, MAIN.result]) {
+    if (!ticks.includes(special)) {
+      ticks = ticks.filter((tick) => Math.abs(pct(tick) - pct(special)) > 4);
+      ticks.push(special);
+    }
+  }
+  ticks.sort((x, y) => x - y);
+
+  return (
+    <div className="relative w-full overflow-hidden rounded-[2rem] border-4" style={{ height: 'min(40vh, 21rem)', borderColor: KID.ink, background: 'linear-gradient(180deg, ' + KID.skyTop + ', ' + KID.skyBottom + ' 70%)' }}>
+      <motion.div className="absolute right-8 top-5 h-16 w-16 rounded-full sm:h-24 sm:w-24" style={{ background: KID.sun, boxShadow: '0 0 50px 14px rgba(255,216,77,0.55)' }} animate={{ scale: [1, 1.06, 1] }} transition={{ duration: 4, repeat: Infinity }} />
+      <motion.div className="absolute left-[10%] top-8 h-9 w-28 rounded-full bg-white/90" animate={{ x: [0, 26, 0] }} transition={{ duration: 18, repeat: Infinity }} />
+      <motion.div className="absolute left-[55%] top-14 h-7 w-20 rounded-full bg-white/80" animate={{ x: [0, -20, 0] }} transition={{ duration: 24, repeat: Infinity }} />
+      <div className="pointer-events-none absolute -left-10 bottom-[14%] h-36 w-[60%] rounded-[50%]" style={{ background: KID.hillBack }} />
+      <div className="pointer-events-none absolute -right-16 bottom-[10%] h-40 w-[70%] rounded-[50%]" style={{ background: KID.hillFront }} />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[24%]" style={{ background: KID.hillFront }} />
+
+      <div className="absolute inset-x-[4%] bottom-[20%] h-12 rounded-full border-4" style={{ background: KID.path, borderColor: KID.pathEdge }}>
+        {ticks.map((tick) => (
+          <div key={tick} className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2" style={{ left: pct(tick) + '%' }}>
+            <div className={'kid-font rounded-xl border-2 px-2 py-0.5 text-sm font-extrabold sm:text-base ' + (tick === 0 ? 'scale-110' : '')} style={{ background: tick === 0 ? KID.sun : KID.card, borderColor: KID.ink, color: KID.ink }}>{tick}</div>
+          </div>
+        ))}
+        <div className="kid-font absolute -bottom-9 left-2 rounded-full px-3 py-0.5 text-sm font-extrabold text-white" style={{ background: KID.blue }}>← Westen</div>
+        <div className="kid-font absolute -bottom-9 right-2 rounded-full px-3 py-0.5 text-sm font-extrabold text-white" style={{ background: KID.coral }}>Osten →</div>
+      </div>
+
+      <div className="pointer-events-none absolute inset-y-0 left-[4%] right-[4%]">
+        {trailTo !== null && (
+          <div className="absolute bottom-[20%] h-12" style={{ left: Math.min(pct(trailFrom), pct(trailTo)) + '%', width: Math.max(0.5, Math.abs(pct(trailTo) - pct(trailFrom))) + '%' }}>
+            <div className="absolute inset-x-0 top-1/2 h-3 -translate-y-1/2 rounded-full" style={{ background: 'rgba(63,155,240,0.5)' }} />
+          </div>
+        )}
+
+        <motion.div className="absolute z-20 -translate-x-1/2" style={{ bottom: '32%' }} animate={{ left: pct(position) + '%' }} transition={{ duration: hopping ? Math.min(2.2, 0.8 + (MAIN.absA + MAIN.absB) / 60) : 0.4, ease: 'easeInOut' }}>
+          <Luno mood={mood} hopping={hopping} dir={dir} />
+          <div className="kid-font mx-auto -mt-1 w-fit rounded-full border-2 px-3 py-0.5 text-base font-extrabold" style={{ background: secret ? KID.sun : KID.card, borderColor: KID.ink, color: KID.ink }}>
+            {hopping ? hopCount : secret ? '?' : position}
+          </div>
+        </motion.div>
+      </div>
+
+      {hopping && (
+        <div className="kid-font absolute left-1/2 top-4 z-30 -translate-x-1/2 rounded-2xl border-4 px-5 py-2 text-2xl font-extrabold" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink }}>
+          👣 {hopCount} Felder
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EquationCards({ revealed, first, second, result }) {
+  const chips = [{ text: '0', dim: false }];
+  chips.push({ text: '+ (' + first + ')', dim: revealed < 1 });
+  chips.push({ text: '+ (' + second + ')', dim: revealed < 2 });
+  chips.push({ text: revealed >= 2 ? '= ' + result : '= ?', dim: revealed < 2 });
+  return (
+    <div className="rounded-3xl border-4 p-4" style={{ background: KID.card, borderColor: KID.ink }}>
+      <p className="kid-font text-sm font-extrabold uppercase tracking-wide" style={{ color: '#8a93a6' }}>Aus der Bewegung wird</p>
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        {chips.map((chip, index) => (
+          <span key={index} className="kid-font rounded-2xl border-2 px-3 py-1.5 text-xl font-extrabold sm:text-2xl" style={{ background: chip.dim ? '#eef1f6' : index === chips.length - 1 ? '#dcf5e1' : '#dceeff', borderColor: chip.dim ? '#c6cdd9' : KID.ink, color: chip.dim ? '#9aa3b5' : KID.ink }}>{chip.text}</span>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export default function App() {
+  const [act, setAct] = useState('watch');
   const [position, setPosition] = useState(0);
-  const [stage, setStage] = useState(0);
-  const [xp, setXp] = useState(0);
+  const [hopping, setHopping] = useState(false);
+  const [hopCount, setHopCount] = useState(0);
+  const [mood, setMood] = useState('happy');
+  const [dir, setDir] = useState(0);
+  const [revealed, setRevealed] = useState(0);
+  const [trail, setTrail] = useState({ from: 0, to: null });
+  const [bubble, setBubble] = useState('Hallo! Ich bin Luno. Schau zu, wie ich ' + MAIN.a + ' + (' + MAIN.b + ') hüpfe!');
+  const [stars, setStars] = useState(0);
   const [gems, setGems] = useState(0);
   const [streak, setStreak] = useState(0);
-  const [feedback, setFeedback] = useState('Starte bei 0. Westen bedeutet Minus.');
   const [attempts, setAttempts] = useState([]);
+  const [doPhase, setDoPhase] = useState('direction');
   const [challenge, setChallenge] = useState(() => makePractice(0));
-  const ticks = useMemo(() => {
-    const values = [];
-    const step = Math.max(10, Math.ceil((MAX - MIN) / 7 / 10) * 10);
-    for (let value = Math.ceil(MIN / step) * step; value <= MAX; value += step) values.push(value);
-    if (!values.includes(0)) values.push(0);
-    if (!values.includes(MAIN.result)) values.push(MAIN.result);
-    return values.sort((x, y) => x - y);
-  }, []);
+  const timer = useRef(null);
 
-  function award(points, diamond = false) {
-    setXp((value) => value + points);
+  useEffect(() => () => { if (timer.current) clearInterval(timer.current); }, []);
+
+  function award(points, diamond) {
+    setStars((value) => value + points);
     if (diamond) setGems((value) => value + 1);
     Meoluna.reportScore(points, { action: 'focused-intervention', prompt: ORIGINAL_PROMPT });
   }
 
-  function stepWestOne() {
-    if (stage >= 1) return;
-    setStage(1);
-    setPosition(MAIN.a);
-    setFeedback(MAIN.a + ' bedeutet: ' + MAIN.absA + ' Felder nach Westen. Die Figur steht jetzt bei ' + MAIN.a + '.');
-    award(5);
-  }
-
-  function stepWestTwo() {
-    if (stage < 1) stepWestOne();
-    if (stage >= 2) return;
-    setStage(2);
-    setPosition(MAIN.result);
-    setFeedback('Noch ' + MAIN.absB + ' Felder weiter nach Westen. Aus der Bewegung wird: ' + MAIN.a + ' + (' + MAIN.b + ') = ' + MAIN.result + '.');
-    award(10, true);
-    Meoluna.completeModule('demo', 15);
-  }
-
-  function resetDemo() {
-    setPosition(0);
-    setStage(0);
-    setFeedback('Starte bei 0. Westen bedeutet Minus.');
-  }
-
-  function checkAnswer(choice) {
-    const nextAttempts = [...attempts, choice];
-    setAttempts(nextAttempts);
-    if (choice === challenge.result) {
-      const nextStreak = streak + 1;
-      setStreak(nextStreak);
-      setFeedback('Richtig: ' + challenge.first + ' + (' + challenge.second + ') = ' + challenge.result + '. Zwei West-Wege bleiben Westen.');
-      award(10, nextStreak % 3 === 0);
-      confetti({ particleCount: 70, spread: 70, origin: { y: 0.65 } });
-      setChallenge(makePractice(nextStreak));
-      if (nextStreak >= 3) {
-        Meoluna.completeModule('practice', 30);
-        Meoluna.complete(45);
+  function hop(from, to, after) {
+    const total = Math.abs(to - from);
+    const duration = Math.min(2200, 700 + total * 18);
+    setHopping(true);
+    setHopCount(0);
+    setDir(Math.sign(to - from));
+    setTrail({ from, to });
+    setPosition(to);
+    const startedAt = Date.now();
+    timer.current = setInterval(() => {
+      const ratio = Math.min(1, (Date.now() - startedAt) / duration);
+      setHopCount(Math.round(ratio * total));
+      if (ratio >= 1) {
+        clearInterval(timer.current);
+        setHopping(false);
+        setDir(0);
+        after();
       }
+    }, 40);
+  }
+
+  function playDemo() {
+    if (hopping) return;
+    setPosition(0);
+    setRevealed(0);
+    setBubble(MAIN.a + ' heißt: ' + MAIN.absA + ' Felder nach Westen!');
+    hop(0, MAIN.a, () => {
+      setRevealed(1);
+      setBubble('Und ' + MAIN.b + ' heißt: noch ' + MAIN.absB + ' Felder weiter nach Westen!');
+      setTimeout(() => {
+        hop(MAIN.a, MAIN.result, () => {
+          setRevealed(2);
+          setMood('cheer');
+          setBubble('Ich bin bei ' + MAIN.result + ' gelandet! Zwei West-Wege bleiben Westen.');
+          award(5, false);
+          setTimeout(() => setMood('happy'), 1200);
+        });
+      }, 900);
+    });
+  }
+
+  function startDoAct() {
+    setAct('do');
+    setPosition(0);
+    setRevealed(0);
+    setTrail({ from: 0, to: null });
+    setDoPhase('direction');
+    setBubble('Jetzt du! ' + MAIN.a + ' + (' + MAIN.b + '). In welche Richtung gehst du?');
+  }
+
+  function chooseDirection(chosen) {
+    if (doPhase !== 'direction') return;
+    if (chosen < 0) {
+      setDoPhase('hop');
+      setBubble('Genau, nach Westen! Drücke auf Hüpfen!');
     } else {
-      setStreak(0);
-      setFeedback('Fast. Du drehst nicht um. Beide Zahlen sind negativ, also gehst du weiter nach Westen. Richtig waere ' + challenge.result + '.');
+      setMood('sad');
+      setBubble('Minus bedeutet Westen. Probier es nochmal!');
+      setTimeout(() => setMood('happy'), 700);
     }
   }
 
-  const pathOneLeft = Math.min(pct(0), pct(MAIN.a));
-  const pathOneWidth = Math.abs(pct(MAIN.a) - pct(0));
-  const pathTwoLeft = Math.min(pct(MAIN.a), pct(MAIN.result));
-  const pathTwoWidth = Math.abs(pct(MAIN.result) - pct(MAIN.a));
+  function startUserHop() {
+    if (doPhase !== 'hop' || hopping) return;
+    setBubble('Erst ' + MAIN.absA + ' Felder, dann noch ' + MAIN.absB + '!');
+    hop(0, MAIN.a, () => {
+      setRevealed(1);
+      setTimeout(() => {
+        hop(MAIN.a, MAIN.result, () => {
+          setDoPhase('land');
+          setBubble('Wo bist du gelandet? Tippe auf die richtige Zahl!');
+        });
+      }, 700);
+    });
+  }
+
+  function checkLanding(choice) {
+    if (doPhase !== 'land') return;
+    setAttempts((list) => [...list, choice]);
+    if (choice === MAIN.result) {
+      setRevealed(2);
+      setMood('cheer');
+      setBubble('Richtig! ' + MAIN.a + ' + (' + MAIN.b + ') = ' + MAIN.result + '. Du addierst die Felder und behältst das Minus.');
+      award(10, true);
+      Meoluna.completeModule('verstehen', 15);
+      confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } });
+      setDoPhase('done');
+      setTimeout(() => setMood('happy'), 1200);
+    } else if (choice === Math.abs(MAIN.result)) {
+      setMood('sad');
+      setBubble('Fast! Zwei Minuswege werden nicht Plus. Du bleibst im Westen.');
+      setTimeout(() => setMood('happy'), 700);
+    } else {
+      setMood('sad');
+      setBubble('Zähle beide West-Wege zusammen: ' + MAIN.absA + ' und ' + MAIN.absB + '.');
+      setTimeout(() => setMood('happy'), 700);
+    }
+  }
+
+  function startPractice() {
+    setAct('practice');
+    setPosition(0);
+    setRevealed(0);
+    setTrail({ from: 0, to: null });
+    setBubble('Deine Aufgabe: ' + challenge.first + ' + (' + challenge.second + '). Tippe auf das Ergebnis!');
+  }
+
+  function checkPractice(choice) {
+    setAttempts((list) => [...list, choice]);
+    if (choice === challenge.result) {
+      const nextStreak = streak + 1;
+      setStreak(nextStreak);
+      setMood('cheer');
+      setBubble('Richtig! ' + challenge.first + ' + (' + challenge.second + ') = ' + challenge.result + '!');
+      award(10, nextStreak % 3 === 0);
+      confetti({ particleCount: 70, spread: 70, origin: { y: 0.6 } });
+      hop(0, challenge.result, () => {
+        setTimeout(() => setMood('happy'), 600);
+      });
+      if (nextStreak >= 3) {
+        Meoluna.completeModule('uebung', 30);
+        Meoluna.complete(45);
+        setTimeout(() => setBubble('Du hast es geschafft! Westen + Westen bleibt Westen. 🏆'), 1500);
+      } else {
+        setTimeout(() => {
+          const next = makePractice(nextStreak);
+          setChallenge(next);
+          setPosition(0);
+          setTrail({ from: 0, to: null });
+          setBubble('Nächste Aufgabe: ' + next.first + ' + (' + next.second + '). Tippe auf das Ergebnis!');
+        }, 1800);
+      }
+    } else {
+      setStreak(0);
+      setMood('sad');
+      setBubble('Du drehst nicht um! Beide Zahlen sind minus, also weiter nach Westen.');
+      setTimeout(() => setMood('happy'), 700);
+    }
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-blue-950 to-emerald-950 p-4 text-white sm:p-8">
-      <div className="mx-auto grid max-w-7xl gap-5 xl:grid-cols-[1.25fr_0.75fr]">
-        <header className="xl:col-span-2 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h1 className="text-4xl font-black tracking-tight sm:text-6xl">Minus-Welt: Nach Westen wird es kleiner</h1>
-            <p className="mt-3 max-w-3xl text-lg text-white/75">Eine kleine Blockwelt fuer {MAIN.a} + ({MAIN.b}). Start bei 0. Westen bedeutet Minus.</p>
+    <div className="kid-font min-h-screen p-3 sm:p-6" style={{ background: 'linear-gradient(180deg, ' + KID.skyBottom + ', #f8fdf2)' }}>
+      <KidStyles />
+      <div className="mx-auto flex max-w-5xl flex-col gap-4">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex gap-2">
+            {['watch', 'do', 'practice'].map((step, index) => (
+              <div key={step} className="kid-font flex h-10 w-10 items-center justify-center rounded-full border-2 text-lg font-extrabold" style={{ background: act === step ? KID.sun : KID.card, borderColor: KID.ink, color: KID.ink }}>{index + 1}</div>
+            ))}
           </div>
-          <div className="rounded-2xl border border-white/15 bg-slate-950/65 p-4 text-lg font-black shadow-2xl">
-            <div className="flex justify-between gap-10"><span>XP</span><span>{xp}</span></div>
-            <div className="flex justify-between gap-10"><span>Diamanten</span><span>{gems}</span></div>
-            <div className="flex justify-between gap-10"><span>Serie</span><span>{streak}</span></div>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 rounded-full border-2 px-3 py-1 text-lg" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink }}>⭐ <span className="font-extrabold">{stars}</span></div>
+            <div className="flex items-center gap-1 rounded-full border-2 px-3 py-1 text-lg" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink }}>💎 <span className="font-extrabold">{gems}</span></div>
+            <div className="flex items-center gap-1 rounded-full border-2 px-3 py-1 text-lg" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink }}>🔥 <span className="font-extrabold">{streak}</span></div>
           </div>
-        </header>
+        </div>
 
-        <section className="rounded-3xl border border-white/15 bg-slate-800/85 p-5 shadow-2xl">
-          <button
-            type="button"
-            onClick={() => (stage === 0 ? stepWestOne() : stage === 1 ? stepWestTwo() : resetDemo())}
-            className="relative block h-[430px] w-full overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-b from-sky-900/50 via-slate-800 to-lime-950 text-left focus:outline-none focus:ring-4 focus:ring-yellow-300/50"
-            aria-label="Blockwelt anklicken, um den naechsten Rechenschritt auszufuehren"
-          >
-            <div className="absolute right-10 top-8 h-20 w-20 rotate-12 rounded-xl bg-yellow-300 shadow-[0_0_40px_rgba(250,204,21,0.45)]" />
-            <div className="absolute left-20 top-16 h-12 w-44 rounded-xl bg-white/65 shadow-[70px_16px_0_rgba(255,255,255,0.55)]" />
-            <div className="absolute right-4 top-4 rounded-full bg-slate-950/70 px-4 py-2 text-sm font-black text-yellow-200">
-              {stage === 0 ? 'Klick: erster West-Weg' : stage === 1 ? 'Klick: zweiter West-Weg' : 'Klick: nochmal ansehen'}
+        <SpeechBubble text={bubble} />
+
+        <Scene position={position} hopping={hopping} hopCount={hopCount} mood={mood} dir={dir} trailFrom={trail.from} trailTo={trail.to} secret={act === 'do' && doPhase === 'land'} />
+
+        {act === 'watch' && (
+          <div className="grid gap-3 sm:grid-cols-2">
+            <BigButton onClick={playDemo} color={KID.blue} colorDark={KID.blueDark}>▶️ Zeig mir!</BigButton>
+            <BigButton onClick={startDoAct} color={KID.green} colorDark={KID.greenDark} disabled={revealed < 2}>Jetzt du! →</BigButton>
+          </div>
+        )}
+
+        {act === 'do' && doPhase === 'direction' && (
+          <div className="grid grid-cols-2 gap-4">
+            <BigButton onClick={() => chooseDirection(-1)} color={KID.blue} colorDark={KID.blueDark}>⬅️ Nach Westen</BigButton>
+            <BigButton onClick={() => chooseDirection(1)} color={KID.coral} colorDark={KID.coralDark}>Nach Osten ➡️</BigButton>
+          </div>
+        )}
+
+        {act === 'do' && doPhase === 'hop' && (
+          <BigButton onClick={startUserHop} color={KID.green} colorDark={KID.greenDark}>🐾 hüpfen!</BigButton>
+        )}
+
+        {act === 'do' && doPhase === 'land' && (
+          <div className="grid grid-cols-3 gap-3">
+            {[MAIN.result, Math.abs(MAIN.result), MAIN.a + MAIN.b - 10].map((choice) => (
+              <button key={choice} type="button" onClick={() => checkLanding(choice)} className="kid-font min-h-[64px] rounded-3xl border-4 text-2xl font-extrabold transition-all active:translate-y-1" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink, boxShadow: '0 6px 0 ' + KID.pathEdge }}>{choice}</button>
+            ))}
+          </div>
+        )}
+
+        {act === 'do' && doPhase === 'done' && (
+          <BigButton onClick={startPractice} color={KID.green} colorDark={KID.greenDark}>🎯 Jetzt üben!</BigButton>
+        )}
+
+        {act === 'practice' && streak < 3 && (
+          <div className="grid grid-cols-3 gap-3">
+            {challenge.choices.map((choice) => (
+              <button key={choice} type="button" onClick={() => checkPractice(choice)} className="kid-font min-h-[64px] rounded-3xl border-4 text-2xl font-extrabold transition-all active:translate-y-1" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink, boxShadow: '0 6px 0 ' + KID.pathEdge }}>{choice}</button>
+            ))}
+          </div>
+        )}
+
+        {act === 'practice' && streak >= 3 && (
+          <div className="rounded-3xl border-4 p-5 text-center" style={{ background: '#e8f9e4', borderColor: KID.ink }}>
+            <p className="text-2xl font-extrabold" style={{ color: KID.ink }}>🏆 Alle Abzeichen geschafft!</p>
+            <div className="mt-3 flex flex-wrap justify-center gap-2">
+              <span className="rounded-full border-2 px-4 py-2 text-lg font-extrabold" style={{ background: KID.sun, borderColor: KID.ink, color: KID.ink }}>🧭 West-Versteher</span>
+              <span className="rounded-full border-2 px-4 py-2 text-lg font-extrabold" style={{ background: KID.sun, borderColor: KID.ink, color: KID.ink }}>⛏️ Minus-Miner</span>
+              <span className="rounded-full border-2 px-4 py-2 text-lg font-extrabold" style={{ background: KID.sun, borderColor: KID.ink, color: KID.ink }}>💎 Diamant-Profi</span>
             </div>
-            <div className="absolute inset-x-0 bottom-0 grid h-24" style={{ gridTemplateColumns: 'repeat(20, minmax(0, 1fr))' }}>
-              {Array.from({ length: 20 }).map((_, index) => <div key={index} className="border border-black/25 bg-gradient-to-b from-green-400 from-25% to-amber-900" />)}
-            </div>
-            <div className="absolute inset-x-[7%] bottom-36 h-28">
-              <div className="absolute inset-x-0 top-12 h-2 rounded-full bg-white" />
-              {ticks.map((tick) => (
-                <div key={tick} className="absolute top-7 -translate-x-1/2 text-center text-sm font-black text-white/75" style={{ left: pct(tick) + '%' }}>
-                  <div className="mx-auto h-9 w-1 rounded-full bg-white/80" />
-                  <span>{tick}</span>
-                </div>
-              ))}
-              {stage >= 1 && <div className="absolute top-6 h-4 rounded-full bg-orange-400" style={{ left: pathOneLeft + '%', width: pathOneWidth + '%' }} />}
-              {stage >= 2 && <div className="absolute top-1 h-4 rounded-full bg-orange-500" style={{ left: pathTwoLeft + '%', width: pathTwoWidth + '%' }} />}
-              {stage >= 1 && <div className="absolute top-0 -translate-x-1/2 rounded-full bg-slate-950 px-3 py-1 text-sm font-black">{MAIN.absA} Felder nach Westen</div>}
-              {stage >= 2 && <div className="absolute -top-8 -translate-x-1/2 rounded-full bg-slate-950 px-3 py-1 text-sm font-black" style={{ left: pct((MAIN.a + MAIN.result) / 2) + '%' }}>noch {MAIN.absB} Felder</div>}
-              {stage >= 2 && <div className="absolute -top-14 h-9 w-9 -translate-x-1/2 rotate-45 rounded bg-cyan-300 shadow-[0_0_25px_rgba(103,232,249,0.6)]" style={{ left: pct(MAIN.result) + '%' }} />}
-            </div>
-            <motion.div className="absolute bottom-[210px] z-20 flex -translate-x-1/2 flex-col items-center drop-shadow-2xl" animate={{ left: pct(position) + '%' }} transition={{ type: 'spring', stiffness: 95, damping: 16 }}>
-              <div className="mb-1 rounded-lg bg-slate-950 px-3 py-1 text-base font-black">{position}</div>
-              <div className="h-9 w-9 rounded-t-md border-4 border-slate-950 bg-amber-200" />
-              <div className="h-9 w-12 border-4 border-slate-950 bg-green-500" />
-              <div className="-mt-1 flex gap-1"><div className="h-7 w-4 border-4 border-slate-950 bg-blue-600" /><div className="h-7 w-4 border-4 border-slate-950 bg-blue-600" /></div>
-            </motion.div>
-          </button>
-
-          <div className="mt-4 grid gap-3 md:grid-cols-3">
-            <div className="rounded-2xl bg-slate-950/50 p-4"><p className="text-sm font-black text-white/60">Start</p><p className="text-4xl font-black">0</p><p>Hier steht die Figur zuerst.</p></div>
-            <div className="rounded-2xl bg-slate-950/50 p-4"><p className="text-sm font-black text-white/60">Erster Weg</p><p className="text-4xl font-black">{MAIN.a}</p><p>{MAIN.absA} Felder nach Westen.</p></div>
-            <div className="rounded-2xl bg-slate-950/50 p-4"><p className="text-sm font-black text-white/60">Zweiter Weg</p><p className="text-4xl font-black">{MAIN.b}</p><p>Noch einmal weiter nach Westen.</p></div>
           </div>
+        )}
 
-          <div className="mt-4 flex flex-wrap gap-3">
-            <button onClick={stepWestOne} className="rounded-2xl bg-yellow-300 px-5 py-4 font-black text-slate-950 shadow-lg shadow-yellow-900/40">1. {MAIN.absA} nach Westen</button>
-            <button onClick={stepWestTwo} className="rounded-2xl bg-yellow-300 px-5 py-4 font-black text-slate-950 shadow-lg shadow-yellow-900/40">2. noch {MAIN.absB} weiter</button>
-            <button onClick={() => { resetDemo(); setTimeout(stepWestOne, 150); setTimeout(stepWestTwo, 1100); }} className="rounded-2xl bg-green-300 px-5 py-4 font-black text-slate-950">Animation komplett</button>
-            <button onClick={resetDemo} className="rounded-2xl bg-slate-300 px-5 py-4 font-black text-slate-950">Reset</button>
-          </div>
-        </section>
-
-        <aside className="rounded-3xl border border-white/15 bg-slate-800/85 p-5 shadow-2xl">
-          <h2 className="text-3xl font-black">Was passiert?</h2>
-          <div className="mt-3 rounded-2xl border-l-8 border-yellow-300 bg-slate-950/55 p-4 text-lg">{feedback}</div>
-
-          <h2 className="mt-6 text-3xl font-black">Rechenbild</h2>
-          <div className="mt-3 rounded-2xl bg-slate-950/55 p-4">
-            <p className="text-sm font-black text-white/60">Aus der Geschichte wird:</p>
-            <p className="mt-2 text-4xl font-black">{stage >= 2 ? MAIN.a + ' + (' + MAIN.b + ') = ' + MAIN.result : stage === 1 ? '0 + (' + MAIN.a + ') = ' + MAIN.a : '0'}</p>
-            <p className="mt-2 text-white/75">{stage >= 2 ? 'Du zaehlst beide West-Wege zusammen und setzt das Minus davor.' : 'Noch nicht fertig.'}</p>
-          </div>
-
-          <h2 className="mt-6 text-3xl font-black">Mini-Challenge</h2>
-          <p className="mt-1 text-white/70">Rechne weiter in der Blockwelt.</p>
-          <p className="mt-3 text-3xl font-black">{challenge.first} + ({challenge.second}) = ?</p>
-          <div className="mt-3 grid grid-cols-2 gap-3">
-            {challenge.choices.map((choice) => <button key={choice} onClick={() => checkAnswer(choice)} className="rounded-2xl border border-white/15 bg-slate-950/55 px-4 py-4 text-2xl font-black hover:bg-slate-900">{choice}</button>)}
-          </div>
-          <p className="mt-4 rounded-2xl bg-slate-950/55 p-4 text-white/75">Tipp: Westen + Westen = weiter nach Westen.</p>
-
-          <h2 className="mt-6 text-3xl font-black">Abzeichen</h2>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <span className={'rounded-full border px-3 py-2 font-black ' + (xp >= 10 ? 'border-green-300 bg-green-300/20' : 'border-white/15 bg-slate-950/40')}>West-Versteher</span>
-            <span className={'rounded-full border px-3 py-2 font-black ' + (xp >= 35 ? 'border-green-300 bg-green-300/20' : 'border-white/15 bg-slate-950/40')}>Minus-Miner</span>
-            <span className={'rounded-full border px-3 py-2 font-black ' + (gems >= 2 ? 'border-green-300 bg-green-300/20' : 'border-white/15 bg-slate-950/40')}>Diamant-Profi</span>
-          </div>
-        </aside>
+        <EquationCards revealed={revealed} first={act === 'practice' ? challenge.first : MAIN.a} second={act === 'practice' ? challenge.second : MAIN.b} result={act === 'practice' ? challenge.result : MAIN.result} />
       </div>
     </div>
   );
