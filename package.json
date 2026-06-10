@@ -19,7 +19,8 @@
     "admin-panel-route-check": "node scripts/admin-panel-route-check.mjs",
     "arithmetic-movement-check": "node --import tsx/esm scripts/arithmetic-movement-check.mjs",
     "movement-golden-check": "node --import tsx/esm scripts/movement-space-golden-check.mjs",
-    "mixing-golden-check": "node --import tsx/esm scripts/mixing-balance-golden-check.mjs"
+    "mixing-golden-check": "node --import tsx/esm scripts/mixing-balance-golden-check.mjs",
+    "building-golden-check": "node --import tsx/esm scripts/building-construct-golden-check.mjs"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.60.0",

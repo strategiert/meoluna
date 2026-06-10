@@ -1,0 +1,113 @@
+{
+  "engine": "building-construct",
+  "learningBrief": {
+    "inputMode": "material",
+    "subject": "mathematik",
+    "gradeLevel": "3",
+    "rawTopic": "Mein Kind versteht Fläche und Umfang nicht.",
+    "extractedTasks": ["Fläche eines Rechtecks", "Umfang eines Rechtecks"],
+    "learningGoals": ["Fläche als Reihen mal Spalten verstehen", "Umfang als Rand verstehen"],
+    "likelyMisconceptions": ["Fläche und Umfang sind dasselbe", "Mehr Umfang heißt immer mehr Fläche"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Der Bilderbuch-Garten",
+    "coreMetaphor": "Fläche ist das Beet, Umfang ist der Zaun drumherum.",
+    "setting": "Ein sonniger Garten. Beete werden gepflanzt, Zäune werden gebaut.",
+    "visualStyle": {
+      "palette": ["#79c7f5", "#8fd16c", "#ffd84d", "#d9a05e", "#27324a"],
+      "mood": "hell, sommerlich, fleißig",
+      "shapes": "Raster-Beete, Zäune, Blumen",
+      "effects": "Beet wächst beim Bauen, Konfetti beim Gelingen"
+    },
+    "guide": { "name": "Luno", "role": "Gärtnermeister", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "anlegen", "title": "Beet anlegen", "purpose": "Maße einstellen: breit und hoch.", "scene": "Die ersten kleinen Beete.", "reward": "Beet-Lehrling" },
+      { "id": "flaeche", "title": "Felder zählen", "purpose": "Fläche als Breite mal Höhe erleben.", "scene": "Beete mit Ziel-Fläche, mehrere Lösungen möglich.", "reward": "Flächen-Gärtner" },
+      { "id": "zaun", "title": "Zaun bauen", "purpose": "Umfang als Rand erleben.", "scene": "Zäune mit Ziel-Länge.", "reward": "Zaun-Bauer" },
+      { "id": "meister", "title": "Meisterprüfung", "purpose": "Fläche und Umfang gemischt.", "scene": "Drei Meister-Aufträge.", "reward": "Garten-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Das Kind verwechselt Fläche (Felder innen) und Umfang (Rand außen).",
+    "embodiedMetaphor": "Das Beet sind die Felder innen, der Zaun ist der Rand außen. Beides baut man selbst.",
+    "successInsight": "Fläche ist Breite mal Höhe. Umfang ist zweimal Breite plus Höhe."
+  },
+  "rooms": [
+    {
+      "roomId": "anlegen",
+      "objective": "Stelle das Beet genau richtig ein!",
+      "mode": "area",
+      "grid": { "cols": 8, "rows": 6 },
+      "tileEmoji": "🌱",
+      "rounds": [
+        { "objective": "Baue ein Beet: 3 breit und 2 hoch!", "goal": { "type": "exact", "width": 3, "height": 2 } },
+        { "objective": "Jetzt größer: 5 breit und 3 hoch!", "goal": { "type": "exact", "width": 5, "height": 3 } }
+      ],
+      "feedback": {
+        "correct": "Genau richtig gebaut!",
+        "tooSmall": "Dein Beet ist noch zu klein. Schau auf das Ziel und baue weiter.",
+        "tooBig": "Dein Beet ist zu groß geworden. Mach es wieder kleiner.",
+        "wrongShape": "Die Felderzahl stimmt, aber Breite und Höhe sind vertauscht oder anders. Schau genau hin!"
+      },
+      "explanationAfterSuccess": "Breite und Höhe bestimmen das Beet. 3 breit und 2 hoch sind 2 Reihen mit je 3 Feldern."
+    },
+    {
+      "roomId": "flaeche",
+      "objective": "Baue Beete mit der richtigen Felderzahl!",
+      "mode": "area",
+      "grid": { "cols": 8, "rows": 6 },
+      "tileEmoji": "🌷",
+      "rounds": [
+        { "objective": "Baue ein Beet mit genau 6 Feldern!", "goal": { "type": "area", "area": 6 } },
+        { "objective": "Baue ein Beet mit genau 12 Feldern!", "goal": { "type": "area", "area": 12 } },
+        { "objective": "Baue ein Beet mit genau 18 Feldern!", "goal": { "type": "area", "area": 18 } }
+      ],
+      "feedback": {
+        "correct": "Die Felderzahl stimmt!",
+        "tooSmall": "Zähle nach: dein Beet hat noch zu wenige Felder.",
+        "tooBig": "Dein Beet hat zu viele Felder. Mach es schmaler oder niedriger.",
+        "wrongShape": "Zähle die Reihen und die Felder pro Reihe."
+      },
+      "explanationAfterSuccess": "12 Felder gehen auf viele Arten: 3 mal 4, 2 mal 6 oder 4 mal 3. Breite mal Höhe ist die Fläche."
+    },
+    {
+      "roomId": "zaun",
+      "objective": "Baue Zäune mit der richtigen Länge!",
+      "mode": "area",
+      "grid": { "cols": 8, "rows": 6 },
+      "tileEmoji": "🌼",
+      "rounds": [
+        { "objective": "Baue ein Beet mit genau 10 Zaunteilen!", "goal": { "type": "perimeter", "perimeter": 10 } },
+        { "objective": "Baue ein Beet mit genau 14 Zaunteilen!", "goal": { "type": "perimeter", "perimeter": 14 } }
+      ],
+      "feedback": {
+        "correct": "Der Zaun passt genau!",
+        "tooSmall": "Dein Zaun ist zu kurz. Mach das Beet breiter oder höher.",
+        "tooBig": "Dein Zaun ist zu lang. Mach das Beet kleiner.",
+        "wrongShape": "Der Zaun läuft nur außen am Rand entlang. Zähle die Zaunteile."
+      },
+      "explanationAfterSuccess": "Der Zaun läuft zweimal die Breite und zweimal die Höhe entlang: 2 mal (Breite plus Höhe)."
+    },
+    {
+      "roomId": "meister",
+      "objective": "Die Meisterprüfung: Fläche und Zaun gemischt!",
+      "mode": "area",
+      "grid": { "cols": 8, "rows": 6 },
+      "tileEmoji": "🌻",
+      "rounds": [
+        { "objective": "Baue ein Beet mit genau 16 Feldern!", "goal": { "type": "area", "area": 16 } },
+        { "objective": "Baue ein Beet mit genau 18 Zaunteilen!", "goal": { "type": "perimeter", "perimeter": 18 } },
+        { "objective": "Das Meisterbeet: 7 breit und 4 hoch!", "goal": { "type": "exact", "width": 7, "height": 4 } }
+      ],
+      "feedback": {
+        "correct": "Meisterhaft gebaut!",
+        "tooSmall": "Noch zu klein für einen Meister. Schau auf das Ziel.",
+        "tooBig": "Zu groß! Ein Meister baut genau.",
+        "wrongShape": "Fläche heißt Felder innen, Zaun heißt Rand außen. Was war gefragt?"
+      },
+      "explanationAfterSuccess": "Du kannst jetzt beides: Felder innen zählen (Fläche) und den Rand außen messen (Umfang)."
+    }
+  ]
+}

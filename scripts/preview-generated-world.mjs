@@ -22,6 +22,9 @@ const { buildFocusedArithmeticMiniAppCode, parseSignedIntegerAddition } = await 
 const { buildMixingBalanceWorldCode } = await import(
   pathToFileURL(join(root, "convex", "pipeline", "engines", "mixingBalanceRenderer.ts")).href
 );
+const { buildBuildingConstructWorldCode } = await import(
+  pathToFileURL(join(root, "convex", "pipeline", "engines", "buildingConstructRenderer.ts")).href
+);
 
 const brief = {
   inputMode: "material",
@@ -91,6 +94,12 @@ const mixingSpec = JSON.parse(
 );
 const mixingCode = buildMixingBalanceWorldCode(mixingSpec);
 
+const buildingSpec = JSON.parse(
+  readFileSync(join(root, "scripts", "fixtures", "building-construct", "baustelle-mixed.json"), "utf8")
+);
+const buildingCode = buildBuildingConstructWorldCode(buildingSpec);
+
 await bundle("movement", movementCode);
 await bundle("focused", focusedCode);
 await bundle("mixing", mixingCode);
+await bundle("building", buildingCode);

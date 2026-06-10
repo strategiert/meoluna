@@ -1,0 +1,107 @@
+{
+  "engine": "building-construct",
+  "learningBrief": {
+    "inputMode": "material",
+    "subject": "mathematik",
+    "gradeLevel": "2",
+    "rawTopic": "Formen und Flächen auf der Baustelle",
+    "extractedTasks": ["Mauern mit Ziel-Fläche bauen", "Figuren aus Formen zusammensetzen"],
+    "learningGoals": ["Fläche als Raster verstehen", "Formen erkennen"],
+    "likelyMisconceptions": ["Fläche kann man nicht zählen"],
+    "focus": "practice",
+    "confidence": "medium"
+  },
+  "world": {
+    "worldName": "Die Bilderbuch-Baustelle",
+    "coreMetaphor": "Bauen heißt zählen: Steine fürs Raster, Formen für die Figuren.",
+    "setting": "Eine fröhliche Baustelle: Mauern hochziehen, dann die Stadt verschönern.",
+    "visualStyle": {
+      "palette": ["#79c7f5", "#d9a05e", "#ffd84d", "#ff7a59", "#27324a"],
+      "mood": "hell, tatkräftig, verspielt",
+      "shapes": "Ziegel-Raster, Grundformen, Kran",
+      "effects": "Mauer wächst, Teile schnappen ein"
+    },
+    "guide": { "name": "Luno", "role": "Polier", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "mauer", "title": "Mauer bauen", "purpose": "Ziegel-Flächen nach Plan bauen.", "scene": "Mauern mit Ziel-Maßen und Ziel-Flächen.", "reward": "Maurer-Lehrling" },
+      { "id": "bauhof", "title": "Bauhof", "purpose": "Geräte aus Formen zusammensetzen.", "scene": "Ampel und Bagger-Schaufel aus Grundformen.", "reward": "Bauhof-Profi" },
+      { "id": "meister", "title": "Meisterprüfung", "purpose": "Große Mauern nach Plan.", "scene": "Die Meister-Mauern der Baustelle.", "reward": "Bau-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Das Kind sieht Flächen nicht als zählbare Raster und Figuren nicht als Formen.",
+    "embodiedMetaphor": "Jede Mauer ist ein Raster aus Ziegeln, jedes Gerät ist aus Grundformen gebaut.",
+    "successInsight": "Bauen macht Mathe sichtbar: Ziegel zählen ist Fläche, Teile erkennen ist Geometrie."
+  },
+  "rooms": [
+    {
+      "roomId": "mauer",
+      "objective": "Baue die Mauern nach Plan!",
+      "mode": "area",
+      "grid": { "cols": 7, "rows": 5 },
+      "tileEmoji": "🧱",
+      "rounds": [
+        { "objective": "Baue eine Mauer: 4 breit und 2 hoch!", "goal": { "type": "exact", "width": 4, "height": 2 } },
+        { "objective": "Baue eine Mauer mit genau 10 Ziegeln!", "goal": { "type": "area", "area": 10 } }
+      ],
+      "feedback": {
+        "correct": "Die Mauer steht!",
+        "tooSmall": "Die Mauer ist noch zu klein. Bau weiter!",
+        "tooBig": "Zu viele Ziegel! Mach die Mauer kleiner.",
+        "wrongShape": "Die Ziegelzahl stimmt, aber der Plan will andere Maße."
+      },
+      "explanationAfterSuccess": "4 breit und 2 hoch sind 2 Reihen mit 4 Ziegeln: 4 mal 2 = 8 Ziegel."
+    },
+    {
+      "roomId": "bauhof",
+      "objective": "Setze die Geräte aus Formen zusammen!",
+      "mode": "compose",
+      "rounds": [
+        {
+          "objective": "Baue die Ampel: Mast und drei Lichter!",
+          "figureName": "Ampel",
+          "slots": [
+            { "shape": "rectangle", "x": 40, "y": 14, "w": 20, "h": 64, "color": "#5d6b85" },
+            { "shape": "circle", "x": 44, "y": 18, "w": 12, "h": 12, "color": "#ff7a59" },
+            { "shape": "circle", "x": 44, "y": 36, "w": 12, "h": 12, "color": "#ffd84d" },
+            { "shape": "circle", "x": 44, "y": 54, "w": 12, "h": 12, "color": "#8fd16c" }
+          ]
+        },
+        {
+          "objective": "Baue den Kran: Turm, Ausleger und Haken-Rad!",
+          "figureName": "Kran",
+          "slots": [
+            { "shape": "rectangle", "x": 30, "y": 30, "w": 12, "h": 56, "color": "#ffd84d" },
+            { "shape": "rectangle", "x": 30, "y": 18, "w": 52, "h": 12, "color": "#ffb84d" },
+            { "shape": "circle", "x": 70, "y": 34, "w": 12, "h": 12, "color": "#5d6b85" }
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": "Das Gerät ist einsatzbereit!",
+        "tooSmall": "Da fehlt noch ein Teil.",
+        "tooBig": "Ein Teil zu viel.",
+        "wrongShape": "Das Teil hat die falsche Form für diese Stelle."
+      },
+      "explanationAfterSuccess": "Mast-Rechteck plus drei Kreis-Lichter ergibt die Ampel. Geräte sind Formen!"
+    },
+    {
+      "roomId": "meister",
+      "objective": "Die Meister-Mauern: groß und genau!",
+      "mode": "area",
+      "grid": { "cols": 7, "rows": 5 },
+      "tileEmoji": "🧱",
+      "rounds": [
+        { "objective": "Baue eine Mauer mit genau 12 Zaunteilen Umfang!", "goal": { "type": "perimeter", "perimeter": 12 } },
+        { "objective": "Die Meister-Mauer: genau 20 Ziegel!", "goal": { "type": "area", "area": 20 } }
+      ],
+      "feedback": {
+        "correct": "Meisterhaft gemauert!",
+        "tooSmall": "Noch zu klein für einen Meister.",
+        "tooBig": "Zu groß! Ein Meister baut genau nach Plan.",
+        "wrongShape": "Lies den Plan genau: Ziegel innen oder Rand außen?"
+      },
+      "explanationAfterSuccess": "Du baust jetzt nach Fläche UND nach Umfang. Plan lesen, bauen, zählen!"
+    }
+  ]
+}

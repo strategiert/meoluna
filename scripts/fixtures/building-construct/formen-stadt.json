@@ -1,0 +1,135 @@
+{
+  "engine": "building-construct",
+  "learningBrief": {
+    "inputMode": "curriculum",
+    "subject": "mathematik",
+    "gradeLevel": "1",
+    "rawTopic": "Formen erkennen: Quadrat, Rechteck, Dreieck, Kreis",
+    "extractedTasks": ["Formen benennen", "Figuren aus Formen zusammensetzen"],
+    "learningGoals": ["Grundformen erkennen", "Figuren in Formen zerlegen"],
+    "likelyMisconceptions": ["Quadrat und Rechteck sind dasselbe", "Gedrehte Formen sind andere Formen"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Die Formen-Stadt",
+    "coreMetaphor": "Alles in der Stadt ist aus Grundformen gebaut.",
+    "setting": "Eine kleine Stadt entsteht: Häuser, Bäume, Boote, Raketen — alles aus Formen.",
+    "visualStyle": {
+      "palette": ["#79c7f5", "#ffd9a8", "#9ecbff", "#8fd16c", "#27324a"],
+      "mood": "hell, verspielt, bunt",
+      "shapes": "Quadrate, Rechtecke, Dreiecke, Kreise, Halbkreise",
+      "effects": "Teile schnappen ein, Konfetti beim Gelingen"
+    },
+    "guide": { "name": "Luno", "role": "Baumeister", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "haeuser", "title": "Häuserviertel", "purpose": "Haus und Turm aus Formen bauen.", "scene": "Wand plus Dach ergibt ein Haus.", "reward": "Häuser-Bauer" },
+      { "id": "park", "title": "Stadtpark", "purpose": "Baum und Boot zusammensetzen.", "scene": "Stamm plus Krone ergibt einen Baum.", "reward": "Park-Gestalter" },
+      { "id": "meister", "title": "Meisterprüfung", "purpose": "Rakete und Schloss mit mehr Teilen.", "scene": "Die großen Bauwerke der Stadt.", "reward": "Stadt-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Das Kind erkennt Grundformen nicht sicher und sieht nicht, dass Figuren aus Formen zusammengesetzt sind.",
+    "embodiedMetaphor": "Jedes Ding in der Stadt wird Teil für Teil aus Grundformen gebaut.",
+    "successInsight": "Große Figuren bestehen aus kleinen Grundformen: erst erkennen, dann bauen."
+  },
+  "rooms": [
+    {
+      "roomId": "haeuser",
+      "objective": "Baue die Gebäude aus den richtigen Teilen!",
+      "mode": "compose",
+      "rounds": [
+        {
+          "objective": "Baue das Haus: erst die Wand, dann das Dach!",
+          "figureName": "Haus",
+          "slots": [
+            { "shape": "rectangle", "x": 28, "y": 50, "w": 44, "h": 36, "color": "#ffd9a8" },
+            { "shape": "triangle", "x": 24, "y": 26, "w": 52, "h": 24, "color": "#ff9d7a" }
+          ]
+        },
+        {
+          "objective": "Baue den Turm: Wand, Dach und Fenster!",
+          "figureName": "Turm",
+          "slots": [
+            { "shape": "rectangle", "x": 39, "y": 36, "w": 22, "h": 50, "color": "#cfe3ff" },
+            { "shape": "triangle", "x": 34, "y": 14, "w": 32, "h": 22, "color": "#9ecbff" },
+            { "shape": "circle", "x": 44, "y": 48, "w": 12, "h": 12, "color": "#fff1c4" }
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": "Das Gebäude steht!",
+        "tooSmall": "Da fehlt noch ein Teil.",
+        "tooBig": "Das ist ein Teil zu viel.",
+        "wrongShape": "Das Teil passt hier nicht. Schau auf die gestrichelte Form: welches Teil hat diese Form?"
+      },
+      "explanationAfterSuccess": "Ein Haus ist ein Rechteck mit einem Dreieck obendrauf. Formen stecken überall!"
+    },
+    {
+      "roomId": "park",
+      "objective": "Baue den Park aus den richtigen Teilen!",
+      "mode": "compose",
+      "rounds": [
+        {
+          "objective": "Baue den Baum: erst der Stamm, dann die Krone!",
+          "figureName": "Baum",
+          "slots": [
+            { "shape": "rectangle", "x": 44, "y": 56, "w": 12, "h": 30, "color": "#c98d4f" },
+            { "shape": "circle", "x": 27, "y": 16, "w": 46, "h": 44, "color": "#8fd16c" }
+          ]
+        },
+        {
+          "objective": "Baue das Boot: Rumpf, Mast und Segel!",
+          "figureName": "Boot",
+          "slots": [
+            { "shape": "rectangle", "x": 24, "y": 64, "w": 52, "h": 16, "color": "#c98d4f" },
+            { "shape": "rectangle", "x": 46, "y": 28, "w": 8, "h": 36, "color": "#a8743c" },
+            { "shape": "triangle", "x": 18, "y": 30, "w": 28, "h": 30, "color": "#fff6e0" }
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": "Der Park wird schön!",
+        "tooSmall": "Da fehlt noch ein Teil.",
+        "tooBig": "Das ist ein Teil zu viel.",
+        "wrongShape": "Das passt nicht. Vergleiche die Form des Teils mit der gestrichelten Stelle."
+      },
+      "explanationAfterSuccess": "Stamm-Rechteck plus Kreis-Krone ergibt einen Baum. Du zerlegst Bilder jetzt in Formen!"
+    },
+    {
+      "roomId": "meister",
+      "objective": "Die Meisterprüfung: große Bauwerke mit vielen Teilen!",
+      "mode": "compose",
+      "rounds": [
+        {
+          "objective": "Baue die Rakete: Körper, Spitze, Fenster und Triebwerk!",
+          "figureName": "Rakete",
+          "slots": [
+            { "shape": "rectangle", "x": 39, "y": 34, "w": 22, "h": 42, "color": "#e8edf5" },
+            { "shape": "triangle", "x": 39, "y": 12, "w": 22, "h": 22, "color": "#ff7a59" },
+            { "shape": "circle", "x": 44, "y": 44, "w": 12, "h": 12, "color": "#9ecbff" },
+            { "shape": "semicircle", "x": 37, "y": 76, "w": 26, "h": 12, "color": "#ffd84d" }
+          ]
+        },
+        {
+          "objective": "Baue das Schloss: Mauer, zwei Türme, zwei Dächer!",
+          "figureName": "Schloss",
+          "slots": [
+            { "shape": "rectangle", "x": 20, "y": 56, "w": 60, "h": 30, "color": "#e8d8c3" },
+            { "shape": "rectangle", "x": 28, "y": 32, "w": 14, "h": 24, "color": "#d8c2a8" },
+            { "shape": "rectangle", "x": 58, "y": 32, "w": 14, "h": 24, "color": "#d8c2a8" },
+            { "shape": "triangle", "x": 26, "y": 14, "w": 18, "h": 18, "color": "#ff9d7a" },
+            { "shape": "triangle", "x": 56, "y": 14, "w": 18, "h": 18, "color": "#ff9d7a" }
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": "Meisterhaft gebaut!",
+        "tooSmall": "Ein Meisterwerk braucht alle Teile.",
+        "tooBig": "Ein Teil zu viel für den Plan.",
+        "wrongShape": "Schau genau: Quadrat, Rechteck, Dreieck, Kreis oder Halbkreis?"
+      },
+      "explanationAfterSuccess": "Auch große Bauwerke sind nur viele Grundformen. Wer Formen erkennt, kann alles bauen."
+    }
+  ]
+}
