@@ -1,0 +1,139 @@
+{
+  "engine": "time-sequence",
+  "learningBrief": {
+    "inputMode": "curriculum",
+    "subject": "geschichte",
+    "gradeLevel": "4",
+    "rawTopic": "Zeitleiste: Epochen und Erfindungen ordnen",
+    "extractedTasks": ["Epochen in die richtige Reihenfolge bringen"],
+    "learningGoals": ["Historische Reihenfolgen verstehen"],
+    "likelyMisconceptions": ["Ritter und Dinosaurier lebten gleichzeitig"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Die große Zeitreise",
+    "coreMetaphor": "Geschichte ist ein langes Zeitband: Was war zuerst, was kam danach?",
+    "setting": "Eine Zeitmaschine fliegt über das Zeitband der Menschheit.",
+    "visualStyle": {
+      "palette": ["#79c7f5", "#d9a05e", "#ffd84d", "#9ecbff", "#27324a"],
+      "mood": "hell, abenteuerlich, staunend",
+      "shapes": "Zeitband, Epochen-Karten, Zeitmaschine",
+      "effects": "Karten schnappen ein, Konfetti beim Gelingen"
+    },
+    "guide": { "name": "Luno", "role": "Zeitreise-Pilot", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "tagesreise", "title": "Kleine Zeitreise", "purpose": "Mit Alltags-Reihenfolgen warm werden.", "scene": "Erst dein Tag, dann ein Bauwerk.", "reward": "Zeit-Lehrling" },
+      { "id": "epochen", "title": "Epochen-Flug", "purpose": "Die großen Zeitalter ordnen.", "scene": "Von der Steinzeit bis heute.", "reward": "Epochen-Pilot" },
+      { "id": "erfindungen", "title": "Erfinder-Werkstatt", "purpose": "Erfindungen in die richtige Reihenfolge.", "scene": "Vom Rad bis zum Computer.", "reward": "Erfinder-Kenner" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Das Kind hat kein Gefühl dafür, was historisch zuerst kam.",
+    "embodiedMetaphor": "Die Zeitmaschine fliegt das Zeitband entlang: jede Karte hat ihren festen Platz.",
+    "successInsight": "Geschichte hat eine Reihenfolge: Wer sie kennt, versteht, wie eines zum anderen führte."
+  },
+  "rooms": [
+    {
+      "roomId": "tagesreise",
+      "objective": "Ordne die kleinen Zeitreisen!",
+      "mode": "timeline",
+      "rounds": [
+        {
+          "objective": "Erst dein Morgen!",
+          "title": "Dein Schulmorgen",
+          "events": [
+            { "id": "aufstehen", "label": "Aufstehen", "emoji": "⏰" },
+            { "id": "fruehstueck", "label": "Frühstücken", "emoji": "🥣" },
+            { "id": "schule", "label": "Zur Schule gehen", "emoji": "🎒" }
+          ]
+        },
+        {
+          "objective": "So entsteht ein Haus!",
+          "title": "Ein Haus wird gebaut",
+          "events": [
+            { "id": "plan", "label": "Plan zeichnen", "emoji": "📐" },
+            { "id": "fundament", "label": "Fundament gießen", "emoji": "🧱" },
+            { "id": "waende", "label": "Wände mauern", "emoji": "🏗️" },
+            { "id": "dach", "label": "Dach decken", "emoji": "🏠" }
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": "Die Reihenfolge stimmt!",
+        "wrongOrder": "Diese Karte kommt noch nicht dran. Was passiert davor?",
+        "wrongLink": "Das folgt nicht daraus.",
+        "tryAgain": "Fang beim Allerersten an und geh Schritt für Schritt."
+      },
+      "explanationAfterSuccess": "Ohne Plan kein Fundament, ohne Fundament keine Wände: Reihenfolge zählt."
+    },
+    {
+      "roomId": "epochen",
+      "objective": "Fliege die großen Zeitalter in der richtigen Reihenfolge ab!",
+      "mode": "timeline",
+      "rounds": [
+        {
+          "objective": "Ganz früher zuerst!",
+          "title": "Vor langer, langer Zeit",
+          "events": [
+            { "id": "dino", "label": "Dinosaurier leben", "emoji": "🦕" },
+            { "id": "steinzeit", "label": "Steinzeit-Menschen jagen", "emoji": "🪨" },
+            { "id": "aegypten", "label": "Pyramiden werden gebaut", "emoji": "🛕" }
+          ]
+        },
+        {
+          "objective": "Jetzt bis heute!",
+          "title": "Von den Rittern bis heute",
+          "events": [
+            { "id": "roemer", "label": "Römer bauen Straßen", "emoji": "🏛️" },
+            { "id": "ritter", "label": "Ritter und Burgen", "emoji": "🏰" },
+            { "id": "dampf", "label": "Dampfmaschinen und Fabriken", "emoji": "🚂" },
+            { "id": "heute", "label": "Computer und Raketen", "emoji": "🚀" }
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": "Dein Zeitflug stimmt!",
+        "wrongOrder": "Diese Zeit kommt später dran. Was war davor?",
+        "wrongLink": "Das folgt nicht daraus.",
+        "tryAgain": "Merkhilfe: Dinos ganz früh, Ritter in der Mitte, Computer heute."
+      },
+      "explanationAfterSuccess": "Dinosaurier und Ritter lebten NIE gleichzeitig: dazwischen liegen Millionen Jahre."
+    },
+    {
+      "roomId": "erfindungen",
+      "objective": "Die Meisterprüfung: Erfindungen ordnen!",
+      "mode": "timeline",
+      "rounds": [
+        {
+          "objective": "Womit haben Menschen geschrieben?",
+          "title": "Vom Stein zur Nachricht",
+          "events": [
+            { "id": "hoehle", "label": "Bilder an Höhlenwände", "emoji": "🖼️" },
+            { "id": "buch", "label": "Bücher werden gedruckt", "emoji": "📚" },
+            { "id": "brief", "label": "Briefe mit der Post", "emoji": "✉️" },
+            { "id": "email", "label": "E-Mails am Computer", "emoji": "💻" }
+          ]
+        },
+        {
+          "objective": "Und wie kamen Menschen voran?",
+          "title": "Unterwegs durch die Zeit",
+          "events": [
+            { "id": "fuss", "label": "Zu Fuß unterwegs", "emoji": "🚶" },
+            { "id": "pferd", "label": "Mit Pferd und Wagen", "emoji": "🐴" },
+            { "id": "eisenbahn", "label": "Mit der Eisenbahn", "emoji": "🚂" },
+            { "id": "auto", "label": "Mit dem Auto", "emoji": "🚗" },
+            { "id": "flugzeug", "label": "Mit dem Flugzeug", "emoji": "✈️" }
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": "Meisterhaft geordnet!",
+        "wrongOrder": "Diese Erfindung kam später. Was gab es davor?",
+        "wrongLink": "Das folgt nicht daraus.",
+        "tryAgain": "Überlege: Was ist einfacher und älter, was ist neuer?"
+      },
+      "explanationAfterSuccess": "Erfindungen bauen aufeinander auf: ohne Eisenbahn-Idee kein Auto, ohne Auto kein Flugzeug-Zeitalter."
+    }
+  ]
+}

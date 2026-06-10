@@ -1,0 +1,175 @@
+{
+  "engine": "time-sequence",
+  "learningBrief": {
+    "inputMode": "curriculum",
+    "subject": "sachunterricht",
+    "gradeLevel": "2",
+    "rawTopic": "Lebenszyklen und Kreisläufe: Schmetterling, Frosch, Jahreszeiten",
+    "extractedTasks": ["Vom Ei zum Schmetterling ordnen"],
+    "learningGoals": ["Entwicklungsschritte in die richtige Reihenfolge bringen"],
+    "likelyMisconceptions": ["Die Raupe ist ein eigenes Tier", "Entwicklung kann Schritte überspringen"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Die Wiese der Wandlungen",
+    "coreMetaphor": "Entwicklung ist ein Weg mit fester Reihenfolge: Schritt für Schritt aufs Zeitband.",
+    "setting": "Eine Sommerwiese, auf der Tiere und Jahreszeiten ihre Wege gehen.",
+    "visualStyle": {
+      "palette": ["#79c7f5", "#8fd16c", "#ffd84d", "#ff7a59", "#27324a"],
+      "mood": "hell, sommerlich, lebendig",
+      "shapes": "Zeitband, Ereignis-Karten, Pfeile",
+      "effects": "Karten schnappen ein, Konfetti beim Gelingen"
+    },
+    "guide": { "name": "Luno", "role": "Wiesen-Forscher", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "schmetterling", "title": "Schmetterlingsweg", "purpose": "Die Metamorphose ordnen.", "scene": "Vom Ei bis zum Falter.", "reward": "Falter-Forscher" },
+      { "id": "jahreskreis", "title": "Jahreskreis", "purpose": "Jahreszeiten und Tag ordnen.", "scene": "Das Jahr und der Tag im Kreis.", "reward": "Jahres-Kenner" },
+      { "id": "wachsen", "title": "Wachs-Ketten", "purpose": "Ursache und Wirkung beim Wachsen.", "scene": "Was passiert, wenn man sät und gießt?", "reward": "Garten-Denker" },
+      { "id": "meister", "title": "Meisterprüfung", "purpose": "Die langen Wege der Natur.", "scene": "Frosch und Wasserkreislauf komplett.", "reward": "Natur-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Das Kind bringt Entwicklungsschritte durcheinander und sieht Abläufe nicht als feste Reihenfolge.",
+    "embodiedMetaphor": "Jeder Ablauf ist ein Zeitband: Karte für Karte in der richtigen Reihenfolge.",
+    "successInsight": "Abläufe in der Natur haben eine feste Reihenfolge, kein Schritt lässt sich überspringen."
+  },
+  "rooms": [
+    {
+      "roomId": "schmetterling",
+      "objective": "Lege den Schmetterlingsweg in die richtige Reihenfolge!",
+      "mode": "timeline",
+      "rounds": [
+        {
+          "objective": "Was kommt zuerst, was danach?",
+          "title": "Vom Ei zum Schmetterling",
+          "events": [
+            { "id": "ei", "label": "Ei am Blatt", "emoji": "🥚" },
+            { "id": "raupe", "label": "Raupe frisst", "emoji": "🐛" },
+            { "id": "puppe", "label": "Puppe hängt", "emoji": "🛡️" },
+            { "id": "falter", "label": "Schmetterling fliegt", "emoji": "🦋" }
+          ]
+        },
+        {
+          "objective": "Jetzt der Marienkäfer!",
+          "title": "Vom Ei zum Marienkäfer",
+          "events": [
+            { "id": "ei", "label": "Eier am Blatt", "emoji": "🥚" },
+            { "id": "larve", "label": "Larve frisst Läuse", "emoji": "🐛" },
+            { "id": "kaefer", "label": "Marienkäfer fliegt", "emoji": "🐞" }
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": "Die Reihenfolge stimmt!",
+        "wrongOrder": "Diese Karte kommt noch nicht dran. Was passiert davor?",
+        "wrongLink": "Das folgt nicht direkt daraus.",
+        "tryAgain": "Tipp: Fang ganz am Anfang an. Was ist das Allererste?"
+      },
+      "explanationAfterSuccess": "Ei, Raupe, Puppe, Schmetterling: die Verwandlung hat immer dieselbe Reihenfolge."
+    },
+    {
+      "roomId": "jahreskreis",
+      "objective": "Ordne das Jahr und den Tag!",
+      "mode": "timeline",
+      "rounds": [
+        {
+          "objective": "Beginne mit dem Frühling!",
+          "title": "Die vier Jahreszeiten",
+          "events": [
+            { "id": "fruehling", "label": "Frühling: alles blüht", "emoji": "🌸" },
+            { "id": "sommer", "label": "Sommer: warm und hell", "emoji": "☀️" },
+            { "id": "herbst", "label": "Herbst: Blätter fallen", "emoji": "🍂" },
+            { "id": "winter", "label": "Winter: Schnee liegt", "emoji": "❄️" }
+          ]
+        },
+        {
+          "objective": "Und jetzt ein ganzer Tag!",
+          "title": "Ein Tag auf der Wiese",
+          "events": [
+            { "id": "morgen", "label": "Sonne geht auf", "emoji": "🌅" },
+            { "id": "mittag", "label": "Sonne steht hoch", "emoji": "☀️" },
+            { "id": "abend", "label": "Sonne geht unter", "emoji": "🌇" },
+            { "id": "nacht", "label": "Mond und Sterne", "emoji": "🌙" }
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": "Genau so läuft es!",
+        "wrongOrder": "Schau genau: Was kommt direkt davor?",
+        "wrongLink": "Das folgt nicht daraus.",
+        "tryAgain": "Denk an dein eigenes Jahr: Was kommt nach dem Sommer?"
+      },
+      "explanationAfterSuccess": "Jahreszeiten und Tage laufen im Kreis, immer in derselben Reihenfolge."
+    },
+    {
+      "roomId": "wachsen",
+      "objective": "Baue die Ursache-Wirkungs-Kette!",
+      "mode": "chain",
+      "rounds": [
+        {
+          "objective": "Die erste Karte liegt schon.",
+          "title": "Vom Samen zur Blume",
+          "events": [
+            { "id": "saen", "label": "Samen kommt in die Erde", "emoji": "🌰" },
+            { "id": "giessen", "label": "Regen gießt die Erde", "emoji": "🌧️" },
+            { "id": "keimen", "label": "Der Keim wächst", "emoji": "🌱" },
+            { "id": "bluehen", "label": "Die Blume blüht", "emoji": "🌷" }
+          ]
+        },
+        {
+          "objective": "Was macht die Biene daraus?",
+          "title": "Von der Blüte zum Honig",
+          "events": [
+            { "id": "bluete", "label": "Blüte öffnet sich", "emoji": "🌼" },
+            { "id": "biene", "label": "Biene sammelt Nektar", "emoji": "🐝" },
+            { "id": "honig", "label": "Im Stock wird Honig", "emoji": "🍯" }
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": "Die Kette stimmt!",
+        "wrongOrder": "Das kommt noch nicht dran.",
+        "wrongLink": "Das passiert nicht dadurch. Was folgt wirklich aus der letzten Karte?",
+        "tryAgain": "Frag dich bei jeder Karte: Passiert das WEGEN der Karte davor?"
+      },
+      "explanationAfterSuccess": "Jedes Glied passiert wegen des vorherigen: säen, gießen, keimen, blühen."
+    },
+    {
+      "roomId": "meister",
+      "objective": "Die Meisterprüfung: lange Wege der Natur!",
+      "mode": "timeline",
+      "rounds": [
+        {
+          "objective": "Der Froschweg hat 5 Schritte!",
+          "title": "Vom Laich zum Frosch",
+          "events": [
+            { "id": "laich", "label": "Laich im Teich", "emoji": "🫧" },
+            { "id": "kaulquappe", "label": "Kaulquappe schwimmt", "emoji": "🐟" },
+            { "id": "beine", "label": "Beine wachsen", "emoji": "🦵" },
+            { "id": "jungfrosch", "label": "Jungfrosch ohne Schwanz", "emoji": "🐸" },
+            { "id": "frosch", "label": "Frosch an Land", "emoji": "🌿" }
+          ]
+        },
+        {
+          "objective": "Und der Weg des Wassers!",
+          "title": "Der Wasserkreislauf",
+          "events": [
+            { "id": "sonne", "label": "Sonne wärmt das Meer", "emoji": "☀️" },
+            { "id": "verdunsten", "label": "Wasser steigt als Dampf auf", "emoji": "💨" },
+            { "id": "wolke", "label": "Wolken entstehen", "emoji": "☁️" },
+            { "id": "regen", "label": "Regen fällt", "emoji": "🌧️" },
+            { "id": "fluss", "label": "Fluss fließt zum Meer", "emoji": "🏞️" }
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": "Meisterhaft geordnet!",
+        "wrongOrder": "Fast! Überlege, was direkt davor passiert.",
+        "wrongLink": "Das folgt nicht daraus.",
+        "tryAgain": "Geh den Weg im Kopf durch, Schritt für Schritt vom Anfang."
+      },
+      "explanationAfterSuccess": "Auch lange Wege sind nur viele kleine Schritte in fester Reihenfolge."
+    }
+  ]
+}

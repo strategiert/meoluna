@@ -25,6 +25,9 @@ const { buildMixingBalanceWorldCode } = await import(
 const { buildBuildingConstructWorldCode } = await import(
   pathToFileURL(join(root, "convex", "pipeline", "engines", "buildingConstructRenderer.ts")).href
 );
+const { buildTimeSequenceWorldCode } = await import(
+  pathToFileURL(join(root, "convex", "pipeline", "engines", "timeSequenceRenderer.ts")).href
+);
 
 const brief = {
   inputMode: "material",
@@ -99,7 +102,13 @@ const buildingSpec = JSON.parse(
 );
 const buildingCode = buildBuildingConstructWorldCode(buildingSpec);
 
+const timeSpec = JSON.parse(
+  readFileSync(join(root, "scripts", "fixtures", "time-sequence", "natur-zyklen.json"), "utf8")
+);
+const timeCode = buildTimeSequenceWorldCode(timeSpec);
+
 await bundle("movement", movementCode);
 await bundle("focused", focusedCode);
 await bundle("mixing", mixingCode);
 await bundle("building", buildingCode);
+await bundle("time", timeCode);

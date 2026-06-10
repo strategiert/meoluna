@@ -1,0 +1,140 @@
+{
+  "engine": "time-sequence",
+  "learningBrief": {
+    "inputMode": "material",
+    "subject": "sachunterricht",
+    "gradeLevel": "3",
+    "rawTopic": "Ursache und Wirkung beim Wetter verstehen",
+    "extractedTasks": ["Wetterketten ordnen"],
+    "learningGoals": ["Ursache-Wirkungs-Ketten erkennen"],
+    "likelyMisconceptions": ["Wetter passiert einfach so, ohne Ursache"],
+    "focus": "understand",
+    "confidence": "medium"
+  },
+  "world": {
+    "worldName": "Die Wetter-Werkstatt",
+    "coreMetaphor": "Wetter ist eine Kette: eines passiert wegen des anderen.",
+    "setting": "Eine Werkstatt in den Wolken, in der Wetterketten zusammengebaut werden.",
+    "visualStyle": {
+      "palette": ["#79c7f5", "#9ecbff", "#ffd84d", "#8fd16c", "#27324a"],
+      "mood": "hell, neugierig, stürmisch-freundlich",
+      "shapes": "Ketten-Glieder, Wetter-Karten, Pfeile",
+      "effects": "Karten schnappen ein, Konfetti beim Gelingen"
+    },
+    "guide": { "name": "Luno", "role": "Wetter-Werker", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "sonnenketten", "title": "Sonnen-Ketten", "purpose": "Einfache Wirkungen der Sonne.", "scene": "Was macht die Sonne mit Schnee und Pfützen?", "reward": "Sonnen-Denker" },
+      { "id": "regenketten", "title": "Regen-Ketten", "purpose": "Wie Regen entsteht und was er bewirkt.", "scene": "Vom Dampf zur Pfütze.", "reward": "Regen-Werker" },
+      { "id": "meister", "title": "Meisterprüfung", "purpose": "Lange Ketten mit fünf Gliedern.", "scene": "Die großen Wetterketten.", "reward": "Wetter-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Das Kind sieht Wetter als zufällig statt als Kette von Ursache und Wirkung.",
+    "embodiedMetaphor": "Jedes Wetter-Glied passiert WEGEN des vorherigen: die Kette macht es sichtbar.",
+    "successInsight": "Wer fragt 'Was passiert dadurch?', versteht das Wetter."
+  },
+  "rooms": [
+    {
+      "roomId": "sonnenketten",
+      "objective": "Baue die Sonnen-Ketten! Die erste Karte liegt schon.",
+      "mode": "chain",
+      "rounds": [
+        {
+          "objective": "Was macht die Sonne mit dem Schnee?",
+          "title": "Sonne und Schnee",
+          "events": [
+            { "id": "sonne", "label": "Die Sonne scheint warm", "emoji": "☀️" },
+            { "id": "schmilzt", "label": "Der Schnee schmilzt", "emoji": "🫠" },
+            { "id": "wasser", "label": "Schmelzwasser fließt", "emoji": "💧" }
+          ]
+        },
+        {
+          "objective": "Und mit der Pfütze?",
+          "title": "Die verschwundene Pfütze",
+          "events": [
+            { "id": "pfuetze", "label": "Eine Pfütze nach dem Regen", "emoji": "💧" },
+            { "id": "sonne", "label": "Die Sonne wärmt die Pfütze", "emoji": "☀️" },
+            { "id": "dampf", "label": "Wasser steigt als Dampf auf", "emoji": "💨" }
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": "Die Kette stimmt!",
+        "wrongOrder": "Das kommt noch nicht dran.",
+        "wrongLink": "Das passiert nicht dadurch. Was folgt wirklich aus der letzten Karte?",
+        "tryAgain": "Frag dich: Was macht die Sonne als Erstes?"
+      },
+      "explanationAfterSuccess": "Die Sonne ist die Ursache, das Schmelzen die Wirkung. Eines folgt aus dem anderen."
+    },
+    {
+      "roomId": "regenketten",
+      "objective": "Baue die Regen-Ketten!",
+      "mode": "chain",
+      "rounds": [
+        {
+          "objective": "Wie wird aus Dampf Regen?",
+          "title": "So entsteht Regen",
+          "events": [
+            { "id": "dampf", "label": "Wasserdampf steigt auf", "emoji": "💨" },
+            { "id": "wolke", "label": "Dampf wird zur Wolke", "emoji": "☁️" },
+            { "id": "schwer", "label": "Die Wolke wird schwer", "emoji": "🌥️" },
+            { "id": "regen", "label": "Regen fällt", "emoji": "🌧️" }
+          ]
+        },
+        {
+          "objective": "Und was macht der Regen?",
+          "title": "Nach dem Regen",
+          "events": [
+            { "id": "regen", "label": "Es regnet lange", "emoji": "🌧️" },
+            { "id": "nass", "label": "Die Erde wird nass", "emoji": "🟤" },
+            { "id": "pflanzen", "label": "Die Pflanzen trinken", "emoji": "🌱" },
+            { "id": "wachsen", "label": "Alles wächst grün", "emoji": "🌿" }
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": "Die Kette stimmt!",
+        "wrongOrder": "Das kommt noch nicht dran.",
+        "wrongLink": "Das folgt nicht daraus. Denk an die letzte Karte: Was bewirkt sie?",
+        "tryAgain": "Geh die Kette im Kopf durch: Dampf, dann Wolke, dann..."
+      },
+      "explanationAfterSuccess": "Regen kommt nicht aus dem Nichts: Dampf, Wolke, schwer, Regen — eine echte Kette."
+    },
+    {
+      "roomId": "meister",
+      "objective": "Die Meisterprüfung: lange Wetterketten!",
+      "mode": "chain",
+      "rounds": [
+        {
+          "objective": "Die große Gewitterkette!",
+          "title": "Vom heißen Tag zum Gewitter",
+          "events": [
+            { "id": "hitze", "label": "Ein sehr heißer Tag", "emoji": "🥵" },
+            { "id": "aufsteigen", "label": "Warme, feuchte Luft steigt auf", "emoji": "💨" },
+            { "id": "turm", "label": "Eine Gewitterwolke türmt sich", "emoji": "🌩️" },
+            { "id": "blitz", "label": "Blitz und Donner", "emoji": "⚡" },
+            { "id": "platzregen", "label": "Platzregen kühlt alles ab", "emoji": "🌧️" }
+          ]
+        },
+        {
+          "objective": "Die große Flusskette!",
+          "title": "Vom Regen zum Hochwasser",
+          "events": [
+            { "id": "dauerregen", "label": "Es regnet tagelang", "emoji": "🌧️" },
+            { "id": "boden", "label": "Der Boden ist voll Wasser", "emoji": "🟤" },
+            { "id": "abfluss", "label": "Wasser fließt in den Fluss", "emoji": "🏞️" },
+            { "id": "steigt", "label": "Der Fluss steigt", "emoji": "📈" },
+            { "id": "hochwasser", "label": "Hochwasser am Ufer", "emoji": "🌊" }
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": "Meisterhaft verkettet!",
+        "wrongOrder": "Das kommt noch nicht dran.",
+        "wrongLink": "Das folgt nicht daraus. Eine Kette springt nie ein Glied weiter.",
+        "tryAgain": "Frag bei jeder Karte: Passiert das WEGEN der Karte davor?"
+      },
+      "explanationAfterSuccess": "Auch großes Wetter ist nur eine lange Kette kleiner Ursachen und Wirkungen."
+    }
+  ]
+}

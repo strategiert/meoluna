@@ -25,11 +25,13 @@ import { runLearningDiagnosis } from "./steps/learningDiagnosis";
 import { runMovementSpaceGenerator } from "./steps/movementSpaceGenerator";
 import { runMixingBalanceGenerator } from "./steps/mixingBalanceGenerator";
 import { runBuildingConstructGenerator } from "./steps/buildingConstructGenerator";
+import { runTimeSequenceGenerator } from "./steps/timeSequenceGenerator";
 import { runFocusedInterventionGate } from "./engines/focusedInterventionGate";
 import { shouldUseFocusedIntervention } from "./engines/focusedInterventionRouter";
 import { isLikelyMovementTopic } from "./engines/movementTopicRouter";
 import { isLikelyMixingTopic } from "./engines/mixingTopicRouter";
 import { isLikelyBuildingTopic } from "./engines/buildingTopicRouter";
+import { isLikelyTimeTopic } from "./engines/timeTopicRouter";
 
 import { STEP_LABELS, STEP_ORDER } from "./types";
 import type { AssetManifest } from "./types";
@@ -364,6 +366,77 @@ export const generateWorldV2 = action({
           };
         } catch (error) {
           console.warn("building-construct generation failed, falling back to existing pipeline:", error);
+        }
+      }
+
+      // ── TIME-SEQUENCE ENGINE ────────────────────────────────────
+      // Early route for timelines, processes, and cause-effect chains.
+      // Runs after building-construct; the broad pipeline remains the fallback.
+      if (isLikelyTimeTopic(args)) {
+        try {
+          await setStatus(0);
+          const diagnosisStart = Date.now();
+          const diagnosis = await runLearningDiagnosis({
+            prompt: args.prompt,
+            pdfText: args.pdfText,
+            gradeLevel: args.gradeLevel,
+            subject: args.subject,
+          });
+          stepTimings.time_diagnosis = {
+            durationMs: Date.now() - diagnosisStart,
+            model: "sonnet",
+            inputTokens: diagnosis.inputTokens,
+            outputTokens: diagnosis.outputTokens,
+          };
+
+          await setStatus(1);
+          const timeStart = Date.now();
+          const time = await runTimeSequenceGenerator({ brief: diagnosis.result });
+          stepTimings.time_generator = {
+            durationMs: Date.now() - timeStart,
+            model: "opus",
+            inputTokens: time.inputTokens,
+            outputTokens: time.outputTokens,
+          };
+
+          const gateResult = runStructuralGate(time.code);
+          if (!gateResult.passed) {
+            throw new Error(`Time Structural Gate Failed: ${gateResult.violations.join(" | ")}`);
+          }
+
+          const worldId: Id<"worlds"> = await ctx.runMutation(api.worlds.create, {
+            title: time.spec.world.worldName,
+            code: time.code,
+            userId: args.userId,
+            isPublic: false,
+            prompt: args.prompt,
+            gradeLevel: args.gradeLevel ?? diagnosis.result.gradeLevel,
+            subject: args.subject ?? diagnosis.result.subject,
+            status: "published",
+            qualityScore: 8,
+            validationMetadata: {
+              validatorSuccess: true,
+              validatorIterations: 0,
+              gateScore: gateResult.score,
+              gatePassed: true,
+              gateViolations: [],
+            },
+          });
+
+          await ctx.runMutation(internal.pipeline.status.completeSession, {
+            sessionId: args.sessionId,
+            worldId,
+          });
+
+          return {
+            worldId,
+            code: time.code,
+            worldName: time.spec.world.worldName,
+            duration: Date.now() - startTime,
+            qualityScore: 8,
+          };
+        } catch (error) {
+          console.warn("time-sequence generation failed, falling back to existing pipeline:", error);
         }
       }
 
