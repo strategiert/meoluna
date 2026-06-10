@@ -26,12 +26,14 @@ import { runMovementSpaceGenerator } from "./steps/movementSpaceGenerator";
 import { runMixingBalanceGenerator } from "./steps/mixingBalanceGenerator";
 import { runBuildingConstructGenerator } from "./steps/buildingConstructGenerator";
 import { runTimeSequenceGenerator } from "./steps/timeSequenceGenerator";
+import { runDetectiveEvidenceGenerator } from "./steps/detectiveEvidenceGenerator";
 import { runFocusedInterventionGate } from "./engines/focusedInterventionGate";
 import { shouldUseFocusedIntervention } from "./engines/focusedInterventionRouter";
 import { isLikelyMovementTopic } from "./engines/movementTopicRouter";
 import { isLikelyMixingTopic } from "./engines/mixingTopicRouter";
 import { isLikelyBuildingTopic } from "./engines/buildingTopicRouter";
 import { isLikelyTimeTopic } from "./engines/timeTopicRouter";
+import { isLikelyDetectiveTopic } from "./engines/detectiveTopicRouter";
 
 import { STEP_LABELS, STEP_ORDER } from "./types";
 import type { AssetManifest } from "./types";
@@ -437,6 +439,77 @@ export const generateWorldV2 = action({
           };
         } catch (error) {
           console.warn("time-sequence generation failed, falling back to existing pipeline:", error);
+        }
+      }
+
+      // ── DETECTIVE-EVIDENCE ENGINE ───────────────────────────────
+      // Early route for reading comprehension, reasoning, and evidence work.
+      // Runs after time-sequence; the broad pipeline remains the fallback.
+      if (isLikelyDetectiveTopic(args)) {
+        try {
+          await setStatus(0);
+          const diagnosisStart = Date.now();
+          const diagnosis = await runLearningDiagnosis({
+            prompt: args.prompt,
+            pdfText: args.pdfText,
+            gradeLevel: args.gradeLevel,
+            subject: args.subject,
+          });
+          stepTimings.detective_diagnosis = {
+            durationMs: Date.now() - diagnosisStart,
+            model: "sonnet",
+            inputTokens: diagnosis.inputTokens,
+            outputTokens: diagnosis.outputTokens,
+          };
+
+          await setStatus(1);
+          const detectiveStart = Date.now();
+          const detective = await runDetectiveEvidenceGenerator({ brief: diagnosis.result });
+          stepTimings.detective_generator = {
+            durationMs: Date.now() - detectiveStart,
+            model: "opus",
+            inputTokens: detective.inputTokens,
+            outputTokens: detective.outputTokens,
+          };
+
+          const gateResult = runStructuralGate(detective.code);
+          if (!gateResult.passed) {
+            throw new Error(`Detective Structural Gate Failed: ${gateResult.violations.join(" | ")}`);
+          }
+
+          const worldId: Id<"worlds"> = await ctx.runMutation(api.worlds.create, {
+            title: detective.spec.world.worldName,
+            code: detective.code,
+            userId: args.userId,
+            isPublic: false,
+            prompt: args.prompt,
+            gradeLevel: args.gradeLevel ?? diagnosis.result.gradeLevel,
+            subject: args.subject ?? diagnosis.result.subject,
+            status: "published",
+            qualityScore: 8,
+            validationMetadata: {
+              validatorSuccess: true,
+              validatorIterations: 0,
+              gateScore: gateResult.score,
+              gatePassed: true,
+              gateViolations: [],
+            },
+          });
+
+          await ctx.runMutation(internal.pipeline.status.completeSession, {
+            sessionId: args.sessionId,
+            worldId,
+          });
+
+          return {
+            worldId,
+            code: detective.code,
+            worldName: detective.spec.world.worldName,
+            duration: Date.now() - startTime,
+            qualityScore: 8,
+          };
+        } catch (error) {
+          console.warn("detective-evidence generation failed, falling back to existing pipeline:", error);
         }
       }
 

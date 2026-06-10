@@ -28,6 +28,9 @@ const { buildBuildingConstructWorldCode } = await import(
 const { buildTimeSequenceWorldCode } = await import(
   pathToFileURL(join(root, "convex", "pipeline", "engines", "timeSequenceRenderer.ts")).href
 );
+const { buildDetectiveEvidenceWorldCode } = await import(
+  pathToFileURL(join(root, "convex", "pipeline", "engines", "detectiveEvidenceRenderer.ts")).href
+);
 
 const brief = {
   inputMode: "material",
@@ -107,8 +110,14 @@ const timeSpec = JSON.parse(
 );
 const timeCode = buildTimeSequenceWorldCode(timeSpec);
 
+const detectiveSpec = JSON.parse(
+  readFileSync(join(root, "scripts", "fixtures", "detective-evidence", "kuchen-krimi.json"), "utf8")
+);
+const detectiveCode = buildDetectiveEvidenceWorldCode(detectiveSpec);
+
 await bundle("movement", movementCode);
 await bundle("focused", focusedCode);
 await bundle("mixing", mixingCode);
 await bundle("building", buildingCode);
 await bundle("time", timeCode);
+await bundle("detective", detectiveCode);

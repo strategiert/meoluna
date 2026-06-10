@@ -1,0 +1,121 @@
+{
+  "engine": "detective-evidence",
+  "learningBrief": {
+    "inputMode": "curriculum",
+    "subject": "deutsch",
+    "gradeLevel": "3",
+    "rawTopic": "Leseverstehen: Antworten in Sachtexten belegen",
+    "extractedTasks": ["Fragen zu Sachtexten mit Textstellen belegen"],
+    "learningGoals": ["Informationen im Text finden und belegen"],
+    "likelyMisconceptions": ["Aus dem Gedächtnis antworten statt aus dem Text"],
+    "focus": "practice",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Die Forscher-Lupe",
+    "coreMetaphor": "Sachtexte sind Fundgruben: Jede Antwort steckt in einem Satz.",
+    "setting": "Eine Forschungsstation im Grünen. Texte über Tiere warten auf genaue Leser.",
+    "visualStyle": {
+      "palette": ["#79c7f5", "#8fd16c", "#fff9ec", "#ffd84d", "#27324a"],
+      "mood": "hell, neugierig, naturnah",
+      "shapes": "Forschertexte, Lupen, Tier-Karten",
+      "effects": "Lupen-Stempel auf Fundstellen, Konfetti beim Gelingen"
+    },
+    "guide": { "name": "Luno", "role": "Forschungsleiter", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "igel", "title": "Igel-Akte", "purpose": "Fundstellen im Igel-Text belegen.", "scene": "Alles über den Igel.", "reward": "Igel-Forscher" },
+      { "id": "bienen", "title": "Bienen-Akte", "purpose": "Fundstellen im Bienen-Text belegen.", "scene": "Das Geheimnis des Bienenstocks.", "reward": "Bienen-Forscher" },
+      { "id": "apfelfall", "title": "Der Apfel-Fall", "purpose": "Zum Abschluss kombinieren.", "scene": "Wer hat den Forschungs-Apfel gefressen?", "reward": "Forscher-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Das Kind antwortet aus dem Gefühl statt aus dem Text.",
+    "embodiedMetaphor": "Die Forscher-Lupe zeigt auf den Satz, in dem die Antwort steckt.",
+    "successInsight": "Wer im Text belegt statt rät, findet sichere Antworten."
+  },
+  "rooms": [
+    {
+      "roomId": "igel",
+      "objective": "Lies den Igel-Text und belege die Antworten!",
+      "mode": "evidence",
+      "caseText": {
+        "title": "Der Igel",
+        "sentences": [
+          "Der Igel trägt etwa 8000 Stacheln auf dem Rücken.",
+          "Im Herbst frisst er sich einen dicken Winterspeck an.",
+          "Den ganzen Winter schläft er tief in einem Laubhaufen.",
+          "Am liebsten frisst der Igel Käfer, Würmer und Schnecken.",
+          "Milch dürfen Igel nicht trinken, davon werden sie krank.",
+          "Im Frühling wacht der Igel hungrig wieder auf."
+        ]
+      },
+      "rounds": [
+        { "question": "Wie viele Stacheln hat ein Igel?", "evidenceIndex": 0 },
+        { "question": "Wo verschläft der Igel den Winter?", "evidenceIndex": 2 },
+        { "question": "Was frisst der Igel am liebsten?", "evidenceIndex": 3 },
+        { "question": "Warum darf ein Igel keine Milch trinken?", "evidenceIndex": 4 }
+      ],
+      "feedback": {
+        "correct": "Fundstelle belegt!",
+        "wrongEvidence": "In diesem Satz steht etwas anderes. Such weiter!",
+        "wrongSuspect": "Der bleibt verdächtig.",
+        "tryAgain": "Such ein Wort aus der Frage im Text: Dort steckt die Antwort."
+      },
+      "explanationAfterSuccess": "Vier Fragen, vier Fundstellen: Die Antwort steht immer im Text."
+    },
+    {
+      "roomId": "bienen",
+      "objective": "Jetzt die Bienen-Akte: Belege die Antworten!",
+      "mode": "evidence",
+      "caseText": {
+        "title": "Die Bienen",
+        "sentences": [
+          "In einem Bienenstock leben bis zu 50000 Bienen.",
+          "Die Königin legt jeden Tag viele hundert Eier.",
+          "Arbeiterinnen sammeln Nektar von Blüte zu Blüte.",
+          "Mit dem Schwänzeltanz zeigen Bienen, wo gute Blumen stehen.",
+          "Aus dem Nektar machen die Bienen im Stock ihren Honig."
+        ]
+      },
+      "rounds": [
+        { "question": "Wie viele Bienen leben in einem Stock?", "evidenceIndex": 0 },
+        { "question": "Wer legt die Eier?", "evidenceIndex": 1 },
+        { "question": "Wie zeigen Bienen, wo gute Blumen stehen?", "evidenceIndex": 3 }
+      ],
+      "feedback": {
+        "correct": "Fundstelle belegt!",
+        "wrongEvidence": "Das steht hier nicht. Vergleiche Frage und Satz genau.",
+        "wrongSuspect": "Der bleibt verdächtig.",
+        "tryAgain": "Lies die Frage laut: Welches Wort suchst du im Text?"
+      },
+      "explanationAfterSuccess": "Auch bei schweren Texten gilt: erst finden, dann antworten."
+    },
+    {
+      "roomId": "apfelfall",
+      "objective": "Der Abschluss-Fall: Wer hat den Forschungs-Apfel gefressen?",
+      "mode": "suspects",
+      "rounds": [
+        {
+          "intro": "Der Apfel von der Futterstation ist weg, nur Bissspuren sind übrig.",
+          "suspects": [
+            { "id": "maus", "name": "Maus Mia", "emoji": "🐭", "traits": { "zähne": "winzig", "ort": "Scheune" } },
+            { "id": "pferd", "name": "Pony Paul", "emoji": "🐴", "traits": { "zähne": "groß", "ort": "Weide" } },
+            { "id": "ziege", "name": "Ziege Zora", "emoji": "🐐", "traits": { "zähne": "groß", "ort": "Scheune" } }
+          ],
+          "clues": [
+            { "text": "Der Apfel lag in der Scheune.", "attribute": "ort", "value": "Scheune" },
+            { "text": "Die Bissspuren sind groß.", "attribute": "zähne", "value": "groß" }
+          ],
+          "culpritId": "ziege"
+        }
+      ],
+      "feedback": {
+        "correct": "Der Fall ist gelöst!",
+        "wrongEvidence": "Das belegt es nicht.",
+        "wrongSuspect": "Halt! Der passt zum Hinweis. Wer passt NICHT dazu?",
+        "tryAgain": "Vergleiche jede Karte mit dem Hinweis: Wer hat etwas anderes?"
+      },
+      "explanationAfterSuccess": "Lesen und kombinieren gehören zusammen: Beweise zeigen, wer es war."
+    }
+  ]
+}

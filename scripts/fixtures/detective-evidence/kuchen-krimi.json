@@ -1,0 +1,162 @@
+{
+  "engine": "detective-evidence",
+  "learningBrief": {
+    "inputMode": "material",
+    "subject": "deutsch",
+    "gradeLevel": "2",
+    "rawTopic": "Textverständnis: Antworten im Text belegen",
+    "extractedTasks": ["Belegstellen finden", "Schlussfolgern"],
+    "learningGoals": ["Behauptungen mit Textstellen belegen", "Indizien kombinieren"],
+    "likelyMisconceptions": ["Raten statt im Text nachsehen", "Die erste passende Antwort nehmen"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Detektivbüro Mondschein",
+    "coreMetaphor": "Ein guter Detektiv rät nicht: Er zeigt auf den Beweis.",
+    "setting": "Ein gemütliches Detektivbüro. Fälle aus der Nachbarschaft warten auf Beweise.",
+    "visualStyle": {
+      "palette": ["#79c7f5", "#fff9ec", "#ffd84d", "#ff7a59", "#27324a"],
+      "mood": "hell, spannend, freundlich",
+      "shapes": "Fall-Akten, Verdächtigen-Karten, Lupen",
+      "effects": "Lupen-Stempel auf Beweise, Konfetti beim Gelingen"
+    },
+    "guide": { "name": "Luno", "role": "Chef-Detektiv", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "kuchenfall", "title": "Der Kuchen-Fall", "purpose": "Beweise im Text finden.", "scene": "Omas Kuchen ist verschwunden.", "reward": "Spür-Nase" },
+      { "id": "tierverhoer", "title": "Das Tier-Verhör", "purpose": "Verdächtige per Indiz ausschließen.", "scene": "Wer war es wirklich?", "reward": "Indizien-Profi" },
+      { "id": "gartenfall", "title": "Der Garten-Fall", "purpose": "Mehr Fragen, mehr Beweise.", "scene": "Im Garten ist etwas passiert.", "reward": "Beweis-Meister" },
+      { "id": "meister", "title": "Meisterprüfung", "purpose": "Der große Fall mit vier Verdächtigen.", "scene": "Die verschwundene Karotte.", "reward": "Meister-Detektiv" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Das Kind rät Antworten, statt sie im Text zu belegen.",
+    "embodiedMetaphor": "Jede Antwort ist ein Beweis: Erst zeigen, wo es steht, dann zählt es.",
+    "successInsight": "Eine Behauptung zählt nur mit Beweis: im Text zeigen oder per Indiz ausschließen."
+  },
+  "rooms": [
+    {
+      "roomId": "kuchenfall",
+      "objective": "Lies den Fall und tippe die Beweis-Sätze an!",
+      "mode": "evidence",
+      "caseText": {
+        "title": "Der verschwundene Kuchen",
+        "sentences": [
+          "Am Sonntag backte Oma einen Apfelkuchen.",
+          "Sie stellte ihn zum Abkühlen auf das Fensterbrett.",
+          "Um drei Uhr war der Kuchen plötzlich weg.",
+          "Unter dem Fenster lagen braune Hundehaare.",
+          "Bello, der Hund, hatte Krümel an der Schnauze."
+        ]
+      },
+      "rounds": [
+        { "question": "Wo stand der Kuchen?", "evidenceIndex": 1 },
+        { "question": "Welcher Beweis zeigt auf Bello?", "evidenceIndex": 4 }
+      ],
+      "feedback": {
+        "correct": "Beweis gefunden!",
+        "wrongEvidence": "Dieser Satz belegt das nicht. Lies die Frage nochmal und such weiter.",
+        "wrongSuspect": "Der bleibt verdächtig.",
+        "tryAgain": "Tipp: Lies jeden Satz langsam. Welcher beantwortet GENAU die Frage?"
+      },
+      "explanationAfterSuccess": "Du hast nicht geraten, du hast gezeigt, wo es steht. Das ist ein Beweis."
+    },
+    {
+      "roomId": "tierverhoer",
+      "objective": "Schließe nach jedem Hinweis einen Verdächtigen aus!",
+      "mode": "suspects",
+      "rounds": [
+        {
+          "intro": "Jemand hat die Wurst vom Frühstückstisch stibitzt.",
+          "suspects": [
+            { "id": "bello", "name": "Bello", "emoji": "🐶", "traits": { "fell": "braun", "ort": "Küche" } },
+            { "id": "minka", "name": "Minka", "emoji": "🐱", "traits": { "fell": "grau", "ort": "Küche" } },
+            { "id": "coco", "name": "Coco", "emoji": "🦜", "traits": { "fell": "bunt", "ort": "Garten" } }
+          ],
+          "clues": [
+            { "text": "Der Dieb war in der Küche.", "attribute": "ort", "value": "Küche" },
+            { "text": "Am Tisch klebt graues Fell.", "attribute": "fell", "value": "grau" }
+          ],
+          "culpritId": "minka"
+        },
+        {
+          "intro": "In der Schule wurde eine Brotdose vertauscht.",
+          "suspects": [
+            { "id": "anna", "name": "Anna", "emoji": "👧", "traits": { "jacke": "rot", "klasse": "1a" } },
+            { "id": "ben", "name": "Ben", "emoji": "👦", "traits": { "jacke": "blau", "klasse": "1a" } },
+            { "id": "carla", "name": "Carla", "emoji": "👩‍🦰", "traits": { "jacke": "blau", "klasse": "1b" } }
+          ],
+          "clues": [
+            { "text": "Die Dose wurde in der Klasse 1a vertauscht.", "attribute": "klasse", "value": "1a" },
+            { "text": "Am Haken hing eine blaue Jacke.", "attribute": "jacke", "value": "blau" }
+          ],
+          "culpritId": "ben"
+        }
+      ],
+      "feedback": {
+        "correct": "Der Fall ist gelöst!",
+        "wrongEvidence": "Das belegt es nicht.",
+        "wrongSuspect": "Halt! Der passt zum Hinweis, der bleibt verdächtig. Wer passt NICHT?",
+        "tryAgain": "Lies den Hinweis genau: Welche Karte hat etwas ANDERES?"
+      },
+      "explanationAfterSuccess": "Hinweis für Hinweis scheiden die Falschen aus. Wer übrig bleibt, war es."
+    },
+    {
+      "roomId": "gartenfall",
+      "objective": "Ein neuer Fall: Finde alle Beweise im Text!",
+      "mode": "evidence",
+      "caseText": {
+        "title": "Das Loch im Gemüsebeet",
+        "sentences": [
+          "Am Morgen entdeckte Opa ein Loch im Gemüsebeet.",
+          "Genau dort hatte er gestern drei Möhren gepflanzt.",
+          "Rund um das Loch waren kleine, spitze Fußspuren.",
+          "Der Zaun hatte unten einen schmalen Spalt.",
+          "Im Nachbargarten wohnt seit kurzem eine Kaninchenfamilie.",
+          "Opa lachte und pflanzte extra Möhren für die Kaninchen."
+        ]
+      },
+      "rounds": [
+        { "question": "Was war an der Stelle mit dem Loch gepflanzt?", "evidenceIndex": 1 },
+        { "question": "Welche Spuren gab es am Loch?", "evidenceIndex": 2 },
+        { "question": "Wie kam der Dieb in den Garten?", "evidenceIndex": 3 }
+      ],
+      "feedback": {
+        "correct": "Beweis gefunden!",
+        "wrongEvidence": "Dieser Satz beantwortet die Frage nicht genau.",
+        "wrongSuspect": "Der bleibt verdächtig.",
+        "tryAgain": "Such das Wort aus der Frage im Text: Wo taucht es auf?"
+      },
+      "explanationAfterSuccess": "Drei Fragen, drei Beweise: So liest ein Detektiv einen Text."
+    },
+    {
+      "roomId": "meister",
+      "objective": "Die Meisterprüfung: vier Verdächtige, drei Hinweise!",
+      "mode": "suspects",
+      "rounds": [
+        {
+          "intro": "Die größte Karotte vom Gemüsefest ist verschwunden.",
+          "suspects": [
+            { "id": "fuchs", "name": "Fritz Fuchs", "emoji": "🦊", "traits": { "fell": "rot", "schuhe": "gelb", "hut": "mit Hut" } },
+            { "id": "hase", "name": "Hanna Hase", "emoji": "🐰", "traits": { "fell": "grau", "schuhe": "blau", "hut": "mit Hut" } },
+            { "id": "eule", "name": "Edda Eule", "emoji": "🦉", "traits": { "fell": "grau", "schuhe": "gelb", "hut": "ohne Hut" } },
+            { "id": "dachs", "name": "Donni Dachs", "emoji": "🦡", "traits": { "fell": "grau", "schuhe": "gelb", "hut": "mit Hut" } }
+          ],
+          "clues": [
+            { "text": "Am Zaun hängt graues Fell.", "attribute": "fell", "value": "grau" },
+            { "text": "Die Fußspuren stammen von gelben Schuhen.", "attribute": "schuhe", "value": "gelb" },
+            { "text": "Ein Zeuge sah jemanden mit Hut davonlaufen.", "attribute": "hut", "value": "mit Hut" }
+          ],
+          "culpritId": "dachs"
+        }
+      ],
+      "feedback": {
+        "correct": "Meisterhaft kombiniert!",
+        "wrongEvidence": "Das belegt es nicht.",
+        "wrongSuspect": "Vorsicht! Der passt zum Hinweis. Schau, wer etwas ANDERES trägt.",
+        "tryAgain": "Geh die Karten durch: Vergleiche jede mit dem Hinweis."
+      },
+      "explanationAfterSuccess": "Drei Hinweise, drei Ausschlüsse, ein Täter: Logik statt Raten."
+    }
+  ]
+}
