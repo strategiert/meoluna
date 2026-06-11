@@ -66,17 +66,21 @@ if (badGate.passed) {
 
 const orchestrator = readFileSync(orchestratorPath, "utf8");
 const focusedIndex = orchestrator.indexOf("if (shouldUseFocusedIntervention(args))");
-const movementIndex = orchestrator.indexOf("if (isLikelyMovementTopic(args))");
+const engineIndex = orchestrator.indexOf("pickEngineByKeywords(args)");
+const llmRouterIndex = orchestrator.indexOf("runGameplayRouter({ brief:");
 const broadIndex = orchestrator.indexOf("const interpreter = await runInterpreter");
 
 if (focusedIndex === -1) {
   failures.push("generateWorldV2 must call shouldUseFocusedIntervention.");
 }
-if (!(focusedIndex !== -1 && movementIndex !== -1 && focusedIndex < movementIndex)) {
-  failures.push("Focused intervention route must run before movement-space routing.");
+if (!(focusedIndex !== -1 && engineIndex !== -1 && focusedIndex < engineIndex)) {
+  failures.push("Focused intervention route must run before the unified gameplay engine route.");
 }
-if (!(focusedIndex !== -1 && broadIndex !== -1 && focusedIndex < broadIndex)) {
-  failures.push("Focused intervention route must run before broad pipeline interpreter.");
+if (llmRouterIndex === -1) {
+  failures.push("generateWorldV2 must fall back to the LLM gameplay router when keywords are silent.");
+}
+if (!(engineIndex !== -1 && broadIndex !== -1 && engineIndex < broadIndex)) {
+  failures.push("Gameplay engine route must run before broad pipeline interpreter.");
 }
 
 if (failures.length > 0) {

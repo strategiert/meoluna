@@ -1,0 +1,144 @@
+{
+  "engine": "sort-match",
+  "learningBrief": {
+    "inputMode": "curriculum",
+    "subject": "englisch",
+    "gradeLevel": "3",
+    "rawTopic": "Englisch Vokabeln: Tiere und Farben",
+    "extractedTasks": ["Tiervokabeln zuordnen", "Farbvokabeln zuordnen"],
+    "learningGoals": ["Englische Grundvokabeln sicher zuordnen"],
+    "likelyMisconceptions": ["Ähnlich klingende Wörter verwechseln"],
+    "focus": "practice",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Der Wörter-Zoo",
+    "coreMetaphor": "Jedes deutsche Wort hat einen englischen Partner: Paar für Paar wird der Zoo bunt.",
+    "setting": "Ein fröhlicher Zoo, in dem alle Schilder zweisprachig werden sollen.",
+    "visualStyle": {
+      "palette": ["#79c7f5", "#8fd16c", "#ffd84d", "#ff7a59", "#27324a"],
+      "mood": "hell, verspielt, neugierig",
+      "shapes": "Wort-Karten, Körbe, Tier-Schilder",
+      "effects": "Paare leuchten auf, Konfetti beim Gelingen"
+    },
+    "guide": { "name": "Luno", "role": "Zoo-Direktor", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "tierpaare", "title": "Tier-Schilder", "purpose": "Tiervokabeln als Paare verbinden.", "scene": "Deutsche und englische Tiernamen.", "reward": "Tier-Kenner" },
+      { "id": "farbpaare", "title": "Farben-Werkstatt", "purpose": "Farbvokabeln als Paare verbinden.", "scene": "Die Zoo-Schilder bekommen Farben.", "reward": "Farben-Profi" },
+      { "id": "sortierhof", "title": "Sortier-Hof", "purpose": "Englische Wörter in Körbe sortieren.", "scene": "Tier oder Farbe? Ab in den richtigen Korb!", "reward": "Sortier-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Das Kind kennt einzelne Vokabeln, ordnet sie aber nicht sicher zu.",
+    "embodiedMetaphor": "Wörter sind Karten mit Partnern und Familien: verbinden und einsortieren statt auswendig aufsagen.",
+    "successInsight": "Vokabeln sitzen, wenn man sie zuordnen kann: zum Partnerwort und zur Wortfamilie."
+  },
+  "rooms": [
+    {
+      "roomId": "tierpaare",
+      "objective": "Verbinde jedes deutsche Tier mit seinem englischen Namen!",
+      "mode": "pairs",
+      "rounds": [
+        {
+          "objective": "Die ersten drei Tiere!",
+          "pairs": [
+            { "id": "hund", "left": { "label": "der Hund", "emoji": "🐶" }, "right": { "label": "dog" } },
+            { "id": "katze", "left": { "label": "die Katze", "emoji": "🐱" }, "right": { "label": "cat" } },
+            { "id": "vogel", "left": { "label": "der Vogel", "emoji": "🐦" }, "right": { "label": "bird" } }
+          ]
+        },
+        {
+          "objective": "Jetzt vier neue Tiere!",
+          "pairs": [
+            { "id": "pferd", "left": { "label": "das Pferd", "emoji": "🐴" }, "right": { "label": "horse" } },
+            { "id": "maus", "left": { "label": "die Maus", "emoji": "🐭" }, "right": { "label": "mouse" } },
+            { "id": "fisch", "left": { "label": "der Fisch", "emoji": "🐟" }, "right": { "label": "fish" } },
+            { "id": "baer", "left": { "label": "der Bär", "emoji": "🐻" }, "right": { "label": "bear" } }
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": "Alle Paare gefunden!",
+        "wrongBasket": "In diesen Korb gehört die Karte nicht.",
+        "wrongPair": "Die beiden gehören nicht zusammen. Schau auf das Bild und sprich das Wort leise.",
+        "tryAgain": "Tipp: Fang mit dem Tier an, das du sicher kennst."
+      },
+      "explanationAfterSuccess": "Hund heißt dog, Katze heißt cat: jedes Wort hat genau einen Partner."
+    },
+    {
+      "roomId": "farbpaare",
+      "objective": "Verbinde die Farben mit ihren englischen Namen!",
+      "mode": "pairs",
+      "rounds": [
+        {
+          "objective": "Die ersten Farben!",
+          "pairs": [
+            { "id": "rot", "left": { "label": "rot", "emoji": "🔴" }, "right": { "label": "red" } },
+            { "id": "blau", "left": { "label": "blau", "emoji": "🔵" }, "right": { "label": "blue" } },
+            { "id": "gruen", "left": { "label": "grün", "emoji": "🟢" }, "right": { "label": "green" } }
+          ]
+        },
+        {
+          "objective": "Und noch vier Farben!",
+          "pairs": [
+            { "id": "gelb", "left": { "label": "gelb", "emoji": "🟡" }, "right": { "label": "yellow" } },
+            { "id": "schwarz", "left": { "label": "schwarz", "emoji": "⚫" }, "right": { "label": "black" } },
+            { "id": "weiss", "left": { "label": "weiß", "emoji": "⚪" }, "right": { "label": "white" } },
+            { "id": "braun", "left": { "label": "braun", "emoji": "🟤" }, "right": { "label": "brown" } }
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": "Alle Farben verbunden!",
+        "wrongBasket": "In diesen Korb gehört die Karte nicht.",
+        "wrongPair": "Das passt nicht zusammen. Der Punkt zeigt dir die Farbe!",
+        "tryAgain": "Sprich die Farbe auf Deutsch und such den englischen Klang."
+      },
+      "explanationAfterSuccess": "Farben sind überall: red, blue, green kennst du jetzt sicher."
+    },
+    {
+      "roomId": "sortierhof",
+      "objective": "Die Meisterprüfung: Ist das englische Wort ein Tier oder eine Farbe?",
+      "mode": "baskets",
+      "rounds": [
+        {
+          "objective": "Sortiere die englischen Wörter!",
+          "categories": [
+            { "id": "tiere", "label": "Animals", "emoji": "🐾" },
+            { "id": "farben", "label": "Colours", "emoji": "🎨" }
+          ],
+          "cards": [
+            { "id": "c1", "label": "dog", "emoji": "🐶", "categoryId": "tiere" },
+            { "id": "c2", "label": "red", "emoji": "🔴", "categoryId": "farben" },
+            { "id": "c3", "label": "horse", "emoji": "🐴", "categoryId": "tiere" },
+            { "id": "c4", "label": "green", "emoji": "🟢", "categoryId": "farben" },
+            { "id": "c5", "label": "cat", "emoji": "🐱", "categoryId": "tiere" },
+            { "id": "c6", "label": "yellow", "emoji": "🟡", "categoryId": "farben" }
+          ]
+        },
+        {
+          "objective": "Jetzt ohne Bilder-Hilfe: nur die Wörter!",
+          "categories": [
+            { "id": "tiere", "label": "Animals", "emoji": "🐾" },
+            { "id": "farben", "label": "Colours", "emoji": "🎨" }
+          ],
+          "cards": [
+            { "id": "d1", "label": "bear", "emoji": "❓", "categoryId": "tiere" },
+            { "id": "d2", "label": "white", "emoji": "❓", "categoryId": "farben" },
+            { "id": "d3", "label": "mouse", "emoji": "❓", "categoryId": "tiere" },
+            { "id": "d4", "label": "brown", "emoji": "❓", "categoryId": "farben" },
+            { "id": "d5", "label": "fish", "emoji": "❓", "categoryId": "tiere" },
+            { "id": "d6", "label": "black", "emoji": "❓", "categoryId": "farben" }
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": "Perfekt sortiert!",
+        "wrongBasket": "In diesen Korb gehört das Wort nicht. Ist es ein Tier oder eine Farbe?",
+        "wrongPair": "Die beiden gehören nicht zusammen.",
+        "tryAgain": "Überlege: Kannst du das Wort streicheln oder anmalen?"
+      },
+      "explanationAfterSuccess": "Du sortierst englische Wörter jetzt nach Bedeutung: animals und colours."
+    }
+  ]
+}

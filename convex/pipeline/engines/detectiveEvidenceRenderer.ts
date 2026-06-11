@@ -393,7 +393,7 @@ function RoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
 
         {phase !== 'done' && (room.mode === 'evidence'
           ? <EvidenceRoom room={room} roundIndex={roundIndex} onRoundWin={handleRoundWin} setBubble={setBubble} setMood={setMood} />
-          : <SuspectsRoom room={room} roundIndex={roundIndex} onRoundWin={handleRoundWin} setBubble={setBubble} setMood={setMood} />)}
+          : <SuspectsRoom key={roundIndex} room={room} roundIndex={roundIndex} onRoundWin={handleRoundWin} setBubble={setBubble} setMood={setMood} />)}
 
         {phase === 'roundDone' && (
           <BigButton onClick={nextRound} color={KID.blue} colorDark={KID.blueDark}>➡️ Nächster Fall!</BigButton>

@@ -452,8 +452,8 @@ function RoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
         <SpeechBubble text={bubble} />
 
         {phase !== 'done' && (room.mode === 'area'
-          ? <AreaRoom room={room} roundIndex={roundIndex} onRoundWin={handleRoundWin} setBubble={setBubble} setMood={setMood} />
-          : <ComposeRoom room={room} roundIndex={roundIndex} onRoundWin={handleRoundWin} setBubble={setBubble} setMood={setMood} />)}
+          ? <AreaRoom key={roundIndex} room={room} roundIndex={roundIndex} onRoundWin={handleRoundWin} setBubble={setBubble} setMood={setMood} />
+          : <ComposeRoom key={roundIndex} room={room} roundIndex={roundIndex} onRoundWin={handleRoundWin} setBubble={setBubble} setMood={setMood} />)}
 
         {phase === 'roundDone' && (
           <BigButton onClick={nextRound} color={KID.blue} colorDark={KID.blueDark}>➡️ Nächste Aufgabe!</BigButton>

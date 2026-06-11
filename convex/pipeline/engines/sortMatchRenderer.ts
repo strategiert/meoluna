@@ -1,10 +1,10 @@
-import type { TimeEngineSpec } from "./timeSequenceTypes";
-import { validateTimeEngineSpec } from "./timeSequenceValidator";
+import type { SortEngineSpec } from "./sortMatchTypes";
+import { validateSortEngineSpec } from "./sortMatchValidator";
 
-export function buildTimeSequenceWorldCode(spec: TimeEngineSpec): string {
-  const validation = validateTimeEngineSpec(spec);
+export function buildSortMatchWorldCode(spec: SortEngineSpec): string {
+  const validation = validateSortEngineSpec(spec);
   if (!validation.passed) {
-    throw new Error(`Invalid time-sequence spec: ${validation.violations.join(" | ")}`);
+    throw new Error(`Invalid sort-match spec: ${validation.violations.join(" | ")}`);
   }
 
   const dataJson = JSON.stringify(spec, null, 2);
@@ -22,8 +22,8 @@ const KID = {
   skyBottom: '#e9f8ff',
   hillBack: '#a8dd8a',
   hillFront: '#7ec463',
-  band: '#fbe3b2',
-  bandEdge: '#d9b178',
+  basket: '#fbe3b2',
+  basketEdge: '#d9b178',
   ink: '#27324a',
   coral: '#ff7a59',
   coralDark: '#c95a3f',
@@ -141,139 +141,225 @@ function RoundDots({ total, current }) {
   );
 }
 
-function buildEventPool(round, startFilled) {
-  return round.events
-    .slice(startFilled)
-    .map((event) => ({ poolId: event.id, event }))
-    .sort(() => Math.random() - 0.5);
-}
-
-function EventCard({ event, dim }) {
+function BasketsScene({ round, cardIndex, sortedByCategory, mood }) {
+  const currentCard = round.cards[cardIndex];
   return (
-    <div className="flex flex-col items-center gap-0.5 px-1">
-      <span className="text-3xl sm:text-4xl">{event.emoji}</span>
-      <span className="kid-font max-w-[7rem] text-center text-xs font-extrabold leading-tight sm:text-sm" style={{ color: dim ? '#9aa3b5' : KID.ink }}>{event.label}</span>
-    </div>
-  );
-}
-
-function TimeScene({ room, round, filledCount }) {
-  const isChain = room.mode === 'chain';
-  return (
-    <div className="relative w-full overflow-hidden rounded-[2rem] border-4 p-4" style={{ minHeight: '17rem', borderColor: KID.ink, background: 'linear-gradient(180deg, ' + KID.skyTop + ', ' + KID.skyBottom + ' 70%)' }}>
+    <div className="relative w-full overflow-hidden rounded-[2rem] border-4 p-4" style={{ minHeight: '15rem', borderColor: KID.ink, background: 'linear-gradient(180deg, ' + KID.skyTop + ', ' + KID.skyBottom + ' 70%)' }}>
       <Sky />
       <div className="relative z-10 flex flex-col items-center gap-4">
-        <span className="kid-font rounded-full border-2 px-4 py-1 text-lg font-extrabold" style={{ background: KID.sun, borderColor: KID.ink, color: KID.ink }}>{round.title}</span>
-        <div className="w-full rounded-2xl border-4 p-3" style={{ background: KID.band, borderColor: KID.bandEdge }}>
-          <div className="flex flex-wrap items-center justify-center gap-1">
-            {round.events.map((event, index) => (
-              <div key={event.id} className="flex items-center gap-1">
-                {index > 0 && (
-                  <span className="kid-font text-lg font-extrabold sm:text-xl" style={{ color: index <= filledCount - 1 || (index === filledCount && index > 0) ? KID.ink : '#c4ad85' }}>
-                    {isChain ? '➜' : '→'}
-                  </span>
-                )}
-                <motion.div
-                  animate={index === filledCount - 1 ? { scale: [0.6, 1.1, 1] } : {}}
-                  className="flex min-h-[5.5rem] min-w-[5.5rem] items-center justify-center rounded-2xl border-4 px-1 py-2"
-                  style={{
-                    background: index < filledCount ? KID.card : 'rgba(255,255,255,0.45)',
-                    borderColor: index < filledCount ? KID.ink : '#c4ad85',
-                    borderStyle: index < filledCount ? 'solid' : 'dashed',
-                  }}
-                >
-                  {index < filledCount
-                    ? <EventCard event={event} dim={false} />
-                    : <span className="kid-font text-2xl font-extrabold" style={{ color: '#b09a72' }}>{index + 1}.</span>}
-                </motion.div>
-              </div>
-            ))}
-          </div>
-          {isChain && filledCount < round.events.length && filledCount > 0 && (
-            <p className="kid-font mt-2 text-center text-base font-extrabold" style={{ color: '#8a6f45' }}>Was passiert dadurch?</p>
+        <span className="kid-font rounded-full border-2 px-4 py-1 text-lg font-extrabold" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink }}>
+          Karte {Math.min(cardIndex + 1, round.cards.length)} von {round.cards.length}
+        </span>
+        <AnimatePresence mode="wait">
+          {currentCard && (
+            <motion.div
+              key={currentCard.id}
+              initial={{ y: -40, scale: 0.6, opacity: 0 }}
+              animate={mood === 'sad' ? { y: 0, scale: 1, opacity: 1, x: [0, -8, 8, -5, 5, 0] } : { y: 0, scale: 1, opacity: 1, x: 0 }}
+              exit={{ y: 60, scale: 0.5, opacity: 0 }}
+              className="kid-font flex flex-col items-center gap-1 rounded-3xl border-4 px-8 py-4 shadow-xl"
+              style={{ background: KID.card, borderColor: KID.ink }}
+            >
+              <span className="text-5xl">{currentCard.emoji}</span>
+              <span className="text-xl font-extrabold sm:text-2xl" style={{ color: KID.ink }}>{currentCard.label}</span>
+            </motion.div>
           )}
+        </AnimatePresence>
+        <div className="flex w-full flex-wrap items-stretch justify-center gap-3">
+          {round.categories.map((category) => (
+            <div key={category.id} className="flex min-w-[7rem] flex-col items-center gap-1 rounded-2xl border-4 px-3 py-2" style={{ background: KID.basket, borderColor: KID.basketEdge }}>
+              <span className="text-2xl">{category.emoji}</span>
+              <span className="kid-font text-sm font-extrabold" style={{ color: KID.ink }}>{category.label}</span>
+              <div className="flex flex-wrap justify-center gap-1">
+                {(sortedByCategory[category.id] || []).map((card) => (
+                  <motion.span key={card.id} initial={{ scale: 0 }} animate={{ scale: 1 }} className="text-lg" title={card.label}>{card.emoji}</motion.span>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
   );
 }
 
-function SequenceEquation({ round, solved }) {
+function BasketsEquation({ round, solved }) {
   return (
     <div className="rounded-3xl border-4 p-4" style={{ background: KID.card, borderColor: KID.ink }}>
-      <p className="kid-font text-sm font-extrabold uppercase tracking-wide" style={{ color: '#8a93a6' }}>Aus der Reihenfolge wird</p>
-      <span className="kid-font mt-2 inline-block rounded-2xl border-2 px-3 py-1.5 text-lg font-extrabold sm:text-xl" style={{ background: solved ? '#dcf5e1' : '#eef1f6', borderColor: solved ? KID.ink : '#c6cdd9', color: solved ? KID.ink : '#9aa3b5' }}>
-        {solved ? round.events.map((event) => event.emoji + ' ' + event.label).join(' ➜ ') : round.title + ' = ?'}
-      </span>
+      <p className="kid-font text-sm font-extrabold uppercase tracking-wide" style={{ color: '#8a93a6' }}>Aus dem Sortieren wird</p>
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        {round.categories.map((category) => {
+          const cards = round.cards.filter((card) => card.categoryId === category.id);
+          return (
+            <span key={category.id} className="kid-font rounded-2xl border-2 px-3 py-1.5 text-base font-extrabold sm:text-lg" style={{ background: solved ? '#dcf5e1' : '#eef1f6', borderColor: solved ? KID.ink : '#c6cdd9', color: solved ? KID.ink : '#9aa3b5' }}>
+              {category.emoji} {category.label}: {solved ? cards.map((card) => card.emoji).join(' ') : cards.length + ' Karten'}
+            </span>
+          );
+        })}
+      </div>
     </div>
   );
 }
 
-function SequenceRoom({ room, roundIndex, onRoundWin, setBubble, setMood }) {
+function BasketsRoom({ room, roundIndex, onRoundWin, setBubble, setMood, mood }) {
   const round = room.rounds[roundIndex];
-  const isChain = room.mode === 'chain';
-  const startFilled = isChain ? 1 : 0;
-  const [filledCount, setFilledCount] = useState(startFilled);
-  const [pool, setPool] = useState(() => buildEventPool(round, startFilled));
-  const [misses, setMisses] = useState(0);
+  const [cardIndex, setCardIndex] = useState(0);
+  const [sortedByCategory, setSortedByCategory] = useState({});
   const [solved, setSolved] = useState(false);
+  const [misses, setMisses] = useState(0);
 
   useEffect(() => {
-    const nextRound = room.rounds[roundIndex];
-    setFilledCount(startFilled);
-    setPool(buildEventPool(nextRound, startFilled));
-    setMisses(0);
+    setCardIndex(0);
+    setSortedByCategory({});
     setSolved(false);
-    setBubble((nextRound.objective || room.objective) + (isChain ? ' Was passiert dadurch?' : ' Was kommt zuerst?'));
+    setMisses(0);
+    setBubble((room.rounds[roundIndex].objective || room.objective) + ' In welchen Korb gehört die Karte?');
   }, [roundIndex]);
 
-  function placeEvent(chip) {
+  function sortCard(category) {
     if (solved) return;
-    const expected = round.events[filledCount];
-    if (!expected) return;
-    if (chip.event.id === expected.id) {
-      const nextCount = filledCount + 1;
-      setFilledCount(nextCount);
-      setPool((list) => list.filter((entry) => entry.poolId !== chip.poolId));
+    const card = round.cards[cardIndex];
+    if (!card) return;
+    if (card.categoryId === category.id) {
+      setSortedByCategory((map) => ({ ...map, [category.id]: [...(map[category.id] || []), card] }));
       setMood('cheer');
-      setTimeout(() => setMood('happy'), 500);
-      if (nextCount >= round.events.length) {
+      setTimeout(() => setMood('happy'), 400);
+      const nextIndex = cardIndex + 1;
+      setCardIndex(nextIndex);
+      if (nextIndex >= round.cards.length) {
         setSolved(true);
         onRoundWin();
       } else {
-        setBubble(isChain ? 'Genau! Und was passiert dadurch?' : 'Richtig! Was kommt danach?');
+        setBubble('Richtig einsortiert! Und die nächste Karte?');
       }
     } else {
       const nextMisses = misses + 1;
       setMisses(nextMisses);
       setMood('sad');
-      if (nextMisses >= 2) {
-        setBubble(room.feedback.tryAgain);
-      } else {
-        setBubble(isChain ? room.feedback.wrongLink : room.feedback.wrongOrder);
-      }
+      setBubble(nextMisses >= 2 ? room.feedback.tryAgain : room.feedback.wrongBasket);
       setTimeout(() => setMood('happy'), 700);
     }
   }
 
   return (
     <>
-      <TimeScene room={room} round={round} filledCount={filledCount} />
+      <BasketsScene round={round} cardIndex={cardIndex} sortedByCategory={sortedByCategory} mood={mood} />
       <div className="flex flex-wrap items-center justify-center gap-3">
-        {pool.map((chip) => (
-          <button
-            key={chip.poolId}
-            type="button"
-            disabled={solved}
-            onClick={() => placeEvent(chip)}
-            className="kid-font flex min-h-[80px] min-w-[7rem] flex-col items-center justify-center rounded-2xl border-4 px-3 py-2 transition-all active:translate-y-1 disabled:opacity-30"
-            style={{ background: KID.card, borderColor: KID.ink, boxShadow: '0 5px 0 ' + KID.bandEdge }}
-          >
-            <EventCard event={chip.event} dim={false} />
-          </button>
+        {round.categories.map((category) => (
+          <BigButton key={category.id} onClick={() => sortCard(category)} color={KID.blue} colorDark={KID.blueDark} disabled={solved}>
+            {category.emoji} {category.label}
+          </BigButton>
         ))}
       </div>
-      <SequenceEquation round={round} solved={solved} />
+      <BasketsEquation round={round} solved={solved} />
+    </>
+  );
+}
+
+function buildRightOrder(round) {
+  return round.pairs.map((pair) => pair.id).sort(() => Math.random() - 0.5);
+}
+
+function PairsRoom({ room, roundIndex, onRoundWin, setBubble, setMood }) {
+  const round = room.rounds[roundIndex];
+  const [rightOrder, setRightOrder] = useState(() => buildRightOrder(round));
+  const [matched, setMatched] = useState([]);
+  const [selectedLeft, setSelectedLeft] = useState(null);
+  const [solved, setSolved] = useState(false);
+  const [misses, setMisses] = useState(0);
+
+  useEffect(() => {
+    setRightOrder(buildRightOrder(room.rounds[roundIndex]));
+    setMatched([]);
+    setSelectedLeft(null);
+    setSolved(false);
+    setMisses(0);
+    setBubble((room.rounds[roundIndex].objective || room.objective) + ' Tippe links eine Karte und dann ihren Partner rechts!');
+  }, [roundIndex]);
+
+  function pickPair(side, pairId) {
+    if (solved || matched.includes(pairId)) return;
+    if (side === 'left') {
+      setSelectedLeft(pairId);
+      return;
+    }
+    if (!selectedLeft) {
+      setBubble('Tippe zuerst links eine Karte an!');
+      return;
+    }
+    if (pairId === selectedLeft) {
+      const nextMatched = [...matched, pairId];
+      setMatched(nextMatched);
+      setSelectedLeft(null);
+      setMood('cheer');
+      setTimeout(() => setMood('happy'), 400);
+      if (nextMatched.length >= round.pairs.length) {
+        setSolved(true);
+        onRoundWin();
+      } else {
+        setBubble('Paar gefunden! Welches Paar findest du als Nächstes?');
+      }
+    } else {
+      const nextMisses = misses + 1;
+      setMisses(nextMisses);
+      setMood('sad');
+      setBubble(nextMisses >= 2 ? room.feedback.tryAgain : room.feedback.wrongPair);
+      setTimeout(() => setMood('happy'), 700);
+    }
+  }
+
+  function pairCard(pair, side, content) {
+    const isMatched = matched.includes(pair.id);
+    const isSelected = side === 'left' && selectedLeft === pair.id;
+    return (
+      <button
+        key={side + pair.id}
+        type="button"
+        disabled={solved || isMatched}
+        onClick={() => pickPair(side, pair.id)}
+        className="kid-font flex min-h-[64px] w-full items-center justify-center gap-2 rounded-2xl border-4 px-3 py-2 text-lg font-extrabold transition-all active:translate-y-1 sm:text-xl"
+        style={{
+          background: isMatched ? '#dcf5e1' : isSelected ? KID.sun : KID.card,
+          borderColor: isMatched ? KID.green : KID.ink,
+          color: KID.ink,
+          opacity: isMatched ? 0.7 : 1,
+          boxShadow: isMatched ? 'none' : '0 5px 0 ' + KID.basketEdge,
+        }}
+      >
+        {content.emoji && <span className="text-2xl">{content.emoji}</span>}
+        <span>{content.label}</span>
+        {isMatched && <span>✅</span>}
+      </button>
+    );
+  }
+
+  return (
+    <>
+      <div className="relative w-full overflow-hidden rounded-[2rem] border-4 p-4" style={{ minHeight: '15rem', borderColor: KID.ink, background: 'linear-gradient(180deg, ' + KID.skyTop + ', ' + KID.skyBottom + ' 70%)' }}>
+        <Sky />
+        <div className="relative z-10 grid grid-cols-2 gap-3 sm:gap-6">
+          <div className="flex flex-col gap-2">
+            {round.pairs.map((pair) => pairCard(pair, 'left', pair.left))}
+          </div>
+          <div className="flex flex-col gap-2">
+            {rightOrder.map((pairId) => {
+              const pair = round.pairs.find((entry) => entry.id === pairId);
+              if (!pair) return null;
+              return pairCard(pair, 'right', pair.right);
+            })}
+          </div>
+        </div>
+      </div>
+      <div className="rounded-3xl border-4 p-4" style={{ background: KID.card, borderColor: KID.ink }}>
+        <p className="kid-font text-sm font-extrabold uppercase tracking-wide" style={{ color: '#8a93a6' }}>Aus dem Sortieren wird</p>
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          {round.pairs.map((pair) => (
+            <span key={pair.id} className="kid-font rounded-2xl border-2 px-3 py-1.5 text-base font-extrabold sm:text-lg" style={{ background: matched.includes(pair.id) ? '#dcf5e1' : '#eef1f6', borderColor: matched.includes(pair.id) ? KID.ink : '#c6cdd9', color: matched.includes(pair.id) ? KID.ink : '#9aa3b5' }}>
+              {matched.includes(pair.id) ? pair.left.label + ' = ' + pair.right.label : '? = ?'}
+            </span>
+          ))}
+        </div>
+      </div>
     </>
   );
 }
@@ -286,12 +372,12 @@ function RoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
 
   function handleRoundWin() {
     setMood('cheer');
-    Meoluna.reportScore(10, { action: 'time-round-correct', roomId: room.roomId, roundIndex });
+    Meoluna.reportScore(10, { action: 'sort-round-correct', roomId: room.roomId, roundIndex });
     onStar();
     if (roundIndex + 1 >= room.rounds.length) {
       setPhase('done');
       setBubble(room.feedback.correct + ' ' + room.explanationAfterSuccess);
-      Meoluna.reportScore(25, { action: 'time-room-complete', roomId: room.roomId });
+      Meoluna.reportScore(25, { action: 'sort-room-complete', roomId: room.roomId });
       Meoluna.completeModule(room.roomId, 25);
       confetti({ particleCount: 100, spread: 75, origin: { y: 0.6 } });
     } else {
@@ -312,7 +398,7 @@ function RoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
       <KidStyles />
       <div className="mx-auto flex max-w-5xl flex-col gap-4">
         <div className="flex items-center justify-between gap-3">
-          <button type="button" onClick={onBack} className="rounded-2xl border-2 px-4 py-2 text-lg font-extrabold transition-all active:translate-y-0.5" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink, boxShadow: '0 4px 0 ' + KID.bandEdge }}>← Karte</button>
+          <button type="button" onClick={onBack} className="rounded-2xl border-2 px-4 py-2 text-lg font-extrabold transition-all active:translate-y-0.5" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink, boxShadow: '0 4px 0 ' + KID.basketEdge }}>← Karte</button>
           <div className="flex items-center gap-3">
             <div className="rounded-2xl border-2 px-4 py-2 text-lg font-extrabold" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink }}>{roomMeta.title || room.roomId}</div>
             <Luno mood={mood} />
@@ -325,9 +411,9 @@ function RoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
 
         <SpeechBubble text={bubble} />
 
-        {phase !== 'done' && (
-          <SequenceRoom key={roundIndex} room={room} roundIndex={roundIndex} onRoundWin={handleRoundWin} setBubble={setBubble} setMood={setMood} />
-        )}
+        {phase !== 'done' && (room.mode === 'baskets'
+          ? <BasketsRoom key={roundIndex} room={room} roundIndex={roundIndex} onRoundWin={handleRoundWin} setBubble={setBubble} setMood={setMood} mood={mood} />
+          : <PairsRoom key={roundIndex} room={room} roundIndex={roundIndex} onRoundWin={handleRoundWin} setBubble={setBubble} setMood={setMood} />)}
 
         {phase === 'roundDone' && (
           <BigButton onClick={nextRound} color={KID.blue} colorDark={KID.blueDark}>➡️ Nächste Aufgabe!</BigButton>
@@ -365,10 +451,10 @@ function Hub({ completedRooms, stars, onStart }) {
                 disabled={locked}
                 onClick={() => onStart(index)}
                 className="rounded-[1.8rem] border-4 p-5 text-center transition-all active:translate-y-1 disabled:opacity-50"
-                style={{ background: done ? '#e8f9e4' : KID.card, borderColor: KID.ink, boxShadow: '0 6px 0 ' + KID.bandEdge }}
+                style={{ background: done ? '#e8f9e4' : KID.card, borderColor: KID.ink, boxShadow: '0 6px 0 ' + KID.basketEdge }}
               >
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full text-3xl" style={{ background: done ? KID.green : locked ? '#dde3ec' : KID.sun }}>
-                  {done ? '⭐' : locked ? '🔒' : isLast ? '🏆' : room.mode === 'timeline' ? '🕰️' : '🔗'}
+                  {done ? '⭐' : locked ? '🔒' : isLast ? '🏆' : room.mode === 'baskets' ? '🧺' : '🃏'}
                 </div>
                 <p className="mt-3 text-xl font-extrabold" style={{ color: KID.ink }}>{meta.title || 'Welt ' + (index + 1)}</p>
                 <p className="mt-1 text-sm font-bold" style={{ color: '#5d6b85' }}>{meta.purpose || room.objective}</p>
@@ -391,7 +477,7 @@ export default function App() {
     const room = SPEC.rooms[activeRoomIndex];
     setCompletedRooms((rooms) => rooms.includes(room.roomId) ? rooms : [...rooms, room.roomId]);
     if (completedRooms.length + 1 >= SPEC.rooms.length) {
-      Meoluna.complete({ engine: 'time-sequence', world: SPEC.world.worldName });
+      Meoluna.complete({ engine: 'sort-match', world: SPEC.world.worldName });
     }
     setActiveRoomIndex(null);
   }

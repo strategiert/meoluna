@@ -22,18 +22,11 @@ import { runValidator } from "./steps/validator";
 import { runStructuralGate } from "./steps/structuralGate";
 import { runFocusedInterventionGenerator } from "./steps/focusedInterventionGenerator";
 import { runLearningDiagnosis } from "./steps/learningDiagnosis";
-import { runMovementSpaceGenerator } from "./steps/movementSpaceGenerator";
-import { runMixingBalanceGenerator } from "./steps/mixingBalanceGenerator";
-import { runBuildingConstructGenerator } from "./steps/buildingConstructGenerator";
-import { runTimeSequenceGenerator } from "./steps/timeSequenceGenerator";
-import { runDetectiveEvidenceGenerator } from "./steps/detectiveEvidenceGenerator";
+import { runGameplayRouter } from "./steps/gameplayRouter";
 import { runFocusedInterventionGate } from "./engines/focusedInterventionGate";
 import { shouldUseFocusedIntervention } from "./engines/focusedInterventionRouter";
-import { isLikelyMovementTopic } from "./engines/movementTopicRouter";
-import { isLikelyMixingTopic } from "./engines/mixingTopicRouter";
-import { isLikelyBuildingTopic } from "./engines/buildingTopicRouter";
-import { isLikelyTimeTopic } from "./engines/timeTopicRouter";
-import { isLikelyDetectiveTopic } from "./engines/detectiveTopicRouter";
+import { pickEngineByKeywords, ENGINE_GENERATORS } from "./engines/engineRegistry";
+import type { EngineName } from "./engines/engineRegistry";
 
 import { STEP_LABELS, STEP_ORDER } from "./types";
 import type { AssetManifest } from "./types";
@@ -158,10 +151,13 @@ export const generateWorldV2 = action({
         }
       }
 
-      // ── MOVEMENT-SPACE VERTICAL SLICE ───────────────────────────
-      // Conservative early route for spatial/number-line topics.
-      // If this branch fails validation or rendering, the existing pipeline remains the fallback.
-      if (isLikelyMovementTopic(args)) {
+      // ── GAMEPLAY ENGINES (deterministic renderers) ──────────────
+      // Unified route for all engine playbooks. Keyword routers are the
+      // free fast path; if none fires, the LLM gameplay router decides.
+      // If no engine fits or generation fails, the broad pipeline below
+      // remains the fallback.
+      {
+        const keywordEngine = pickEngineByKeywords(args);
         try {
           await setStatus(0);
           const diagnosisStart = Date.now();
@@ -171,345 +167,76 @@ export const generateWorldV2 = action({
             gradeLevel: args.gradeLevel,
             subject: args.subject,
           });
-          stepTimings.movement_diagnosis = {
+          stepTimings.engine_diagnosis = {
             durationMs: Date.now() - diagnosisStart,
             model: "sonnet",
             inputTokens: diagnosis.inputTokens,
             outputTokens: diagnosis.outputTokens,
           };
 
-          await setStatus(1);
-          const movementStart = Date.now();
-          const movement = await runMovementSpaceGenerator({ brief: diagnosis.result });
-          stepTimings.movement_generator = {
-            durationMs: Date.now() - movementStart,
-            model: "opus",
-            inputTokens: movement.inputTokens,
-            outputTokens: movement.outputTokens,
-          };
-
-          const gateResult = runStructuralGate(movement.code);
-          if (!gateResult.passed) {
-            throw new Error(`Movement Structural Gate Failed: ${gateResult.violations.join(" | ")}`);
+          let engineName: EngineName | null = keywordEngine;
+          if (!engineName) {
+            const routerStart = Date.now();
+            const routed = await runGameplayRouter({ brief: diagnosis.result });
+            stepTimings.gameplay_router = {
+              durationMs: Date.now() - routerStart,
+              model: "sonnet",
+              inputTokens: routed.inputTokens,
+              outputTokens: routed.outputTokens,
+            };
+            engineName = routed.engine === "none" ? null : routed.engine;
           }
 
-          const worldId: Id<"worlds"> = await ctx.runMutation(api.worlds.create, {
-            title: movement.spec.world.worldName,
-            code: movement.code,
-            userId: args.userId,
-            isPublic: false,
-            prompt: args.prompt,
-            gradeLevel: args.gradeLevel ?? diagnosis.result.gradeLevel,
-            subject: args.subject ?? diagnosis.result.subject,
-            status: "published",
-            qualityScore: 8,
-            validationMetadata: {
-              validatorSuccess: true,
-              validatorIterations: 0,
-              gateScore: gateResult.score,
-              gatePassed: true,
-              gateViolations: [],
-            },
-          });
+          if (engineName) {
+            await setStatus(1);
+            const generationStart = Date.now();
+            const generation = await ENGINE_GENERATORS[engineName]({ brief: diagnosis.result });
+            stepTimings.engine_generator = {
+              durationMs: Date.now() - generationStart,
+              model: "opus",
+              inputTokens: generation.inputTokens,
+              outputTokens: generation.outputTokens,
+            };
 
-          await ctx.runMutation(internal.pipeline.status.completeSession, {
-            sessionId: args.sessionId,
-            worldId,
-          });
+            const gateResult = runStructuralGate(generation.code);
+            if (!gateResult.passed) {
+              throw new Error(`Engine Structural Gate Failed (${engineName}): ${gateResult.violations.join(" | ")}`);
+            }
 
-          return {
-            worldId,
-            code: movement.code,
-            worldName: movement.spec.world.worldName,
-            duration: Date.now() - startTime,
-            qualityScore: 8,
-          };
-        } catch (error) {
-          console.warn("movement-space generation failed, falling back to existing pipeline:", error);
-        }
-      }
+            const worldId: Id<"worlds"> = await ctx.runMutation(api.worlds.create, {
+              title: generation.worldName,
+              code: generation.code,
+              userId: args.userId,
+              isPublic: false,
+              prompt: args.prompt,
+              gradeLevel: args.gradeLevel ?? diagnosis.result.gradeLevel,
+              subject: args.subject ?? diagnosis.result.subject,
+              status: "published",
+              qualityScore: 8,
+              validationMetadata: {
+                validatorSuccess: true,
+                validatorIterations: 0,
+                gateScore: gateResult.score,
+                gatePassed: true,
+                gateViolations: [],
+              },
+            });
 
-      // ── MIXING-BALANCE ENGINE ───────────────────────────────────
-      // Early route for fractions, ratios, mixtures, and balance equations.
-      // Runs after movement-space; the broad pipeline remains the fallback.
-      if (isLikelyMixingTopic(args)) {
-        try {
-          await setStatus(0);
-          const diagnosisStart = Date.now();
-          const diagnosis = await runLearningDiagnosis({
-            prompt: args.prompt,
-            pdfText: args.pdfText,
-            gradeLevel: args.gradeLevel,
-            subject: args.subject,
-          });
-          stepTimings.mixing_diagnosis = {
-            durationMs: Date.now() - diagnosisStart,
-            model: "sonnet",
-            inputTokens: diagnosis.inputTokens,
-            outputTokens: diagnosis.outputTokens,
-          };
+            await ctx.runMutation(internal.pipeline.status.completeSession, {
+              sessionId: args.sessionId,
+              worldId,
+            });
 
-          await setStatus(1);
-          const mixingStart = Date.now();
-          const mixing = await runMixingBalanceGenerator({ brief: diagnosis.result });
-          stepTimings.mixing_generator = {
-            durationMs: Date.now() - mixingStart,
-            model: "opus",
-            inputTokens: mixing.inputTokens,
-            outputTokens: mixing.outputTokens,
-          };
-
-          const gateResult = runStructuralGate(mixing.code);
-          if (!gateResult.passed) {
-            throw new Error(`Mixing Structural Gate Failed: ${gateResult.violations.join(" | ")}`);
+            return {
+              worldId,
+              code: generation.code,
+              worldName: generation.worldName,
+              duration: Date.now() - startTime,
+              qualityScore: 8,
+            };
           }
-
-          const worldId: Id<"worlds"> = await ctx.runMutation(api.worlds.create, {
-            title: mixing.spec.world.worldName,
-            code: mixing.code,
-            userId: args.userId,
-            isPublic: false,
-            prompt: args.prompt,
-            gradeLevel: args.gradeLevel ?? diagnosis.result.gradeLevel,
-            subject: args.subject ?? diagnosis.result.subject,
-            status: "published",
-            qualityScore: 8,
-            validationMetadata: {
-              validatorSuccess: true,
-              validatorIterations: 0,
-              gateScore: gateResult.score,
-              gatePassed: true,
-              gateViolations: [],
-            },
-          });
-
-          await ctx.runMutation(internal.pipeline.status.completeSession, {
-            sessionId: args.sessionId,
-            worldId,
-          });
-
-          return {
-            worldId,
-            code: mixing.code,
-            worldName: mixing.spec.world.worldName,
-            duration: Date.now() - startTime,
-            qualityScore: 8,
-          };
         } catch (error) {
-          console.warn("mixing-balance generation failed, falling back to existing pipeline:", error);
-        }
-      }
-
-      // ── BUILDING-CONSTRUCT ENGINE ───────────────────────────────
-      // Early route for geometry: areas, perimeters, shape composition.
-      // Runs after mixing-balance; the broad pipeline remains the fallback.
-      if (isLikelyBuildingTopic(args)) {
-        try {
-          await setStatus(0);
-          const diagnosisStart = Date.now();
-          const diagnosis = await runLearningDiagnosis({
-            prompt: args.prompt,
-            pdfText: args.pdfText,
-            gradeLevel: args.gradeLevel,
-            subject: args.subject,
-          });
-          stepTimings.building_diagnosis = {
-            durationMs: Date.now() - diagnosisStart,
-            model: "sonnet",
-            inputTokens: diagnosis.inputTokens,
-            outputTokens: diagnosis.outputTokens,
-          };
-
-          await setStatus(1);
-          const buildingStart = Date.now();
-          const building = await runBuildingConstructGenerator({ brief: diagnosis.result });
-          stepTimings.building_generator = {
-            durationMs: Date.now() - buildingStart,
-            model: "opus",
-            inputTokens: building.inputTokens,
-            outputTokens: building.outputTokens,
-          };
-
-          const gateResult = runStructuralGate(building.code);
-          if (!gateResult.passed) {
-            throw new Error(`Building Structural Gate Failed: ${gateResult.violations.join(" | ")}`);
-          }
-
-          const worldId: Id<"worlds"> = await ctx.runMutation(api.worlds.create, {
-            title: building.spec.world.worldName,
-            code: building.code,
-            userId: args.userId,
-            isPublic: false,
-            prompt: args.prompt,
-            gradeLevel: args.gradeLevel ?? diagnosis.result.gradeLevel,
-            subject: args.subject ?? diagnosis.result.subject,
-            status: "published",
-            qualityScore: 8,
-            validationMetadata: {
-              validatorSuccess: true,
-              validatorIterations: 0,
-              gateScore: gateResult.score,
-              gatePassed: true,
-              gateViolations: [],
-            },
-          });
-
-          await ctx.runMutation(internal.pipeline.status.completeSession, {
-            sessionId: args.sessionId,
-            worldId,
-          });
-
-          return {
-            worldId,
-            code: building.code,
-            worldName: building.spec.world.worldName,
-            duration: Date.now() - startTime,
-            qualityScore: 8,
-          };
-        } catch (error) {
-          console.warn("building-construct generation failed, falling back to existing pipeline:", error);
-        }
-      }
-
-      // ── TIME-SEQUENCE ENGINE ────────────────────────────────────
-      // Early route for timelines, processes, and cause-effect chains.
-      // Runs after building-construct; the broad pipeline remains the fallback.
-      if (isLikelyTimeTopic(args)) {
-        try {
-          await setStatus(0);
-          const diagnosisStart = Date.now();
-          const diagnosis = await runLearningDiagnosis({
-            prompt: args.prompt,
-            pdfText: args.pdfText,
-            gradeLevel: args.gradeLevel,
-            subject: args.subject,
-          });
-          stepTimings.time_diagnosis = {
-            durationMs: Date.now() - diagnosisStart,
-            model: "sonnet",
-            inputTokens: diagnosis.inputTokens,
-            outputTokens: diagnosis.outputTokens,
-          };
-
-          await setStatus(1);
-          const timeStart = Date.now();
-          const time = await runTimeSequenceGenerator({ brief: diagnosis.result });
-          stepTimings.time_generator = {
-            durationMs: Date.now() - timeStart,
-            model: "opus",
-            inputTokens: time.inputTokens,
-            outputTokens: time.outputTokens,
-          };
-
-          const gateResult = runStructuralGate(time.code);
-          if (!gateResult.passed) {
-            throw new Error(`Time Structural Gate Failed: ${gateResult.violations.join(" | ")}`);
-          }
-
-          const worldId: Id<"worlds"> = await ctx.runMutation(api.worlds.create, {
-            title: time.spec.world.worldName,
-            code: time.code,
-            userId: args.userId,
-            isPublic: false,
-            prompt: args.prompt,
-            gradeLevel: args.gradeLevel ?? diagnosis.result.gradeLevel,
-            subject: args.subject ?? diagnosis.result.subject,
-            status: "published",
-            qualityScore: 8,
-            validationMetadata: {
-              validatorSuccess: true,
-              validatorIterations: 0,
-              gateScore: gateResult.score,
-              gatePassed: true,
-              gateViolations: [],
-            },
-          });
-
-          await ctx.runMutation(internal.pipeline.status.completeSession, {
-            sessionId: args.sessionId,
-            worldId,
-          });
-
-          return {
-            worldId,
-            code: time.code,
-            worldName: time.spec.world.worldName,
-            duration: Date.now() - startTime,
-            qualityScore: 8,
-          };
-        } catch (error) {
-          console.warn("time-sequence generation failed, falling back to existing pipeline:", error);
-        }
-      }
-
-      // ── DETECTIVE-EVIDENCE ENGINE ───────────────────────────────
-      // Early route for reading comprehension, reasoning, and evidence work.
-      // Runs after time-sequence; the broad pipeline remains the fallback.
-      if (isLikelyDetectiveTopic(args)) {
-        try {
-          await setStatus(0);
-          const diagnosisStart = Date.now();
-          const diagnosis = await runLearningDiagnosis({
-            prompt: args.prompt,
-            pdfText: args.pdfText,
-            gradeLevel: args.gradeLevel,
-            subject: args.subject,
-          });
-          stepTimings.detective_diagnosis = {
-            durationMs: Date.now() - diagnosisStart,
-            model: "sonnet",
-            inputTokens: diagnosis.inputTokens,
-            outputTokens: diagnosis.outputTokens,
-          };
-
-          await setStatus(1);
-          const detectiveStart = Date.now();
-          const detective = await runDetectiveEvidenceGenerator({ brief: diagnosis.result });
-          stepTimings.detective_generator = {
-            durationMs: Date.now() - detectiveStart,
-            model: "opus",
-            inputTokens: detective.inputTokens,
-            outputTokens: detective.outputTokens,
-          };
-
-          const gateResult = runStructuralGate(detective.code);
-          if (!gateResult.passed) {
-            throw new Error(`Detective Structural Gate Failed: ${gateResult.violations.join(" | ")}`);
-          }
-
-          const worldId: Id<"worlds"> = await ctx.runMutation(api.worlds.create, {
-            title: detective.spec.world.worldName,
-            code: detective.code,
-            userId: args.userId,
-            isPublic: false,
-            prompt: args.prompt,
-            gradeLevel: args.gradeLevel ?? diagnosis.result.gradeLevel,
-            subject: args.subject ?? diagnosis.result.subject,
-            status: "published",
-            qualityScore: 8,
-            validationMetadata: {
-              validatorSuccess: true,
-              validatorIterations: 0,
-              gateScore: gateResult.score,
-              gatePassed: true,
-              gateViolations: [],
-            },
-          });
-
-          await ctx.runMutation(internal.pipeline.status.completeSession, {
-            sessionId: args.sessionId,
-            worldId,
-          });
-
-          return {
-            worldId,
-            code: detective.code,
-            worldName: detective.spec.world.worldName,
-            duration: Date.now() - startTime,
-            qualityScore: 8,
-          };
-        } catch (error) {
-          console.warn("detective-evidence generation failed, falling back to existing pipeline:", error);
+          console.warn("gameplay engine generation failed, falling back to existing pipeline:", error);
         }
       }
 

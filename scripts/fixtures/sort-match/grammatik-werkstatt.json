@@ -1,0 +1,163 @@
+{
+  "engine": "sort-match",
+  "learningBrief": {
+    "inputMode": "material",
+    "subject": "deutsch",
+    "gradeLevel": "2",
+    "rawTopic": "Artikel der/die/das und Einzahl/Mehrzahl üben",
+    "extractedTasks": ["Artikel zuordnen", "Mehrzahl bilden"],
+    "learningGoals": ["Artikel sicher zuordnen", "Einzahl und Mehrzahl verbinden"],
+    "likelyMisconceptions": ["Artikel nach Gefühl raten"],
+    "focus": "practice",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Die Wörter-Werkstatt",
+    "coreMetaphor": "Wörter haben feste Plätze: jeder Artikel ein Regal, jede Einzahl ihre Mehrzahl.",
+    "setting": "Eine gemütliche Werkstatt, in der Wörter einsortiert und verbunden werden.",
+    "visualStyle": {
+      "palette": ["#79c7f5", "#d9a05e", "#ffd84d", "#8fd16c", "#27324a"],
+      "mood": "hell, ordentlich, freundlich",
+      "shapes": "Wort-Karten, Regale, Körbe",
+      "effects": "Karten schnappen in Regale, Konfetti beim Gelingen"
+    },
+    "guide": { "name": "Luno", "role": "Werkstatt-Meister", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "artikel", "title": "Artikel-Regale", "purpose": "der, die oder das?", "scene": "Jedes Wort in sein Regal.", "reward": "Artikel-Kenner" },
+      { "id": "mehrzahl", "title": "Mehrzahl-Paare", "purpose": "Einzahl und Mehrzahl verbinden.", "scene": "Aus einem werden viele.", "reward": "Mehrzahl-Profi" },
+      { "id": "meister", "title": "Meisterprüfung", "purpose": "Schwere Wörter sortieren.", "scene": "Die kniffligen Fälle der Werkstatt.", "reward": "Wörter-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Das Kind rät Artikel und Mehrzahlformen, statt sie sicher zuzuordnen.",
+    "embodiedMetaphor": "Die Werkstatt hat drei Regale: der, die, das. Jedes Wort gehört in genau eins.",
+    "successInsight": "Artikel und Mehrzahl lernt man durch Einsortieren, bis die Hand es von allein weiß."
+  },
+  "rooms": [
+    {
+      "roomId": "artikel",
+      "objective": "Sortiere jedes Wort in sein Artikel-Regal!",
+      "mode": "baskets",
+      "rounds": [
+        {
+          "objective": "Die ersten sechs Wörter!",
+          "categories": [
+            { "id": "der", "label": "der", "emoji": "🟦" },
+            { "id": "die", "label": "die", "emoji": "🟥" },
+            { "id": "das", "label": "das", "emoji": "🟩" }
+          ],
+          "cards": [
+            { "id": "a1", "label": "Hund", "emoji": "🐶", "categoryId": "der" },
+            { "id": "a2", "label": "Katze", "emoji": "🐱", "categoryId": "die" },
+            { "id": "a3", "label": "Haus", "emoji": "🏠", "categoryId": "das" },
+            { "id": "a4", "label": "Baum", "emoji": "🌳", "categoryId": "der" },
+            { "id": "a5", "label": "Blume", "emoji": "🌸", "categoryId": "die" },
+            { "id": "a6", "label": "Auto", "emoji": "🚗", "categoryId": "das" }
+          ]
+        },
+        {
+          "objective": "Sechs neue Wörter!",
+          "categories": [
+            { "id": "der", "label": "der", "emoji": "🟦" },
+            { "id": "die", "label": "die", "emoji": "🟥" },
+            { "id": "das", "label": "das", "emoji": "🟩" }
+          ],
+          "cards": [
+            { "id": "b1", "label": "Apfel", "emoji": "🍎", "categoryId": "der" },
+            { "id": "b2", "label": "Sonne", "emoji": "☀️", "categoryId": "die" },
+            { "id": "b3", "label": "Buch", "emoji": "📖", "categoryId": "das" },
+            { "id": "b4", "label": "Mond", "emoji": "🌙", "categoryId": "der" },
+            { "id": "b5", "label": "Banane", "emoji": "🍌", "categoryId": "die" },
+            { "id": "b6", "label": "Brot", "emoji": "🍞", "categoryId": "das" }
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": "Alles richtig einsortiert!",
+        "wrongBasket": "In dieses Regal gehört das Wort nicht. Sprich es leise mit Artikel!",
+        "wrongPair": "Die beiden gehören nicht zusammen.",
+        "tryAgain": "Tipp: Sag den Satz im Kopf: 'Ich sehe ___ Hund.' Was klingt richtig?"
+      },
+      "explanationAfterSuccess": "der Hund, die Katze, das Haus: jedes Wort hat seinen festen Artikel."
+    },
+    {
+      "roomId": "mehrzahl",
+      "objective": "Verbinde jede Einzahl mit ihrer Mehrzahl!",
+      "mode": "pairs",
+      "rounds": [
+        {
+          "objective": "Die ersten Paare!",
+          "pairs": [
+            { "id": "m1", "left": { "label": "der Hund", "emoji": "🐶" }, "right": { "label": "die Hunde" } },
+            { "id": "m2", "left": { "label": "das Kind", "emoji": "🧒" }, "right": { "label": "die Kinder" } },
+            { "id": "m3", "left": { "label": "die Blume", "emoji": "🌸" }, "right": { "label": "die Blumen" } }
+          ]
+        },
+        {
+          "objective": "Jetzt die kniffligen!",
+          "pairs": [
+            { "id": "m4", "left": { "label": "die Maus", "emoji": "🐭" }, "right": { "label": "die Mäuse" } },
+            { "id": "m5", "left": { "label": "das Buch", "emoji": "📖" }, "right": { "label": "die Bücher" } },
+            { "id": "m6", "left": { "label": "der Apfel", "emoji": "🍎" }, "right": { "label": "die Äpfel" } },
+            { "id": "m7", "left": { "label": "das Auto", "emoji": "🚗" }, "right": { "label": "die Autos" } }
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": "Alle Paare verbunden!",
+        "wrongBasket": "In diesen Korb gehört die Karte nicht.",
+        "wrongPair": "Die beiden gehören nicht zusammen. Sag die Mehrzahl laut!",
+        "tryAgain": "Tipp: Stell dir viele davon vor: ein Hund, viele ...?"
+      },
+      "explanationAfterSuccess": "Mehrzahl hat viele Formen: Hunde, Kinder, Mäuse, Bücher. Verbinden macht sie sicher."
+    },
+    {
+      "roomId": "meister",
+      "objective": "Die Meisterprüfung: knifflige Wörter sortieren!",
+      "mode": "baskets",
+      "rounds": [
+        {
+          "objective": "Vorsicht, hier raten viele falsch!",
+          "categories": [
+            { "id": "der", "label": "der", "emoji": "🟦" },
+            { "id": "die", "label": "die", "emoji": "🟥" },
+            { "id": "das", "label": "das", "emoji": "🟩" }
+          ],
+          "cards": [
+            { "id": "k1", "label": "Mädchen", "emoji": "👧", "categoryId": "das" },
+            { "id": "k2", "label": "Schmetterling", "emoji": "🦋", "categoryId": "der" },
+            { "id": "k3", "label": "Schokolade", "emoji": "🍫", "categoryId": "die" },
+            { "id": "k4", "label": "Känguru", "emoji": "🦘", "categoryId": "das" },
+            { "id": "k5", "label": "Tomate", "emoji": "🍅", "categoryId": "die" },
+            { "id": "k6", "label": "Regenbogen", "emoji": "🌈", "categoryId": "der" }
+          ]
+        },
+        {
+          "objective": "Das große Finale: acht Wörter!",
+          "categories": [
+            { "id": "der", "label": "der", "emoji": "🟦" },
+            { "id": "die", "label": "die", "emoji": "🟥" },
+            { "id": "das", "label": "das", "emoji": "🟩" }
+          ],
+          "cards": [
+            { "id": "f1", "label": "Elefant", "emoji": "🐘", "categoryId": "der" },
+            { "id": "f2", "label": "Giraffe", "emoji": "🦒", "categoryId": "die" },
+            { "id": "f3", "label": "Eichhörnchen", "emoji": "🐿️", "categoryId": "das" },
+            { "id": "f4", "label": "Pinguin", "emoji": "🐧", "categoryId": "der" },
+            { "id": "f5", "label": "Schildkröte", "emoji": "🐢", "categoryId": "die" },
+            { "id": "f6", "label": "Krokodil", "emoji": "🐊", "categoryId": "das" },
+            { "id": "f7", "label": "Ananas", "emoji": "🍍", "categoryId": "die" },
+            { "id": "f8", "label": "Eis", "emoji": "🍦", "categoryId": "das" }
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": "Meisterhaft sortiert!",
+        "wrongBasket": "Knifflig! Sprich das Wort mit allen drei Artikeln: Was klingt richtig?",
+        "wrongPair": "Die beiden gehören nicht zusammen.",
+        "tryAgain": "Merkhilfe: Wörter mit -chen sind immer 'das' (das Mädchen, das Eichhörnchen)."
+      },
+      "explanationAfterSuccess": "Sogar die kniffligen sitzt du jetzt: das Mädchen, der Schmetterling, die Schokolade."
+    }
+  ]
+}
