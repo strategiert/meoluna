@@ -4,7 +4,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAction, useMutation } from 'convex/react';
+import { useAction, useMutation, useQuery } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -55,7 +55,7 @@ export default function Create() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Convex Actions
-  const generateWorldV2 = useAction(api.pipeline.orchestrator.generateWorldV2);
+  const startGeneration = useMutation(api.pipeline.status.startGeneration);
   const extractPDF = useAction(api.documents.extractTextFromPDF);
   const autoFixCode = useAction(api.generate.autoFixCode);
   const saveWorld = useMutation(api.worlds.create);
@@ -64,6 +64,89 @@ export default function Create() {
 
   // V2 Pipeline Session
   const [sessionId, setSessionId] = useState<string | null>(null);
+  // Recovery: true, wenn diese Session aus localStorage wiederhergestellt wurde
+  // (Browser-Refresh / Tab-Wechsel waehrend der Generierung).
+  const [isRecovering, setIsRecovering] = useState(false);
+
+  // Die Generierung laeuft serverseitig (Convex-Action) unabhaengig vom Browser
+  // weiter. Wir merken uns die laufende Session, damit der Client nach einem
+  // Refresh wieder andocken kann.
+  const ACTIVE_SESSION_KEY = 'meoluna_active_session';
+  const [pendingWorldId, setPendingWorldId] = useState<string | null>(null);
+
+  // Reaktive Kette: Session beobachten -> fertige worldId -> Welt-Code laden.
+  // Greift identisch im Live-Fall und nach einem Browser-Refresh.
+  const activeSession = useQuery(
+    api.pipeline.status.getSession,
+    sessionId ? { sessionId } : 'skip'
+  );
+  const completedWorld = useQuery(
+    api.worlds.get,
+    pendingWorldId ? { id: pendingWorldId as any } : 'skip'
+  );
+
+  // Beim Mount: laeuft noch eine Generierung aus einer frueheren Browser-Sitzung?
+  // Dann andocken und den Fortschritt weiter zeigen (die Convex-Action laeuft
+  // serverseitig ohnehin weiter).
+  useEffect(() => {
+    const stored = typeof window !== 'undefined' ? localStorage.getItem(ACTIVE_SESSION_KEY) : null;
+    if (stored && !sessionId) {
+      setSessionId(stored);
+      setIsGenerating(true);
+      setIsRecovering(true);
+      setWorldTitle('Deine Lernwelt wird gebaut...');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Session-Status -> Welt anstossen bzw. Fehler zeigen.
+  useEffect(() => {
+    if (!activeSession) return;
+    if (activeSession.status === 'completed' && activeSession.worldId) {
+      localStorage.removeItem(ACTIVE_SESSION_KEY);
+      setPendingWorldId(activeSession.worldId as string);
+    } else if (activeSession.status === 'failed') {
+      localStorage.removeItem(ACTIVE_SESSION_KEY);
+      setIsGenerating(false);
+      setIsRecovering(false);
+      setSessionId(null);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: `Hoppla, die Generierung ist fehlgeschlagen: ${activeSession.error ?? 'Unbekannter Fehler'}. Versuch es nochmal!`,
+          timestamp: new Date(),
+        },
+      ]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeSession?.status, activeSession?.worldId]);
+
+  // Fertige Welt geladen -> Vorschau + Code anzeigen (Live und Recovery gleich).
+  useEffect(() => {
+    if (!pendingWorldId || !completedWorld) return;
+    setCurrentCode(completedWorld.code);
+    setWorldId(pendingWorldId);
+    setWorldTitle(completedWorld.title);
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: `${completedWorld.title} — deine einzigartige Lernwelt! 🌙✨`,
+        code: completedWorld.code,
+        worldId: pendingWorldId,
+        timestamp: new Date(),
+      },
+    ]);
+    setIsGenerating(false);
+    setIsRecovering(false);
+    setSessionId(null);
+    setPendingWorldId(null);
+    if (pdfText) handlePdfClear();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingWorldId, completedWorld?._id]);
 
   // PDF State
   const [pdfFile, setPdfFile] = useState<File | null>(null);
@@ -165,38 +248,24 @@ export default function Create() {
       // Generate unique session ID for progress tracking
       const newSessionId = `gen_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
       setSessionId(newSessionId);
+      // Persistieren, damit ein Refresh/Tab-Wechsel die laufende Generierung
+      // wiederfindet (die Convex-Action laeuft serverseitig ohnehin weiter).
+      localStorage.setItem(ACTIVE_SESSION_KEY, newSessionId);
 
-      // Pipeline V2: 10-step orchestration
-      const result = await generateWorldV2({
+      // Pipeline V2 als Hintergrund-Job starten (laeuft serverseitig weiter,
+      // auch bei Refresh/Tab-Wechsel). Anzeige + Code uebernimmt die reaktive
+      // Kette (activeSession -> completedWorld). isGenerating bleibt true, bis
+      // der Session-Status auf completed/failed wechselt.
+      await startGeneration({
         prompt: input.trim(),
         pdfText: pdfText || undefined,
         userId: user.id,
         sessionId: newSessionId,
       });
-
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: pdfText
-          ? `${result.worldName} — basierend auf dem PDF! 🌙📄✨`
-          : `${result.worldName} — deine einzigartige Lernwelt! 🌙✨`,
-        code: result.code,
-        worldId: result.worldId,
-        timestamp: new Date()
-      };
-
-      setMessages(prev => [...prev, assistantMessage]);
-      setCurrentCode(result.code);
-      setWorldId(result.worldId);
-      setSessionId(null);
-
-      // Clear PDF after successful generation
-      if (pdfText) {
-        handlePdfClear();
-      }
-
     } catch (err) {
       setSessionId(null);
+      localStorage.removeItem(ACTIVE_SESSION_KEY);
+      setIsGenerating(false);
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
@@ -204,8 +273,6 @@ export default function Create() {
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsGenerating(false);
     }
   };
 
@@ -387,11 +454,18 @@ export default function Create() {
           </AnimatePresence>
 
           {isGenerating && (
-            <GenerationProgress
-              sessionId={sessionId || undefined}
-              isGenerating={isGenerating}
-              isPdfBased={!!pdfText}
-            />
+            <>
+              {isRecovering && (
+                <div className="mb-3 rounded-xl border border-moon-aurora/30 bg-moon-aurora/10 px-4 py-2 text-sm text-moon-aurora">
+                  Deine Lernwelt wird im Hintergrund weitergebaut — du kannst die Seite jederzeit verlassen.
+                </div>
+              )}
+              <GenerationProgress
+                sessionId={sessionId || undefined}
+                isGenerating={isGenerating}
+                isPdfBased={!!pdfText}
+              />
+            </>
           )}
 
           <div ref={messagesEndRef} />

@@ -3,7 +3,36 @@
 // ============================================================================
 
 import { v } from "convex/values";
-import { query, internalMutation } from "../_generated/server";
+import { query, mutation, internalMutation } from "../_generated/server";
+import { api } from "../_generated/api";
+
+// --- Mutations (client-facing) ---
+
+// Startet die Welt-Generierung als Hintergrund-Job. Die schwere Arbeit laeuft
+// als gescheduelte Convex-Action und damit garantiert serverseitig zu Ende,
+// unabhaengig davon, ob der Browser refresht, der Tab wechselt oder schliesst.
+// Gibt sofort zurueck; der Client beobachtet den Fortschritt reaktiv ueber
+// getSession(sessionId).
+export const startGeneration = mutation({
+  args: {
+    prompt: v.string(),
+    pdfText: v.optional(v.string()),
+    imageDescription: v.optional(v.string()),
+    gradeLevel: v.optional(v.string()),
+    subject: v.optional(v.string()),
+    contextAnswers: v.optional(v.object({
+      intent: v.optional(v.string()),
+      audience: v.optional(v.string()),
+      guidance: v.optional(v.string()),
+    })),
+    userId: v.string(),
+    sessionId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.scheduler.runAfter(0, api.pipeline.orchestrator.generateWorldV2, args);
+    return { sessionId: args.sessionId };
+  },
+});
 
 // --- Queries ---
 
