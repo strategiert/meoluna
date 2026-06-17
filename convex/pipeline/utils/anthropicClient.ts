@@ -1,5 +1,8 @@
 // ============================================================================
 // Anthropic API Client - Shared helper for all pipeline steps
+// WICHTIG: Nur via /v1/models verifizierte Modell-IDs verwenden. Die alten
+// Mai-2025-IDs (claude-*-4-20250514) liefern 404 not_found. Aktuell gueltig:
+// claude-sonnet-4-6 (schnelle Steps) und claude-opus-4-6 (kreative Generatoren).
 // ============================================================================
 
 export interface AnthropicCallOptions {
