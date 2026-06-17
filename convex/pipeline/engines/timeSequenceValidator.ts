@@ -93,10 +93,11 @@ export function validateTimeEngineSpec(spec: TimeEngineSpec): TimeValidationResu
       });
     });
 
+    // Nur das vom Modus tatsaechlich gerenderte Feedback ist Pflicht.
     if (!hasText(room.feedback?.correct)) violations.push(`E_ROOM_${label}: correct feedback missing`);
-    if (!hasText(room.feedback?.wrongOrder)) violations.push(`E_ROOM_${label}: wrongOrder feedback missing`);
-    if (!hasText(room.feedback?.wrongLink)) violations.push(`E_ROOM_${label}: wrongLink feedback missing`);
     if (!hasText(room.feedback?.tryAgain)) violations.push(`E_ROOM_${label}: tryAgain feedback missing`);
+    if (room.mode === "timeline" && !hasText(room.feedback?.wrongOrder)) violations.push(`E_ROOM_${label}: wrongOrder feedback missing`);
+    if (room.mode === "chain" && !hasText(room.feedback?.wrongLink)) violations.push(`E_ROOM_${label}: wrongLink feedback missing`);
     if (!hasText(room.explanationAfterSuccess)) violations.push(`E_ROOM_${label}: explanationAfterSuccess missing`);
   }
 

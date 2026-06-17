@@ -19,7 +19,7 @@ Schwierigkeit: ${interpreted.difficulty}
 Erfinde jetzt ein Universum, das noch NIEMAND für dieses Thema verwendet hat.`;
 
   const { result, inputTokens, outputTokens } = await callAnthropicJson<CreativeDirectorOutput>({
-    model: "claude-opus-4-20250514",
+    model: "claude-opus-4-6",
     systemPrompt: CREATIVE_DIRECTOR_SYSTEM_PROMPT,
     userMessage,
     maxTokens: 4000,

@@ -139,10 +139,11 @@ export function validateSortEngineSpec(spec: SortEngineSpec): SortValidationResu
       violations.push(`E_ROOM_${label}: mode must be baskets or pairs`);
     }
 
+    // Nur das vom Modus tatsaechlich gerenderte Feedback ist Pflicht.
     if (!hasText(room.feedback?.correct)) violations.push(`E_ROOM_${label}: correct feedback missing`);
-    if (!hasText(room.feedback?.wrongBasket)) violations.push(`E_ROOM_${label}: wrongBasket feedback missing`);
-    if (!hasText(room.feedback?.wrongPair)) violations.push(`E_ROOM_${label}: wrongPair feedback missing`);
     if (!hasText(room.feedback?.tryAgain)) violations.push(`E_ROOM_${label}: tryAgain feedback missing`);
+    if (isBasketsRoom(room) && !hasText(room.feedback?.wrongBasket)) violations.push(`E_ROOM_${label}: wrongBasket feedback missing`);
+    if (isPairsRoom(room) && !hasText(room.feedback?.wrongPair)) violations.push(`E_ROOM_${label}: wrongPair feedback missing`);
     if (!hasText(room.explanationAfterSuccess)) violations.push(`E_ROOM_${label}: explanationAfterSuccess missing`);
   }
 

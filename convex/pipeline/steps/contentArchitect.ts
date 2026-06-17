@@ -45,7 +45,7 @@ WICHTIG: Korrigiere ALLE criticalErrors aus dem Quality-Gate!`;
   }
 
   const { result, inputTokens, outputTokens } = await callAnthropicJson<ContentArchitectOutput>({
-    model: "claude-opus-4-20250514",
+    model: "claude-opus-4-6",
     systemPrompt: CONTENT_ARCHITECT_SYSTEM_PROMPT,
     userMessage,
     maxTokens: 8000,

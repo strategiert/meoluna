@@ -14,7 +14,7 @@ export async function runBuildingConstructGenerator(input: {
   outputTokens: number;
 }> {
   const response = await callAnthropicJson<BuildingEngineSpec>({
-    model: "claude-opus-4-20250514",
+    model: "claude-opus-4-6",
     systemPrompt: BUILDING_CONSTRUCT_SYSTEM_PROMPT,
     userMessage: JSON.stringify(input.brief),
     maxTokens: 12000,

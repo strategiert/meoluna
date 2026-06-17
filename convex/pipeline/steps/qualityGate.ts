@@ -36,7 +36,7 @@ ${JSON.stringify(content, null, 2)}
 Prüfe ALLES auf Fehler. Sei streng aber fair.`;
 
   const { result, inputTokens, outputTokens } = await callAnthropicJson<QualityGateOutput>({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-sonnet-4-6",
     systemPrompt: QUALITY_GATE_SYSTEM_PROMPT,
     userMessage,
     maxTokens: 4000,

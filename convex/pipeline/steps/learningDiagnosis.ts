@@ -17,7 +17,7 @@ export async function runLearningDiagnosis(input: {
   });
 
   const response = await callAnthropicJson<LearningBrief>({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-sonnet-4-6",
     systemPrompt: LEARNING_DIAGNOSIS_SYSTEM_PROMPT,
     userMessage,
     maxTokens: 3000,

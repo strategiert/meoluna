@@ -75,7 +75,7 @@ Kritische Fehler: ${quality.criticalErrors.map(e => e.description).join("; ") ||
 Generiere jetzt das WorldData-JSON. Gib NUR das JSON zurück, kein Markdown, keine Erklärungen.`;
 
   const response = await callAnthropic({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-sonnet-4-6",
     systemPrompt: CODE_GENERATOR_SYSTEM_PROMPT,
     userMessage,
     maxTokens: 16000,

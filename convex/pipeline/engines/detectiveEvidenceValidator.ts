@@ -156,10 +156,11 @@ export function validateDetectiveEngineSpec(spec: DetectiveEngineSpec): Detectiv
       violations.push(`E_ROOM_${label}: mode must be evidence or suspects`);
     }
 
+    // Nur das vom Modus tatsaechlich gerenderte Feedback ist Pflicht.
     if (!hasText(room.feedback?.correct)) violations.push(`E_ROOM_${label}: correct feedback missing`);
-    if (!hasText(room.feedback?.wrongEvidence)) violations.push(`E_ROOM_${label}: wrongEvidence feedback missing`);
-    if (!hasText(room.feedback?.wrongSuspect)) violations.push(`E_ROOM_${label}: wrongSuspect feedback missing`);
     if (!hasText(room.feedback?.tryAgain)) violations.push(`E_ROOM_${label}: tryAgain feedback missing`);
+    if (isEvidenceRoom(room) && !hasText(room.feedback?.wrongEvidence)) violations.push(`E_ROOM_${label}: wrongEvidence feedback missing`);
+    if (isSuspectsRoom(room) && !hasText(room.feedback?.wrongSuspect)) violations.push(`E_ROOM_${label}: wrongSuspect feedback missing`);
     if (!hasText(room.explanationAfterSuccess)) violations.push(`E_ROOM_${label}: explanationAfterSuccess missing`);
   }
 

@@ -54,10 +54,11 @@ function roomLabel(room: BuildingRoom): string {
 
 function validateFeedback(room: BuildingRoom, violations: string[]): void {
   const label = roomLabel(room);
+  // Nur das vom Modus tatsaechlich gerenderte Feedback ist Pflicht.
   if (!hasText(room.feedback?.correct)) violations.push(`E_ROOM_${label}: correct feedback missing`);
-  if (!hasText(room.feedback?.tooSmall)) violations.push(`E_ROOM_${label}: tooSmall feedback missing`);
-  if (!hasText(room.feedback?.tooBig)) violations.push(`E_ROOM_${label}: tooBig feedback missing`);
   if (!hasText(room.feedback?.wrongShape)) violations.push(`E_ROOM_${label}: wrongShape feedback missing`);
+  if (isAreaRoom(room) && !hasText(room.feedback?.tooSmall)) violations.push(`E_ROOM_${label}: tooSmall feedback missing`);
+  if (isAreaRoom(room) && !hasText(room.feedback?.tooBig)) violations.push(`E_ROOM_${label}: tooBig feedback missing`);
   if (!hasText(room.explanationAfterSuccess)) violations.push(`E_ROOM_${label}: explanationAfterSuccess missing`);
 }
 

@@ -42,10 +42,11 @@ function roomLabel(room: MixingRoom): string {
 
 function validateFeedback(room: MixingRoom, violations: string[]): void {
   const label = roomLabel(room);
+  // Nur das vom Modus tatsaechlich gerenderte Feedback ist Pflicht.
   if (!hasText(room.feedback?.correct)) violations.push(`E_ROOM_${label}: correct feedback missing`);
   if (!hasText(room.feedback?.tooMuch)) violations.push(`E_ROOM_${label}: tooMuch feedback missing`);
-  if (!hasText(room.feedback?.tooLittle)) violations.push(`E_ROOM_${label}: tooLittle feedback missing`);
-  if (!hasText(room.feedback?.wrongMix)) violations.push(`E_ROOM_${label}: wrongMix feedback missing`);
+  if (isRecipeRoom(room) && !hasText(room.feedback?.tooLittle)) violations.push(`E_ROOM_${label}: tooLittle feedback missing`);
+  if (isRecipeRoom(room) && !hasText(room.feedback?.wrongMix)) violations.push(`E_ROOM_${label}: wrongMix feedback missing`);
   if (!hasText(room.explanationAfterSuccess)) violations.push(`E_ROOM_${label}: explanationAfterSuccess missing`);
 }
 

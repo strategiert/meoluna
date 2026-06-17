@@ -14,7 +14,7 @@ export async function runDetectiveEvidenceGenerator(input: {
   outputTokens: number;
 }> {
   const response = await callAnthropicJson<DetectiveEngineSpec>({
-    model: "claude-opus-4-20250514",
+    model: "claude-opus-4-6",
     systemPrompt: DETECTIVE_EVIDENCE_SYSTEM_PROMPT,
     userMessage: JSON.stringify(input.brief),
     maxTokens: 12000,

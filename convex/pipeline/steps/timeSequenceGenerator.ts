@@ -14,7 +14,7 @@ export async function runTimeSequenceGenerator(input: {
   outputTokens: number;
 }> {
   const response = await callAnthropicJson<TimeEngineSpec>({
-    model: "claude-opus-4-20250514",
+    model: "claude-opus-4-6",
     systemPrompt: TIME_SEQUENCE_SYSTEM_PROMPT,
     userMessage: JSON.stringify(input.brief),
     maxTokens: 12000,

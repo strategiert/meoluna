@@ -60,7 +60,7 @@ export async function runFocusedInterventionGenerator(input: {
   ].filter(Boolean).join("\n\n");
 
   const response = await callAnthropic({
-    model: "claude-opus-4-20250514",
+    model: "claude-opus-4-6",
     systemPrompt: FOCUSED_INTERVENTION_SYSTEM_PROMPT,
     userMessage,
     maxTokens: 24000,

@@ -32,7 +32,7 @@ export async function runGameplayRouter(input: {
   outputTokens: number;
 }> {
   const response = await callAnthropicJson<{ engine: string; reason?: string }>({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-sonnet-4-6",
     systemPrompt: GAMEPLAY_ROUTER_SYSTEM_PROMPT,
     userMessage: JSON.stringify(input.brief),
     maxTokens: 300,
