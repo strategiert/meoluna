@@ -25,6 +25,7 @@ import { Button } from '@/components/ui/button';
 import { WorldPreview } from '@/components/WorldPreview';
 import { PdfUpload } from '@/components/PdfUpload';
 import { GenerationProgress } from '@/components/GenerationProgress';
+import { registerServiceWorker, ensurePushSubscription } from '@/lib/push';
 import { uploadFileToConvexStorage } from '@/lib/convexStorageUpload';
 import { SignedIn, SignedOut, SignInButton, useUser } from '@clerk/clerk-react';
 
@@ -56,6 +57,7 @@ export default function Create() {
 
   // Convex Actions
   const startGeneration = useMutation(api.pipeline.status.startGeneration);
+  const savePushSubscription = useMutation(api.pushDb.savePushSubscription);
   const extractPDF = useAction(api.documents.extractTextFromPDF);
   const autoFixCode = useAction(api.generate.autoFixCode);
   const saveWorld = useMutation(api.worlds.create);
@@ -155,6 +157,11 @@ export default function Create() {
   const [pdfUploadProgress, setPdfUploadProgress] = useState(0);
   const [pdfError, setPdfError] = useState<string | null>(null);
 
+  // Service Worker fuer Web-Push registrieren (einmalig).
+  useEffect(() => {
+    registerServiceWorker();
+  }, []);
+
   // Auto-scroll zu neuen Nachrichten
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -251,6 +258,10 @@ export default function Create() {
       // Persistieren, damit ein Refresh/Tab-Wechsel die laufende Generierung
       // wiederfindet (die Convex-Action laeuft serverseitig ohnehin weiter).
       localStorage.setItem(ACTIVE_SESSION_KEY, newSessionId);
+
+      // Opt-in Web-Push: fragt einmalig nach Erlaubnis, damit der Nutzer auch
+      // bei geschlossenem Browser benachrichtigt wird. Blockiert nicht.
+      void ensurePushSubscription(user.id, savePushSubscription);
 
       // Pipeline V2 als Hintergrund-Job starten (laeuft serverseitig weiter,
       // auch bei Refresh/Tab-Wechsel). Anzeige + Code uebernimmt die reaktive

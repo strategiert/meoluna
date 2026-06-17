@@ -503,4 +503,15 @@ export default defineSchema({
   })
     .index("by_session", ["sessionId"])
     .index("by_user", ["userId"]),
+
+  // Web-Push-Subscriptions je Nutzer (Benachrichtigung wenn Welt fertig).
+  pushSubscriptions: defineTable({
+    userId: v.string(),
+    endpoint: v.string(),
+    p256dh: v.string(),
+    auth: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_endpoint", ["endpoint"]),
 });

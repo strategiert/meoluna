@@ -4,7 +4,7 @@
 
 import { v } from "convex/values";
 import { query, mutation, internalMutation } from "../_generated/server";
-import { api } from "../_generated/api";
+import { api, internal } from "../_generated/api";
 
 // --- Mutations (client-facing) ---
 
@@ -116,6 +116,13 @@ export const completeSession = internalMutation({
         worldId: args.worldId,
         completedAt: Date.now(),
       });
+      // Web-Push an den Nutzer (auch bei geschlossenem Browser).
+      if (args.worldId) {
+        await ctx.scheduler.runAfter(0, internal.push.sendWorldReady, {
+          userId: session.userId,
+          worldId: args.worldId,
+        });
+      }
     }
   },
 });
