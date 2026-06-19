@@ -1,0 +1,69 @@
+{
+  "engine": "counting",
+  "learningBrief": {
+    "inputMode": "curriculum",
+    "subject": "mathematik",
+    "gradeLevel": "1",
+    "rawTopic": "Zaehlen und Mengen bis 10",
+    "extractedTasks": ["Anzahl bestimmen", "Mengen legen", "Mengen vergleichen"],
+    "learningGoals": ["Anzahlen sicher erfassen", "mehr/weniger erkennen"],
+    "likelyMisconceptions": ["Objekte doppelt zaehlen", "groessere Objekte = mehr"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Der Zaehl-Zoo",
+    "coreMetaphor": "Im Zoo wird gezaehlt: jedes Tier wird genau einmal getippt.",
+    "setting": "Ein froehlicher Zoo voller Tiere zum Zaehlen und Vergleichen.",
+    "visualStyle": { "palette": ["#79c7f5", "#8fd16c", "#ffd84d", "#ff7a59", "#27324a"], "mood": "hell, tierisch, froehlich", "shapes": "Tiere, Gehege, Zahlen", "effects": "Tiere huepfen rein, Konfetti beim Gelingen" },
+    "guide": { "name": "Luno", "role": "Zoo-Zaehlmeister", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "zaehlen", "title": "Tiere zaehlen", "purpose": "Anzahl bestimmen.", "scene": "Wie viele Tiere sind im Gehege?", "reward": "Zaehl-Lehrling" },
+      { "id": "legen", "title": "Futter legen", "purpose": "Genau N Objekte legen.", "scene": "Lege genau so viele wie gefordert.", "reward": "Futter-Profi" },
+      { "id": "vergleichen", "title": "Wer hat mehr?", "purpose": "Mengen vergleichen.", "scene": "Welches Gehege hat mehr Tiere?", "reward": "Vergleichs-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Das Kind erfasst Anzahlen noch nicht sicher und vergleicht Mengen unsicher.",
+    "embodiedMetaphor": "Zaehlen heisst: jedes Ding genau einmal antippen. Vergleichen heisst: beide Gruppen zaehlen.",
+    "successInsight": "Anzahl bestimmt man durch Zaehlen, nicht durch Schaetzen."
+  },
+  "rooms": [
+    {
+      "roomId": "zaehlen",
+      "objective": "Zaehle die Tiere und tippe die richtige Zahl!",
+      "mode": "count",
+      "rounds": [
+        { "objective": "Wie viele Fische?", "emoji": "🐟", "count": 3 },
+        { "objective": "Wie viele Voegel?", "emoji": "🐦", "count": 5 },
+        { "objective": "Wie viele Affen?", "emoji": "🐵", "count": 7 }
+      ],
+      "feedback": { "correct": "Genau richtig gezaehlt!", "tooMany": "Das ist zu viel. Tippe jedes Tier einmal und zaehle mit.", "tooFew": "Das ist zu wenig. Zaehle nochmal alle Tiere.", "tryAgain": "Tippe jedes Tier genau einmal: eins, zwei, drei ..." },
+      "explanationAfterSuccess": "Du hast jedes Tier genau einmal gezaehlt. So findet man die Anzahl."
+    },
+    {
+      "roomId": "legen",
+      "objective": "Lege genau so viel Futter wie gefordert!",
+      "mode": "make",
+      "rounds": [
+        { "objective": "Lege 4 Aepfel!", "emoji": "🍎", "target": 4 },
+        { "objective": "Lege 6 Karotten!", "emoji": "🥕", "target": 6 },
+        { "objective": "Lege 9 Nuesse!", "emoji": "🌰", "target": 9 }
+      ],
+      "feedback": { "correct": "Perfekt, genau richtig!", "tooMany": "Du hast zu viele gelegt. Nimm welche weg.", "tooFew": "Es sind noch zu wenige. Leg noch mehr dazu.", "tryAgain": "Zaehle beim Legen mit, bis du das Ziel erreichst." },
+      "explanationAfterSuccess": "Du hast genau die richtige Menge gelegt und mitgezaehlt."
+    },
+    {
+      "roomId": "vergleichen",
+      "objective": "Welches Gehege hat mehr oder weniger Tiere?",
+      "mode": "compare",
+      "rounds": [
+        { "objective": "Welche Gruppe hat MEHR?", "leftEmoji": "🐰", "leftCount": 6, "rightEmoji": "🐢", "rightCount": 3, "ask": "more" },
+        { "objective": "Welche Gruppe hat WENIGER?", "leftEmoji": "🦆", "leftCount": 8, "rightEmoji": "🐠", "rightCount": 4, "ask": "less" },
+        { "objective": "Sind beide gleich viele?", "leftEmoji": "⭐", "leftCount": 5, "rightEmoji": "🌟", "rightCount": 5, "ask": "equal" }
+      ],
+      "feedback": { "correct": "Richtig verglichen!", "tooMany": "Zaehle beide Gruppen genau.", "tooFew": "Zaehle beide Gruppen genau.", "tryAgain": "Zaehle erst die linke, dann die rechte Gruppe und vergleiche." },
+      "explanationAfterSuccess": "Wer mehr hat, sieht man durch Zaehlen beider Gruppen, nicht durch Hinsehen."
+    }
+  ]
+}

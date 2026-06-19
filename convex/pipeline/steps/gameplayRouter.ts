@@ -17,12 +17,13 @@ Du bekommst eine Lern-Diagnose (LearningBrief) und wählst die passende Gameplay
 - "detective-evidence": Beweis-Sätze im Text finden und Verdächtige per Indizien ausschließen. Für Leseverstehen, Textverständnis, Argumentieren, Schlussfolgern, Quellenarbeit.
 - "sort-match": Karten in Körbe sortieren und Paare verbinden. Für Vokabeln (Fremdsprachen), Artikel der/die/das, Wortarten, Einzahl/Mehrzahl, Klassifikation (Tiere, Stoffe, Feste), gerade/ungerade.
 - "word-builder": Wörter aus Buchstaben- oder Silben-Bausteinen zusammensetzen. Für Rechtschreibung, Silbentrennung, Lesenlernen, erstes Schreiben.
+- "counting": Objekte zählen, Anzahl legen, Mengen vergleichen (mehr/weniger/gleich). Für Vorschule/Klasse 1, Zahlen bis 20, Mengenverständnis.
 - "none": Kein Spielprinzip passt klar (z.B. freies Schreiben langer Texte, Musik mit Ton, offene Diskussionen, komplexe Experimente).
 
 Wähle die Engine, deren Kern-Handlung das Lernproblem am direktesten ERLEBBAR macht. Im Zweifel zwischen zwei Engines: nimm die konkretere Handlung. Nur "none", wenn wirklich nichts passt.
 
 Antworte ausschließlich als JSON:
-{ "engine": "movement-space" | "mixing-balance" | "building-construct" | "time-sequence" | "detective-evidence" | "sort-match" | "word-builder" | "none", "reason": "ein kurzer Satz" }`;
+{ "engine": "movement-space" | "mixing-balance" | "building-construct" | "time-sequence" | "detective-evidence" | "sort-match" | "word-builder" | "counting" | "none", "reason": "ein kurzer Satz" }`;
 
 export async function runGameplayRouter(input: {
   brief: LearningBrief;
