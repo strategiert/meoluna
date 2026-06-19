@@ -140,12 +140,19 @@ export default function WorldView() {
     const { event, amount, context } = payload;
 
     try {
+      // Engines uebergeben completeModule(roomId) mit STRING-roomId als
+      // moduleIndex. Die Mutation erwartet aber number -> sonst
+      // ArgumentValidationError und XP wird gar nicht gezaehlt. moduleIndex ist
+      // nur ein loses Tracking-Feld, daher nicht-numerische Werte verwerfen.
+      const numericModuleIndex =
+        typeof context?.moduleIndex === 'number' ? context.moduleIndex : undefined;
+
       const result = await reportScore({
         userId: user.id,
         worldId: worldId as Id<"worlds">,
         worldScore: amount,
         eventType: event,
-        moduleIndex: context?.moduleIndex,
+        moduleIndex: numericModuleIndex,
       });
 
       showXPWithLevelCheck(result.xpAwarded, result.leveledUp, result.newLevel);
