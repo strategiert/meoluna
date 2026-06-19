@@ -68,10 +68,16 @@ const orchestrator = readFileSync(orchestratorPath, "utf8");
 const focusedIndex = orchestrator.indexOf("if (shouldUseFocusedIntervention(args))");
 const engineIndex = orchestrator.indexOf("pickEngineByKeywords(args)");
 const llmRouterIndex = orchestrator.indexOf("runGameplayRouter({ brief:");
-const broadIndex = orchestrator.indexOf("const interpreter = await runInterpreter");
+// Universeller Fallback ist jetzt die Focused-Mini-App (kein altes
+// Quiz-Skeleton mehr). Der letzte runFocusedWorld()-Aufruf ist der Fallback.
+const fallbackIndex = orchestrator.lastIndexOf("return await runFocusedWorld()");
+const helperIndex = orchestrator.indexOf("const runFocusedWorld = async");
 
 if (focusedIndex === -1) {
   failures.push("generateWorldV2 must call shouldUseFocusedIntervention.");
+}
+if (helperIndex === -1) {
+  failures.push("generateWorldV2 must define the runFocusedWorld helper.");
 }
 if (!(focusedIndex !== -1 && engineIndex !== -1 && focusedIndex < engineIndex)) {
   failures.push("Focused intervention route must run before the unified gameplay engine route.");
@@ -79,8 +85,13 @@ if (!(focusedIndex !== -1 && engineIndex !== -1 && focusedIndex < engineIndex)) 
 if (llmRouterIndex === -1) {
   failures.push("generateWorldV2 must fall back to the LLM gameplay router when keywords are silent.");
 }
-if (!(engineIndex !== -1 && broadIndex !== -1 && engineIndex < broadIndex)) {
-  failures.push("Gameplay engine route must run before broad pipeline interpreter.");
+// Der Focused-Fallback muss NACH der Engine-Route stehen (universeller Fallback).
+if (!(engineIndex !== -1 && fallbackIndex !== -1 && engineIndex < fallbackIndex)) {
+  failures.push("Focused fallback must run after the gameplay engine route.");
+}
+// Sicherstellen, dass die alte Broad-Pipeline wirklich entfernt ist.
+if (orchestrator.includes("runCodeGenerator") || orchestrator.includes("runCreativeDirector")) {
+  failures.push("Old broad pipeline (codeGenerator/creativeDirector) must be removed.");
 }
 
 if (failures.length > 0) {

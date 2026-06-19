@@ -59,28 +59,46 @@ export async function runFocusedInterventionGenerator(input: {
     "Baue jetzt die fokussierte Mini-App.",
   ].filter(Boolean).join("\n\n");
 
-  const response = await callAnthropic({
-    model: "claude-opus-4-6",
-    systemPrompt: FOCUSED_INTERVENTION_SYSTEM_PROMPT,
-    userMessage,
-    maxTokens: 24000,
-    temperature: 0.65,
-  });
+  // Als universeller Fallback muss das robust sein: bei Gate-Verstoessen
+  // (z.B. fehlende Meoluna-Calls) bekommt das Modell die konkreten Fehler
+  // als Feedback und baut neu, statt die Generierung scheitern zu lassen.
+  const maxAttempts = 3;
+  let inputTokens = 0;
+  let outputTokens = 0;
+  let lastViolations: string[] = [];
 
-  let code = stripCodeFence(response.text);
-  if (!code.includes("export default")) {
-    code += "\n\nexport default App;";
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const retryNote = attempt === 0
+      ? ""
+      : `\n\nDein letzter Versuch war UNGUELTIG: ${lastViolations.join(" | ")}\nPFLICHT: Die App MUSS window.Meoluna.reportScore(punkte, ...) bei richtigen Antworten, Meoluna.completeModule(...) nach einem Abschnitt und Meoluna.complete(...) am Ende aufrufen. Baue sie neu und stelle das sicher.`;
+
+    const response = await callAnthropic({
+      model: "claude-opus-4-6",
+      systemPrompt: FOCUSED_INTERVENTION_SYSTEM_PROMPT,
+      userMessage: userMessage + retryNote,
+      maxTokens: 24000,
+      temperature: 0.65,
+    });
+    inputTokens += response.inputTokens;
+    outputTokens += response.outputTokens;
+
+    let code = stripCodeFence(response.text);
+    if (!code.includes("export default")) {
+      code += "\n\nexport default App;";
+    }
+
+    const gate = runFocusedInterventionGate(code);
+    if (gate.passed) {
+      return {
+        code,
+        worldName: "Mini-App: Sofort verstehen",
+        inputTokens,
+        outputTokens,
+      };
+    }
+    lastViolations = gate.violations;
+    console.warn(`[focused-intervention] gate failed on attempt ${attempt + 1}: ${gate.violations.join(" | ")}`);
   }
 
-  const gate = runFocusedInterventionGate(code);
-  if (!gate.passed) {
-    throw new Error(`Focused intervention gate failed: ${gate.violations.join(" | ")}`);
-  }
-
-  return {
-    code,
-    worldName: "Mini-App: Sofort verstehen",
-    inputTokens: response.inputTokens,
-    outputTokens: response.outputTokens,
-  };
+  throw new Error(`Focused intervention gate failed after ${maxAttempts} attempts: ${lastViolations.join(" | ")}`);
 }
