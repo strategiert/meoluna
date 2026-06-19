@@ -18,12 +18,13 @@ Du bekommst eine Lern-Diagnose (LearningBrief) und wählst die passende Gameplay
 - "sort-match": Karten in Körbe sortieren und Paare verbinden. Für Vokabeln (Fremdsprachen), Artikel der/die/das, Wortarten, Einzahl/Mehrzahl, Klassifikation (Tiere, Stoffe, Feste), gerade/ungerade.
 - "word-builder": Wörter aus Buchstaben- oder Silben-Bausteinen zusammensetzen. Für Rechtschreibung, Silbentrennung, Lesenlernen, erstes Schreiben.
 - "counting": Objekte zählen, Anzahl legen, Mengen vergleichen (mehr/weniger/gleich). Für Vorschule/Klasse 1, Zahlen bis 20, Mengenverständnis.
+- "pattern": Muster erkennen und fortsetzen, fehlendes Teil in einer periodischen Reihe finden (ABAB, ABC, AABB). Für Vorschule/Klasse 1-2, Muster, Reihenfolgen, logisches Vorbereiten.
 - "none": Kein Spielprinzip passt klar (z.B. freies Schreiben langer Texte, Musik mit Ton, offene Diskussionen, komplexe Experimente).
 
 Wähle die Engine, deren Kern-Handlung das Lernproblem am direktesten ERLEBBAR macht. Im Zweifel zwischen zwei Engines: nimm die konkretere Handlung. Nur "none", wenn wirklich nichts passt.
 
 Antworte ausschließlich als JSON:
-{ "engine": "movement-space" | "mixing-balance" | "building-construct" | "time-sequence" | "detective-evidence" | "sort-match" | "word-builder" | "counting" | "none", "reason": "ein kurzer Satz" }`;
+{ "engine": "movement-space" | "mixing-balance" | "building-construct" | "time-sequence" | "detective-evidence" | "sort-match" | "word-builder" | "counting" | "pattern" | "none", "reason": "ein kurzer Satz" }`;
 
 export async function runGameplayRouter(input: {
   brief: LearningBrief;

@@ -7,8 +7,10 @@ import { isLikelyDetectiveTopic } from "./detectiveTopicRouter";
 import { isLikelySortTopic } from "./sortTopicRouter";
 import { isLikelyWordTopic } from "./wordTopicRouter";
 import { isLikelyCountingTopic } from "./countingTopicRouter";
+import { isLikelyPatternTopic } from "./patternTopicRouter";
 import { runMovementSpaceGenerator } from "../steps/movementSpaceGenerator";
 import { runCountingGenerator } from "../steps/countingGenerator";
+import { runPatternGenerator } from "../steps/patternGenerator";
 import { runMixingBalanceGenerator } from "../steps/mixingBalanceGenerator";
 import { runBuildingConstructGenerator } from "../steps/buildingConstructGenerator";
 import { runTimeSequenceGenerator } from "../steps/timeSequenceGenerator";
@@ -24,7 +26,8 @@ export type EngineName =
   | "detective-evidence"
   | "sort-match"
   | "word-builder"
-  | "counting";
+  | "counting"
+  | "pattern";
 
 export const ENGINE_NAMES: EngineName[] = [
   "movement-space",
@@ -35,6 +38,7 @@ export const ENGINE_NAMES: EngineName[] = [
   "sort-match",
   "word-builder",
   "counting",
+  "pattern",
 ];
 
 type RouterInput = {
@@ -48,6 +52,7 @@ type RouterInput = {
 // Liefert null, wenn kein Keyword greift — dann entscheidet der LLM-Gameplay-Router.
 export function pickEngineByKeywords(input: RouterInput): EngineName | null {
   if (isLikelyCountingTopic(input)) return "counting";
+  if (isLikelyPatternTopic(input)) return "pattern";
   if (isLikelyMovementTopic(input)) return "movement-space";
   if (isLikelyMixingTopic(input)) return "mixing-balance";
   if (isLikelyBuildingTopic(input)) return "building-construct";
@@ -99,6 +104,10 @@ export const ENGINE_GENERATORS: Record<
   },
   "counting": async (input) => {
     const result = await runCountingGenerator(input);
+    return { worldName: result.spec.world.worldName, code: result.code, inputTokens: result.inputTokens, outputTokens: result.outputTokens };
+  },
+  "pattern": async (input) => {
+    const result = await runPatternGenerator(input);
     return { worldName: result.spec.world.worldName, code: result.code, inputTokens: result.inputTokens, outputTokens: result.outputTokens };
   },
 };

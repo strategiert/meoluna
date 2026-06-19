@@ -25,7 +25,8 @@
     "detective-golden-check": "node --import tsx/esm scripts/detective-evidence-golden-check.mjs",
     "sort-golden-check": "node --import tsx/esm scripts/sort-match-golden-check.mjs",
     "word-golden-check": "node --import tsx/esm scripts/word-builder-golden-check.mjs",
-    "counting-golden-check": "node --import tsx/esm scripts/counting-golden-check.mjs"
+    "counting-golden-check": "node --import tsx/esm scripts/counting-golden-check.mjs",
+    "pattern-golden-check": "node --import tsx/esm scripts/pattern-golden-check.mjs"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.60.0",

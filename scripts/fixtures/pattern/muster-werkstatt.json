@@ -1,0 +1,68 @@
+{
+  "engine": "pattern",
+  "learningBrief": {
+    "inputMode": "curriculum",
+    "subject": "mathematik",
+    "gradeLevel": "1",
+    "rawTopic": "Muster erkennen und fortsetzen",
+    "extractedTasks": ["Muster fortsetzen", "fehlendes Teil finden"],
+    "learningGoals": ["periodische Muster erkennen", "die Regel anwenden"],
+    "likelyMisconceptions": ["nur das letzte Bild kopieren statt die Regel sehen"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Die Muster-Werkstatt",
+    "coreMetaphor": "In einer bunten Werkstatt werden Perlenketten und Fliesenreihen nach Mustern gebaut.",
+    "setting": "Eine warme Bastelwerkstatt voller Formen und Farben.",
+    "visualStyle": { "palette": ["#27324a", "#ff7a59", "#3f9bf0", "#54b865", "#ffd84d"], "mood": "bunt, einladend, klar", "shapes": "Kreise, Perlen, Fliesen", "effects": "Konfetti beim Gelingen" },
+    "guide": { "name": "Luno", "role": "Muster-Meister", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "perlen", "title": "Perlenketten", "purpose": "Einfache AB-Muster fortsetzen.", "scene": "Perlen auf eine Schnur fortsetzen.", "reward": "Perlen-Lehrling" },
+      { "id": "fliesen", "title": "Fliesenreihen", "purpose": "ABC-Muster fortsetzen.", "scene": "Fliesen in der Reihe ergaenzen.", "reward": "Fliesen-Profi" },
+      { "id": "meister", "title": "Meisterpruefung", "purpose": "Luecken in der Mitte fuellen.", "scene": "Welches Teil fehlt mittendrin?", "reward": "Muster-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Das Kind kopiert oft nur das letzte Bild, statt die Wiederhol-Regel zu erkennen.",
+    "embodiedMetaphor": "Ein Muster ist wie ein Lied, das sich immer wiederholt - wer den Takt hoert, weiss was kommt.",
+    "successInsight": "Wenn ich die Regel erkenne, kann ich jedes fehlende Teil finden."
+  },
+  "rooms": [
+    {
+      "roomId": "perlen",
+      "objective": "Setze die Perlenkette fort!",
+      "mode": "continue",
+      "rounds": [
+        { "objective": "Was kommt als Naechstes?", "sequence": ["🔴", "🔵", "🔴", "🔵"], "gapIndex": 3, "options": ["🔴", "🔵"] },
+        { "objective": "Und jetzt?", "sequence": ["🟡", "🟢", "🟡", "🟢"], "gapIndex": 3, "options": ["🟡", "🟢"] },
+        { "objective": "Weiter so!", "sequence": ["🔴", "🔴", "🔵", "🔴", "🔴", "🔵"], "gapIndex": 5, "options": ["🔴", "🔵"] }
+      ],
+      "feedback": { "correct": "Genau, immer im Wechsel!", "wrongPiece": "Schau, welche Perle sich wiederholt.", "tryAgain": "Lies die Kette von vorne: rot, blau, rot, blau ..." },
+      "explanationAfterSuccess": "Rot, Blau, Rot, Blau - das Muster wiederholt sich immer gleich."
+    },
+    {
+      "roomId": "fliesen",
+      "objective": "Setze die Fliesenreihe fort!",
+      "mode": "continue",
+      "rounds": [
+        { "objective": "Was kommt als Naechstes?", "sequence": ["🟥", "🟦", "🟨", "🟥", "🟦", "🟨"], "gapIndex": 5, "options": ["🟥", "🟦", "🟨"] },
+        { "objective": "Und hier?", "sequence": ["⭐", "🌙", "☀️", "⭐", "🌙", "☀️"], "gapIndex": 5, "options": ["⭐", "🌙", "☀️"] }
+      ],
+      "feedback": { "correct": "Stark, drei im Takt!", "wrongPiece": "Zaehle die Gruppe: eins, zwei, drei, dann von vorne.", "tryAgain": "Such die drei Teile, die sich wiederholen." },
+      "explanationAfterSuccess": "Rot, Blau, Gelb - drei Fliesen wiederholen sich immer in derselben Reihe."
+    },
+    {
+      "roomId": "meister",
+      "objective": "Welches Teil fehlt mittendrin?",
+      "mode": "fill",
+      "rounds": [
+        { "objective": "Fuelle die Luecke!", "sequence": ["🐱", "🐶", "🐱", "🐶", "🐱", "🐶"], "gapIndex": 3, "options": ["🐱", "🐶"] },
+        { "objective": "Und hier?", "sequence": ["🍎", "🍌", "🍇", "🍎", "🍌", "🍇"], "gapIndex": 4, "options": ["🍎", "🍌", "🍇"] },
+        { "objective": "Letzte Aufgabe!", "sequence": ["🔺", "🔺", "🔵", "🔺", "🔺", "🔵"], "gapIndex": 3, "options": ["🔺", "🔵"] }
+      ],
+      "feedback": { "correct": "Meisterhaft! Du hast die Regel gesehen.", "wrongPiece": "Schau links und rechts von der Luecke - was passt zum Takt?", "tryAgain": "Lies das Muster von vorne und tippe mit." },
+      "explanationAfterSuccess": "Auch mittendrin gilt die Regel - das fehlende Teil ergibt sich aus dem Takt."
+    }
+  ]
+}

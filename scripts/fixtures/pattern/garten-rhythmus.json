@@ -1,0 +1,68 @@
+{
+  "engine": "pattern",
+  "learningBrief": {
+    "inputMode": "freitext",
+    "subject": "sachunterricht",
+    "gradeLevel": "2",
+    "rawTopic": "Muster in der Natur fortsetzen",
+    "extractedTasks": ["Muster fortsetzen", "Luecke fuellen"],
+    "learningGoals": ["laengere Muster erkennen", "die Regel begruenden"],
+    "likelyMisconceptions": ["bei mehr Teilen den Takt verlieren"],
+    "focus": "practice",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Der Garten-Rhythmus",
+    "coreMetaphor": "In einem Zaubergarten wachsen Blumen und Blaetter in festen Mustern entlang der Beete.",
+    "setting": "Ein sonniger Garten mit Beeten voller Blumen und Tiere.",
+    "visualStyle": { "palette": ["#27324a", "#54b865", "#ff7a59", "#3f9bf0", "#ffd84d"], "mood": "frisch, sonnig, ruhig", "shapes": "Blumen, Blaetter, kleine Tiere", "effects": "Bluetenblaetter wirbeln beim Gelingen" },
+    "guide": { "name": "Luno", "role": "Gaertner", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "beet", "title": "Das erste Beet", "purpose": "AB-Muster fortsetzen.", "scene": "Blumen in der Reihe ergaenzen.", "reward": "Garten-Lehrling" },
+      { "id": "wiese", "title": "Die bunte Wiese", "purpose": "Laengere Muster fortsetzen.", "scene": "Tiere und Blumen im Takt.", "reward": "Wiesen-Profi" },
+      { "id": "meister", "title": "Meisterbeet", "purpose": "Luecken mitten im Beet.", "scene": "Welche Pflanze fehlt?", "reward": "Garten-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Bei laengeren Reihen verliert das Kind leicht den Takt des Musters.",
+    "embodiedMetaphor": "Ein Beet folgt einem Rhythmus wie ein Trommelschlag - immer dieselbe Abfolge.",
+    "successInsight": "Wenn ich den Rhythmus mitlese, finde ich jede fehlende Pflanze."
+  },
+  "rooms": [
+    {
+      "roomId": "beet",
+      "objective": "Setze das Blumenbeet fort!",
+      "mode": "continue",
+      "rounds": [
+        { "objective": "Was kommt als Naechstes?", "sequence": ["🌻", "🌷", "🌻", "🌷"], "gapIndex": 3, "options": ["🌻", "🌷"] },
+        { "objective": "Und jetzt?", "sequence": ["🌼", "🍃", "🌼", "🍃"], "gapIndex": 3, "options": ["🌼", "🍃"] },
+        { "objective": "Weiter!", "sequence": ["🌹", "🌹", "🌿", "🌹", "🌹", "🌿"], "gapIndex": 5, "options": ["🌹", "🌿"] }
+      ],
+      "feedback": { "correct": "Schoen, im Takt gepflanzt!", "wrongPiece": "Welche Blume kommt nach diesem Muster?", "tryAgain": "Lies das Beet von vorne mit." },
+      "explanationAfterSuccess": "Sonnenblume, Tulpe, Sonnenblume, Tulpe - das Beet folgt immer demselben Takt."
+    },
+    {
+      "roomId": "wiese",
+      "objective": "Setze die Wiese fort!",
+      "mode": "continue",
+      "rounds": [
+        { "objective": "Was kommt als Naechstes?", "sequence": ["🐝", "🦋", "🐞", "🐝", "🦋", "🐞"], "gapIndex": 5, "options": ["🐝", "🦋", "🐞"] },
+        { "objective": "Und hier?", "sequence": ["🌸", "🌸", "🐝", "🌸", "🌸", "🐝"], "gapIndex": 5, "options": ["🌸", "🐝"] }
+      ],
+      "feedback": { "correct": "Stark, den Rhythmus gehalten!", "wrongPiece": "Such die Gruppe, die sich wiederholt.", "tryAgain": "Zaehle die Tiere im Takt und tippe mit." },
+      "explanationAfterSuccess": "Biene, Schmetterling, Marienkaefer - drei Tiere im immer gleichen Takt."
+    },
+    {
+      "roomId": "meister",
+      "objective": "Welche Pflanze fehlt mittendrin?",
+      "mode": "fill",
+      "rounds": [
+        { "objective": "Fuelle die Luecke!", "sequence": ["🌻", "🌿", "🌻", "🌿", "🌻", "🌿"], "gapIndex": 3, "options": ["🌻", "🌿"] },
+        { "objective": "Und hier?", "sequence": ["🍓", "🫐", "🍋", "🍓", "🫐", "🍋"], "gapIndex": 4, "options": ["🍓", "🫐", "🍋"] },
+        { "objective": "Letzte Aufgabe!", "sequence": ["🌷", "🌷", "🐞", "🌷", "🌷", "🐞"], "gapIndex": 4, "options": ["🌷", "🐞"] }
+      ],
+      "feedback": { "correct": "Meisterhaft! Der Rhythmus stimmt.", "wrongPiece": "Schau links und rechts der Luecke - was passt in den Takt?", "tryAgain": "Lies den Rhythmus von vorne und tippe mit." },
+      "explanationAfterSuccess": "Auch mitten im Beet gilt der Rhythmus - die fehlende Pflanze ergibt sich aus dem Takt."
+    }
+  ]
+}
