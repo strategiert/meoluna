@@ -21,9 +21,28 @@ export interface AnthropicResponse {
   stopReason: string | null;   // "end_turn" | "max_tokens" | ...
 }
 
+// Harte Obergrenze pro einzelnem Request. Ohne Timeout kann ein haengender
+// Socket die ganze Convex-Action bis zum Wall-Clock-Kill blockieren -> die
+// Session bleibt ewig "running" (Zombie), weil der Kill den catch-Block nie
+// erreicht. Mit Abort wirft der Call sauber -> Orchestrator-catch -> failSession.
+const REQUEST_TIMEOUT_MS = 120_000;
+const NETWORK_RETRIES = 2;
+
+function isTransientNetworkError(error: unknown): boolean {
+  if (error instanceof Error) {
+    // AbortError (Timeout) oder generische fetch/Netzwerk-Fehler ("fetch failed",
+    // ECONNRESET, ETIMEDOUT, socket hang up ...). HTTP-Status-Fehler werden NICHT
+    // hier behandelt (die kommen als eigene Exception mit Status).
+    return error.name === "AbortError" || /fetch failed|network|ECONNRESET|ETIMEDOUT|socket hang up|terminated/i.test(error.message);
+  }
+  return false;
+}
+
 /**
  * Makes a call to the Anthropic Messages API.
  * Used by all pipeline steps that need LLM inference.
+ * Each attempt is bounded by REQUEST_TIMEOUT_MS; transient network/timeout
+ * failures are retried, HTTP status errors surface immediately.
  */
 export async function callAnthropic(options: AnthropicCallOptions): Promise<AnthropicResponse> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -31,37 +50,64 @@ export async function callAnthropic(options: AnthropicCallOptions): Promise<Anth
     throw new Error("ANTHROPIC_API_KEY nicht konfiguriert");
   }
 
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01",
-    },
-    body: JSON.stringify({
-      model: options.model,
-      max_tokens: options.maxTokens,
-      temperature: options.temperature,
-      system: options.systemPrompt,
-      messages: [{ role: "user", content: options.userMessage }],
-    }),
-  });
+  let lastError: Error | null = null;
 
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Anthropic API Error: ${response.status} - ${error}`);
+  for (let attempt = 0; attempt <= NETWORK_RETRIES; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    try {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+        },
+        body: JSON.stringify({
+          model: options.model,
+          max_tokens: options.maxTokens,
+          temperature: options.temperature,
+          system: options.systemPrompt,
+          messages: [{ role: "user", content: options.userMessage }],
+        }),
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        const error = await response.text();
+        // 429/5xx sind serverseitig transient -> retry. 4xx (ausser 429) nicht.
+        if (response.status === 429 || response.status >= 500) {
+          lastError = new Error(`Anthropic API Error: ${response.status} - ${error}`);
+          console.warn(`[anthropic] ${response.status}, attempt ${attempt + 1}/${NETWORK_RETRIES + 1}, retrying...`);
+          continue;
+        }
+        throw new Error(`Anthropic API Error: ${response.status} - ${error}`);
+      }
+
+      const data = await response.json();
+      const text = data.content?.[0]?.text || "";
+
+      return {
+        text,
+        inputTokens: data.usage?.input_tokens || 0,
+        outputTokens: data.usage?.output_tokens || 0,
+        model: options.model,
+        stopReason: data.stop_reason ?? null,
+      };
+    } catch (error) {
+      if (isTransientNetworkError(error)) {
+        const aborted = error instanceof Error && error.name === "AbortError";
+        lastError = new Error(aborted ? `Anthropic request timed out after ${REQUEST_TIMEOUT_MS}ms` : `Anthropic network error: ${error instanceof Error ? error.message : String(error)}`);
+        console.warn(`[anthropic] ${lastError.message}, attempt ${attempt + 1}/${NETWORK_RETRIES + 1}, retrying...`);
+        continue;
+      }
+      throw error;
+    } finally {
+      clearTimeout(timer);
+    }
   }
 
-  const data = await response.json();
-  const text = data.content?.[0]?.text || "";
-
-  return {
-    text,
-    inputTokens: data.usage?.input_tokens || 0,
-    outputTokens: data.usage?.output_tokens || 0,
-    model: options.model,
-    stopReason: data.stop_reason ?? null,
-  };
+  throw lastError || new Error("Anthropic request failed after retries");
 }
 
 /**
