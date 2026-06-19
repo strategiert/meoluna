@@ -139,8 +139,8 @@ export function validateDetectiveEngineSpec(spec: DetectiveEngineSpec): Detectiv
         if (!hasText(round.intro)) {
           violations.push(`E_ROOM_${roundLabel}: intro is required`);
         }
-        if (!Array.isArray(round.suspects) || round.suspects.length < 3 || round.suspects.length > 5) {
-          violations.push(`E_ROOM_${roundLabel}: needs 3-5 suspects`);
+        if (!Array.isArray(round.suspects) || round.suspects.length < 3 || round.suspects.length > 4) {
+          violations.push(`E_ROOM_${roundLabel}: needs 3-4 suspects (kleine Raetsel sind zuverlaessig korrekt)`);
           return;
         }
         if (!Array.isArray(round.clues)) {

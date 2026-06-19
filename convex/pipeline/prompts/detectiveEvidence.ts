@@ -100,11 +100,22 @@ Regeln für evidence-Räume:
 - Jede Frage nutzt einen ANDEREN Satz (evidenceIndex pro Raum eindeutig).
 - 2-4 Fragen (rounds) pro Text.
 
+Bevorzuge evidence-Räume (Beweis-Satz im Text finden) - sie sind robust und brauchen keine komplexe Logik. Nutze suspects-Räume sparsam (hoechstens 2 in der Welt) und HALTE SIE KLEIN: am besten 3 Verdächtige (= 2 Hinweise), hoechstens 4. Kleine Ausschluss-Raetsel sind leicht korrekt zu konstruieren, grosse fast nie.
+
 Regeln für suspects-Räume:
-- 3-5 Verdächtige, jeder mit denselben trait-Schlüsseln (z.B. haare, kleidung, hobby) und kindgerechten Werten.
+- 3 bis 4 Verdächtige (3 bevorzugt), jeder mit denselben trait-Schlüsseln (z.B. haare, kleidung, hobby) und kindgerechten Werten.
 - Anzahl clues = Anzahl Verdächtige minus 1; jeder Hinweis sagt eine Eigenschaft des Täters ("attribute" = "value").
-- Nach jedem Hinweis darf GENAU EIN noch übriger Verdächtiger nicht passen; der Täter passt zu allen Hinweisen.
 - Keine echten Verbrechen: verschwundene Kuchen, vertauschte Brotdosen, versteckte Bälle — freundliche Rätsel.
+
+SO baust du ein korrektes suspects-Rätsel (Pflicht-Verfahren, sonst wird es abgelehnt):
+1. Lege den Täter fest und gib ihm eindeutige trait-Werte.
+2. Bringe die ANDEREN Verdächtigen in eine Reihenfolge: V1, V2, V3, ...
+3. Schreibe für JEDEN dieser Nicht-Täter genau einen Hinweis (in derselben Reihenfolge). Hinweis k nennt eine Täter-Eigenschaft, die NUR Vk widerspricht — alle danach noch übrigen Verdächtigen UND der Täter müssen zu diesem Hinweis passen.
+4. Pruefe Schritt für Schritt durch: Nach Hinweis 1 faellt NUR V1 weg, nach Hinweis 2 NUR V2, ... am Ende bleibt nur der Täter. Faellt bei einem Hinweis mehr als einer (oder keiner) weg, baue ihn um.
+
+Mini-Beispiel (3 Verdächtige, 2 Hinweise): Täter=Katze{ort:Kueche,fell:grau}. V1=Hund{ort:Garten,fell:braun}, V2=Vogel{ort:Kueche,fell:bunt}.
+- Hinweis 1 "Der Dieb war in der Kueche" (ort=Kueche): schliesst NUR Hund aus (Garten). Katze+Vogel bleiben.
+- Hinweis 2 "Am Tatort klebt graues Fell" (fell=grau): schliesst NUR Vogel aus (bunt). Katze bleibt = Täter. Korrekt.
 
 Session-Format (10-15 Minuten Spielzeit):
 - 3 bis 6 Räume, vom Aufwärmen bis zur Meisterprüfung als letztem Raum (längerer Text bzw. 5 Verdächtige).

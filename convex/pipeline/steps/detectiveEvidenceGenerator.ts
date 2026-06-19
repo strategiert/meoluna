@@ -1,4 +1,4 @@
-import { callAnthropicJson } from "../utils/anthropicClient";
+import { generateValidatedSpec } from "../utils/specGenerator";
 import { DETECTIVE_EVIDENCE_SYSTEM_PROMPT } from "../prompts/detectiveEvidence";
 import type { LearningBrief } from "../engines/movementSpaceTypes";
 import type { DetectiveEngineSpec } from "../engines/detectiveEvidenceTypes";
@@ -13,23 +13,24 @@ export async function runDetectiveEvidenceGenerator(input: {
   inputTokens: number;
   outputTokens: number;
 }> {
-  const response = await callAnthropicJson<DetectiveEngineSpec>({
+  // Validierungs-Retry: Detective-Ausschlussraetsel haben harte Logik-
+  // Constraints, die Opus mal verfehlt. Bei Fehler bekommt das Modell die
+  // konkreten Verstoesse als Feedback statt sofortigem Broad-Fallback.
+  const { spec, inputTokens, outputTokens } = await generateValidatedSpec<DetectiveEngineSpec>({
     model: "claude-opus-4-6",
     systemPrompt: DETECTIVE_EVIDENCE_SYSTEM_PROMPT,
-    userMessage: JSON.stringify(input.brief),
+    brief: input.brief,
     maxTokens: 16000,
     temperature: 0.4,
+    validate: validateDetectiveEngineSpec,
+    label: "detective-evidence",
+    maxAttempts: 2,
   });
 
-  const validation = validateDetectiveEngineSpec(response.result);
-  if (!validation.passed) {
-    throw new Error(`Detective spec failed validation: ${validation.violations.join(" | ")}`);
-  }
-
   return {
-    spec: response.result,
-    code: buildDetectiveEvidenceWorldCode(response.result),
-    inputTokens: response.inputTokens,
-    outputTokens: response.outputTokens,
+    spec,
+    code: buildDetectiveEvidenceWorldCode(spec),
+    inputTokens,
+    outputTokens,
   };
 }
