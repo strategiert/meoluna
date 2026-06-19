@@ -29,7 +29,8 @@
     "pattern-golden-check": "node --import tsx/esm scripts/pattern-golden-check.mjs",
     "clock-golden-check": "node --import tsx/esm scripts/clock-golden-check.mjs",
     "money-golden-check": "node --import tsx/esm scripts/money-golden-check.mjs",
-    "map-golden-check": "node --import tsx/esm scripts/map-golden-check.mjs"
+    "map-golden-check": "node --import tsx/esm scripts/map-golden-check.mjs",
+    "live-sweep": "node --import tsx/esm scripts/live-sweep.mjs"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.60.0",
