@@ -1,0 +1,89 @@
+{
+  "engine": "map",
+  "learningBrief": {
+    "inputMode": "freitext",
+    "subject": "sachunterricht",
+    "gradeLevel": "3",
+    "rawTopic": "Orientierung mit Karte und Kompass",
+    "extractedTasks": ["Orte finden", "laengere Wege nach Himmelsrichtungen gehen"],
+    "learningGoals": ["Gitterkarte sicher lesen", "Himmelsrichtungen kombinieren"],
+    "likelyMisconceptions": ["bei laengeren Wegen die Richtung verlieren"],
+    "focus": "practice",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Die Zauberwald-Karte",
+    "coreMetaphor": "Luno wandert mit Karte und Kompass durch einen Zauberwald und findet jeden geheimen Ort.",
+    "setting": "Ein magischer Wald mit Lichtungen, Pilzen und einer Hoehle.",
+    "visualStyle": { "palette": ["#27324a", "#54b865", "#ffd84d", "#3f9bf0", "#ff7a59"], "mood": "geheimnisvoll, freundlich, ruhig", "shapes": "Gitter, Baeume, Kompass", "effects": "Konfetti beim Gelingen" },
+    "guide": { "name": "Luno", "role": "Waldwanderer", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "waldrand", "title": "Am Waldrand", "purpose": "Orte auf der Karte finden.", "scene": "Tiere und Pflanzen suchen.", "reward": "Wald-Lehrling" },
+      { "id": "lichtung", "title": "Auf der Lichtung", "purpose": "Kurze Wege gehen.", "scene": "Vom Zeltplatz zum Stern.", "reward": "Pfad-Profi" },
+      { "id": "hoehle", "title": "Meisterpruefung", "purpose": "Laengere Wege nach Himmelsrichtungen.", "scene": "Den Diamanten in der Hoehle finden.", "reward": "Wald-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Bei laengeren Wegen verlieren Kinder leicht die Richtung.",
+    "embodiedMetaphor": "Der Kompass bleibt gleich: Norden oben, Osten rechts - egal wie lang der Weg ist.",
+    "successInsight": "Schritt fuer Schritt nach Kompass komme ich sicher ans Ziel."
+  },
+  "rooms": [
+    {
+      "roomId": "waldrand",
+      "objective": "Finde den Ort auf der Karte!",
+      "mode": "locate",
+      "rows": 5,
+      "cols": 5,
+      "landmarks": [
+        { "emoji": "🍄", "label": "Pilz", "row": 0, "col": 0 },
+        { "emoji": "🦊", "label": "Fuchs", "row": 0, "col": 4 },
+        { "emoji": "🌲", "label": "Tanne", "row": 2, "col": 2 },
+        { "emoji": "🐸", "label": "Frosch", "row": 4, "col": 0 },
+        { "emoji": "🦉", "label": "Eule", "row": 4, "col": 4 }
+      ],
+      "rounds": [
+        { "objective": "Wo steht sie?", "targetIndex": 2 },
+        { "objective": "Wo sitzt sie?", "targetIndex": 4 }
+      ],
+      "feedback": { "correct": "Genau gefunden!", "wrongCell": "Schau genau auf das gesuchte Emoji.", "tryAgain": "Suche das gleiche Bild wie in der Frage." },
+      "explanationAfterSuccess": "Jeder Ort hat seine Zelle - Karte lesen klappt schon sicher."
+    },
+    {
+      "roomId": "lichtung",
+      "objective": "Folge dem kurzen Weg!",
+      "mode": "path",
+      "rows": 5,
+      "cols": 5,
+      "landmarks": [
+        { "emoji": "🏕️", "label": "Zeltplatz", "row": 4, "col": 2 },
+        { "emoji": "⭐", "label": "Stern", "row": 0, "col": 2 },
+        { "emoji": "🌰", "label": "Eichel", "row": 2, "col": 0 }
+      ],
+      "rounds": [
+        { "objective": "Wo kommst du an?", "startIndex": 0, "steps": [ { "dir": "north", "count": 4 } ] },
+        { "objective": "Und hier?", "startIndex": 2, "steps": [ { "dir": "east", "count": 2 }, { "dir": "north", "count": 2 } ] }
+      ],
+      "feedback": { "correct": "Stark navigiert!", "wrongCell": "Norden ist oben - zaehle die Schritte hoch.", "tryAgain": "Gehe Schritt fuer Schritt in die genannte Richtung." },
+      "explanationAfterSuccess": "Nach Norden heisst nach oben - Schritt fuer Schritt erreichst du den Stern."
+    },
+    {
+      "roomId": "hoehle",
+      "objective": "Folge dem langen Weg zum Diamanten!",
+      "mode": "path",
+      "rows": 5,
+      "cols": 5,
+      "landmarks": [
+        { "emoji": "🚪", "label": "Hoehlentor", "row": 4, "col": 4 },
+        { "emoji": "💎", "label": "Diamant", "row": 0, "col": 0 },
+        { "emoji": "🔦", "label": "Lampe", "row": 2, "col": 2 }
+      ],
+      "rounds": [
+        { "objective": "Wo kommst du an?", "startIndex": 0, "steps": [ { "dir": "west", "count": 4 }, { "dir": "north", "count": 4 } ] },
+        { "objective": "Und hier?", "startIndex": 2, "steps": [ { "dir": "north", "count": 2 }, { "dir": "west", "count": 2 } ] }
+      ],
+      "feedback": { "correct": "Meisterhaft, der Diamant gehoert dir!", "wrongCell": "Westen ist links, Norden ist oben - zaehle genau.", "tryAgain": "Erst die eine Richtung ganz gehen, dann die naechste." },
+      "explanationAfterSuccess": "Egal wie lang der Weg ist - Kompass im Kopf bringt dich sicher ans Ziel."
+    }
+  ]
+}

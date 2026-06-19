@@ -1,0 +1,89 @@
+{
+  "engine": "map",
+  "learningBrief": {
+    "inputMode": "curriculum",
+    "subject": "sachunterricht",
+    "gradeLevel": "2",
+    "rawTopic": "Karte lesen und Himmelsrichtungen",
+    "extractedTasks": ["Orte auf der Karte finden", "Wegen nach Himmelsrichtungen folgen"],
+    "learningGoals": ["eine Gitterkarte lesen", "Norden/Sueden/Osten/Westen anwenden"],
+    "likelyMisconceptions": ["Osten und Westen verwechseln", "Norden mit Sueden vertauschen"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Die Schatzinsel",
+    "coreMetaphor": "Luno erkundet eine Schatzinsel und findet mit Karte und Kompass jeden Ort.",
+    "setting": "Eine sonnige Insel mit Strand, Bucht und Dschungel.",
+    "visualStyle": { "palette": ["#27324a", "#ffd84d", "#54b865", "#3f9bf0", "#ff7a59"], "mood": "abenteuerlich, warm, freundlich", "shapes": "Gitter, Wahrzeichen, Kompass", "effects": "Konfetti beim Gelingen" },
+    "guide": { "name": "Luno", "role": "Inselforscher", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "strand", "title": "Am Strand", "purpose": "Orte auf der Karte finden.", "scene": "Wahrzeichen am Strand suchen.", "reward": "Karten-Lehrling" },
+      { "id": "bucht", "title": "In der Bucht", "purpose": "Weitere Orte finden.", "scene": "Tiere und Felsen in der Bucht.", "reward": "Karten-Profi" },
+      { "id": "dschungel", "title": "Meisterpruefung", "purpose": "Wegen nach Himmelsrichtungen folgen.", "scene": "Den Schatz im Dschungel finden.", "reward": "Insel-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Kinder verwechseln Osten und Westen und verlieren die Orientierung auf der Karte.",
+    "embodiedMetaphor": "Der Kompass zeigt immer: Norden ist oben, Osten ist rechts.",
+    "successInsight": "Mit dem Kompass im Kopf finde ich jeden Ort und jeden Weg."
+  },
+  "rooms": [
+    {
+      "roomId": "strand",
+      "objective": "Finde den Ort auf der Karte!",
+      "mode": "locate",
+      "rows": 4,
+      "cols": 4,
+      "landmarks": [
+        { "emoji": "🌴", "label": "Palme", "row": 0, "col": 0 },
+        { "emoji": "🐚", "label": "Muschel", "row": 0, "col": 3 },
+        { "emoji": "⛵", "label": "Segelboot", "row": 3, "col": 1 },
+        { "emoji": "🦀", "label": "Krabbe", "row": 3, "col": 3 }
+      ],
+      "rounds": [
+        { "objective": "Wo steht sie?", "targetIndex": 0 },
+        { "objective": "Und wo ist das?", "targetIndex": 1 }
+      ],
+      "feedback": { "correct": "Genau gefunden!", "wrongCell": "Schau nochmal genau auf das Bild.", "tryAgain": "Suche das gleiche Emoji wie in der Aufgabe." },
+      "explanationAfterSuccess": "Jeder Ort hat seine feste Zelle auf der Karte - du hast sie gefunden."
+    },
+    {
+      "roomId": "bucht",
+      "objective": "Finde auch diese Orte!",
+      "mode": "locate",
+      "rows": 4,
+      "cols": 4,
+      "landmarks": [
+        { "emoji": "🪨", "label": "Fels", "row": 1, "col": 1 },
+        { "emoji": "🐠", "label": "Fisch", "row": 2, "col": 2 },
+        { "emoji": "🏖️", "label": "Sandbank", "row": 0, "col": 2 },
+        { "emoji": "🦜", "label": "Papagei", "row": 3, "col": 0 }
+      ],
+      "rounds": [
+        { "objective": "Wo schwimmt er?", "targetIndex": 1 },
+        { "objective": "Wo sitzt er?", "targetIndex": 3 }
+      ],
+      "feedback": { "correct": "Stark gefunden!", "wrongCell": "Schau genau, welche Zelle das Emoji hat.", "tryAgain": "Vergleiche das Emoji in der Frage mit der Karte." },
+      "explanationAfterSuccess": "Auch in der Bucht hat jeder Ort seine Zelle - Karte lesen klappt schon gut."
+    },
+    {
+      "roomId": "dschungel",
+      "objective": "Folge dem Weg nach Himmelsrichtungen!",
+      "mode": "path",
+      "rows": 4,
+      "cols": 4,
+      "landmarks": [
+        { "emoji": "🏠", "label": "Huette", "row": 3, "col": 0 },
+        { "emoji": "💎", "label": "Schatz", "row": 0, "col": 3 },
+        { "emoji": "🌳", "label": "Grosser Baum", "row": 1, "col": 2 }
+      ],
+      "rounds": [
+        { "objective": "Wo kommst du an?", "startIndex": 0, "steps": [ { "dir": "east", "count": 3 }, { "dir": "north", "count": 3 } ] },
+        { "objective": "Und hier?", "startIndex": 2, "steps": [ { "dir": "south", "count": 2 }, { "dir": "west", "count": 1 } ] }
+      ],
+      "feedback": { "correct": "Meisterhaft navigiert!", "wrongCell": "Osten ist rechts, Norden ist oben - zaehle die Schritte.", "tryAgain": "Gehe Schritt fuer Schritt: erst die eine Richtung, dann die naechste." },
+      "explanationAfterSuccess": "Nach Osten heisst nach rechts, nach Norden nach oben - so findest du jeden Weg."
+    }
+  ]
+}

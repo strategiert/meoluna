@@ -10,11 +10,13 @@ import { isLikelyCountingTopic } from "./countingTopicRouter";
 import { isLikelyPatternTopic } from "./patternTopicRouter";
 import { isLikelyClockTopic } from "./clockTopicRouter";
 import { isLikelyMoneyTopic } from "./moneyTopicRouter";
+import { isLikelyMapTopic } from "./mapTopicRouter";
 import { runMovementSpaceGenerator } from "../steps/movementSpaceGenerator";
 import { runCountingGenerator } from "../steps/countingGenerator";
 import { runPatternGenerator } from "../steps/patternGenerator";
 import { runClockGenerator } from "../steps/clockGenerator";
 import { runMoneyGenerator } from "../steps/moneyGenerator";
+import { runMapGenerator } from "../steps/mapGenerator";
 import { runMixingBalanceGenerator } from "../steps/mixingBalanceGenerator";
 import { runBuildingConstructGenerator } from "../steps/buildingConstructGenerator";
 import { runTimeSequenceGenerator } from "../steps/timeSequenceGenerator";
@@ -33,7 +35,8 @@ export type EngineName =
   | "counting"
   | "pattern"
   | "clock"
-  | "money";
+  | "money"
+  | "map";
 
 export const ENGINE_NAMES: EngineName[] = [
   "movement-space",
@@ -47,6 +50,7 @@ export const ENGINE_NAMES: EngineName[] = [
   "pattern",
   "clock",
   "money",
+  "map",
 ];
 
 type RouterInput = {
@@ -63,6 +67,7 @@ export function pickEngineByKeywords(input: RouterInput): EngineName | null {
   if (isLikelyPatternTopic(input)) return "pattern";
   if (isLikelyClockTopic(input)) return "clock";
   if (isLikelyMoneyTopic(input)) return "money";
+  if (isLikelyMapTopic(input)) return "map";
   if (isLikelyMovementTopic(input)) return "movement-space";
   if (isLikelyMixingTopic(input)) return "mixing-balance";
   if (isLikelyBuildingTopic(input)) return "building-construct";
@@ -126,6 +131,10 @@ export const ENGINE_GENERATORS: Record<
   },
   "money": async (input) => {
     const result = await runMoneyGenerator(input);
+    return { worldName: result.spec.world.worldName, code: result.code, inputTokens: result.inputTokens, outputTokens: result.outputTokens };
+  },
+  "map": async (input) => {
+    const result = await runMapGenerator(input);
     return { worldName: result.spec.world.worldName, code: result.code, inputTokens: result.inputTokens, outputTokens: result.outputTokens };
   },
 };
