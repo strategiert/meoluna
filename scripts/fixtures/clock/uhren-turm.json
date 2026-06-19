@@ -1,0 +1,69 @@
+{
+  "engine": "clock",
+  "learningBrief": {
+    "inputMode": "curriculum",
+    "subject": "mathematik",
+    "gradeLevel": "2",
+    "rawTopic": "Die Uhr lesen und stellen",
+    "extractedTasks": ["volle und halbe Stunden lesen", "Zeiger stellen"],
+    "learningGoals": ["analoge Uhr sicher ablesen", "Uhrzeiten einstellen"],
+    "likelyMisconceptions": ["grossen und kleinen Zeiger verwechseln"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Der Uhrenturm von Luno",
+    "coreMetaphor": "In einem alten Turm haelt Luno die grosse Turmuhr in Gang und liest die Zeit fuer das ganze Dorf.",
+    "setting": "Ein gemuetlicher Uhrenturm mit grossen Zifferblaettern.",
+    "visualStyle": { "palette": ["#27324a", "#ff7a59", "#3f9bf0", "#54b865", "#ffd84d"], "mood": "warm, ruhig, klar", "shapes": "Zifferblaetter, Zeiger, Zahnraeder", "effects": "Konfetti beim Gelingen" },
+    "guide": { "name": "Luno", "role": "Turmuhr-Waechter", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "voll", "title": "Volle Stunden", "purpose": "Volle Stunden ablesen.", "scene": "Der grosse Zeiger steht auf 12.", "reward": "Stunden-Lehrling" },
+      { "id": "halb", "title": "Halbe Stunden", "purpose": "Halbe Stunden ablesen.", "scene": "Der grosse Zeiger steht auf 6.", "reward": "Halbstunden-Profi" },
+      { "id": "meister", "title": "Meisterpruefung", "purpose": "Viertelzeiten stellen.", "scene": "Stelle die Turmuhr genau.", "reward": "Uhren-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Kinder verwechseln oft den kleinen Stundenzeiger mit dem grossen Minutenzeiger.",
+    "embodiedMetaphor": "Der kleine Zeiger ist langsam und zeigt die Stunde, der grosse ist schnell und zeigt die Minuten.",
+    "successInsight": "Erst den kleinen Zeiger lesen (Stunde), dann den grossen (Minuten)."
+  },
+  "rooms": [
+    {
+      "roomId": "voll",
+      "objective": "Lies die volle Stunde!",
+      "mode": "read",
+      "rounds": [
+        { "objective": "Wie spaet ist es?", "hour": 3, "minute": 0, "options": [ { "hour": 3, "minute": 0 }, { "hour": 4, "minute": 0 }, { "hour": 3, "minute": 30 } ] },
+        { "objective": "Und jetzt?", "hour": 7, "minute": 0, "options": [ { "hour": 7, "minute": 0 }, { "hour": 6, "minute": 0 }, { "hour": 8, "minute": 0 } ] },
+        { "objective": "Mittagszeit!", "hour": 12, "minute": 0, "options": [ { "hour": 12, "minute": 0 }, { "hour": 11, "minute": 0 }, { "hour": 1, "minute": 0 } ] }
+      ],
+      "feedback": { "correct": "Genau abgelesen!", "wrongTime": "Schau auf den kleinen Zeiger - der zeigt die Stunde.", "tryAgain": "Der grosse Zeiger steht auf 12, also volle Stunde. Welche Zahl zeigt der kleine?" },
+      "explanationAfterSuccess": "Steht der grosse Zeiger auf 12, ist es eine volle Stunde - der kleine Zeiger sagt welche."
+    },
+    {
+      "roomId": "halb",
+      "objective": "Lies die halbe Stunde!",
+      "mode": "read",
+      "rounds": [
+        { "objective": "Wie spaet?", "hour": 2, "minute": 30, "options": [ { "hour": 2, "minute": 30 }, { "hour": 2, "minute": 0 }, { "hour": 6, "minute": 30 } ] },
+        { "objective": "Und hier?", "hour": 9, "minute": 30, "options": [ { "hour": 9, "minute": 30 }, { "hour": 6, "minute": 45 }, { "hour": 9, "minute": 0 } ] },
+        { "objective": "Schlafenszeit naht!", "hour": 8, "minute": 30, "options": [ { "hour": 8, "minute": 30 }, { "hour": 8, "minute": 0 }, { "hour": 7, "minute": 30 } ] }
+      ],
+      "feedback": { "correct": "Stark, halbe Stunde erkannt!", "wrongTime": "Der grosse Zeiger steht auf 6 - das ist eine halbe Stunde.", "tryAgain": "Grosser Zeiger auf 6 = halb. Welche Stunde zeigt der kleine gerade an?" },
+      "explanationAfterSuccess": "Steht der grosse Zeiger auf 6, ist eine halbe Stunde vergangen - es ist halb."
+    },
+    {
+      "roomId": "meister",
+      "objective": "Stelle die Turmuhr genau!",
+      "mode": "set",
+      "rounds": [
+        { "objective": "Stelle 4 Uhr.", "hour": 4, "minute": 0 },
+        { "objective": "Stelle Viertel nach 1 (1:15).", "hour": 1, "minute": 15 },
+        { "objective": "Stelle Dreiviertel 6 (5:45).", "hour": 5, "minute": 45 }
+      ],
+      "feedback": { "correct": "Meisterhaft gestellt!", "wrongTime": "Stelle erst die Stunde, dann die Minuten.", "tryAgain": "Kleiner Zeiger auf die Stunde, grosser Zeiger auf die Minute." },
+      "explanationAfterSuccess": "Beim Stellen gilt dasselbe: kleiner Zeiger Stunde, grosser Zeiger Minuten."
+    }
+  ]
+}

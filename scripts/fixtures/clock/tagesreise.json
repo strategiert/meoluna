@@ -1,0 +1,67 @@
+{
+  "engine": "clock",
+  "learningBrief": {
+    "inputMode": "freitext",
+    "subject": "mathematik",
+    "gradeLevel": "1",
+    "rawTopic": "Uhrzeit und Tagesablauf",
+    "extractedTasks": ["volle Stunden lesen", "Zeit zum Tagesablauf zuordnen"],
+    "learningGoals": ["volle und halbe Stunden lesen", "Uhrzeiten stellen"],
+    "likelyMisconceptions": ["Zeiger verwechseln", "halbe Stunde falsch lesen"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Lunos Tagesreise",
+    "coreMetaphor": "Luno reist durch einen ganzen Tag - vom Aufstehen bis zum Schlafengehen - und liest an jeder Station die Uhr.",
+    "setting": "Ein freundlicher Tag mit Sonne, Mittag und Mond.",
+    "visualStyle": { "palette": ["#27324a", "#ffd84d", "#3f9bf0", "#54b865", "#ff7a59"], "mood": "warm, freundlich, klar", "shapes": "Sonne, Mond, Zifferblatt", "effects": "Konfetti beim Gelingen" },
+    "guide": { "name": "Luno", "role": "Tagesbegleiter", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "morgen", "title": "Am Morgen", "purpose": "Volle Stunden am Morgen lesen.", "scene": "Aufstehen und Fruehstueck.", "reward": "Morgen-Lehrling" },
+      { "id": "mittag", "title": "Am Mittag", "purpose": "Halbe Stunden lesen.", "scene": "Schule und Mittagessen.", "reward": "Mittags-Profi" },
+      { "id": "abend", "title": "Am Abend", "purpose": "Uhr stellen fuer den Abend.", "scene": "Spielen und Schlafengehen.", "reward": "Tages-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Kinder ordnen Uhrzeiten schwer dem eigenen Tagesablauf zu.",
+    "embodiedMetaphor": "Jede Tageszeit hat ihre Uhr - die Uhr erzaehlt, was gerade dran ist.",
+    "successInsight": "Wenn ich die Uhr lese, weiss ich, was im Tag gerade passiert."
+  },
+  "rooms": [
+    {
+      "roomId": "morgen",
+      "objective": "Lies die Morgen-Uhr!",
+      "mode": "read",
+      "rounds": [
+        { "objective": "Aufstehen um?", "hour": 7, "minute": 0, "options": [ { "hour": 7, "minute": 0 }, { "hour": 8, "minute": 0 }, { "hour": 7, "minute": 30 } ] },
+        { "objective": "Schulbeginn um?", "hour": 8, "minute": 0, "options": [ { "hour": 8, "minute": 0 }, { "hour": 9, "minute": 0 }, { "hour": 6, "minute": 0 } ] }
+      ],
+      "feedback": { "correct": "Guten Morgen, richtig!", "wrongTime": "Der grosse Zeiger steht auf 12 - volle Stunde. Welche zeigt der kleine?", "tryAgain": "Lies zuerst den kleinen Zeiger fuer die Stunde." },
+      "explanationAfterSuccess": "Am Morgen zeigt der kleine Zeiger auf 7 oder 8 - Zeit fuer Schule."
+    },
+    {
+      "roomId": "mittag",
+      "objective": "Lies die Mittags-Uhr!",
+      "mode": "read",
+      "rounds": [
+        { "objective": "Mittagessen um?", "hour": 12, "minute": 30, "options": [ { "hour": 12, "minute": 30 }, { "hour": 12, "minute": 0 }, { "hour": 6, "minute": 30 } ] },
+        { "objective": "Hausaufgaben um?", "hour": 2, "minute": 30, "options": [ { "hour": 2, "minute": 30 }, { "hour": 3, "minute": 30 }, { "hour": 2, "minute": 0 } ] }
+      ],
+      "feedback": { "correct": "Stark, halbe Stunde erkannt!", "wrongTime": "Grosser Zeiger auf 6 bedeutet: halbe Stunde.", "tryAgain": "Grosser Zeiger auf 6 = halb. Welche Stunde gerade?" },
+      "explanationAfterSuccess": "Steht der grosse Zeiger auf 6, ist eine halbe Stunde um."
+    },
+    {
+      "roomId": "abend",
+      "objective": "Stelle die Abend-Uhr!",
+      "mode": "set",
+      "rounds": [
+        { "objective": "Abendessen: stelle 6 Uhr.", "hour": 6, "minute": 0 },
+        { "objective": "Vorlesen: stelle halb 8 (7:30).", "hour": 7, "minute": 30 },
+        { "objective": "Schlafenszeit: stelle 8 Uhr.", "hour": 8, "minute": 0 }
+      ],
+      "feedback": { "correct": "Gute Nacht, perfekt gestellt!", "wrongTime": "Stelle erst die Stunde, dann die Minute.", "tryAgain": "Kleiner Zeiger auf die Stunde, grosser auf die Minute." },
+      "explanationAfterSuccess": "Am Abend stellst du die Uhr genau wie am Tag - Stunde zuerst, dann Minuten."
+    }
+  ]
+}
