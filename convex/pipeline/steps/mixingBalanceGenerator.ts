@@ -17,7 +17,7 @@ export async function runMixingBalanceGenerator(input: {
     model: "claude-opus-4-6",
     systemPrompt: MIXING_BALANCE_SYSTEM_PROMPT,
     userMessage: JSON.stringify(input.brief),
-    maxTokens: 10000,
+    maxTokens: 16000,
     temperature: 0.4,
   });
 

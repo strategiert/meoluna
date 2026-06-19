@@ -32,7 +32,7 @@ export async function runMovementSpaceGenerator(input: {
     model: "claude-opus-4-6",
     systemPrompt: MOVEMENT_SPACE_SYSTEM_PROMPT,
     userMessage: JSON.stringify(input.brief),
-    maxTokens: 10000,
+    maxTokens: 16000,
     temperature: 0.4,
   });
 

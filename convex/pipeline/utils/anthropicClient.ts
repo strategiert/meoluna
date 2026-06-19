@@ -18,6 +18,7 @@ export interface AnthropicResponse {
   inputTokens: number;
   outputTokens: number;
   model: string;
+  stopReason: string | null;   // "end_turn" | "max_tokens" | ...
 }
 
 /**
@@ -59,6 +60,7 @@ export async function callAnthropic(options: AnthropicCallOptions): Promise<Anth
     inputTokens: data.usage?.input_tokens || 0,
     outputTokens: data.usage?.output_tokens || 0,
     model: options.model,
+    stopReason: data.stop_reason ?? null,
   };
 }
 
@@ -82,10 +84,19 @@ export function parseJsonResponse<T>(text: string): T {
 
   try {
     return JSON.parse(cleaned) as T;
-  } catch (e) {
-    throw new Error(
-      `JSON parse failed: ${e instanceof Error ? e.message : "Unknown error"}\n\nRaw text (first 500 chars): ${cleaned.substring(0, 500)}`
-    );
+  } catch (firstError) {
+    // Haeufigster LLM-Fehler: trailing commas vor } oder ]. Einmal reparieren.
+    const repaired = cleaned.replace(/,(\s*[}\]])/g, "$1");
+    try {
+      return JSON.parse(repaired) as T;
+    } catch (e) {
+      // Bei Fehler das ENDE zeigen - dort wird Truncation (abgeschnittenes
+      // JSON wegen max_tokens) sichtbar.
+      const tail = cleaned.slice(-300);
+      throw new Error(
+        `JSON parse failed: ${e instanceof Error ? e.message : "Unknown error"}\n\nLast 300 chars: ...${tail}`
+      );
+    }
   }
 }
 
@@ -95,19 +106,28 @@ export function parseJsonResponse<T>(text: string): T {
  */
 export async function callAnthropicJson<T>(
   options: AnthropicCallOptions,
-  maxRetries = 1
+  maxRetries = 2
 ): Promise<{ result: T; inputTokens: number; outputTokens: number }> {
   let lastError: Error | null = null;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    const message = attempt === 0
-      ? options.userMessage
-      : `${options.userMessage}\n\nWICHTIG: Antworte NUR mit validem JSON. Keine Erklärungen, kein Markdown-Wrapper.`;
-
     const response = await callAnthropic({
       ...options,
-      userMessage: message,
+      userMessage: attempt === 0
+        ? options.userMessage
+        : `${options.userMessage}\n\nWICHTIG: Antworte NUR mit einem einzigen validen JSON-Objekt. Keine Erklärungen, kein Markdown, keine trailing commas.`,
     });
+
+    // Truncation (Output wegen max_tokens abgeschnitten) ist nicht durch einen
+    // Prompt-Hinweis behebbar - der Output muss kuerzer werden bzw. das Budget
+    // hoeher. Sichtbar machen statt blind retryen.
+    if (response.stopReason === "max_tokens") {
+      lastError = new Error(
+        `Antwort wegen max_tokens (${options.maxTokens}) abgeschnitten - Output zu lang fuer das Budget.`
+      );
+      console.warn(`[anthropicJson] truncated at max_tokens=${options.maxTokens}, attempt ${attempt + 1}`);
+      continue;
+    }
 
     try {
       const result = parseJsonResponse<T>(response.text);
@@ -119,7 +139,7 @@ export async function callAnthropicJson<T>(
     } catch (e) {
       lastError = e instanceof Error ? e : new Error(String(e));
       if (attempt < maxRetries) {
-        console.warn(`JSON parse attempt ${attempt + 1} failed, retrying...`);
+        console.warn(`[anthropicJson] parse attempt ${attempt + 1} failed (stop_reason=${response.stopReason}), retrying...`);
       }
     }
   }

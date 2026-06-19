@@ -17,7 +17,7 @@ export async function runDetectiveEvidenceGenerator(input: {
     model: "claude-opus-4-6",
     systemPrompt: DETECTIVE_EVIDENCE_SYSTEM_PROMPT,
     userMessage: JSON.stringify(input.brief),
-    maxTokens: 12000,
+    maxTokens: 16000,
     temperature: 0.4,
   });
 
