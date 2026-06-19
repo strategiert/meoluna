@@ -23,7 +23,8 @@
     "building-golden-check": "node --import tsx/esm scripts/building-construct-golden-check.mjs",
     "time-golden-check": "node --import tsx/esm scripts/time-sequence-golden-check.mjs",
     "detective-golden-check": "node --import tsx/esm scripts/detective-evidence-golden-check.mjs",
-    "sort-golden-check": "node --import tsx/esm scripts/sort-match-golden-check.mjs"
+    "sort-golden-check": "node --import tsx/esm scripts/sort-match-golden-check.mjs",
+    "word-golden-check": "node --import tsx/esm scripts/word-builder-golden-check.mjs"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.60.0",

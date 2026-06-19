@@ -34,6 +34,9 @@ const { buildDetectiveEvidenceWorldCode } = await import(
 const { buildSortMatchWorldCode } = await import(
   pathToFileURL(join(root, "convex", "pipeline", "engines", "sortMatchRenderer.ts")).href
 );
+const { buildWordBuilderWorldCode } = await import(
+  pathToFileURL(join(root, "convex", "pipeline", "engines", "wordBuilderRenderer.ts")).href
+);
 
 const brief = {
   inputMode: "material",
@@ -123,6 +126,11 @@ const sortSpec = JSON.parse(
 );
 const sortCode = buildSortMatchWorldCode(sortSpec);
 
+const wordSpec = JSON.parse(
+  readFileSync(join(root, "scripts", "fixtures", "word-builder", "buchstaben-werkstatt.json"), "utf8")
+);
+const wordCode = buildWordBuilderWorldCode(wordSpec);
+
 await bundle("movement", movementCode);
 await bundle("focused", focusedCode);
 await bundle("mixing", mixingCode);
@@ -130,3 +138,4 @@ await bundle("building", buildingCode);
 await bundle("time", timeCode);
 await bundle("detective", detectiveCode);
 await bundle("sort", sortCode);
+await bundle("word", wordCode);

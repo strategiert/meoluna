@@ -5,12 +5,14 @@ import { isLikelyBuildingTopic } from "./buildingTopicRouter";
 import { isLikelyTimeTopic } from "./timeTopicRouter";
 import { isLikelyDetectiveTopic } from "./detectiveTopicRouter";
 import { isLikelySortTopic } from "./sortTopicRouter";
+import { isLikelyWordTopic } from "./wordTopicRouter";
 import { runMovementSpaceGenerator } from "../steps/movementSpaceGenerator";
 import { runMixingBalanceGenerator } from "../steps/mixingBalanceGenerator";
 import { runBuildingConstructGenerator } from "../steps/buildingConstructGenerator";
 import { runTimeSequenceGenerator } from "../steps/timeSequenceGenerator";
 import { runDetectiveEvidenceGenerator } from "../steps/detectiveEvidenceGenerator";
 import { runSortMatchGenerator } from "../steps/sortMatchGenerator";
+import { runWordBuilderGenerator } from "../steps/wordBuilderGenerator";
 
 export type EngineName =
   | "movement-space"
@@ -18,7 +20,8 @@ export type EngineName =
   | "building-construct"
   | "time-sequence"
   | "detective-evidence"
-  | "sort-match";
+  | "sort-match"
+  | "word-builder";
 
 export const ENGINE_NAMES: EngineName[] = [
   "movement-space",
@@ -27,6 +30,7 @@ export const ENGINE_NAMES: EngineName[] = [
   "time-sequence",
   "detective-evidence",
   "sort-match",
+  "word-builder",
 ];
 
 type RouterInput = {
@@ -44,6 +48,7 @@ export function pickEngineByKeywords(input: RouterInput): EngineName | null {
   if (isLikelyBuildingTopic(input)) return "building-construct";
   if (isLikelyTimeTopic(input)) return "time-sequence";
   if (isLikelyDetectiveTopic(input)) return "detective-evidence";
+  if (isLikelyWordTopic(input)) return "word-builder";
   if (isLikelySortTopic(input)) return "sort-match";
   return null;
 }
@@ -81,6 +86,10 @@ export const ENGINE_GENERATORS: Record<
   },
   "sort-match": async (input) => {
     const result = await runSortMatchGenerator(input);
+    return { worldName: result.spec.world.worldName, code: result.code, inputTokens: result.inputTokens, outputTokens: result.outputTokens };
+  },
+  "word-builder": async (input) => {
+    const result = await runWordBuilderGenerator(input);
     return { worldName: result.spec.world.worldName, code: result.code, inputTokens: result.inputTokens, outputTokens: result.outputTokens };
   },
 };

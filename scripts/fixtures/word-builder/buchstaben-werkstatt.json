@@ -1,0 +1,89 @@
+{
+  "engine": "word-builder",
+  "learningBrief": {
+    "inputMode": "curriculum",
+    "subject": "deutsch",
+    "gradeLevel": "1",
+    "rawTopic": "Erstes Schreiben: kurze Woerter aus Buchstaben bauen",
+    "extractedTasks": ["Woerter buchstabieren", "Silben verbinden"],
+    "learningGoals": ["Laute zu Buchstaben verbinden", "Woerter richtig schreiben"],
+    "likelyMisconceptions": ["Buchstaben in falscher Reihenfolge", "Laute weglassen"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Die Buchstaben-Werkstatt",
+    "coreMetaphor": "Woerter werden Baustein fuer Baustein zusammengebaut wie aus Bauklötzen.",
+    "setting": "Eine helle Werkstatt voller Buchstaben- und Silben-Bausteine.",
+    "visualStyle": {
+      "palette": ["#79c7f5", "#ffd84d", "#54b865", "#ff7a59", "#27324a"],
+      "mood": "hell, freundlich, werkelig",
+      "shapes": "Bausteine, Regale, Werkbank",
+      "effects": "Bausteine rasten ein, Konfetti beim Gelingen"
+    },
+    "guide": { "name": "Luno", "role": "Werkstatt-Meister", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "kurze-woerter", "title": "Kurze Woerter", "purpose": "Drei Buchstaben zum Aufwaermen.", "scene": "Tier-Woerter aus Buchstaben.", "reward": "Buchstaben-Lehrling" },
+      { "id": "silben", "title": "Silben-Regal", "purpose": "Woerter aus Silben bauen.", "scene": "Zwei Silben ergeben ein Wort.", "reward": "Silben-Profi" },
+      { "id": "meister", "title": "Meisterpruefung", "purpose": "Laengere Woerter mit Ablenkern.", "scene": "Die schweren Woerter der Werkstatt.", "reward": "Wort-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Das Kind verbindet Laute und Buchstaben noch nicht sicher zu ganzen Woertern.",
+    "embodiedMetaphor": "Jeder Buchstabe ist ein Baustein. In der richtigen Reihenfolge entsteht ein Wort.",
+    "successInsight": "Ein Wort entsteht Baustein fuer Baustein in der richtigen Reihenfolge."
+  },
+  "rooms": [
+    {
+      "roomId": "kurze-woerter",
+      "objective": "Bau die kurzen Woerter aus Buchstaben!",
+      "mode": "letters",
+      "rounds": [
+        { "objective": "Bau das Wort zum Bild!", "word": "Hund", "emoji": "🐶", "chips": ["H", "u", "n", "d"] },
+        { "objective": "Und dieses Tier?", "word": "Katze", "emoji": "🐱", "chips": ["K", "a", "t", "z", "e"] },
+        { "objective": "Noch eins!", "word": "Maus", "emoji": "🐭", "chips": ["M", "a", "u", "s"] }
+      ],
+      "feedback": {
+        "correct": "Perfekt gebaut!",
+        "wrongChip": "Dieser Buchstabe gehoert nicht hierher. Hoere genau auf den naechsten Laut.",
+        "wrongOrder": "Der Buchstabe stimmt, aber er kommt spaeter dran.",
+        "tryAgain": "Sprich das Wort langsam und hoere, welcher Laut zuerst kommt."
+      },
+      "explanationAfterSuccess": "Hund: H-u-n-d. Buchstabe fuer Buchstabe wird daraus ein Wort."
+    },
+    {
+      "roomId": "silben",
+      "objective": "Bau die Woerter aus Silben!",
+      "mode": "syllables",
+      "rounds": [
+        { "objective": "Zwei Silben, ein Wort!", "word": "Sommer", "emoji": "☀️", "chips": ["Som", "mer"] },
+        { "objective": "Und der Winter?", "word": "Winter", "emoji": "❄️", "chips": ["Win", "ter"] },
+        { "objective": "Jetzt drei Silben!", "word": "Banane", "emoji": "🍌", "chips": ["Ba", "na", "ne"] }
+      ],
+      "feedback": {
+        "correct": "Genau, so klingt das Wort!",
+        "wrongChip": "Diese Silbe passt nicht. Klatsche das Wort einmal mit.",
+        "wrongOrder": "Richtige Silbe, aber sie kommt spaeter.",
+        "tryAgain": "Klatsche das Wort in Silben: Som - mer."
+      },
+      "explanationAfterSuccess": "Sommer hat zwei Silben: Som-mer. Silben helfen beim Lesen und Schreiben."
+    },
+    {
+      "roomId": "meister",
+      "objective": "Die Meisterpruefung: laengere Woerter mit Ablenkern!",
+      "mode": "letters",
+      "rounds": [
+        { "objective": "Was waechst im Garten?", "word": "Blume", "emoji": "🌸", "chips": ["B", "l", "u", "m", "e"], "distractors": ["o", "n"] },
+        { "objective": "Womit schreibt man?", "word": "Stift", "emoji": "✏️", "chips": ["S", "t", "i", "f", "t"], "distractors": ["e", "p"] },
+        { "objective": "Das grosse Finale!", "word": "Sonne", "emoji": "🌞", "chips": ["S", "o", "n", "n", "e"], "distractors": ["a", "m"] }
+      ],
+      "feedback": {
+        "correct": "Meisterhaft buchstabiert!",
+        "wrongChip": "Dieser Buchstabe gehoert nicht ins Wort. Schau auf das Bild und hoere genau.",
+        "wrongOrder": "Richtiger Buchstabe, falsche Stelle.",
+        "tryAgain": "Sprich langsam: welcher Laut kommt als Naechstes?"
+      },
+      "explanationAfterSuccess": "Auch lange Woerter sind nur viele Buchstaben in der richtigen Reihenfolge."
+    }
+  ]
+}

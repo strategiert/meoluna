@@ -77,9 +77,9 @@ async function main() {
       console.error(`FAIL registry: expected ${expected} for "${input.prompt}", got ${got}`);
     }
   }
-  if (ENGINE_NAMES.length !== 6) {
+  if (ENGINE_NAMES.length < 6) {
     failed += 1;
-    console.error(`FAIL registry: expected 6 engines, got ${ENGINE_NAMES.length}`);
+    console.error(`FAIL registry: expected at least 6 engines, got ${ENGINE_NAMES.length}`);
   }
 
   const files = readdirSync(FIXTURE_DIR).filter((name) => name.endsWith(".json")).sort();

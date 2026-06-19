@@ -1,0 +1,89 @@
+{
+  "engine": "word-builder",
+  "learningBrief": {
+    "inputMode": "curriculum",
+    "subject": "deutsch",
+    "gradeLevel": "2",
+    "rawTopic": "Silben lesen und Woerter fluessig zusammensetzen",
+    "extractedTasks": ["Silben zu Woertern verbinden"],
+    "learningGoals": ["Silbenweise lesen", "Woerter aus Silben aufbauen"],
+    "likelyMisconceptions": ["Wort als Ganzes raten statt Silben lesen"],
+    "focus": "practice",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Die Silben-Lesereise",
+    "coreMetaphor": "Jedes Wort ist eine kleine Reise von Silbe zu Silbe.",
+    "setting": "Eine bunte Reise ueber Silben-Trittsteine.",
+    "visualStyle": {
+      "palette": ["#79c7f5", "#8fd16c", "#ffd84d", "#ff7a59", "#27324a"],
+      "mood": "hell, abenteuerlich, froehlich",
+      "shapes": "Trittsteine, Silben-Bausteine, Pfad",
+      "effects": "Steine leuchten, Konfetti beim Gelingen"
+    },
+    "guide": { "name": "Luno", "role": "Lese-Lotse", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "zwei-silben", "title": "Zwei-Silben-Pfad", "purpose": "Woerter aus zwei Silben.", "scene": "Erste Trittsteine.", "reward": "Silben-Lehrling" },
+      { "id": "drei-silben", "title": "Drei-Silben-Bruecke", "purpose": "Woerter aus drei Silben.", "scene": "Laengere Woerter.", "reward": "Lese-Profi" },
+      { "id": "meister", "title": "Meisterpruefung", "purpose": "Lange Woerter mit Ablenker-Silben.", "scene": "Die grosse Lesereise.", "reward": "Lese-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Das Kind raet Woerter statt sie Silbe fuer Silbe zu lesen.",
+    "embodiedMetaphor": "Silben sind Trittsteine: Stein fuer Stein kommt man sicher durchs Wort.",
+    "successInsight": "Silbenweise lesen macht auch lange Woerter leicht."
+  },
+  "rooms": [
+    {
+      "roomId": "zwei-silben",
+      "objective": "Setze die Woerter aus zwei Silben zusammen!",
+      "mode": "syllables",
+      "rounds": [
+        { "objective": "Stein fuer Stein!", "word": "Tasse", "emoji": "☕", "chips": ["Tas", "se"] },
+        { "objective": "Weiter geht's!", "word": "Apfel", "emoji": "🍎", "chips": ["Ap", "fel"] },
+        { "objective": "Noch ein Wort!", "word": "Blume", "emoji": "🌷", "chips": ["Blu", "me"] }
+      ],
+      "feedback": {
+        "correct": "Toll gelesen!",
+        "wrongChip": "Diese Silbe passt nicht. Klatsche das Wort einmal.",
+        "wrongOrder": "Richtige Silbe, aber sie kommt spaeter.",
+        "tryAgain": "Klatsche das Wort in Silben und hoere die erste."
+      },
+      "explanationAfterSuccess": "Tasse: Tas-se. Zwei Silben, ein Wort."
+    },
+    {
+      "roomId": "drei-silben",
+      "objective": "Jetzt Woerter aus drei Silben!",
+      "mode": "syllables",
+      "rounds": [
+        { "objective": "Drei Trittsteine!", "word": "Tomate", "emoji": "🍅", "chips": ["To", "ma", "te"] },
+        { "objective": "Weiter!", "word": "Schokolade", "emoji": "🍫", "chips": ["Scho", "ko", "la", "de"] },
+        { "objective": "Ein Tier!", "word": "Elefant", "emoji": "🐘", "chips": ["E", "le", "fant"] }
+      ],
+      "feedback": {
+        "correct": "Klasse gelesen!",
+        "wrongChip": "Diese Silbe gehoert nicht ins Wort.",
+        "wrongOrder": "Richtige Silbe, falsche Stelle.",
+        "tryAgain": "Lies langsam Silbe fuer Silbe von vorne."
+      },
+      "explanationAfterSuccess": "To-ma-te: drei Silben. Stein fuer Stein liest du das ganze Wort."
+    },
+    {
+      "roomId": "meister",
+      "objective": "Die Meisterpruefung: lange Woerter mit Ablenker-Silben!",
+      "mode": "syllables",
+      "rounds": [
+        { "objective": "Wo spielt man?", "word": "Spielplatz", "emoji": "🛝", "chips": ["Spiel", "platz"], "distractors": ["gar", "ten"] },
+        { "objective": "Was im Sommer?", "word": "Sonnenblume", "emoji": "🌻", "chips": ["Son", "nen", "blu", "me"], "distractors": ["mer"] },
+        { "objective": "Das Finale!", "word": "Regenbogen", "emoji": "🌈", "chips": ["Re", "gen", "bo", "gen"], "distractors": ["son"] }
+      ],
+      "feedback": {
+        "correct": "Meisterhaft gelesen!",
+        "wrongChip": "Diese Silbe gehoert nicht ins Wort. Lies die Silben auf den Steinen.",
+        "wrongOrder": "Richtige Silbe, aber sie kommt spaeter.",
+        "tryAgain": "Lies das Wort Silbe fuer Silbe von vorne."
+      },
+      "explanationAfterSuccess": "Son-nen-blu-me: vier Silben. Auch lange Woerter liest du Stein fuer Stein."
+    }
+  ]
+}
