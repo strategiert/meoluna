@@ -9,10 +9,12 @@ import { isLikelyWordTopic } from "./wordTopicRouter";
 import { isLikelyCountingTopic } from "./countingTopicRouter";
 import { isLikelyPatternTopic } from "./patternTopicRouter";
 import { isLikelyClockTopic } from "./clockTopicRouter";
+import { isLikelyMoneyTopic } from "./moneyTopicRouter";
 import { runMovementSpaceGenerator } from "../steps/movementSpaceGenerator";
 import { runCountingGenerator } from "../steps/countingGenerator";
 import { runPatternGenerator } from "../steps/patternGenerator";
 import { runClockGenerator } from "../steps/clockGenerator";
+import { runMoneyGenerator } from "../steps/moneyGenerator";
 import { runMixingBalanceGenerator } from "../steps/mixingBalanceGenerator";
 import { runBuildingConstructGenerator } from "../steps/buildingConstructGenerator";
 import { runTimeSequenceGenerator } from "../steps/timeSequenceGenerator";
@@ -30,7 +32,8 @@ export type EngineName =
   | "word-builder"
   | "counting"
   | "pattern"
-  | "clock";
+  | "clock"
+  | "money";
 
 export const ENGINE_NAMES: EngineName[] = [
   "movement-space",
@@ -43,6 +46,7 @@ export const ENGINE_NAMES: EngineName[] = [
   "counting",
   "pattern",
   "clock",
+  "money",
 ];
 
 type RouterInput = {
@@ -58,6 +62,7 @@ export function pickEngineByKeywords(input: RouterInput): EngineName | null {
   if (isLikelyCountingTopic(input)) return "counting";
   if (isLikelyPatternTopic(input)) return "pattern";
   if (isLikelyClockTopic(input)) return "clock";
+  if (isLikelyMoneyTopic(input)) return "money";
   if (isLikelyMovementTopic(input)) return "movement-space";
   if (isLikelyMixingTopic(input)) return "mixing-balance";
   if (isLikelyBuildingTopic(input)) return "building-construct";
@@ -117,6 +122,10 @@ export const ENGINE_GENERATORS: Record<
   },
   "clock": async (input) => {
     const result = await runClockGenerator(input);
+    return { worldName: result.spec.world.worldName, code: result.code, inputTokens: result.inputTokens, outputTokens: result.outputTokens };
+  },
+  "money": async (input) => {
+    const result = await runMoneyGenerator(input);
     return { worldName: result.spec.world.worldName, code: result.code, inputTokens: result.inputTokens, outputTokens: result.outputTokens };
   },
 };

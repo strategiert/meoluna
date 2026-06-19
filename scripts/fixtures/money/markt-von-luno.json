@@ -1,0 +1,69 @@
+{
+  "engine": "money",
+  "learningBrief": {
+    "inputMode": "curriculum",
+    "subject": "mathematik",
+    "gradeLevel": "2",
+    "rawTopic": "Mit Geld bezahlen und Rueckgeld geben",
+    "extractedTasks": ["Betraege genau legen", "Rueckgeld berechnen"],
+    "learningGoals": ["Euro und Cent sicher legen", "Wechselgeld bestimmen"],
+    "likelyMisconceptions": ["Muenzwerte verwechseln", "zu viel oder zu wenig legen"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Der Markt von Luno",
+    "coreMetaphor": "Auf einem bunten Wochenmarkt kauft Luno ein und zahlt an jedem Stand genau passend.",
+    "setting": "Ein lebhafter Marktplatz mit Obst, Brot und kleinen Schaetzen.",
+    "visualStyle": { "palette": ["#27324a", "#ff7a59", "#54b865", "#ffd84d", "#3f9bf0"], "mood": "warm, lebhaft, freundlich", "shapes": "Muenzen, Scheine, Marktstaende", "effects": "Konfetti beim Gelingen" },
+    "guide": { "name": "Luno", "role": "Markt-Einkaeufer", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "kiosk", "title": "Am Kiosk", "purpose": "Kleine glatte Betraege legen.", "scene": "Kaugummi und Sticker bezahlen.", "reward": "Muenz-Lehrling" },
+      { "id": "baeckerei", "title": "In der Baeckerei", "purpose": "Gemischte Betraege legen.", "scene": "Broetchen und Brot bezahlen.", "reward": "Zahl-Profi" },
+      { "id": "meister", "title": "Meisterpruefung", "purpose": "Rueckgeld richtig geben.", "scene": "Du bist heute an der Kasse.", "reward": "Geld-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Kinder verwechseln Muenzwerte und legen zu viel oder zu wenig.",
+    "embodiedMetaphor": "Bezahlen heisst: passende Muenzen zusammenlegen, bis der Betrag genau stimmt.",
+    "successInsight": "Wenn die Summe der Muenzen genau den Preis trifft, hast du richtig bezahlt."
+  },
+  "rooms": [
+    {
+      "roomId": "kiosk",
+      "objective": "Lege den Betrag genau!",
+      "mode": "pay",
+      "rounds": [
+        { "objective": "Sticker fuer 70 ct.", "targetCents": 70, "denoms": [10, 20, 50] },
+        { "objective": "Kaugummi fuer 60 ct.", "targetCents": 60, "denoms": [10, 20, 50] },
+        { "objective": "Bonbon fuer 5 ct.", "targetCents": 5, "denoms": [1, 2, 5] }
+      ],
+      "feedback": { "correct": "Genau bezahlt!", "wrongAmount": "Zaehle die Muenzen zusammen.", "tryAgain": "Lege grosse Muenzen zuerst, dann fuelle mit kleinen auf." },
+      "explanationAfterSuccess": "50 + 20 = 70 ct - die Muenzen zusammen ergeben genau den Preis."
+    },
+    {
+      "roomId": "baeckerei",
+      "objective": "Lege auch gemischte Betraege!",
+      "mode": "pay",
+      "rounds": [
+        { "objective": "Brot fuer 1,20 €.", "targetCents": 120, "denoms": [10, 20, 50, 100] },
+        { "objective": "Broetchen fuer 95 ct.", "targetCents": 95, "denoms": [5, 10, 20, 50] },
+        { "objective": "Kuchen fuer 1,50 €.", "targetCents": 150, "denoms": [50, 100] }
+      ],
+      "feedback": { "correct": "Stark, genau gelegt!", "wrongAmount": "Schau auf die Summe unten - stimmt sie schon?", "tryAgain": "Erst den Euro legen, dann die Cent dazu." },
+      "explanationAfterSuccess": "1 € und 20 ct ergeben 1,20 € - Euro und Cent zusammen ergeben den Preis."
+    },
+    {
+      "roomId": "meister",
+      "objective": "Gib das richtige Rueckgeld!",
+      "mode": "change",
+      "rounds": [
+        { "objective": "Preis 80 ct, bezahlt 1 €.", "priceCents": 80, "paidCents": 100, "denoms": [10, 20] },
+        { "objective": "Preis 1,50 €, bezahlt 2 €.", "priceCents": 150, "paidCents": 200, "denoms": [10, 20, 50] },
+        { "objective": "Preis 70 ct, bezahlt 1 €.", "priceCents": 70, "paidCents": 100, "denoms": [10, 20] }
+      ],
+      "feedback": { "correct": "Meisterhaft gewechselt!", "wrongAmount": "Rueckgeld = bezahlt minus Preis. Lege genau diesen Rest.", "tryAgain": "Rechne: bezahlt minus Preis. Lege genau so viel zurueck." },
+      "explanationAfterSuccess": "Rueckgeld ist der Rest: bezahlt minus Preis - den legst du der Kundin zurueck."
+    }
+  ]
+}

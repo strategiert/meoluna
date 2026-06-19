@@ -1,0 +1,66 @@
+{
+  "engine": "money",
+  "learningBrief": {
+    "inputMode": "freitext",
+    "subject": "mathematik",
+    "gradeLevel": "3",
+    "rawTopic": "Euro-Scheine und Muenzen, bezahlen und wechseln",
+    "extractedTasks": ["mit Scheinen bezahlen", "Rueckgeld geben"],
+    "learningGoals": ["Scheine und Muenzen kombinieren", "Wechselgeld legen"],
+    "likelyMisconceptions": ["Euro und Cent vermischen", "Rueckgeld zu hoch schaetzen"],
+    "focus": "practice",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Lunos Sparschwein",
+    "coreMetaphor": "Luno leert sein Sparschwein und uebt Einkaufen mit Muenzen und kleinen Scheinen.",
+    "setting": "Ein gemuetliches Kinderzimmer mit Sparschwein und Spielladen.",
+    "visualStyle": { "palette": ["#27324a", "#ff7a59", "#54b865", "#ffd84d", "#3f9bf0"], "mood": "warm, spielerisch, ruhig", "shapes": "Muenzen, Scheine, Sparschwein", "effects": "Konfetti beim Gelingen" },
+    "guide": { "name": "Luno", "role": "Spar-Fuchs", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "muenzen", "title": "Muenzen zaehlen", "purpose": "Betraege mit Muenzen legen.", "scene": "Aus dem Sparschwein bezahlen.", "reward": "Spar-Lehrling" },
+      { "id": "scheine", "title": "Mit Scheinen", "purpose": "Mit kleinen Scheinen bezahlen.", "scene": "Groessere Einkaeufe.", "reward": "Schein-Profi" },
+      { "id": "meister", "title": "Meisterpruefung", "purpose": "Rueckgeld mit Scheinen und Muenzen.", "scene": "An der Spielkasse.", "reward": "Spar-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Kinder mischen Euro und Cent und schaetzen Rueckgeld oft zu hoch.",
+    "embodiedMetaphor": "Scheine sind grosse Schritte, Muenzen kleine - zusammen treffen sie jeden Betrag.",
+    "successInsight": "Mit grossen Scheinen anfangen und mit Muenzen genau auffuellen."
+  },
+  "rooms": [
+    {
+      "roomId": "muenzen",
+      "objective": "Lege den Betrag mit Muenzen!",
+      "mode": "pay",
+      "rounds": [
+        { "objective": "Radiergummi fuer 30 ct.", "targetCents": 30, "denoms": [10, 20] },
+        { "objective": "Stift fuer 50 ct.", "targetCents": 50, "denoms": [10, 20, 50] }
+      ],
+      "feedback": { "correct": "Genau aus dem Sparschwein!", "wrongAmount": "Zaehle die Muenzen zusammen.", "tryAgain": "Lege grosse Muenzen zuerst." },
+      "explanationAfterSuccess": "10 + 20 = 30 ct - die Muenzen ergeben zusammen genau den Preis."
+    },
+    {
+      "roomId": "scheine",
+      "objective": "Bezahle mit Scheinen!",
+      "mode": "pay",
+      "rounds": [
+        { "objective": "Buch fuer 5 €.", "targetCents": 500, "denoms": [100, 200, 500] },
+        { "objective": "Spiel fuer 7 €.", "targetCents": 700, "denoms": [100, 200, 500] }
+      ],
+      "feedback": { "correct": "Stark mit Scheinen bezahlt!", "wrongAmount": "Schau auf die Summe - fehlt noch ein Schein?", "tryAgain": "Nimm den groessten Schein zuerst, dann fuelle auf." },
+      "explanationAfterSuccess": "5 € + 2 € = 7 € - grosse Scheine zuerst, dann passend ergaenzen."
+    },
+    {
+      "roomId": "meister",
+      "objective": "Gib das richtige Rueckgeld!",
+      "mode": "change",
+      "rounds": [
+        { "objective": "Preis 2,50 €, bezahlt 5 €.", "priceCents": 250, "paidCents": 500, "denoms": [50, 100, 200] },
+        { "objective": "Preis 3,50 €, bezahlt 5 €.", "priceCents": 350, "paidCents": 500, "denoms": [50, 100] }
+      ],
+      "feedback": { "correct": "Meisterhaft gewechselt!", "wrongAmount": "Rueckgeld = bezahlt minus Preis. Lege genau diesen Rest.", "tryAgain": "Rechne bezahlt minus Preis und lege genau so viel." },
+      "explanationAfterSuccess": "5 € minus 2,50 € sind 2,50 € Rueckgeld - genau diesen Rest legst du zurueck."
+    }
+  ]
+}

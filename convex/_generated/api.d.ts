@@ -48,6 +48,10 @@ import type * as pipeline_engines_timeSequenceRenderer from "../pipeline/engines
 import type * as pipeline_engines_timeSequenceTypes from "../pipeline/engines/timeSequenceTypes.js";
 import type * as pipeline_engines_timeSequenceValidator from "../pipeline/engines/timeSequenceValidator.js";
 import type * as pipeline_engines_timeTopicRouter from "../pipeline/engines/timeTopicRouter.js";
+import type * as pipeline_engines_wordBuilderRenderer from "../pipeline/engines/wordBuilderRenderer.js";
+import type * as pipeline_engines_wordBuilderTypes from "../pipeline/engines/wordBuilderTypes.js";
+import type * as pipeline_engines_wordBuilderValidator from "../pipeline/engines/wordBuilderValidator.js";
+import type * as pipeline_engines_wordTopicRouter from "../pipeline/engines/wordTopicRouter.js";
 import type * as pipeline_orchestrator from "../pipeline/orchestrator.js";
 import type * as pipeline_prompts_assetPlanner from "../pipeline/prompts/assetPlanner.js";
 import type * as pipeline_prompts_autoFix from "../pipeline/prompts/autoFix.js";
@@ -65,6 +69,7 @@ import type * as pipeline_prompts_movementSpace from "../pipeline/prompts/moveme
 import type * as pipeline_prompts_qualityGate from "../pipeline/prompts/qualityGate.js";
 import type * as pipeline_prompts_sortMatch from "../pipeline/prompts/sortMatch.js";
 import type * as pipeline_prompts_timeSequence from "../pipeline/prompts/timeSequence.js";
+import type * as pipeline_prompts_wordBuilder from "../pipeline/prompts/wordBuilder.js";
 import type * as pipeline_skeleton_worldSkeleton from "../pipeline/skeleton/worldSkeleton.js";
 import type * as pipeline_status from "../pipeline/status.js";
 import type * as pipeline_steps_assetGenerator from "../pipeline/steps/assetGenerator.js";
@@ -86,9 +91,11 @@ import type * as pipeline_steps_sortMatchGenerator from "../pipeline/steps/sortM
 import type * as pipeline_steps_structuralGate from "../pipeline/steps/structuralGate.js";
 import type * as pipeline_steps_timeSequenceGenerator from "../pipeline/steps/timeSequenceGenerator.js";
 import type * as pipeline_steps_validator from "../pipeline/steps/validator.js";
+import type * as pipeline_steps_wordBuilderGenerator from "../pipeline/steps/wordBuilderGenerator.js";
 import type * as pipeline_types from "../pipeline/types.js";
 import type * as pipeline_utils_anthropicClient from "../pipeline/utils/anthropicClient.js";
 import type * as pipeline_utils_falClient from "../pipeline/utils/falClient.js";
+import type * as pipeline_utils_specGenerator from "../pipeline/utils/specGenerator.js";
 import type * as pipeline_utils_validation from "../pipeline/utils/validation.js";
 import type * as progress from "../progress.js";
 import type * as push from "../push.js";
@@ -146,6 +153,10 @@ declare const fullApi: ApiFromModules<{
   "pipeline/engines/timeSequenceTypes": typeof pipeline_engines_timeSequenceTypes;
   "pipeline/engines/timeSequenceValidator": typeof pipeline_engines_timeSequenceValidator;
   "pipeline/engines/timeTopicRouter": typeof pipeline_engines_timeTopicRouter;
+  "pipeline/engines/wordBuilderRenderer": typeof pipeline_engines_wordBuilderRenderer;
+  "pipeline/engines/wordBuilderTypes": typeof pipeline_engines_wordBuilderTypes;
+  "pipeline/engines/wordBuilderValidator": typeof pipeline_engines_wordBuilderValidator;
+  "pipeline/engines/wordTopicRouter": typeof pipeline_engines_wordTopicRouter;
   "pipeline/orchestrator": typeof pipeline_orchestrator;
   "pipeline/prompts/assetPlanner": typeof pipeline_prompts_assetPlanner;
   "pipeline/prompts/autoFix": typeof pipeline_prompts_autoFix;
@@ -163,6 +174,7 @@ declare const fullApi: ApiFromModules<{
   "pipeline/prompts/qualityGate": typeof pipeline_prompts_qualityGate;
   "pipeline/prompts/sortMatch": typeof pipeline_prompts_sortMatch;
   "pipeline/prompts/timeSequence": typeof pipeline_prompts_timeSequence;
+  "pipeline/prompts/wordBuilder": typeof pipeline_prompts_wordBuilder;
   "pipeline/skeleton/worldSkeleton": typeof pipeline_skeleton_worldSkeleton;
   "pipeline/status": typeof pipeline_status;
   "pipeline/steps/assetGenerator": typeof pipeline_steps_assetGenerator;
@@ -184,9 +196,11 @@ declare const fullApi: ApiFromModules<{
   "pipeline/steps/structuralGate": typeof pipeline_steps_structuralGate;
   "pipeline/steps/timeSequenceGenerator": typeof pipeline_steps_timeSequenceGenerator;
   "pipeline/steps/validator": typeof pipeline_steps_validator;
+  "pipeline/steps/wordBuilderGenerator": typeof pipeline_steps_wordBuilderGenerator;
   "pipeline/types": typeof pipeline_types;
   "pipeline/utils/anthropicClient": typeof pipeline_utils_anthropicClient;
   "pipeline/utils/falClient": typeof pipeline_utils_falClient;
+  "pipeline/utils/specGenerator": typeof pipeline_utils_specGenerator;
   "pipeline/utils/validation": typeof pipeline_utils_validation;
   progress: typeof progress;
   push: typeof push;
