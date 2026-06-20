@@ -32,6 +32,9 @@ Wichtig:
 
 Technik:
 - Gib nur React-Code zurueck.
+- Beginne die Antwort mit GENAU einer Titelzeile als Kommentar:
+  // WORLD_NAME: <kurzer, thematischer Welt-Titel, z.B. "Die Blattfabrik" oder "Stromkreis-Werkstatt">
+  Der Titel benennt die Metapher/Welt konkret - NIEMALS generisch wie "Mini-App" oder "Lernwelt".
 - EINE exportierte App-Komponente: export default function App().
 - Erlaubte Imports:
   import { useState, useMemo, useEffect } from 'react';

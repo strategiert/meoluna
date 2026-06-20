@@ -11,6 +11,25 @@ function stripCodeFence(code: string): string {
     .trim();
 }
 
+// Liest den vom Modell emittierten "// WORLD_NAME: ..."-Marker. Fallback:
+// ein aus dem Prompt abgeleiteter Titel statt des alten generischen Strings.
+function extractWorldName(code: string, prompt: string): string {
+  const match = code.match(/\/\/\s*WORLD_NAME:\s*(.+)/);
+  const raw = match?.[1]?.trim().replace(/['"]/g, "");
+  if (raw && raw.length >= 3 && raw.length <= 80 && !/^mini-?app|^lernwelt$/i.test(raw)) {
+    return raw;
+  }
+  // Fallback: erster sinnvoller Teil des Prompts (vor ? , Zeilenumbruch / Klassenangabe).
+  const chunk = prompt
+    .split(/[?,\n]|Klasse\s*\d+/i)[0]
+    .replace(/^(wie funktioniert|was ist|was sind|erklaere?|erstelle eine lernwelt (zum thema|ueber))\s+/i, "")
+    .trim();
+  if (chunk.length >= 3 && chunk.length <= 80) {
+    return chunk.charAt(0).toUpperCase() + chunk.slice(1);
+  }
+  return "Fokus-Mini-Welt";
+}
+
 export async function runFocusedInterventionGenerator(input: {
   prompt: string;
   pdfText?: string;
@@ -62,7 +81,10 @@ export async function runFocusedInterventionGenerator(input: {
   // Als universeller Fallback muss das robust sein: bei Gate-Verstoessen
   // (z.B. fehlende Meoluna-Calls) bekommt das Modell die konkreten Fehler
   // als Feedback und baut neu, statt die Generierung scheitern zu lassen.
-  const maxAttempts = 3;
+  // 2 Versuche: der zweite ist die Sicherheits-Reserve. Jeder Versuch ist eine
+  // teure ~600-Zeilen-Opus-Generierung (~120s) - drei davon waren der Haupt-
+  // Zeitfresser fuer die ~9 Faecher ohne eigene Engine.
+  const maxAttempts = 2;
   let inputTokens = 0;
   let outputTokens = 0;
   let lastViolations: string[] = [];
@@ -91,7 +113,7 @@ export async function runFocusedInterventionGenerator(input: {
     if (gate.passed) {
       return {
         code,
-        worldName: "Mini-App: Sofort verstehen",
+        worldName: extractWorldName(code, input.prompt),
         inputTokens,
         outputTokens,
       };
