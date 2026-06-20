@@ -292,7 +292,12 @@ export const Sandbox: React.FC<SandboxProps> = ({
       // style-prop wird via Prop-Spreading auf den Wrapper-div angewendet.
       style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column' }}
       files={{
-        '/App.js': { code: sanitized, active: true },
+        // .tsx statt .js: der Sandpack-Bundler transpiliert dann TypeScript.
+        // Manche Focused-Welten (freier LLM-Code) emittieren TS-Syntax wie
+        // useState<Foo[]>() oder Typannotationen - als .js crasht das beim
+        // Parsen ("Unexpected token"). Plain JS bleibt gueltiges TS, also
+        // funktionieren alle Welten (Engines + Focused) ohne Aenderung.
+        '/App.tsx': { code: sanitized, active: true },
         '/index.js': { code: INDEX_JS, hidden: true },
         '/public/index.html': { code: INDEX_HTML, hidden: true },
       }}

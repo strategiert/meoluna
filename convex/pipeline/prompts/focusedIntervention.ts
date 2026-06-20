@@ -46,6 +46,7 @@ Technik:
 - Kein Markdown ausserhalb des Codes.
 
 Codequalitaet:
+- Schreibe reines JavaScript/JSX, KEIN TypeScript: keine Typannotationen (kein "x: string"), keine Generics (kein "useState<Foo[]>()"), keine interface/type/enum-Deklarationen. Nur einfache useState(...)-Aufrufe.
 - Keine doppelten Funktionsnamen.
 - Keine p5-Konstanten redeklarieren.
 - Keine Objekte direkt in JSX rendern.
