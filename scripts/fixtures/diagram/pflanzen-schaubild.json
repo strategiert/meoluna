@@ -1,0 +1,93 @@
+{
+  "engine": "diagram",
+  "learningBrief": {
+    "inputMode": "curriculum",
+    "subject": "sachunterricht",
+    "gradeLevel": "3",
+    "rawTopic": "Die Teile einer Pflanze benennen",
+    "extractedTasks": ["Pflanzenteile benennen", "Teile auf dem Schaubild finden"],
+    "learningGoals": ["Wurzel, Stiel, Blatt, Bluete kennen", "Teile zuordnen"],
+    "likelyMisconceptions": ["Stiel und Stamm verwechseln", "Knospe und Bluete verwechseln"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Lunos Pflanzen-Labor",
+    "coreMetaphor": "Luno erforscht im Labor eine Pflanze und benennt jeden ihrer Teile.",
+    "setting": "Ein helles Forscher-Labor voller Pflanzen.",
+    "visualStyle": { "palette": ["#27324a", "#54b865", "#ffd84d", "#3f9bf0", "#ff7a59"], "mood": "neugierig, hell, freundlich", "shapes": "Pflanze, Lupe, Marker", "effects": "Konfetti beim Gelingen" },
+    "guide": { "name": "Luno", "role": "Pflanzenforscher", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "teile", "title": "Die Teile", "purpose": "Pflanzenteile benennen.", "scene": "Eine junge Pflanze beschriften.", "reward": "Pflanzen-Lehrling" },
+      { "id": "baum", "title": "Am Baum", "purpose": "Teile am Baum finden.", "scene": "Den Baum erkunden.", "reward": "Baum-Profi" },
+      { "id": "meister", "title": "Meisterpruefung", "purpose": "Teile der Blume finden.", "scene": "Die Sonnenblume genau kennen.", "reward": "Pflanzen-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Kinder verwechseln aehnliche Pflanzenteile wie Stiel und Stamm oder Knospe und Bluete.",
+    "embodiedMetaphor": "Jeder Teil der Pflanze hat seinen Platz und seine Aufgabe - von der Wurzel unten bis zur Bluete oben.",
+    "successInsight": "Wenn ich weiss, wo jeder Teil sitzt, kann ich jede Pflanze beschriften."
+  },
+  "rooms": [
+    {
+      "roomId": "teile",
+      "objective": "Benenne die markierte Stelle!",
+      "mode": "label",
+      "backdrop": "🌱",
+      "caption": "Eine junge Pflanze",
+      "markers": [
+        { "label": "Wurzel", "x": 50, "y": 90 },
+        { "label": "Stiel", "x": 50, "y": 55 },
+        { "label": "Blatt", "x": 25, "y": 50 },
+        { "label": "Bluete", "x": 50, "y": 15 },
+        { "label": "Knospe", "x": 72, "y": 30 }
+      ],
+      "rounds": [
+        { "objective": "Was ist unten?", "markerIndex": 0, "options": ["Wurzel", "Blatt", "Bluete"] },
+        { "objective": "Und ganz oben?", "markerIndex": 3, "options": ["Bluete", "Wurzel"] }
+      ],
+      "feedback": { "correct": "Genau benannt!", "wrongSpot": "Schau, wo der Teil sitzt - unten oder oben?", "tryAgain": "Die Wurzel ist unten, die Bluete oben." },
+      "explanationAfterSuccess": "Die Wurzel haelt die Pflanze unten fest, die Bluete sitzt ganz oben."
+    },
+    {
+      "roomId": "baum",
+      "objective": "Finde den Teil am Baum!",
+      "mode": "find",
+      "backdrop": "🌳",
+      "caption": "Ein grosser Baum",
+      "markers": [
+        { "label": "Krone", "x": 50, "y": 20 },
+        { "label": "Stamm", "x": 50, "y": 62 },
+        { "label": "Wurzel", "x": 50, "y": 92 },
+        { "label": "Ast", "x": 76, "y": 35 },
+        { "label": "Blatt", "x": 26, "y": 28 }
+      ],
+      "rounds": [
+        { "objective": "Tippe den Stamm an.", "targetIndex": 1 },
+        { "objective": "Wo ist ein Blatt?", "targetIndex": 4 }
+      ],
+      "feedback": { "correct": "Stark gefunden!", "wrongSpot": "Der Stamm ist der dicke Teil in der Mitte.", "tryAgain": "Schau genau: wo waechst was am Baum?" },
+      "explanationAfterSuccess": "Der Stamm traegt die Krone, die Wurzel sitzt unter der Erde."
+    },
+    {
+      "roomId": "meister",
+      "objective": "Finde den Teil der Blume!",
+      "mode": "find",
+      "backdrop": "🌻",
+      "caption": "Eine Sonnenblume",
+      "markers": [
+        { "label": "Bluetenblatt", "x": 50, "y": 15 },
+        { "label": "Samen", "x": 50, "y": 38 },
+        { "label": "Stiel", "x": 50, "y": 68 },
+        { "label": "Blatt", "x": 26, "y": 58 },
+        { "label": "Wurzel", "x": 50, "y": 92 }
+      ],
+      "rounds": [
+        { "objective": "Wo ist ein Bluetenblatt?", "targetIndex": 0 },
+        { "objective": "Tippe die Wurzel an.", "targetIndex": 4 }
+      ],
+      "feedback": { "correct": "Meisterhaft!", "wrongSpot": "Die Bluetenblaetter sind aussen oben, die Wurzel unten.", "tryAgain": "Geh von oben nach unten durch die Blume." },
+      "explanationAfterSuccess": "Bluetenblatt, Samen, Stiel, Blatt, Wurzel - jede Blume hat dieselben Teile."
+    }
+  ]
+}

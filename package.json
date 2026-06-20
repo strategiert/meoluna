@@ -30,6 +30,7 @@
     "clock-golden-check": "node --import tsx/esm scripts/clock-golden-check.mjs",
     "money-golden-check": "node --import tsx/esm scripts/money-golden-check.mjs",
     "map-golden-check": "node --import tsx/esm scripts/map-golden-check.mjs",
+    "diagram-golden-check": "node --import tsx/esm scripts/diagram-golden-check.mjs",
     "live-sweep": "node --import tsx/esm scripts/live-sweep.mjs"
   },
   "dependencies": {

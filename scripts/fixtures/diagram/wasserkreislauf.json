@@ -1,0 +1,74 @@
+{
+  "engine": "diagram",
+  "learningBrief": {
+    "inputMode": "freitext",
+    "subject": "sachunterricht",
+    "gradeLevel": "4",
+    "rawTopic": "Die Stationen des Wasserkreislaufs",
+    "extractedTasks": ["Stationen benennen", "Stationen im Schaubild finden"],
+    "learningGoals": ["Verdunstung, Wolke, Regen, Fluss, Meer kennen", "den Kreislauf verstehen"],
+    "likelyMisconceptions": ["Verdunstung und Niederschlag verwechseln"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Lunos Wasser-Reise",
+    "coreMetaphor": "Luno folgt einem Wassertropfen durch den ganzen Kreislauf - vom Meer in die Wolke und zurueck.",
+    "setting": "Eine Landschaft mit Meer, Wolken und Fluss.",
+    "visualStyle": { "palette": ["#27324a", "#3f9bf0", "#79c7f5", "#ffd84d", "#54b865"], "mood": "frisch, weit, ruhig", "shapes": "Wolke, Regen, Fluss, Marker", "effects": "Konfetti beim Gelingen" },
+    "guide": { "name": "Luno", "role": "Tropfen-Begleiter", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "stationen", "title": "Die Stationen", "purpose": "Stationen benennen.", "scene": "Den Kreislauf beschriften.", "reward": "Wasser-Lehrling" },
+      { "id": "finde", "title": "Meisterpruefung", "purpose": "Stationen finden.", "scene": "Jede Station genau kennen.", "reward": "Kreislauf-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Kinder verwechseln Verdunstung (Wasser steigt auf) und Niederschlag (Wasser faellt).",
+    "embodiedMetaphor": "Wasser wandert im Kreis: es steigt als Dampf auf, wird zur Wolke, faellt als Regen und fliesst zurueck ins Meer.",
+    "successInsight": "Wenn ich die Stationen kenne, verstehe ich den ganzen Kreislauf."
+  },
+  "rooms": [
+    {
+      "roomId": "stationen",
+      "objective": "Benenne die markierte Station!",
+      "mode": "label",
+      "backdrop": "☁️",
+      "caption": "Der Wasserkreislauf",
+      "markers": [
+        { "label": "Wolke", "x": 50, "y": 15 },
+        { "label": "Regen", "x": 72, "y": 45 },
+        { "label": "Fluss", "x": 55, "y": 75 },
+        { "label": "Meer", "x": 25, "y": 82 },
+        { "label": "Sonne", "x": 15, "y": 20 }
+      ],
+      "rounds": [
+        { "objective": "Was ist ganz oben?", "markerIndex": 0, "options": ["Wolke", "Meer", "Sonne"] },
+        { "objective": "Was faellt herunter?", "markerIndex": 1, "options": ["Regen", "Fluss"] },
+        { "objective": "Wohin fliesst das Wasser?", "markerIndex": 2, "options": ["Fluss", "Meer", "Regen"] }
+      ],
+      "feedback": { "correct": "Genau benannt!", "wrongSpot": "Denk an den Weg des Tropfens.", "tryAgain": "Oben Wolke, dann Regen, dann Fluss, dann Meer." },
+      "explanationAfterSuccess": "Wolke, Regen, Fluss, Meer - das Wasser wandert immer im Kreis."
+    },
+    {
+      "roomId": "finde",
+      "objective": "Finde die Station!",
+      "mode": "find",
+      "backdrop": "🌍",
+      "caption": "Der Kreislauf auf der Erde",
+      "markers": [
+        { "label": "Verdunstung", "x": 22, "y": 45 },
+        { "label": "Wolke", "x": 50, "y": 18 },
+        { "label": "Niederschlag", "x": 74, "y": 45 },
+        { "label": "Ozean", "x": 28, "y": 82 },
+        { "label": "Grundwasser", "x": 55, "y": 88 }
+      ],
+      "rounds": [
+        { "objective": "Wo steigt Wasser auf? (Verdunstung)", "targetIndex": 0 },
+        { "objective": "Tippe die Wolke an.", "targetIndex": 1 },
+        { "objective": "Wo faellt der Niederschlag?", "targetIndex": 2 }
+      ],
+      "feedback": { "correct": "Meisterhaft gefunden!", "wrongSpot": "Verdunstung steigt auf, Niederschlag faellt herab.", "tryAgain": "Folge dem Tropfen: aufsteigen, Wolke, herabfallen." },
+      "explanationAfterSuccess": "Verdunstung steigt auf, wird zur Wolke, faellt als Niederschlag - der Kreislauf schliesst sich."
+    }
+  ]
+}
