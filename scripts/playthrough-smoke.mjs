@@ -8,7 +8,7 @@
 import { mkdirSync, readFileSync, writeFileSync, readdirSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { build } from "esbuild";
+import { build, transform } from "esbuild";
 import { chromium } from "playwright";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -141,7 +141,36 @@ async function main() {
   }
 
   await browser.close();
-  console.log(`\n${failed === 0 ? "XP-Contract OK - korrekte Klicks feuern reportScore" : failed + " problematisch"}.`);
+
+  // ── Focused-TypeScript-Regression ──────────────────────────────────
+  // Focused-Welten sind freier LLM-Code und emittieren manchmal TypeScript
+  // (useState<Foo[]>(), Typannotationen). Der Sandpack-Renderer legt den Code
+  // als /App.tsx ab und transpiliert TS. Faellt das auf /App.js zurueck,
+  // crasht jede TS-Welt ("Unexpected token") - genau der Familien-Stammbaum-Bug.
+  const TS_WORLD = [
+    `import { useState } from 'react';`,
+    `type Item = { en: string; de: string };`,
+    `export default function App() {`,
+    `  const [items, setItems] = useState<Item[]>([{ en: 'mother', de: 'Mutter' }]);`,
+    `  const [score, setScore] = useState<number>(0);`,
+    `  return <button onClick={() => { setScore(score + 1); window.Meoluna.reportScore(10, {}); window.Meoluna.completeModule('a', 25); window.Meoluna.complete({}); }}>{items[0].de} {score}</button>;`,
+    `}`,
+  ].join("\n");
+
+  let tsOkAsTsx = false, tsFailsAsJs = false;
+  try { await transform(TS_WORLD, { loader: "tsx", jsx: "automatic" }); tsOkAsTsx = true; } catch {}
+  try { await transform(TS_WORLD, { loader: "jsx", jsx: "automatic" }); } catch { tsFailsAsJs = true; }
+  const sandbox = readFileSync(join(ROOT, "src", "components", "Sandbox.tsx"), "utf8");
+  const sandboxUsesTsx = sandbox.includes("'/App.tsx'") || sandbox.includes('"/App.tsx"');
+
+  if (tsOkAsTsx && tsFailsAsJs && sandboxUsesTsx) {
+    console.log(`PASS ts-world  Focused-TS rendert als .tsx, Sandbox-Entry ist /App.tsx`);
+  } else {
+    failed += 1;
+    console.log(`FAIL ts-world  tsxOK=${tsOkAsTsx} failsAsJs=${tsFailsAsJs} sandboxTsx=${sandboxUsesTsx} (Sandbox muss /App.tsx nutzen)`);
+  }
+
+  console.log(`\n${failed === 0 ? "XP-Contract + TS-Toleranz OK" : failed + " problematisch"}.`);
   if (failed > 0) process.exit(1);
 }
 
