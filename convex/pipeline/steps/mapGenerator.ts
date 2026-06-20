@@ -14,7 +14,8 @@ export async function runMapGenerator(input: {
   outputTokens: number;
 }> {
   const { spec, inputTokens, outputTokens } = await generateValidatedSpec<MapEngineSpec>({
-    model: "claude-opus-4-6",
+    model: "claude-sonnet-4-6",
+    escalateModel: "claude-opus-4-6",
     systemPrompt: MAP_SYSTEM_PROMPT,
     brief: input.brief,
     maxTokens: 12000,

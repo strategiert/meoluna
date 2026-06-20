@@ -39,7 +39,7 @@ async function pollOne(job) {
   while (Date.now() - job.startedAt < TIMEOUT_MS) {
     const s = await client.query(api.pipeline.status.getSession, { sessionId: job.sessionId });
     if (s && (s.status === "done" || s.status === "complete" || s.status === "completed") && s.worldId) {
-      return { job, status: s.status, worldId: s.worldId };
+      return { job, status: s.status, worldId: s.worldId, elapsedMs: Date.now() - job.startedAt };
     }
     if (s && (s.status === "error" || s.status === "failed")) {
       return { job, status: s.status, worldId: s.worldId ?? null, error: s.error ?? s.stepLabel };
@@ -68,7 +68,8 @@ async function main() {
       failed += 1;
       console.log(`FAIL ${tag} status=${r.status} worldId=${r.worldId} title="${world?.title ?? "?"}" -> Marker fehlen: ${missing.join(", ")} (FALLBACK statt Engine?)`);
     } else {
-      console.log(`PASS ${tag} status=${r.status} worldId=${r.worldId} title="${world?.title ?? "?"}" (${code.split("\n").length} Zeilen Code)`);
+      const secs = r.elapsedMs ? `${Math.round(r.elapsedMs / 1000)}s` : "?";
+      console.log(`PASS ${tag} ${secs.padStart(5)} worldId=${r.worldId} title="${world?.title ?? "?"}" (${code.split("\n").length} Zeilen)`);
     }
   }
 
