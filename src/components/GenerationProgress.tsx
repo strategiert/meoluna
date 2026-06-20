@@ -5,23 +5,10 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Check, FileText, Brain, Sparkles, Loader2, Palette, Gamepad2, Image, ShieldCheck, Code, Wrench } from "lucide-react";
+import { Check, FileText, Brain, Sparkles, Loader2, Wrench } from "lucide-react";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { MoonLogo } from "@/components/icons/MoonLogo";
-
-// V2 Pipeline Stages (echte Steps)
-const V2_STAGES = [
-  { step: 0, label: "Analysiere dein Thema...", icon: Brain, message: "Thema, Lernziele und Schwierigkeit werden erkannt..." },
-  { step: 1, label: "Erfinde einzigartiges Universum...", icon: Sparkles, message: "Ein kreatives Spielwelt-Konzept wird erschaffen..." },
-  { step: 2, label: "Designe die Minigames...", icon: Gamepad2, message: "Einzigartige Spielmechaniken für jedes Level..." },
-  { step: 3, label: "Plane Grafiken...", icon: Palette, message: "Bild-Prompts und visuelle Identität werden erstellt..." },
-  { step: 4, label: "Generiere Bilder...", icon: Image, message: "KI-Bilder werden parallel generiert..." },
-  { step: 5, label: "Erstelle Spiel-Challenges...", icon: Brain, message: "Challenges, Lösungen und Feedback werden designt..." },
-  { step: 6, label: "Qualitätsprüfung...", icon: ShieldCheck, message: "Alle Inhalte werden auf Korrektheit geprüft..." },
-  { step: 7, label: "Baue deine Spielwelt...", icon: Code, message: "React-Code wird aus dem Plan generiert..." },
-  { step: 8, label: "Teste und optimiere...", icon: Wrench, message: "Code wird validiert und Fehler automatisch gefixt..." },
-];
 
 // V1 Legacy Stages (Auto-Progression)
 type LegacyStage = "uploading" | "extracting" | "analyzing" | "designing" | "generating" | "images" | "finalizing" | "complete";
@@ -64,32 +51,57 @@ export function GenerationProgress({
 
   const isV2 = !!sessionId && !!session;
 
+  // Verstrichene Zeit fuer eine zeitbasierte, "lebendige" Fortschrittsanzeige.
+  // Hook MUSS vor dem fruehen return stehen (Hook-Reihenfolge konstant).
+  const [elapsed, setElapsed] = useState(0);
+  useEffect(() => {
+    if (!isGenerating || !isV2) { setElapsed(0); return; }
+    const t = setInterval(() => setElapsed((e) => e + 1), 1000);
+    return () => clearInterval(t);
+  }, [isGenerating, isV2]);
+
   // V2 rendering
   if (isV2) {
     const currentStep = session.currentStep ?? 0;
     const isComplete = session.status === "completed";
     const isFailed = session.status === "failed";
-    const progress = isComplete ? 100 : Math.floor((currentStep / V2_STAGES.length) * 95);
+
+    // Reale Pipeline kennt nur 3 sichtbare Phasen: verstehen (Step 0),
+    // Welt erschaffen (die lange Generierung), Feinschliff (Validierung).
+    // Die alten 9 Stufen beschrieben die geloeschte Broad-Pipeline.
+    const PHASES = [
+      { label: "Thema verstehen", icon: Brain, floor: 6 },
+      { label: "Deine Welt entsteht", icon: Sparkles, floor: 22 },
+      { label: "Letzter Feinschliff", icon: Wrench, floor: 88 },
+    ];
+    const phaseIndex = currentStep <= 0 ? 0 : currentStep >= 8 ? 2 : 1;
+
+    // Glatter, asymptotischer Balken (~92 % nach ~90s) - klebt nie, springt
+    // bei Abschluss auf 100 %. Geht nie zurueck (max gegen Phasen-Untergrenze).
+    const ease = Math.round((1 - Math.exp(-elapsed / 42)) * 92);
+    const progress = isComplete ? 100 : Math.min(97, Math.max(ease, PHASES[phaseIndex].floor));
+
+    const MESSAGES = [
+      "Luno entwirft gerade deine Spielwelt...",
+      "Lernziele werden in ein Abenteuer verwandelt...",
+      "Aufgaben mit Schwierigkeitsrampe entstehen...",
+      "Jede Runde wird auf Loesbarkeit geprueft...",
+      "Maskottchen, Farben und Sterne kommen dazu...",
+      "Fast fertig - der Feinschliff laeuft...",
+    ];
+    const rotating = MESSAGES[Math.floor(elapsed / 4) % MESSAGES.length];
 
     return (
       <div className="space-y-6">
         {/* Animated moon logo */}
         <div className="flex justify-center">
           <motion.div
-            animate={{
-              scale: isComplete ? [1, 1.2, 1] : 1,
-              rotate: isComplete ? 0 : 360,
-            }}
-            transition={{
-              rotate: { repeat: Infinity, duration: 8, ease: "linear" },
-              scale: { duration: 0.5 },
-            }}
+            animate={{ scale: isComplete ? [1, 1.2, 1] : 1, rotate: isComplete ? 0 : 360 }}
+            transition={{ rotate: { repeat: Infinity, duration: 8, ease: "linear" }, scale: { duration: 0.5 } }}
             className="relative"
           >
             <div className={`w-20 h-20 rounded-full flex items-center justify-center ${
-              isFailed
-                ? "bg-gradient-to-br from-red-500 via-red-400 to-red-600"
-                : "bg-gradient-to-br from-moon via-moon/80 to-aurora"
+              isFailed ? "bg-gradient-to-br from-red-500 via-red-400 to-red-600" : "bg-gradient-to-br from-moon via-moon/80 to-aurora"
             }`}>
               {isComplete ? (
                 <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 200 }}>
@@ -99,8 +111,6 @@ export function GenerationProgress({
                 <MoonLogo size="lg" />
               )}
             </div>
-
-            {/* Orbiting particles */}
             {!isComplete && !isFailed && (
               <>
                 {[0, 1, 2].map((i) => (
@@ -117,46 +127,26 @@ export function GenerationProgress({
           </motion.div>
         </div>
 
-        {/* V2 Pipeline stages */}
-        <div className="space-y-2">
-          {V2_STAGES.map((s, index) => {
-            const isCompleted = index < currentStep;
-            const isCurrent = index === currentStep && !isComplete;
-            const Icon = s.icon;
-
+        {/* Drei reale Phasen */}
+        <div className="flex items-stretch justify-center gap-2">
+          {PHASES.map((p, index) => {
+            const isCompleted = isComplete || index < phaseIndex;
+            const isCurrent = !isComplete && index === phaseIndex;
+            const Icon = p.icon;
             return (
-              <motion.div
-                key={s.step}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.05 }}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all ${
-                  isCurrent
-                    ? "bg-moon/10 border border-moon/30"
-                    : isCompleted
-                    ? "bg-muted/30"
-                    : "opacity-30"
+              <div
+                key={p.label}
+                className={`flex flex-1 flex-col items-center gap-1.5 rounded-xl px-2 py-3 text-center transition-all ${
+                  isCurrent ? "bg-moon/10 border border-moon/30" : isCompleted ? "bg-muted/30" : "opacity-40"
                 }`}
               >
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center transition-all ${
-                  isCompleted
-                    ? "bg-green-500/20 text-green-500"
-                    : isCurrent
-                    ? "bg-moon/20 text-moon"
-                    : "bg-muted text-muted-foreground"
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  isCompleted ? "bg-green-500/20 text-green-500" : isCurrent ? "bg-moon/20 text-moon" : "bg-muted text-muted-foreground"
                 }`}>
-                  {isCompleted ? (
-                    <Check className="w-3.5 h-3.5" />
-                  ) : isCurrent ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <Icon className="w-3.5 h-3.5" />
-                  )}
+                  {isCompleted ? <Check className="w-4 h-4" /> : isCurrent ? <Loader2 className="w-4 h-4 animate-spin" /> : <Icon className="w-4 h-4" />}
                 </div>
-                <span className={`text-sm ${isCurrent ? "text-foreground font-medium" : "text-muted-foreground"}`}>
-                  {s.label}
-                </span>
-              </motion.div>
+                <span className={`text-xs leading-tight ${isCurrent ? "text-foreground font-medium" : "text-muted-foreground"}`}>{p.label}</span>
+              </div>
             );
           })}
         </div>
@@ -166,27 +156,33 @@ export function GenerationProgress({
           <div className="h-2 bg-muted rounded-full overflow-hidden">
             <motion.div
               className={`h-full ${isFailed ? "bg-red-500" : "bg-gradient-to-r from-moon to-aurora"}`}
-              initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
             />
           </div>
           <p className="text-xs text-center text-muted-foreground">{progress}%</p>
         </div>
 
-        {/* Current message */}
+        {/* Rotierende Botschaft */}
         <motion.p
-          key={currentStep}
-          initial={{ opacity: 0, y: 10 }}
+          key={isComplete || isFailed ? "final" : rotating}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center text-sm text-muted-foreground"
+          className="text-center text-sm text-muted-foreground min-h-[2.5rem]"
         >
           {isFailed
-            ? `Fehler: ${session.error || "Unbekannter Fehler"}`
+            ? `Da ist etwas schiefgelaufen: ${session.error || "Unbekannter Fehler"}. Versuch es noch einmal.`
             : isComplete
             ? "Deine Lernwelt ist bereit! ✨"
-            : V2_STAGES[currentStep]?.message || "Wird verarbeitet..."}
+            : rotating}
         </motion.p>
+
+        {/* Du-kannst-gehen-Hinweis */}
+        {!isComplete && !isFailed && (
+          <p className="text-center text-xs text-moon/80">
+            Das dauert ein bis zwei Minuten. Du kannst die Seite ruhig verlassen — wir bauen im Hintergrund weiter.
+          </p>
+        )}
       </div>
     );
   }
