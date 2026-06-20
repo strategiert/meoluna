@@ -1,0 +1,88 @@
+{
+  "engine": "chart",
+  "learningBrief": {
+    "inputMode": "curriculum",
+    "subject": "mathematik",
+    "gradeLevel": "3",
+    "rawTopic": "Balkendiagramme ablesen und vergleichen",
+    "extractedTasks": ["Werte ablesen", "groessten und kleinsten Wert finden"],
+    "learningGoals": ["Balkenhoehe als Wert lesen", "Werte vergleichen"],
+    "likelyMisconceptions": ["Balken zaehlen statt Wert ablesen", "groessten Balken falsch bestimmen"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Lunos Klassen-Umfrage",
+    "coreMetaphor": "Luno wertet Umfragen der Klasse aus und liest die Ergebnisse aus bunten Balken ab.",
+    "setting": "Ein helles Klassenzimmer mit grossen Diagrammen an der Tafel.",
+    "visualStyle": { "palette": ["#27324a", "#3f9bf0", "#ff7a59", "#54b865", "#ffd84d"], "mood": "hell, neugierig, freundlich", "shapes": "Balken, Tafel, Marker", "effects": "Konfetti beim Gelingen" },
+    "guide": { "name": "Luno", "role": "Umfrage-Auswerter", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "tiere", "title": "Lieblingstiere", "purpose": "Werte ablesen.", "scene": "Die Lieblingstier-Umfrage.", "reward": "Diagramm-Lehrling" },
+      { "id": "eis", "title": "Lieblingseis", "purpose": "Weitere Werte ablesen.", "scene": "Die Eissorten-Umfrage.", "reward": "Ablese-Profi" },
+      { "id": "meister", "title": "Meisterpruefung", "purpose": "Werte vergleichen.", "scene": "Die verkauften Eis pro Tag.", "reward": "Daten-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Kinder zaehlen oft die Balken statt den Wert an der Hoehe abzulesen.",
+    "embodiedMetaphor": "Je hoeher der Balken, desto groesser der Wert - die Hoehe erzaehlt die Zahl.",
+    "successInsight": "Ich lese den Wert an der Hoehe des Balkens ab und kann sie vergleichen."
+  },
+  "rooms": [
+    {
+      "roomId": "tiere",
+      "objective": "Lies den Wert ab!",
+      "mode": "read",
+      "chartType": "bar",
+      "categories": [
+        { "label": "Hund", "value": 8 },
+        { "label": "Katze", "value": 6 },
+        { "label": "Hase", "value": 3 },
+        { "label": "Vogel", "value": 4 }
+      ],
+      "rounds": [
+        { "objective": "Wie viele moegen Hunde?", "categoryIndex": 0, "options": [8, 6, 5] },
+        { "objective": "Und Hasen?", "categoryIndex": 2, "options": [3, 4, 2] }
+      ],
+      "feedback": { "correct": "Genau abgelesen!", "wrongValue": "Schau auf die Hoehe des Balkens.", "tryAgain": "Folge dem Balken nach oben bis zur Zahl." },
+      "explanationAfterSuccess": "Der Hund-Balken reicht bis 8 - 8 Kinder moegen Hunde."
+    },
+    {
+      "roomId": "eis",
+      "objective": "Lies auch diese Werte ab!",
+      "mode": "read",
+      "chartType": "bar",
+      "categories": [
+        { "label": "Schoko", "value": 10 },
+        { "label": "Vanille", "value": 7 },
+        { "label": "Erdbeere", "value": 5 },
+        { "label": "Zitrone", "value": 2 }
+      ],
+      "rounds": [
+        { "objective": "Wie viele moegen Vanille?", "categoryIndex": 1, "options": [7, 8, 6] },
+        { "objective": "Und Zitrone?", "categoryIndex": 3, "options": [2, 3] }
+      ],
+      "feedback": { "correct": "Stark abgelesen!", "wrongValue": "Schau genau, bis wohin der Balken reicht.", "tryAgain": "Lies die Zahl an der Spitze des Balkens." },
+      "explanationAfterSuccess": "Jeder Balken zeigt mit seiner Hoehe genau, wie viele es waehlten."
+    },
+    {
+      "roomId": "meister",
+      "objective": "Vergleiche die Werte!",
+      "mode": "find",
+      "chartType": "bar",
+      "categories": [
+        { "label": "Mo", "value": 4 },
+        { "label": "Di", "value": 9 },
+        { "label": "Mi", "value": 6 },
+        { "label": "Do", "value": 2 },
+        { "label": "Fr", "value": 7 }
+      ],
+      "rounds": [
+        { "objective": "An welchem Tag am MEISTEN verkauft?", "ask": "most" },
+        { "objective": "Und am WENIGSTEN?", "ask": "least" }
+      ],
+      "feedback": { "correct": "Meisterhaft verglichen!", "wrongValue": "Der hoechste Balken ist am meisten, der niedrigste am wenigsten.", "tryAgain": "Suche den hoechsten bzw. den niedrigsten Balken." },
+      "explanationAfterSuccess": "Der hoechste Balken (Di, 9) ist am meisten, der niedrigste (Do, 2) am wenigsten."
+    }
+  ]
+}

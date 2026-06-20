@@ -1,0 +1,86 @@
+{
+  "engine": "chart",
+  "learningBrief": {
+    "inputMode": "freitext",
+    "subject": "mathematik",
+    "gradeLevel": "2",
+    "rawTopic": "Piktogramme lesen und vergleichen",
+    "extractedTasks": ["Bilder zaehlen", "am meisten und wenigsten finden"],
+    "learningGoals": ["Piktogramm als Anzahl lesen", "Mengen vergleichen"],
+    "likelyMisconceptions": ["Bilder ueberspringen beim Zaehlen"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Lunos Bildergarten",
+    "coreMetaphor": "Im Garten zaehlt Luno die Ernte mit Bildern - jedes Bild steht fuer ein Stueck.",
+    "setting": "Ein sonniger Garten mit Beeten und Koerben.",
+    "visualStyle": { "palette": ["#27324a", "#54b865", "#ff7a59", "#ffd84d", "#3f9bf0"], "mood": "sonnig, frisch, freundlich", "shapes": "Obst, Gemuese, Bilder-Reihen", "effects": "Konfetti beim Gelingen" },
+    "guide": { "name": "Luno", "role": "Gartenzaehler", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "korb", "title": "Der Obstkorb", "purpose": "Bilder ablesen.", "scene": "Obst im Korb zaehlen.", "reward": "Bilder-Lehrling" },
+      { "id": "beet", "title": "Das Gemuesebeet", "purpose": "Mengen vergleichen.", "scene": "Gemuese vergleichen.", "reward": "Garten-Profi" },
+      { "id": "meister", "title": "Meisterpruefung", "purpose": "Wetter-Bilder vergleichen.", "scene": "Die Wetter-Woche.", "reward": "Bilder-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Kinder ueberspringen beim Zaehlen der Bilder leicht eines.",
+    "embodiedMetaphor": "Jedes Bild ist ein Stueck - ich zaehle die Bilder, dann weiss ich die Anzahl.",
+    "successInsight": "Ich zaehle die Bilder einzeln und kann die Reihen vergleichen."
+  },
+  "rooms": [
+    {
+      "roomId": "korb",
+      "objective": "Lies die Anzahl ab!",
+      "mode": "read",
+      "chartType": "picto",
+      "categories": [
+        { "label": "Apfel", "value": 5, "emoji": "🍎" },
+        { "label": "Banane", "value": 3, "emoji": "🍌" },
+        { "label": "Birne", "value": 4, "emoji": "🍐" }
+      ],
+      "rounds": [
+        { "objective": "Wie viele Aepfel?", "categoryIndex": 0, "options": [5, 4] },
+        { "objective": "Und Bananen?", "categoryIndex": 1, "options": [3, 2, 4] }
+      ],
+      "feedback": { "correct": "Genau gezaehlt!", "wrongValue": "Zaehle jedes Bild einzeln.", "tryAgain": "Tippe jedes Bild mit dem Finger mit." },
+      "explanationAfterSuccess": "5 Apfel-Bilder bedeuten 5 Aepfel - jedes Bild ist eins."
+    },
+    {
+      "roomId": "beet",
+      "objective": "Vergleiche das Gemuese!",
+      "mode": "find",
+      "chartType": "picto",
+      "categories": [
+        { "label": "Tomate", "value": 6, "emoji": "🍅" },
+        { "label": "Gurke", "value": 2, "emoji": "🥒" },
+        { "label": "Karotte", "value": 4, "emoji": "🥕" },
+        { "label": "Paprika", "value": 3, "emoji": "🫑" }
+      ],
+      "rounds": [
+        { "objective": "Wovon gibt es am MEISTEN?", "ask": "most" },
+        { "objective": "Und am WENIGSTEN?", "ask": "least" }
+      ],
+      "feedback": { "correct": "Stark verglichen!", "wrongValue": "Die laengste Bilder-Reihe ist am meisten.", "tryAgain": "Suche die laengste und die kuerzeste Reihe." },
+      "explanationAfterSuccess": "Tomate hat die laengste Reihe (6), Gurke die kuerzeste (2)."
+    },
+    {
+      "roomId": "meister",
+      "objective": "Vergleiche die Wetter-Woche!",
+      "mode": "find",
+      "chartType": "picto",
+      "categories": [
+        { "label": "Sonne", "value": 7, "emoji": "☀️" },
+        { "label": "Wolke", "value": 3, "emoji": "☁️" },
+        { "label": "Regen", "value": 5, "emoji": "🌧️" },
+        { "label": "Schnee", "value": 1, "emoji": "❄️" }
+      ],
+      "rounds": [
+        { "objective": "Welches Wetter am MEISTEN?", "ask": "most" },
+        { "objective": "Und am WENIGSTEN?", "ask": "least" }
+      ],
+      "feedback": { "correct": "Meisterhaft!", "wrongValue": "Zaehle die Bilder jeder Reihe und vergleiche.", "tryAgain": "Die laengste Reihe ist am meisten, die kuerzeste am wenigsten." },
+      "explanationAfterSuccess": "Sonne hatte die meisten Tage (7), Schnee den einen (1)."
+    }
+  ]
+}

@@ -12,6 +12,7 @@ import { isLikelyClockTopic } from "./clockTopicRouter";
 import { isLikelyMoneyTopic } from "./moneyTopicRouter";
 import { isLikelyMapTopic } from "./mapTopicRouter";
 import { isLikelyDiagramTopic } from "./diagramTopicRouter";
+import { isLikelyChartTopic } from "./chartTopicRouter";
 import { runMovementSpaceGenerator } from "../steps/movementSpaceGenerator";
 import { runCountingGenerator } from "../steps/countingGenerator";
 import { runPatternGenerator } from "../steps/patternGenerator";
@@ -19,6 +20,7 @@ import { runClockGenerator } from "../steps/clockGenerator";
 import { runMoneyGenerator } from "../steps/moneyGenerator";
 import { runMapGenerator } from "../steps/mapGenerator";
 import { runDiagramGenerator } from "../steps/diagramGenerator";
+import { runChartGenerator } from "../steps/chartGenerator";
 import { runMixingBalanceGenerator } from "../steps/mixingBalanceGenerator";
 import { runBuildingConstructGenerator } from "../steps/buildingConstructGenerator";
 import { runTimeSequenceGenerator } from "../steps/timeSequenceGenerator";
@@ -39,7 +41,8 @@ export type EngineName =
   | "clock"
   | "money"
   | "map"
-  | "diagram";
+  | "diagram"
+  | "chart";
 
 export const ENGINE_NAMES: EngineName[] = [
   "movement-space",
@@ -55,6 +58,7 @@ export const ENGINE_NAMES: EngineName[] = [
   "money",
   "map",
   "diagram",
+  "chart",
 ];
 
 type RouterInput = {
@@ -73,6 +77,7 @@ export function pickEngineByKeywords(input: RouterInput): EngineName | null {
   if (isLikelyMoneyTopic(input)) return "money";
   if (isLikelyMapTopic(input)) return "map";
   if (isLikelyDiagramTopic(input)) return "diagram";
+  if (isLikelyChartTopic(input)) return "chart";
   if (isLikelyMovementTopic(input)) return "movement-space";
   if (isLikelyMixingTopic(input)) return "mixing-balance";
   if (isLikelyBuildingTopic(input)) return "building-construct";
@@ -144,6 +149,10 @@ export const ENGINE_GENERATORS: Record<
   },
   "diagram": async (input) => {
     const result = await runDiagramGenerator(input);
+    return { worldName: result.spec.world.worldName, code: result.code, inputTokens: result.inputTokens, outputTokens: result.outputTokens };
+  },
+  "chart": async (input) => {
+    const result = await runChartGenerator(input);
     return { worldName: result.spec.world.worldName, code: result.code, inputTokens: result.inputTokens, outputTokens: result.outputTokens };
   },
 };

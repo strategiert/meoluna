@@ -23,12 +23,13 @@ Du bekommst eine Lern-Diagnose (LearningBrief) und wählst die passende Gameplay
 - "money": Mit Euro-Münzen/Scheinen genau bezahlen und Rückgeld legen. Für Klasse 1-3, Geld, Einkaufen, Beträge, Wechselgeld.
 - "map": Schatzkarte auf einem Gitter lesen, Orte finden und Wegen nach Himmelsrichtungen folgen. Für Klasse 1-4, Karte lesen, Himmelsrichtungen, Orientierung, Kompass.
 - "diagram": Ein Schaubild beschriften - Teile eines Ganzen benennen und auf dem Bild finden. Für Naturwissenschaft (Pflanze, Stromkreis, Wasserkreislauf, Zelle, Körperteile), Erdkunde (Kontinente), Aufbau/Bestandteile von etwas.
+- "chart": Ein Balken- oder Piktogramm-Diagramm ablesen - Werte ablesen und vergleichen (am meisten/wenigsten). Für Mathe "Daten und Häufigkeit", Statistik, Strichlisten, Tabellen.
 - "none": Kein Spielprinzip passt klar (z.B. freies Schreiben langer Texte, Musik mit Ton, offene Diskussionen, komplexe Experimente).
 
 Wähle die Engine, deren Kern-Handlung das Lernproblem am direktesten ERLEBBAR macht. Im Zweifel zwischen zwei Engines: nimm die konkretere Handlung. Nur "none", wenn wirklich nichts passt.
 
 Antworte ausschließlich als JSON:
-{ "engine": "movement-space" | "mixing-balance" | "building-construct" | "time-sequence" | "detective-evidence" | "sort-match" | "word-builder" | "counting" | "pattern" | "clock" | "money" | "map" | "diagram" | "none", "reason": "ein kurzer Satz" }`;
+{ "engine": "movement-space" | "mixing-balance" | "building-construct" | "time-sequence" | "detective-evidence" | "sort-match" | "word-builder" | "counting" | "pattern" | "clock" | "money" | "map" | "diagram" | "chart" | "none", "reason": "ein kurzer Satz" }`;
 
 export async function runGameplayRouter(input: {
   brief: LearningBrief;
