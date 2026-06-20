@@ -32,6 +32,8 @@
     "map-golden-check": "node --import tsx/esm scripts/map-golden-check.mjs",
     "diagram-golden-check": "node --import tsx/esm scripts/diagram-golden-check.mjs",
     "chart-golden-check": "node --import tsx/esm scripts/chart-golden-check.mjs",
+    "visual-check": "node --import tsx/esm scripts/visual-regression.mjs",
+    "visual-update": "node --import tsx/esm scripts/visual-regression.mjs --update",
     "live-sweep": "node --import tsx/esm scripts/live-sweep.mjs"
   },
   "dependencies": {
@@ -93,6 +95,7 @@
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.16",
     "concurrently": "^8.2.2",
+    "playwright": "^1.61.0",
     "postcss": "^8.4.32",
     "tailwindcss": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
