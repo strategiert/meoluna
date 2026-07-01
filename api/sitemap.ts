@@ -45,10 +45,9 @@ function urlEntry(loc: string, lastmod?: number): string {
 export default async function handler(_req: VercelRequest, res: VercelResponse) {
   const entries: string[] = STATIC_PATHS.map((p) => urlEntry(SITE + p));
 
-  const worlds = (await convexQuery<Array<{ _id: string; updatedAt?: number; _creationTime: number }>>('worlds:listPublic', {})) ?? [];
+  // Welten (/w/:id) werden BEWUSST NICHT indexiert - das sind interaktive
+  // App-Inhalte, keine SEO-Landingpages. Nur Blogposts + statische Seiten.
   const posts = (await convexQuery<Array<{ slug: string; updatedAt?: number; publishedAt?: number }>>('blog:listPublished', { limit: 500 })) ?? [];
-
-  for (const w of worlds) entries.push(urlEntry(`${SITE}/w/${w._id}`, w.updatedAt ?? w._creationTime));
   for (const p of posts) entries.push(urlEntry(`${SITE}/blog/${p.slug}`, p.updatedAt ?? p.publishedAt));
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join('\n')}\n</urlset>\n`;

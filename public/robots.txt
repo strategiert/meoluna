@@ -1,7 +1,8 @@
 User-agent: *
 Allow: /
 
-# Private/interne Bereiche nicht crawlen
+# Welten (interaktive App-Inhalte) + private/interne Bereiche nicht crawlen
+Disallow: /w/
 Disallow: /dashboard
 Disallow: /create
 Disallow: /teacher

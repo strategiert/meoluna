@@ -87,13 +87,8 @@ export const create = mutation({
       createdAt: Date.now(),
     });
 
-    // Nur oeffentliche Welten an IndexNow melden.
-    if (args.isPublic) {
-      await ctx.scheduler.runAfter(0, internal.indexnow.pingUrls, {
-        urls: [`https://meoluna.com/w/${id}`, "https://meoluna.com/explore"],
-      });
-    }
-
+    // Welten werden NICHT an Suchmaschinen gemeldet (interaktive App-Inhalte,
+    // keine SEO-Seiten). SEO laeuft ueber die separate Marketing-Site.
     return id;
   },
 });
@@ -154,12 +149,7 @@ export const togglePublic = mutation({
     if (world) {
       const newValue = !world.isPublic;
       await ctx.db.patch(args.id, { isPublic: newValue });
-      // Beim Oeffentlich-Schalten an IndexNow melden.
-      if (newValue) {
-        await ctx.scheduler.runAfter(0, internal.indexnow.pingUrls, {
-          urls: [`https://meoluna.com/w/${args.id}`, "https://meoluna.com/explore"],
-        });
-      }
+      // Welten werden bewusst NICHT an Suchmaschinen gemeldet.
       return { isPublic: newValue };
     }
     return { isPublic: false };
