@@ -70,7 +70,7 @@ export const create = mutation({
     })),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.insert("worlds", {
+    const id = await ctx.db.insert("worlds", {
       title: args.title,
       code: args.code,
       userId: args.userId,
@@ -86,6 +86,15 @@ export const create = mutation({
       likes: 0,
       createdAt: Date.now(),
     });
+
+    // Nur oeffentliche Welten an IndexNow melden.
+    if (args.isPublic) {
+      await ctx.scheduler.runAfter(0, internal.indexnow.pingUrls, {
+        urls: [`https://meoluna.com/w/${id}`, "https://meoluna.com/explore"],
+      });
+    }
+
+    return id;
   },
 });
 
@@ -145,6 +154,12 @@ export const togglePublic = mutation({
     if (world) {
       const newValue = !world.isPublic;
       await ctx.db.patch(args.id, { isPublic: newValue });
+      // Beim Oeffentlich-Schalten an IndexNow melden.
+      if (newValue) {
+        await ctx.scheduler.runAfter(0, internal.indexnow.pingUrls, {
+          urls: [`https://meoluna.com/w/${args.id}`, "https://meoluna.com/explore"],
+        });
+      }
       return { isPublic: newValue };
     }
     return { isPublic: false };

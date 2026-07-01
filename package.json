@@ -35,6 +35,7 @@
     "visual-check": "node --import tsx/esm scripts/visual-regression.mjs",
     "visual-update": "node --import tsx/esm scripts/visual-regression.mjs --update",
     "playthrough-smoke": "node --import tsx/esm scripts/playthrough-smoke.mjs",
+    "indexnow-submit": "node --import tsx/esm scripts/indexnow-submit-all.mjs",
     "live-sweep": "node --import tsx/esm scripts/live-sweep.mjs"
   },
   "dependencies": {

@@ -18,6 +18,7 @@ import type * as curriculum from "../curriculum.js";
 import type * as documents from "../documents.js";
 import type * as generate from "../generate.js";
 import type * as http from "../http.js";
+import type * as indexnow from "../indexnow.js";
 import type * as messages from "../messages.js";
 import type * as pipeline_engines_arithmeticMovementSpec from "../pipeline/engines/arithmeticMovementSpec.js";
 import type * as pipeline_engines_buildingConstructRenderer from "../pipeline/engines/buildingConstructRenderer.js";
@@ -150,6 +151,7 @@ declare const fullApi: ApiFromModules<{
   documents: typeof documents;
   generate: typeof generate;
   http: typeof http;
+  indexnow: typeof indexnow;
   messages: typeof messages;
   "pipeline/engines/arithmeticMovementSpec": typeof pipeline_engines_arithmeticMovementSpec;
   "pipeline/engines/buildingConstructRenderer": typeof pipeline_engines_buildingConstructRenderer;

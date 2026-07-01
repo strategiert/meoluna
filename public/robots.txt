@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# Private/interne Bereiche nicht crawlen
+Disallow: /dashboard
+Disallow: /create
+Disallow: /teacher
+Disallow: /join
+Disallow: /admin
+Disallow: /backend
+Disallow: /demo/
+
+Sitemap: https://meoluna.com/sitemap.xml

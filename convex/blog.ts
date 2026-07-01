@@ -3,7 +3,10 @@
  */
 
 import { query, mutation } from "./_generated/server";
+import { internal } from "./_generated/api";
 import { v } from "convex/values";
+
+const SITE = "https://meoluna.com";
 
 // Get all published blog posts
 export const listPublished = query({
@@ -91,7 +94,14 @@ export const create = mutation({
       createdAt: now,
       updatedAt: now,
     });
-    
+
+    // Bei Veroeffentlichung sofort an IndexNow melden.
+    if (args.isPublished) {
+      await ctx.scheduler.runAfter(0, internal.indexnow.pingUrls, {
+        urls: [`${SITE}/blog/${args.slug}`, `${SITE}/blog`],
+      });
+    }
+
     return id;
   },
 });
@@ -127,7 +137,15 @@ export const update = mutation({
       publishedAt,
       updatedAt: now,
     });
-    
+
+    // Melden, wenn jetzt (weiterhin) veroeffentlicht.
+    const slug = updates.slug ?? existing.slug;
+    if (updates.isPublished ?? existing.isPublished) {
+      await ctx.scheduler.runAfter(0, internal.indexnow.pingUrls, {
+        urls: [`${SITE}/blog/${slug}`, `${SITE}/blog`],
+      });
+    }
+
     return id;
   },
 });
