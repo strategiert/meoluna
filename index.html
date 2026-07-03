@@ -21,18 +21,39 @@
         try {
           if (!/(^|\.)meoluna\.(com|de)$/.test(location.hostname)) return;
           var EP = 'https://a.meoluna.com/ev';
-          function send() {
+          var CK = 'ml_consent', PK = 'ml_pid';
+          var granted = false;
+          try { granted = localStorage.getItem(CK) === 'granted'; } catch (e) { /* gesperrt */ }
+          function pid() {
             try {
-              navigator.sendBeacon(EP, new Blob([JSON.stringify({
-                t: 'pv', p: location.pathname, q: location.search,
+              var v = localStorage.getItem(PK);
+              if (!v) { v = crypto.randomUUID(); localStorage.setItem(PK, v); }
+              return v;
+            } catch (e) { return ''; }
+          }
+          function send(t, extra) {
+            try {
+              var payload = Object.assign({
+                t: t || 'pv', p: location.pathname, q: location.search,
                 r: document.referrer, h: location.hostname
-              })], { type: 'text/plain' }));
+              }, extra || {});
+              if (granted) { payload.pid = pid(); payload.sw = (screen && screen.width) || 0; }
+              navigator.sendBeacon(EP, new Blob([JSON.stringify(payload)], { type: 'text/plain' }));
             } catch (e) { /* still */ }
           }
-          send();
+          send('pv');
           var ps = history.pushState;
-          history.pushState = function () { ps.apply(this, arguments); send(); };
-          window.addEventListener('popstate', send);
+          history.pushState = function () { ps.apply(this, arguments); send('pv'); };
+          window.addEventListener('popstate', function () { send('pv'); });
+          var t0 = Date.now(), engSent = false;
+          document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'hidden' && granted && !engSent) {
+              engSent = true; send('eng', { ms: Date.now() - t0 });
+            }
+          });
+          window.addEventListener('ml-consent', function (ev) {
+            if (ev && ev.detail === 'granted') { granted = true; send('eng', { ms: Date.now() - t0 }); }
+          });
         } catch (e) { /* still */ }
       })();
     </script>

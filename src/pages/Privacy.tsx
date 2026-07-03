@@ -61,6 +61,26 @@ export default function Privacy() {
             löschen.
           </p>
 
+          <h2>4a. Eigene Reichweitenmessung (zweistufig)</h2>
+          <p>
+            Wir messen die Nutzung mit einer eigenen, cookielosen Statistik ohne
+            Drittanbieter-Tracker. Ohne Einwilligung wird beim Seitenaufruf eine Meldung an
+            unseren eigenen Server (Cloudflare) gesendet: aufgerufener Pfad, Herkunfts-Domain
+            (Referrer), Kampagnen-Parameter der Adresszeile, Land, grober Gerätetyp und Browser.
+            Aus IP-Adresse und Browser-Kennung wird ein täglich wechselnder, anonymer Kurzwert
+            gebildet; die IP-Adresse selbst wird nicht gespeichert. Eine Wiedererkennung über den
+            Tag hinaus ist nicht möglich. Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO; es erfolgt
+            kein Zugriff auf Informationen in Ihrem Endgerät.
+          </p>
+          <p>
+            Nur mit Ihrer Einwilligung im Hinweis-Banner speichern wir eine zufällig erzeugte
+            Kennung im lokalen Speicher Ihres Browsers und erfassen zusätzlich Bildschirmbreite
+            und Verweildauer, um wiederkehrende Besuche zu erkennen. Rechtsgrundlage: § 25 Abs. 1
+            TDDDG i. V. m. Art. 6 Abs. 1 lit. a DSGVO. Sie können die Einwilligung jederzeit
+            widerrufen, indem Sie den lokalen Speicher Ihres Browsers für meoluna.com löschen.
+            Es werden keine Daten an Werbe-Netzwerke weitergegeben.
+          </p>
+
           <h2>5. Ihre Rechte</h2>
           <p>Sie haben das Recht auf:</p>
           <ul>

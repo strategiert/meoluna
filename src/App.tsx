@@ -10,6 +10,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { useUserSync } from '@/hooks/useUserSync';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useAnimatedTitle } from '@/hooks/useAnimatedTitle';
+import ConsentBanner from '@/components/ConsentBanner';
 
 // Pages
 import Index from '@/pages/Index';
@@ -78,6 +79,7 @@ export default function App() {
         {/* Fallback */}
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <ConsentBanner />
     </TooltipProvider>
   );
 }
