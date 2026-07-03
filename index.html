@@ -13,5 +13,28 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // First-Party-Analytics (Stufe 0, cookielos, kein Gerätezugriff) → eigener
+      // Ingest-Worker a.meoluna.com → AE-Datensatz meoluna_analytics.
+      // Schema/Playbook: ANALYTICS-ROLLOUT.md im Shared Workspace.
+      (function () {
+        try {
+          if (!/(^|\.)meoluna\.(com|de)$/.test(location.hostname)) return;
+          var EP = 'https://a.meoluna.com/ev';
+          function send() {
+            try {
+              navigator.sendBeacon(EP, new Blob([JSON.stringify({
+                t: 'pv', p: location.pathname, q: location.search,
+                r: document.referrer, h: location.hostname
+              })], { type: 'text/plain' }));
+            } catch (e) { /* still */ }
+          }
+          send();
+          var ps = history.pushState;
+          history.pushState = function () { ps.apply(this, arguments); send(); };
+          window.addEventListener('popstate', send);
+        } catch (e) { /* still */ }
+      })();
+    </script>
   </body>
 </html>
