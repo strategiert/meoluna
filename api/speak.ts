@@ -11,14 +11,39 @@
  */
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { createRemoteJWKSet, jwtVerify } from 'jose';
 
 const ELEVENLABS_KEY  = process.env.ELEVENLABS_API_KEY;
 const OPENAI_KEY      = process.env.OPENAI_API_KEY;
 const VOICE_ID        = process.env.ELEVENLABS_VOICE_ID ?? 'pNInz6obpgDQGcFmaJgB'; // Adam multilingual
 
+// Clerk-Issuer für die Verifikation des Session-Tokens.
+const CLERK_ISSUER = process.env.CLERK_JWT_ISSUER_DOMAIN ?? 'https://clerk.meoluna.com';
+const JWKS = createRemoteJWKSet(new URL(`${CLERK_ISSUER}/.well-known/jwks.json`));
+
+// Prüft das mitgesendete Clerk-Session-Token. Verhindert, dass der bezahlte
+// TTS-Proxy anonym missbraucht wird.
+async function verifyAuth(req: VercelRequest): Promise<boolean> {
+  const header = req.headers['authorization'];
+  const token = typeof header === 'string' && header.startsWith('Bearer ')
+    ? header.slice(7)
+    : undefined;
+  if (!token) return false;
+  try {
+    await jwtVerify(token, JWKS, { issuer: CLERK_ISSUER });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  if (!(await verifyAuth(req))) {
+    return res.status(401).json({ error: 'Nicht authentifiziert' });
   }
 
   const { text } = req.body as { text?: string };

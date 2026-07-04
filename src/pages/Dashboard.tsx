@@ -50,7 +50,7 @@ function getGreeting(): string {
 
 export default function Dashboard() {
   const { user, isLoaded } = useUser();
-  const worlds = useQuery(api.worlds.listByUser, user?.id ? { userId: user.id } : 'skip');
+  const worlds = useQuery(api.worlds.listByUser, user?.id ? {} : 'skip');
   const togglePublic = useMutation(api.worlds.togglePublic);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterPublic, setFilterPublic] = useState<boolean | null>(null);

@@ -514,4 +514,17 @@ export default defineSchema({
   })
     .index("by_user", ["userId"])
     .index("by_endpoint", ["endpoint"]),
+
+  // Eigentümer hochgeladener Dateien (Arbeitsblätter etc.). Ermöglicht
+  // Zugriffskontrolle auf Storage-URLs/Löschungen und OCR (Kinder-Daten).
+  fileUploads: defineTable({
+    storageId: v.id("_storage"),
+    userId: v.string(), // clerkId des Uploaders
+    fileName: v.string(),
+    fileType: v.string(),
+    fileSize: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_storage", ["storageId"])
+    .index("by_user", ["userId"]),
 });

@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query, internalMutation } from "./_generated/server";
+import { requireAdmin } from "./lib/auth";
 
 // ============================================================================
 // QUERIES
@@ -92,7 +93,7 @@ export const getCurriculumStatus = query({
 // MUTATIONS
 // ============================================================================
 
-// Fach erstellen/aktualisieren
+// Fach erstellen/aktualisieren — nur Admin.
 export const upsertSubject = mutation({
   args: {
     slug: v.string(),
@@ -103,6 +104,7 @@ export const upsertSubject = mutation({
     isActive: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const existing = await ctx.db
       .query("subjects")
       .withIndex("by_slug", (q) => q.eq("slug", args.slug))
@@ -126,7 +128,7 @@ export const upsertSubject = mutation({
   },
 });
 
-// Thema erstellen
+// Thema erstellen — nur Admin.
 export const createTopic = mutation({
   args: {
     subjectId: v.id("subjects"),
@@ -139,6 +141,7 @@ export const createTopic = mutation({
     sourceUrl: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     return await ctx.db.insert("topics", {
       ...args,
       isActive: true,
@@ -146,7 +149,7 @@ export const createTopic = mutation({
   },
 });
 
-// Curriculum-Quelle registrieren
+// Curriculum-Quelle registrieren — nur Admin.
 export const registerCurriculumSource = mutation({
   args: {
     bundesland: v.string(),
@@ -156,6 +159,7 @@ export const registerCurriculumSource = mutation({
     url: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     return await ctx.db.insert("curriculumSources", {
       ...args,
       isParsed: false,
@@ -164,13 +168,14 @@ export const registerCurriculumSource = mutation({
   },
 });
 
-// Quelle als geparst markieren
+// Quelle als geparst markieren — nur Admin.
 export const markSourceParsed = mutation({
   args: {
     sourceId: v.id("curriculumSources"),
     topicsExtracted: v.number(),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     await ctx.db.patch(args.sourceId, {
       isParsed: true,
       parsedAt: Date.now(),
@@ -183,7 +188,13 @@ export const markSourceParsed = mutation({
 // INTERNAL MUTATIONS (für Batch-Operationen)
 // ============================================================================
 
-// Batch-Import von Themen (öffentlich für Seeding-Scripts)
+// Batch-Import von Themen — nur Admin.
+// ACHTUNG: Wird bisher von scripts/import_topics.mjs und
+// scripts/import_sekundarstufe.mjs über einen unauthentifizierten
+// ConvexHttpClient aufgerufen. Diese Scripts schlagen nach dieser
+// Änderung fehl, bis sie sich als Admin authentifizieren (z. B. mit
+// einem Service-/Admin-Token) oder auf `npx convex run` mit Deploy-Key
+// umgestellt werden. Siehe Flag am Ende der Antwort.
 export const batchImportTopics = mutation({
   args: {
     topics: v.array(
@@ -200,6 +211,7 @@ export const batchImportTopics = mutation({
     ),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     let imported = 0;
 
     for (const topic of args.topics) {

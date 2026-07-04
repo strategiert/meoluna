@@ -13,7 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { WorldPreview } from '@/components/WorldPreview';
 import { useAction } from 'convex/react';
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { useUser, useAuth } from '@clerk/clerk-react';
 import { XPPopup } from '@/components/XPPopup';
 import { ProgressStats } from '@/components/ProgressStats';
 
@@ -33,13 +33,14 @@ interface MeolunaProgressPayload {
 export default function WorldView() {
   const { worldId } = useParams<{ worldId: string }>();
   const { user } = useUser();
+  const { getToken } = useAuth();
   const world = useQuery(api.worlds.get, worldId ? { id: worldId as Id<"worlds"> } : 'skip');
   const progress = useQuery(
     api.progress.getByWorld,
-    user?.id && worldId ? { userId: user.id, worldId: worldId as Id<"worlds"> } : 'skip'
+    user?.id && worldId ? { worldId: worldId as Id<"worlds"> } : 'skip'
   );
   // userStats für Level-Up Detection
-  const userStats = useQuery(api.progress.getUserStats, user?.id ? { userId: user.id } : 'skip');
+  const userStats = useQuery(api.progress.getUserStats, user?.id ? {} : 'skip');
 
   const autoFixCode = useAction(api.generate.autoFixCode);
   const reportScore = useMutation(api.progress.reportScore);
@@ -112,9 +113,17 @@ export default function WorldView() {
   const handleSpeak = useCallback(async (text: string) => {
     if (!voiceEnabled || !text) return;
     try {
+      // /api/speak verlangt jetzt ein gültiges Clerk-Session-Token — ohne
+      // Anmeldung (z.B. abgemeldet) wird der TTS-Aufruf still übersprungen.
+      const token = await getToken();
+      if (!token) return;
+
       const res = await fetch('/api/speak', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ text }),
       });
       if (!res.ok) return;
@@ -131,7 +140,7 @@ export default function WorldView() {
     } catch (e) {
       console.warn('[Meoluna Voice] TTS error:', e);
     }
-  }, [voiceEnabled]);
+  }, [voiceEnabled, getToken]);
 
   // Handler für neue meoluna:progress Events
   const handleProgressEvent = useCallback(async (payload: MeolunaProgressPayload) => {
@@ -148,7 +157,6 @@ export default function WorldView() {
         typeof context?.moduleIndex === 'number' ? context.moduleIndex : undefined;
 
       const result = await reportScore({
-        userId: user.id,
         worldId: worldId as Id<"worlds">,
         worldScore: amount,
         eventType: event,
@@ -166,6 +174,13 @@ export default function WorldView() {
 
   // Handler für XP Events aus der Lernwelt
   const handleWorldMessage = useCallback(async (event: MessageEvent) => {
+    // Nur Nachrichten aus einem in DIESER Seite eingebetteten iframe (der
+    // Sandbox) akzeptieren — blockiert postMessage aus fremden Fenstern/Tabs.
+    const fromEmbeddedIframe = Array.from(
+      document.querySelectorAll('iframe'),
+    ).some((f) => f.contentWindow === event.source);
+    if (!fromEmbeddedIframe) return;
+
     const data = event.data;
     if (typeof data !== 'object' || !data.type) return;
 
@@ -200,15 +215,16 @@ export default function WorldView() {
       // ========================================
       switch (data.type) {
         case 'xp':
-          // XP verdient (Legacy: amount wird als worldScore behandelt)
+          // XP verdient (Legacy: amount wird als worldScore behandelt).
+          // Betrag begrenzen, um XP-Manipulation aus dem Sandbox-Code zu dämpfen.
           if (typeof data.amount === 'number' && data.amount > 0) {
+            const clamped = Math.min(data.amount, 1000);
             const result = await addXP({
-              userId: user.id,
               worldId: worldId as Id<"worlds">,
-              xpEarned: data.amount,
+              xpEarned: clamped,
               moduleIndex: data.moduleIndex,
             });
-            showXPWithLevelCheck(data.amount, result.leveledUp, result.newLevel);
+            showXPWithLevelCheck(clamped, result.leveledUp, result.newLevel);
           }
           break;
 
@@ -216,7 +232,6 @@ export default function WorldView() {
           // Modul abgeschlossen
           if (typeof data.index === 'number') {
             const result = await reportScore({
-              userId: user.id,
               worldId: worldId as Id<"worlds">,
               worldScore: 0, // Kein Score, nur Modul-Event
               eventType: 'module',
@@ -229,7 +244,6 @@ export default function WorldView() {
         case 'complete':
           // Welt abgeschlossen
           const result = await completeWorldMutation({
-            userId: user.id,
             worldId: worldId as Id<"worlds">,
           });
           if (!result.alreadyCompleted) {

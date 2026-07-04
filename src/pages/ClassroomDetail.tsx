@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
-import { Id, Doc } from '../../convex/_generated/dataModel';
+import { Id } from '../../convex/_generated/dataModel';
 import { motion } from 'framer-motion';
 import {
   ArrowLeft,
@@ -127,11 +127,9 @@ function InviteCodeSection({ code, classroomId }: { code: string; classroomId: I
 
 function AssignWorldDialog({
   classroomId,
-  userId,
   existingWorldIds
 }: {
   classroomId: Id<"classrooms">;
-  userId: string;
   existingWorldIds: string[];
 }) {
   const [open, setOpen] = useState(false);
@@ -140,17 +138,20 @@ function AssignWorldDialog({
   const [dueDate, setDueDate] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const worlds = useQuery(api.worlds.listByUser, { userId });
+  const worlds = useQuery(api.worlds.listByUser, {});
   const publicWorlds = useQuery(api.worlds.listPublic, {});
   const assignWorld = useMutation(api.classrooms.assignWorld);
   const { toast } = useToast();
 
-  // Kombiniere eigene und öffentliche Welten, filtere bereits zugewiesene
+  // Kombiniere eigene und öffentliche Welten, filtere bereits zugewiesene.
+  // listPublic liefert bewusst keine userId (Privacy) — eigene Welten werden
+  // daher über die _id-Menge der eigenen Welten (aus listByUser) ausgeschlossen.
+  const ownWorldIds = new Set((worlds || []).map((w) => w._id));
   const availableWorlds = [
-    ...(worlds || []).filter((w: Doc<"worlds">) => !existingWorldIds.includes(w._id)),
-    ...(publicWorlds || []).filter((w: Doc<"worlds">) =>
+    ...(worlds || []).filter((w) => !existingWorldIds.includes(w._id)),
+    ...(publicWorlds || []).filter((w) =>
       !existingWorldIds.includes(w._id) &&
-      w.userId !== userId
+      !ownWorldIds.has(w._id)
     ),
   ];
 
@@ -163,7 +164,6 @@ function AssignWorldDialog({
       const result = await assignWorld({
         classroomId,
         worldId: selectedWorld as Id<"worlds">,
-        assignedBy: userId,
         instructions: instructions.trim() || undefined,
         dueDate: dueDate ? new Date(dueDate).getTime() : undefined,
         isRequired: true,
@@ -527,7 +527,6 @@ export default function ClassroomDetail() {
                 {user?.id && (
                   <AssignWorldDialog
                     classroomId={classroom._id}
-                    userId={user.id}
                     existingWorldIds={existingWorldIds}
                   />
                 )}

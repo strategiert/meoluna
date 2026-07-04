@@ -72,7 +72,7 @@ const subjects = [
   'Ethik', 'Religion', 'Wirtschaft', 'Politik', 'Sonstiges',
 ];
 
-function CreateClassroomDialog({ userId }: { userId: string }) {
+function CreateClassroomDialog() {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -92,7 +92,6 @@ function CreateClassroomDialog({ userId }: { userId: string }) {
       const result = await createClassroom({
         name: name.trim(),
         description: description.trim() || undefined,
-        teacherId: userId,
         gradeLevel: gradeLevel || undefined,
         subject: subject || undefined,
       });
@@ -314,11 +313,11 @@ export default function TeacherDashboard() {
   const { user, isLoaded } = useUser();
   const classrooms = useQuery(
     api.classrooms.listByTeacher,
-    user?.id ? { teacherId: user.id } : 'skip'
+    user?.id ? {} : 'skip'
   );
   const overview = useQuery(
     api.classrooms.getTeacherOverview,
-    user?.id ? { teacherId: user.id } : 'skip'
+    user?.id ? {} : 'skip'
   );
   const deleteClassroom = useMutation(api.classrooms.remove);
   const { toast } = useToast();
@@ -406,7 +405,7 @@ export default function TeacherDashboard() {
                   Verwalte deine Klassen und verfolge den Lernfortschritt
                 </p>
               </div>
-              {user?.id && <CreateClassroomDialog userId={user.id} />}
+              {user?.id && <CreateClassroomDialog />}
             </div>
 
             {/* Stats */}
@@ -497,7 +496,7 @@ export default function TeacherDashboard() {
               <p className="text-muted-foreground mb-6 max-w-md mx-auto">
                 Erstelle deine erste Klasse und lade Schüler mit einem Einladungscode ein.
               </p>
-              {user?.id && <CreateClassroomDialog userId={user.id} />}
+              {user?.id && <CreateClassroomDialog />}
             </motion.div>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

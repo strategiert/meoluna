@@ -270,7 +270,6 @@ export default function Create() {
       await startGeneration({
         prompt: input.trim(),
         pdfText: pdfText || undefined,
-        userId: user.id,
         sessionId: newSessionId,
       });
     } catch (err) {
@@ -319,7 +318,6 @@ export default function Create() {
       const newWorldId = await saveWorld({
         title: worldTitle || 'Neue Lernwelt',
         code: currentCode,
-        userId: user.id,
         isPublic: false
       });
       navigate(`/w/${newWorldId}`);

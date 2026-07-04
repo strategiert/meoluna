@@ -229,7 +229,6 @@ Nutze die hochgeladene Datei als Grundlage. Die Welt soll kindgerecht, interakti
       const result = await generateWorldV2({
         prompt,
         pdfText: pdfText || undefined,
-        userId: user.id,
         sessionId,
         gradeLevel: String(selectedGrade),
         subject: selectedSubject.slug,

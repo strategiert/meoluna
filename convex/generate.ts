@@ -1,5 +1,7 @@
 import { v } from "convex/values";
 import { action } from "./_generated/server";
+import { api } from "./_generated/api";
+import { requireIdentity } from "./lib/auth";
 import { shouldUseFocusedIntervention } from "./pipeline/engines/focusedInterventionRouter";
 import { runFocusedInterventionGenerator } from "./pipeline/steps/focusedInterventionGenerator";
 import { isLikelyMovementTopic } from "./pipeline/engines/movementTopicRouter";
@@ -493,7 +495,12 @@ export const generateWorld = action({
     subject: v.optional(v.string()),
     style: v.optional(v.string()),
   },
-  handler: async (_ctx, args) => {
+  handler: async (ctx, args) => {
+    // Ruft eine kostenpflichtige LLM-API auf — darf nicht anonym erreichbar
+    // sein. Diese Action persistiert selbst keine Welt (gibt nur den Code
+    // zurück), daher genügt hier die reine Authentifizierungsprüfung.
+    await requireIdentity(ctx);
+
     const apiKey = process.env.ANTHROPIC_API_KEY;
 
     if (!apiKey) {
@@ -595,7 +602,12 @@ export const generateWorldFromPDF = action({
     subject: v.optional(v.string()),
     style: v.optional(v.string()),
   },
-  handler: async (_ctx, args) => {
+  handler: async (ctx, args) => {
+    // Ruft eine kostenpflichtige LLM-API auf — darf nicht anonym erreichbar
+    // sein. Diese Action persistiert selbst keine Welt (gibt nur den Code
+    // zurück), daher genügt hier die reine Authentifizierungsprüfung.
+    await requireIdentity(ctx);
+
     const apiKey = process.env.ANTHROPIC_API_KEY;
 
     if (!apiKey) {
@@ -714,7 +726,11 @@ export const autoFixCode = action({
     error: v.string(),
     code: v.string(),
   },
-  handler: async (_ctx, args) => {
+  handler: async (ctx, args) => {
+    // Ruft eine kostenpflichtige LLM-API auf — darf nicht anonym erreichbar
+    // sein.
+    await requireIdentity(ctx);
+
     const apiKey = process.env.ANTHROPIC_API_KEY;
 
     if (!apiKey) {
@@ -844,7 +860,14 @@ export const upgradeWorldCode = action({
   args: {
     code: v.string(),
   },
-  handler: async (_ctx, args) => {
+  handler: async (ctx, args) => {
+    // Öffentliche Action, aber nur für den internen, bereits admin-geprüften
+    // Gebrauch aus worlds.ts::upgradeWorld / migrateAllWorlds gedacht (die
+    // dort schon assertAdmin aufrufen). Zusätzliche Absicherung hier, falls
+    // diese Action doch einmal direkt aufgerufen wird — bricht bestehende
+    // interne Aufrufer nicht, da diese ohnehin als Admin laufen.
+    await ctx.runQuery(api.users.assertAdmin, {});
+
     const apiKey = process.env.ANTHROPIC_API_KEY;
 
     if (!apiKey) {

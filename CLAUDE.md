@@ -88,7 +88,7 @@ Summarize subagent output before acting on it. Don't mirror full subagent reason
 3. **Mission Control updaten**
    ```bash
    # Task-Status updaten
-   curl -X PATCH -H "Authorization: Bearer a8c0ea72755c4fe081c5156a03060695" \
+   curl -X PATCH -H "Authorization: Bearer ${MISSION_CONTROL_TOKEN}" \
      -H "Content-Type: application/json" \
      -d '{"status": "Done"}' \
      "https://mission-control-etj.pages.dev/api/tasks/<task-id>?project=meoluna"
@@ -121,18 +121,18 @@ Summarize subagent output before acting on it. Don't mirror full subagent reason
 ### 🎯 Mission Control API (für Task-Tracking)
 
 **URL:** `https://mission-control-etj.pages.dev`
-**Auth:** `Authorization: Bearer a8c0ea72755c4fe081c5156a03060695`
+**Auth:** `Authorization: Bearer ${MISSION_CONTROL_TOKEN}`
 **Projekt:** `meoluna`
 
 #### Alle Tasks abrufen
 ```bash
-curl -H "Authorization: Bearer a8c0ea72755c4fe081c5156a03060695" \
+curl -H "Authorization: Bearer ${MISSION_CONTROL_TOKEN}" \
   "https://mission-control-etj.pages.dev/api/tasks?project=meoluna"
 ```
 
 #### Neuen Task erstellen
 ```bash
-curl -X POST -H "Authorization: Bearer a8c0ea72755c4fe081c5156a03060695" \
+curl -X POST -H "Authorization: Bearer ${MISSION_CONTROL_TOKEN}" \
   -H "Content-Type: application/json" \
   -d '{
     "title": "Task-Titel hier",
@@ -145,7 +145,7 @@ curl -X POST -H "Authorization: Bearer a8c0ea72755c4fe081c5156a03060695" \
 
 #### Task updaten (Status ändern)
 ```bash
-curl -X PATCH -H "Authorization: Bearer a8c0ea72755c4fe081c5156a03060695" \
+curl -X PATCH -H "Authorization: Bearer ${MISSION_CONTROL_TOKEN}" \
   -H "Content-Type: application/json" \
   -d '{"status": "Done", "notes": "Ergebnis: Was wurde erreicht. Commit xyz."}' \
   "https://mission-control-etj.pages.dev/api/tasks/<TASK-ID>?project=meoluna"

@@ -6,9 +6,10 @@
 // ============================================================================
 
 import { v } from "convex/values";
-import { action } from "../_generated/server";
-import { internal, api } from "../_generated/api";
+import { action, internalAction, ActionCtx } from "../_generated/server";
+import { internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
+import { requireIdentity } from "../lib/auth";
 
 import { runValidator } from "./steps/validator";
 import { runStructuralGate } from "./steps/structuralGate";
@@ -22,31 +23,49 @@ import type { EngineName } from "./engines/engineRegistry";
 
 import { STEP_LABELS, STEP_ORDER } from "./types";
 
+const generateWorldV2Args = {
+  prompt: v.string(),
+  pdfText: v.optional(v.string()),
+  imageDescription: v.optional(v.string()),
+  gradeLevel: v.optional(v.string()),
+  subject: v.optional(v.string()),
+  contextAnswers: v.optional(v.object({
+    intent: v.optional(v.string()),
+    audience: v.optional(v.string()),
+    guidance: v.optional(v.string()),
+  })),
+  sessionId: v.string(),
+};
+
+type GenerateWorldV2Args = {
+  prompt: string;
+  pdfText?: string;
+  imageDescription?: string;
+  gradeLevel?: string;
+  subject?: string;
+  contextAnswers?: {
+    intent?: string;
+    audience?: string;
+    guidance?: string;
+  };
+  sessionId: string;
+  // Vertrauenswuerdige userId — wird NIE vom Client entgegengenommen, sondern
+  // von jedem Aufrufer serverseitig aus dem Auth-Kontext abgeleitet, bevor
+  // diese Kernfunktion aufgerufen wird (siehe generateWorldV2 unten und
+  // pipeline/status.ts::startGeneration).
+  userId: string;
+};
+
 // ============================================================================
-// MAIN ACTION: generateWorldV2
+// KERN-IMPLEMENTIERUNG: von zwei vertrauenswuerdigen Entry-Points aufgerufen
 // ============================================================================
-export const generateWorldV2 = action({
-  args: {
-    prompt: v.string(),
-    pdfText: v.optional(v.string()),
-    imageDescription: v.optional(v.string()),
-    gradeLevel: v.optional(v.string()),
-    subject: v.optional(v.string()),
-    contextAnswers: v.optional(v.object({
-      intent: v.optional(v.string()),
-      audience: v.optional(v.string()),
-      guidance: v.optional(v.string()),
-    })),
-    userId: v.string(),
-    sessionId: v.string(),
-  },
-  handler: async (ctx, args): Promise<{
+async function runGenerateWorldV2(ctx: ActionCtx, args: GenerateWorldV2Args): Promise<{
     worldId: Id<"worlds">;
     code: string;
     worldName: string;
     duration: number;
     qualityScore: number;
-  }> => {
+  }> {
     const startTime = Date.now();
     const stepTimings: Record<string, {
       durationMs: number;
@@ -106,7 +125,7 @@ export const generateWorldV2 = action({
           throw new Error(`Focused Intervention Gate Failed: ${focusedGate.violations.join(" | ")}`);
         }
 
-        const worldId: Id<"worlds"> = await ctx.runMutation(api.worlds.create, {
+        const worldId: Id<"worlds"> = await ctx.runMutation(internal.worlds.internalCreate, {
           title: focused.worldName,
           code: validated.code,
           userId: args.userId,
@@ -200,7 +219,7 @@ export const generateWorldV2 = action({
               throw new Error(`Engine Structural Gate Failed (${engineName}): ${gateResult.violations.join(" | ")}`);
             }
 
-            const worldId: Id<"worlds"> = await ctx.runMutation(api.worlds.create, {
+            const worldId: Id<"worlds"> = await ctx.runMutation(internal.worlds.internalCreate, {
               title: generation.worldName,
               code: generation.code,
               userId: args.userId,
@@ -256,5 +275,44 @@ export const generateWorldV2 = action({
 
       throw new Error(`Pipeline V2 Error: ${errorMsg}`);
     }
+}
+
+// ============================================================================
+// OEFFENTLICHER ENTRY-POINT: direkter Client-Aufruf (z.B. WorldCreatorModal)
+// Identitaet wird ausschliesslich aus dem verifizierten Clerk-JWT abgeleitet,
+// niemals aus einem Client-Argument.
+// ============================================================================
+export const generateWorldV2 = action({
+  args: generateWorldV2Args,
+  handler: async (ctx, args): Promise<{
+    worldId: Id<"worlds">;
+    code: string;
+    worldName: string;
+    duration: number;
+    qualityScore: number;
+  }> => {
+    const identity = await requireIdentity(ctx);
+    return runGenerateWorldV2(ctx, { ...args, userId: identity.subject });
+  },
+});
+
+// ============================================================================
+// INTERNER ENTRY-POINT: nur fuer serverseitige Aufrufer (z.B.
+// pipeline/status.ts::startGeneration via ctx.scheduler.runAfter).
+// Scheduler-Aufrufe behalten den Auth-Kontext des urspruenglichen Aufrufers
+// NICHT bei (ctx.auth waere dort leer) — deshalb reicht der Aufrufer die
+// bereits verifizierte userId hier explizit und vertrauenswuerdig durch.
+// Nicht oeffentlich erreichbar, also von aussen nicht faelschbar.
+// ============================================================================
+export const generateWorldV2Internal = internalAction({
+  args: { ...generateWorldV2Args, userId: v.string() },
+  handler: async (ctx, args): Promise<{
+    worldId: Id<"worlds">;
+    code: string;
+    worldName: string;
+    duration: number;
+    qualityScore: number;
+  }> => {
+    return runGenerateWorldV2(ctx, args);
   },
 });

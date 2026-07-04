@@ -5,6 +5,7 @@
 import { query, mutation } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { v } from "convex/values";
+import { requireAdmin } from "./lib/auth";
 
 const SITE = "https://meoluna.com";
 
@@ -72,7 +73,7 @@ export const getCategories = query({
   },
 });
 
-// Create a new blog post (admin only)
+// Create a new blog post — nur Admin. Identität serverseitig aus ctx.auth.
 export const create = mutation({
   args: {
     slug: v.string(),
@@ -86,6 +87,7 @@ export const create = mutation({
     isPublished: v.boolean(),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const now = Date.now();
     
     const id = await ctx.db.insert("blogPosts", {
@@ -95,8 +97,9 @@ export const create = mutation({
       updatedAt: now,
     });
 
-    // Bei Veroeffentlichung sofort an IndexNow melden.
+    // Bei Veroeffentlichung: statische Site neu bauen + an IndexNow melden.
     if (args.isPublished) {
+      await ctx.scheduler.runAfter(0, internal.indexnow.triggerSiteRebuild, {});
       await ctx.scheduler.runAfter(0, internal.indexnow.pingUrls, {
         urls: [`${SITE}/blog/${args.slug}`, `${SITE}/blog`],
       });
@@ -106,7 +109,7 @@ export const create = mutation({
   },
 });
 
-// Update a blog post
+// Update a blog post — nur Admin. Identität serverseitig aus ctx.auth.
 export const update = mutation({
   args: {
     id: v.id("blogPosts"),
@@ -120,6 +123,7 @@ export const update = mutation({
     isPublished: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const { id, ...updates } = args;
     const now = Date.now();
     
@@ -138,9 +142,10 @@ export const update = mutation({
       updatedAt: now,
     });
 
-    // Melden, wenn jetzt (weiterhin) veroeffentlicht.
+    // Wenn jetzt (weiterhin) veroeffentlicht: Site neu bauen + IndexNow melden.
     const slug = updates.slug ?? existing.slug;
     if (updates.isPublished ?? existing.isPublished) {
+      await ctx.scheduler.runAfter(0, internal.indexnow.triggerSiteRebuild, {});
       await ctx.scheduler.runAfter(0, internal.indexnow.pingUrls, {
         urls: [`${SITE}/blog/${slug}`, `${SITE}/blog`],
       });
@@ -150,10 +155,11 @@ export const update = mutation({
   },
 });
 
-// Delete a blog post
+// Delete a blog post — nur Admin. Identität serverseitig aus ctx.auth.
 export const remove = mutation({
   args: { id: v.id("blogPosts") },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     await ctx.db.delete(args.id);
   },
 });

@@ -126,11 +126,11 @@ export default function AdminHome() {
   const { user, isLoaded } = useUser();
   const convexUser = useQuery(
     api.users.getUser,
-    user?.id ? { clerkId: user.id } : "skip",
+    user?.id ? {} : "skip",
   );
   const overview = useQuery(
     api.admin.getOverview,
-    user?.id && convexUser?.role === "admin" ? { userId: user.id } : "skip",
+    user?.id && convexUser?.role === "admin" ? {} : "skip",
   );
 
   if (!isLoaded || (user && convexUser === undefined) || (convexUser?.role === "admin" && overview === undefined)) {

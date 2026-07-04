@@ -1,20 +1,6 @@
-import { v } from "convex/values";
 import { query } from "./_generated/server";
 import type { Doc } from "./_generated/dataModel";
-import type { QueryCtx } from "./_generated/server";
-
-async function assertAdmin(ctx: QueryCtx, userId: string): Promise<Doc<"users">> {
-  const user = await ctx.db
-    .query("users")
-    .withIndex("by_clerk_id", (q) => q.eq("clerkId", userId))
-    .first();
-
-  if (!user || user.role !== "admin") {
-    throw new Error("Admin access required.");
-  }
-
-  return user;
-}
+import { requireAdmin } from "./lib/auth";
 
 function createdAt(doc: { createdAt?: number; _creationTime: number }): number {
   return doc.createdAt ?? doc._creationTime;
@@ -49,9 +35,9 @@ function mapWorld(world: Doc<"worlds">, userById: Map<string, Doc<"users">>) {
 }
 
 export const getOverview = query({
-  args: { userId: v.string() },
-  handler: async (ctx, args) => {
-    await assertAdmin(ctx, args.userId);
+  args: {},
+  handler: async (ctx) => {
+    await requireAdmin(ctx);
 
     const now = Date.now();
     const since24h = now - 24 * 60 * 60 * 1000;
@@ -223,9 +209,9 @@ export const getOverview = query({
 });
 
 export const listWorlds = query({
-  args: { userId: v.string() },
-  handler: async (ctx, args) => {
-    await assertAdmin(ctx, args.userId);
+  args: {},
+  handler: async (ctx) => {
+    await requireAdmin(ctx);
 
     const users = await ctx.db.query("users").collect();
     const userById = new Map(users.map((user) => [user.clerkId, user]));

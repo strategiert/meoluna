@@ -1,22 +1,11 @@
 import { mutation, query } from "../_generated/server";
 import { v } from "convex/values";
+import { hashEmail } from "./hash";
+import { requireIdentity, requireAdmin, getUserOrNull } from "../lib/auth";
 
-// Simple hash function for GDPR compliance (djb2 algorithm)
-// Note: For production, consider using a Node.js action for SHA-256
-function simpleHash(str: string): string {
-  let hash = 5381;
-  for (let i = 0; i < str.length; i++) {
-    hash = ((hash << 5) + hash) ^ str.charCodeAt(i);
-  }
-  return Math.abs(hash).toString(16).padStart(8, "0");
-}
-
-// Hash email for GDPR compliance
-function hashEmail(email: string): string {
-  return simpleHash(email.toLowerCase().trim() + "meoluna_salt_2026");
-}
-
-// Resolve identity - get or create canonical user ID
+// Resolve identity - liefert nur minimale, nicht-sensible Infos zurück
+// (kein verknüpfter userId, keine Attribution) – anonyme Clients nutzen dies,
+// um ihre eigene canonicalUserId zu ermitteln.
 export const resolveIdentity = query({
   args: { anonymousId: v.string() },
   handler: async (ctx, args) => {
@@ -29,30 +18,29 @@ export const resolveIdentity = query({
       return {
         canonicalUserId: args.anonymousId,
         isLinked: false,
-        userId: undefined,
       };
     }
 
     return {
       canonicalUserId: identity.canonicalUserId,
       isLinked: !!identity.userId,
-      userId: identity.userId,
-      firstTouchAttribution: identity.firstTouchAttribution,
-      lastTouchAttribution: identity.lastTouchAttribution,
     };
   },
 });
 
-// Link user ID to anonymous ID (called after login/signup)
+// Verknüpft die anonyme Identität mit dem ANGEMELDETEN Nutzer.
+// userId wird serverseitig aus ctx.auth abgeleitet – niemals aus Client-Args –
+// damit niemand seine anonyme Identität an ein fremdes Konto hängen kann.
 export const linkUserId = mutation({
   args: {
     anonymousId: v.string(),
-    userId: v.string(),
     email: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    const identity = await requireIdentity(ctx);
+    const userId = identity.subject;
     const now = Date.now();
-    const emailHash = args.email ? hashEmail(args.email) : undefined;
+    const emailHash = args.email ? await hashEmail(args.email) : undefined;
 
     // Find existing identity by anonymousId
     const existingByAnonymous = await ctx.db
@@ -63,7 +51,7 @@ export const linkUserId = mutation({
     // Check if there's already an identity for this userId
     const existingByUser = await ctx.db
       .query("userIdentityGraph")
-      .withIndex("by_user_id", (q) => q.eq("userId", args.userId))
+      .withIndex("by_user_id", (q) => q.eq("userId", userId))
       .first();
 
     if (existingByUser && existingByAnonymous && existingByUser._id !== existingByAnonymous._id) {
@@ -117,7 +105,7 @@ export const linkUserId = mutation({
     if (existingByAnonymous) {
       // Link user ID to existing anonymous identity
       await ctx.db.patch(existingByAnonymous._id, {
-        userId: args.userId,
+        userId,
         emailHash,
         lastActivity: now,
       });
@@ -159,7 +147,7 @@ export const linkUserId = mutation({
     // Create new identity with user ID
     await ctx.db.insert("userIdentityGraph", {
       canonicalUserId: args.anonymousId,
-      userId: args.userId,
+      userId,
       emailHash,
       devices: [
         {
@@ -180,21 +168,24 @@ export const linkUserId = mutation({
   },
 });
 
-// Get identity by user ID
+// Eigene verknüpfte Identität abrufen (oder Admin). Der Identity-Graph enthält
+// verknüpfte userId, emailHash und Attribution – daher nicht frei abfragbar.
 export const getIdentityByUserId = query({
-  args: { userId: v.string() },
-  handler: async (ctx, args) => {
+  args: {},
+  handler: async (ctx) => {
+    const user = await requireIdentity(ctx);
     return await ctx.db
       .query("userIdentityGraph")
-      .withIndex("by_user_id", (q) => q.eq("userId", args.userId))
+      .withIndex("by_user_id", (q) => q.eq("userId", user.subject))
       .first();
   },
 });
 
-// Get identity by canonical ID
+// Get identity by canonical ID — nur Admin (Reporting/Debug).
 export const getIdentityByCanonicalId = query({
   args: { canonicalUserId: v.string() },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     return await ctx.db
       .query("userIdentityGraph")
       .withIndex("by_canonical_id", (q) => q.eq("canonicalUserId", args.canonicalUserId))
@@ -202,7 +193,7 @@ export const getIdentityByCanonicalId = query({
   },
 });
 
-// Update attribution when user returns with new campaign
+// Update attribution — nur für die eigene (angemeldete) Identität.
 export const updateAttribution = mutation({
   args: {
     canonicalUserId: v.string(),
@@ -215,6 +206,7 @@ export const updateAttribution = mutation({
     }),
   },
   handler: async (ctx, args) => {
+    const user = await getUserOrNull(ctx);
     const now = Date.now();
 
     const existing = await ctx.db
@@ -224,6 +216,12 @@ export const updateAttribution = mutation({
 
     if (!existing) {
       return { success: false, reason: "Identity not found" };
+    }
+
+    // Ist die Identität bereits mit einem Konto verknüpft, darf nur dieser
+    // Nutzer (oder ein Admin) die Attribution ändern.
+    if (existing.userId && existing.userId !== user?.clerkId && user?.role !== "admin") {
+      return { success: false, reason: "Nicht autorisiert" };
     }
 
     // Update last touch attribution

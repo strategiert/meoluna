@@ -1,21 +1,7 @@
 import { mutation, query } from "../_generated/server";
 import { v } from "convex/values";
-
-// Simple hash function for GDPR compliance (djb2 algorithm)
-// Note: For production, consider using a Node.js action for SHA-256
-function simpleHash(str: string): string {
-  let hash = 5381;
-  for (let i = 0; i < str.length; i++) {
-    hash = ((hash << 5) + hash) ^ str.charCodeAt(i);
-  }
-  return Math.abs(hash).toString(16).padStart(8, "0");
-}
-
-// Hash IP for GDPR compliance
-function hashIp(ip: string | undefined): string | undefined {
-  if (!ip) return undefined;
-  return simpleHash(ip + "meoluna_salt_2026");
-}
+import { hashIp } from "./hash";
+import { requireAdmin } from "../lib/auth";
 
 // Collect click data (pageview/session start)
 export const collectClick = mutation({
@@ -38,7 +24,7 @@ export const collectClick = mutation({
   },
   handler: async (ctx, args) => {
     const now = Date.now();
-    const ipHash = hashIp(args.clientIp);
+    const ipHash = await hashIp(args.clientIp);
 
     // Check if session already exists
     const existingSession = await ctx.db
@@ -179,10 +165,11 @@ async function initializeIdentity(
   }
 }
 
-// Query to get session data
+// Session-Rohdaten (IP-Hash, Attribution, User-Agent) — nur Admin (Reporting).
 export const getSession = query({
   args: { sessionId: v.string() },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     return await ctx.db
       .query("sessionClicks")
       .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
@@ -190,10 +177,11 @@ export const getSession = query({
   },
 });
 
-// Query to get sessions by anonymous ID
+// Sessions je anonymer ID — nur Admin (Reporting).
 export const getSessionsByAnonymousId = query({
   args: { anonymousId: v.string() },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     return await ctx.db
       .query("sessionClicks")
       .withIndex("by_anonymous", (q) => q.eq("anonymousId", args.anonymousId))

@@ -280,7 +280,7 @@ npx tsc --noEmit --pretty
 ## MISSION CONTROL
 
 - URL: https://mission-control-etj.pages.dev
-- API Key: `a8c0ea72755c4fe081c5156a03060695`
+- API Key: `${MISSION_CONTROL_TOKEN}`
 - Projekt: `meoluna`
 - Auth: `?apiKey=...` oder Bearer Token
 

@@ -18,7 +18,6 @@ export function useUserSync() {
     hasSynced.current = true;
 
     syncUser({
-      clerkId: user.id,
       email: user.primaryEmailAddress?.emailAddress,
       name: user.fullName ?? user.firstName ?? undefined,
       imageUrl: user.imageUrl,

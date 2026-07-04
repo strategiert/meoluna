@@ -41,12 +41,12 @@ export default function SiteStudioEditor() {
 
   const convexUser = useQuery(
     api.users.getUser,
-    user?.id ? { clerkId: user.id } : "skip",
+    user?.id ? {} : "skip",
   );
   const state = useQuery(
     api.siteStudio.getPageEditorState,
     user?.id && pageIdValue && convexUser?.role === "admin"
-      ? { userId: user.id, pageId: pageIdValue }
+      ? { pageId: pageIdValue }
       : "skip",
   );
 
@@ -156,7 +156,6 @@ export default function SiteStudioEditor() {
     setSelectedBlockId(blockId);
     try {
       await selectBlock({
-        userId: user.id,
         pageId: pageIdValue,
         mode: nextMode,
         selectedBlockId: blockId,
@@ -171,7 +170,6 @@ export default function SiteStudioEditor() {
     setIsRunningCommand(true);
     try {
       const result = await runPageCommand({
-        userId: user.id,
         pageId: pageIdValue,
         revisionId,
         prompt: prompt.trim(),
@@ -199,7 +197,6 @@ export default function SiteStudioEditor() {
     setIsSavingInspector(true);
     try {
       await applyOperations({
-        userId: user.id,
         pageId: pageIdValue,
         baseRevisionId: revisionId,
         operations: [
@@ -236,7 +233,6 @@ export default function SiteStudioEditor() {
     setIsApplyingTheme(true);
     try {
       const result = await updateThemeTokens({
-        userId: user.id,
         projectId: state.project._id,
         tokenPatch: {
           colors: {
@@ -269,7 +265,6 @@ export default function SiteStudioEditor() {
     setIsRollingBackRevisionId(snapshotRevisionId);
     try {
       await rollbackToRevision({
-        userId: user.id,
         pageId: pageIdValue,
         targetRevisionId: snapshotRevisionId,
       });
@@ -293,7 +288,6 @@ export default function SiteStudioEditor() {
     setIsPublishing(true);
     try {
       const result = await publishRevision({
-        userId: user.id,
         pageId: pageIdValue,
         revisionId,
         approvalNote: approvalNote.trim() || undefined,
@@ -393,7 +387,6 @@ export default function SiteStudioEditor() {
                       setMode(entry);
                       if (user?.id && pageIdValue) {
                         void selectBlock({
-                          userId: user.id,
                           pageId: pageIdValue,
                           mode: entry,
                           selectedBlockId,

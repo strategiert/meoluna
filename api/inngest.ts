@@ -1,10 +1,12 @@
 import { Inngest } from "inngest";
 import { serve } from "inngest/next";
 
-// Create the Inngest client
+// Create the Inngest client. Der Event-Key wird aus der Umgebung gelesen,
+// damit nur autorisierte Sender Events auslösen können.
 const inngest = new Inngest({
   id: "meoluna",
   name: "Meoluna",
+  eventKey: process.env.INNGEST_EVENT_KEY,
 });
 
 // Background job for world generation
@@ -64,8 +66,19 @@ const healthCheck = inngest.createFunction(
   async () => ({ status: "ok", timestamp: new Date().toISOString() })
 );
 
-// Export handler
+// Fail-closed: In Produktion MUSS INNGEST_SIGNING_KEY gesetzt sein, sonst
+// würden eingehende Aufrufe unverifiziert akzeptiert (unautorisiertes
+// Auslösen bezahlter Generierung). Lieber Endpoint tot als offen.
+if (process.env.NODE_ENV === "production" && !process.env.INNGEST_SIGNING_KEY) {
+  throw new Error(
+    "[inngest] INNGEST_SIGNING_KEY ist in Produktion nicht gesetzt — Endpoint verweigert den Start.",
+  );
+}
+
+// Export handler. Der Signing-Key verifiziert, dass Aufrufe wirklich von
+// Inngest stammen (verhindert unautorisiertes Auslösen bezahlter Generierung).
 export default serve({
   client: inngest,
   functions: [generateWorldBackground, healthCheck],
+  signingKey: process.env.INNGEST_SIGNING_KEY,
 });

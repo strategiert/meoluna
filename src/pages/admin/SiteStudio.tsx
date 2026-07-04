@@ -29,11 +29,11 @@ export default function SiteStudio() {
 
   const convexUser = useQuery(
     api.users.getUser,
-    user?.id ? { clerkId: user.id } : "skip",
+    user?.id ? {} : "skip",
   );
   const projects = useQuery(
     api.siteStudio.listProjects,
-    user?.id && convexUser?.role === "admin" ? { userId: user.id } : "skip",
+    user?.id && convexUser?.role === "admin" ? {} : "skip",
   );
 
   const createProject = useMutation(api.siteStudio.createProject);
@@ -59,7 +59,6 @@ export default function SiteStudio() {
     api.siteStudio.listPagesByProject,
     user?.id && selectedProjectId
       ? {
-          userId: user.id,
           projectId: selectedProjectId,
         }
       : "skip",
@@ -98,7 +97,6 @@ export default function SiteStudio() {
     try {
       const slug = slugify(projectSlug || projectName);
       const result = await createProject({
-        userId: user.id,
         name: projectName.trim(),
         slug,
       });
@@ -129,7 +127,6 @@ export default function SiteStudio() {
     setIsCreatingPage(true);
     try {
       const result = await createPage({
-        userId: user.id,
         projectId: selectedProjectId,
         title: pageTitle.trim(),
         slug: normalizedSlug,

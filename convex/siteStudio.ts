@@ -2,6 +2,7 @@ import { v } from "convex/values";
 import { action, internalMutation, mutation, query } from "./_generated/server";
 import { api, internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
+import { requireAdmin, requireIdentity } from "./lib/auth";
 
 type SiteMode = "chat" | "visual" | "theme";
 type RevisionSource = "chat" | "visual" | "theme" | "rollback" | "publish";
@@ -593,18 +594,6 @@ Regeln:
   };
 }
 
-async function assertAdminByClerkId(ctx: { db: any }, clerkId: string): Promise<Doc<"users">> {
-  const user = await ctx.db
-    .query("users")
-    .withIndex("by_clerk_id", (q: any) => q.eq("clerkId", clerkId))
-    .first();
-
-  if (!user || user.role !== "admin") {
-    throw new Error("Admin access required.");
-  }
-  return user;
-}
-
 async function resolveProjectTheme(
   ctx: { db: any },
   project: Doc<"siteProjects">,
@@ -636,9 +625,9 @@ async function getNextRevisionNumber(
 }
 
 export const listProjects = query({
-  args: { userId: v.string() },
-  handler: async (ctx, args) => {
-    await assertAdminByClerkId(ctx, args.userId);
+  args: {},
+  handler: async (ctx) => {
+    await requireAdmin(ctx);
     const projects = await ctx.db.query("siteProjects").order("desc").take(100);
 
     const withStats = await Promise.all(
@@ -696,12 +685,11 @@ export const getPublishedPageBySlug = query({
 
 export const createProject = mutation({
   args: {
-    userId: v.string(),
     name: v.string(),
     slug: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    await assertAdminByClerkId(ctx, args.userId);
+    const admin = await requireAdmin(ctx);
     const normalizedSlug = slugify(args.slug ?? args.name);
     if (!normalizedSlug) {
       throw new Error("Invalid project slug.");
@@ -719,7 +707,7 @@ export const createProject = mutation({
     const projectId = await ctx.db.insert("siteProjects", {
       name: args.name.trim(),
       slug: normalizedSlug,
-      createdBy: args.userId,
+      createdBy: admin.clerkId,
       createdAt: now,
       updatedAt: now,
     });
@@ -729,7 +717,7 @@ export const createProject = mutation({
       name: "Default Theme",
       tokens: buildDefaultThemeTokens(),
       isDefault: true,
-      createdBy: args.userId,
+      createdBy: admin.clerkId,
       createdAt: now,
       updatedAt: now,
     });
@@ -745,11 +733,10 @@ export const createProject = mutation({
 
 export const listPagesByProject = query({
   args: {
-    userId: v.string(),
     projectId: v.id("siteProjects"),
   },
   handler: async (ctx, args) => {
-    await assertAdminByClerkId(ctx, args.userId);
+    await requireAdmin(ctx);
     const pages = await ctx.db
       .query("sitePages")
       .withIndex("by_project", (q) => q.eq("projectId", args.projectId))
@@ -761,14 +748,13 @@ export const listPagesByProject = query({
 
 export const createPage = mutation({
   args: {
-    userId: v.string(),
     projectId: v.id("siteProjects"),
     slug: v.string(),
     title: v.string(),
     initialPrompt: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    await assertAdminByClerkId(ctx, args.userId);
+    const admin = await requireAdmin(ctx);
     const project = await ctx.db.get(args.projectId);
     if (!project) {
       throw new Error("Project not found.");
@@ -795,8 +781,8 @@ export const createPage = mutation({
       slug: normalizedSlug,
       title: args.title.trim(),
       status: "draft",
-      createdBy: args.userId,
-      updatedBy: args.userId,
+      createdBy: admin.clerkId,
+      updatedBy: admin.clerkId,
       createdAt: now,
       updatedAt: now,
     });
@@ -813,7 +799,7 @@ export const createPage = mutation({
       dslDocument: initialDocument,
       themeOverrides: {},
       changeSummary: "Initial draft created.",
-      createdBy: args.userId,
+      createdBy: admin.clerkId,
       source: "chat",
       createdAt: now,
     });
@@ -821,7 +807,7 @@ export const createPage = mutation({
     await ctx.db.patch(pageId, {
       currentRevisionId: revisionId,
       updatedAt: now,
-      updatedBy: args.userId,
+      updatedBy: admin.clerkId,
     });
 
     const theme = await resolveProjectTheme(ctx, project as Doc<"siteProjects">);
@@ -831,7 +817,7 @@ export const createPage = mutation({
       snapshotType: "auto",
       dslDocument: initialDocument,
       themeTokens: theme?.tokens ?? buildDefaultThemeTokens(),
-      createdBy: args.userId,
+      createdBy: admin.clerkId,
       createdAt: now,
     });
 
@@ -841,11 +827,10 @@ export const createPage = mutation({
 
 export const getRevision = query({
   args: {
-    userId: v.string(),
     revisionId: v.id("pageRevisions"),
   },
   handler: async (ctx, args) => {
-    await assertAdminByClerkId(ctx, args.userId);
+    await requireAdmin(ctx);
     const revision = await ctx.db.get(args.revisionId);
     if (!revision) return null;
     const page = await ctx.db.get(revision.pageId);
@@ -855,11 +840,10 @@ export const getRevision = query({
 
 export const getPageEditorState = query({
   args: {
-    userId: v.string(),
     pageId: v.id("sitePages"),
   },
   handler: async (ctx, args) => {
-    await assertAdminByClerkId(ctx, args.userId);
+    const admin = await requireAdmin(ctx);
     const page = await ctx.db.get(args.pageId);
     if (!page) return null;
     const project = await ctx.db.get(page.projectId);
@@ -874,7 +858,7 @@ export const getPageEditorState = query({
     const editorSession = await ctx.db
       .query("editorSessions")
       .withIndex("by_page_user", (q) =>
-        q.eq("pageId", args.pageId).eq("userId", args.userId),
+        q.eq("pageId", args.pageId).eq("userId", admin.clerkId),
       )
       .first();
 
@@ -911,7 +895,6 @@ export const getPageEditorState = query({
 
 export const selectBlock = mutation({
   args: {
-    userId: v.string(),
     pageId: v.id("sitePages"),
     mode: v.union(v.literal("chat"), v.literal("visual"), v.literal("theme")),
     selectedBlockId: v.optional(v.string()),
@@ -919,12 +902,12 @@ export const selectBlock = mutation({
     contextWindowRef: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    await assertAdminByClerkId(ctx, args.userId);
+    const admin = await requireAdmin(ctx);
     const now = Date.now();
     const existing = await ctx.db
       .query("editorSessions")
       .withIndex("by_page_user", (q) =>
-        q.eq("pageId", args.pageId).eq("userId", args.userId),
+        q.eq("pageId", args.pageId).eq("userId", admin.clerkId),
       )
       .first();
 
@@ -941,7 +924,7 @@ export const selectBlock = mutation({
 
     return await ctx.db.insert("editorSessions", {
       pageId: args.pageId,
-      userId: args.userId,
+      userId: admin.clerkId,
       mode: args.mode,
       selectedBlockId: args.selectedBlockId,
       lastPrompt: args.lastPrompt,
@@ -953,7 +936,6 @@ export const selectBlock = mutation({
 
 export const applyOperations = mutation({
   args: {
-    userId: v.string(),
     pageId: v.id("sitePages"),
     baseRevisionId: v.id("pageRevisions"),
     operations: v.any(),
@@ -969,7 +951,7 @@ export const applyOperations = mutation({
     ),
   },
   handler: async (ctx, args) => {
-    await assertAdminByClerkId(ctx, args.userId);
+    const admin = await requireAdmin(ctx);
 
     const page = await ctx.db.get(args.pageId);
     if (!page) {
@@ -994,7 +976,7 @@ export const applyOperations = mutation({
       dslDocument: nextDocument,
       themeOverrides: baseRevision.themeOverrides ?? {},
       changeSummary: args.changeSummary ?? "Block changes applied.",
-      createdBy: args.userId,
+      createdBy: admin.clerkId,
       source: (args.source ?? "chat") as RevisionSource,
       baseRevisionId: args.baseRevisionId,
       createdAt: now,
@@ -1002,7 +984,7 @@ export const applyOperations = mutation({
 
     await ctx.db.patch(args.pageId, {
       currentRevisionId: newRevisionId,
-      updatedBy: args.userId,
+      updatedBy: admin.clerkId,
       updatedAt: now,
       status: page.status === "published" ? "review" : page.status,
     });
@@ -1016,7 +998,7 @@ export const applyOperations = mutation({
         snapshotType: "auto",
         dslDocument: nextDocument,
         themeTokens: theme?.tokens ?? buildDefaultThemeTokens(),
-        createdBy: args.userId,
+        createdBy: admin.clerkId,
         createdAt: now,
       });
     }
@@ -1031,7 +1013,6 @@ export const applyOperations = mutation({
 
 export const updateThemeTokens = mutation({
   args: {
-    userId: v.string(),
     projectId: v.id("siteProjects"),
     tokenPatch: v.any(),
     themeId: v.optional(v.id("themeTokens")),
@@ -1039,7 +1020,7 @@ export const updateThemeTokens = mutation({
     applyToAllPages: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    await assertAdminByClerkId(ctx, args.userId);
+    const admin = await requireAdmin(ctx);
     const project = await ctx.db.get(args.projectId);
     if (!project) throw new Error("Project not found.");
 
@@ -1059,7 +1040,7 @@ export const updateThemeTokens = mutation({
         name: args.name?.trim() || "Default Theme",
         tokens: deepMerge(buildDefaultThemeTokens() as unknown as JsonRecord, asRecord(args.tokenPatch)),
         isDefault: true,
-        createdBy: args.userId,
+        createdBy: admin.clerkId,
         createdAt: now,
         updatedAt: now,
       });
@@ -1102,7 +1083,7 @@ export const updateThemeTokens = mutation({
             globalThemeUpdatedAt: now,
           },
           changeSummary: "Global theme update applied.",
-          createdBy: args.userId,
+          createdBy: admin.clerkId,
           source: "theme",
           baseRevisionId: currentRevision._id,
           createdAt: now,
@@ -1110,7 +1091,7 @@ export const updateThemeTokens = mutation({
 
         await ctx.db.patch(page._id, {
           currentRevisionId: revisionId,
-          updatedBy: args.userId,
+          updatedBy: admin.clerkId,
           updatedAt: now,
           status: page.status === "published" ? "review" : page.status,
         });
@@ -1121,7 +1102,7 @@ export const updateThemeTokens = mutation({
           snapshotType: "auto",
           dslDocument: currentRevision.dslDocument,
           themeTokens: mergedTokens,
-          createdBy: args.userId,
+          createdBy: admin.clerkId,
           createdAt: now,
         });
         affectedPages += 1;
@@ -1134,12 +1115,11 @@ export const updateThemeTokens = mutation({
 
 export const rollbackToRevision = mutation({
   args: {
-    userId: v.string(),
     pageId: v.id("sitePages"),
     targetRevisionId: v.id("pageRevisions"),
   },
   handler: async (ctx, args) => {
-    await assertAdminByClerkId(ctx, args.userId);
+    const admin = await requireAdmin(ctx);
 
     const page = await ctx.db.get(args.pageId);
     if (!page) throw new Error("Page not found.");
@@ -1156,7 +1136,7 @@ export const rollbackToRevision = mutation({
       dslDocument: targetRevision.dslDocument,
       themeOverrides: targetRevision.themeOverrides ?? {},
       changeSummary: `Rollback to revision #${targetRevision.revisionNumber}.`,
-      createdBy: args.userId,
+      createdBy: admin.clerkId,
       source: "rollback",
       baseRevisionId: page.currentRevisionId,
       createdAt: now,
@@ -1164,7 +1144,7 @@ export const rollbackToRevision = mutation({
 
     await ctx.db.patch(args.pageId, {
       currentRevisionId: newRevisionId,
-      updatedBy: args.userId,
+      updatedBy: admin.clerkId,
       updatedAt: now,
       status: page.status === "published" ? "review" : page.status,
     });
@@ -1178,7 +1158,7 @@ export const rollbackToRevision = mutation({
         snapshotType: "manual",
         dslDocument: targetRevision.dslDocument,
         themeTokens: theme?.tokens ?? buildDefaultThemeTokens(),
-        createdBy: args.userId,
+        createdBy: admin.clerkId,
         createdAt: now,
       });
     }
@@ -1189,7 +1169,6 @@ export const rollbackToRevision = mutation({
 
 export const runPageCommand = action({
   args: {
-    userId: v.string(),
     pageId: v.id("sitePages"),
     revisionId: v.id("pageRevisions"),
     prompt: v.string(),
@@ -1205,10 +1184,9 @@ export const runPageCommand = action({
     changeSummary: string;
     previewRevisionId: Id<"pageRevisions">;
   }> => {
-    const user = await ctx.runQuery(api.users.getUser, { clerkId: args.userId });
-    if (!user || user.role !== "admin") {
-      throw new Error("Admin access required.");
-    }
+    await ctx.runQuery(api.users.assertAdmin, {});
+    const identity = await requireIdentity(ctx);
+    const adminClerkId = identity.subject;
 
     const mode: SiteMode = args.mode ?? "chat";
     const runId = (await ctx.runMutation(
@@ -1216,7 +1194,7 @@ export const runPageCommand = action({
       {
         pageId: args.pageId,
         revisionId: args.revisionId,
-        userId: args.userId,
+        userId: adminClerkId,
         prompt: args.prompt,
         mode,
       },
@@ -1224,7 +1202,6 @@ export const runPageCommand = action({
 
     try {
       const revisionResult = await ctx.runQuery(api.siteStudio.getRevision, {
-        userId: args.userId,
         revisionId: args.revisionId,
       });
       if (!revisionResult?.revision || !revisionResult.page) {
@@ -1254,7 +1231,6 @@ export const runPageCommand = action({
       const changeSummary = llmResult?.changeSummary ?? fallback.changeSummary;
 
       const applyResult = (await ctx.runMutation(api.siteStudio.applyOperations, {
-        userId: args.userId,
         pageId: args.pageId,
         baseRevisionId: args.revisionId,
         operations,
@@ -1274,7 +1250,6 @@ export const runPageCommand = action({
       });
 
       await ctx.runMutation(api.siteStudio.selectBlock, {
-        userId: args.userId,
         pageId: args.pageId,
         mode,
         selectedBlockId: args.selectedBlockId,
@@ -1318,7 +1293,6 @@ export default function GeneratedSitePage() {
 
 export const publishRevision = action({
   args: {
-    userId: v.string(),
     pageId: v.id("sitePages"),
     revisionId: v.id("pageRevisions"),
     approvalNote: v.optional(v.string()),
@@ -1327,13 +1301,11 @@ export const publishRevision = action({
     ctx,
     args,
   ): Promise<{ publishLogId: Id<"publishLogs">; commitSha?: string; paths: string[] }> => {
-    const user = await ctx.runQuery(api.users.getUser, { clerkId: args.userId });
-    if (!user || user.role !== "admin") {
-      throw new Error("Admin access required.");
-    }
+    await ctx.runQuery(api.users.assertAdmin, {});
+    const identity = await requireIdentity(ctx);
+    const adminClerkId = identity.subject;
 
     const state = await ctx.runQuery(api.siteStudio.getPageEditorState, {
-      userId: args.userId,
       pageId: args.pageId,
     });
     if (!state?.page || !state.project) {
@@ -1341,7 +1313,6 @@ export const publishRevision = action({
     }
 
     const revisionResult = await ctx.runQuery(api.siteStudio.getRevision, {
-      userId: args.userId,
       revisionId: args.revisionId,
     });
     if (!revisionResult?.revision) {
@@ -1360,7 +1331,7 @@ export const publishRevision = action({
       snapshotType: "pre_publish",
       dslDocument,
       themeTokens,
-      createdBy: args.userId,
+      createdBy: adminClerkId,
     });
 
     const webhookUrl = process.env.SITE_PUBLISH_WEBHOOK_URL;
@@ -1415,7 +1386,7 @@ export const publishRevision = action({
       {
         pageId: args.pageId,
         revisionId: args.revisionId,
-        publishedBy: args.userId,
+        publishedBy: adminClerkId,
         commitSha,
         paths,
         status,

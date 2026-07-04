@@ -1,16 +1,26 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import {
+  requireUser,
+  requireTeacher,
+  requireClassroomOwner,
+  requireClassroomAccess,
+} from "./lib/auth";
 
 // ============================================================================
 // HELPER FUNCTIONS
 // ============================================================================
 
-// Generiere 6-stelligen Invite-Code
+// Generiere kryptografisch zufälligen 8-stelligen Invite-Code.
+// 32-Zeichen-Alphabet (keine verwechselbaren Zeichen) × 8 Stellen = ~40 Bit.
+// 256 % 32 === 0 → modulo ist unverzerrt.
 function generateInviteCode(): string {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // Keine verwechselbaren Zeichen (0/O, 1/I/L)
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const bytes = new Uint8Array(8);
+  crypto.getRandomValues(bytes);
   let code = "";
-  for (let i = 0; i < 6; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  for (let i = 0; i < 8; i++) {
+    code += chars.charAt(bytes[i] % chars.length);
   }
   return code;
 }
@@ -19,16 +29,16 @@ function generateInviteCode(): string {
 // CLASSROOM QUERIES
 // ============================================================================
 
-// Alle Klassen eines Teachers
+// Alle Klassen des angemeldeten Teachers (Identität serverseitig aus ctx.auth).
 export const listByTeacher = query({
-  args: { teacherId: v.string() },
-  handler: async (ctx, args) => {
+  args: {},
+  handler: async (ctx) => {
+    const user = await requireUser(ctx);
     const classrooms = await ctx.db
       .query("classrooms")
-      .withIndex("by_teacher", (q) => q.eq("teacherId", args.teacherId))
+      .withIndex("by_teacher", (q) => q.eq("teacherId", user.clerkId))
       .collect();
 
-    // Füge Mitgliederzahl hinzu
     const classroomsWithCounts = await Promise.all(
       classrooms.map(async (classroom) => {
         const members = await ctx.db
@@ -46,13 +56,14 @@ export const listByTeacher = query({
   },
 });
 
-// Alle Klassen, in denen ein User Mitglied ist
+// Alle Klassen, in denen der angemeldete User Mitglied ist.
 export const listByStudent = query({
-  args: { userId: v.string() },
-  handler: async (ctx, args) => {
+  args: {},
+  handler: async (ctx) => {
+    const user = await requireUser(ctx);
     const memberships = await ctx.db
       .query("classroomMembers")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .withIndex("by_user", (q) => q.eq("userId", user.clerkId))
       .collect();
 
     const classrooms = await Promise.all(
@@ -66,26 +77,22 @@ export const listByStudent = query({
   },
 });
 
-// Einzelne Klasse mit Details
+// Einzelne Klasse mit Details — nur für Teacher/Mitglieder/Admin.
 export const getById = query({
   args: { classroomId: v.id("classrooms") },
   handler: async (ctx, args) => {
-    const classroom = await ctx.db.get(args.classroomId);
-    if (!classroom) return null;
+    const { classroom } = await requireClassroomAccess(ctx, args.classroomId);
 
-    // Mitglieder laden
     const members = await ctx.db
       .query("classroomMembers")
       .withIndex("by_classroom", (q) => q.eq("classroomId", args.classroomId))
       .collect();
 
-    // Assignments laden
     const assignments = await ctx.db
       .query("classroomAssignments")
       .withIndex("by_classroom", (q) => q.eq("classroomId", args.classroomId))
       .collect();
 
-    // Welten für Assignments laden
     const assignmentsWithWorlds = await Promise.all(
       assignments.map(async (a) => {
         const world = await ctx.db.get(a.worldId);
@@ -101,18 +108,22 @@ export const getById = query({
   },
 });
 
-// Klasse per Invite-Code finden (für Beitritts-Preview)
+// Klasse per Invite-Code finden (Beitritts-Preview).
+// Erfordert Anmeldung (nur eingeloggte Nutzer treten Klassen bei) und gibt
+// nur minimale, nicht-sensible Metadaten zurück.
 export const getByInviteCode = query({
   args: { inviteCode: v.string() },
   handler: async (ctx, args) => {
+    await requireUser(ctx);
     const classroom = await ctx.db
       .query("classrooms")
-      .withIndex("by_invite_code", (q) => q.eq("inviteCode", args.inviteCode.toUpperCase()))
+      .withIndex("by_invite_code", (q) =>
+        q.eq("inviteCode", args.inviteCode.toUpperCase())
+      )
       .first();
 
     if (!classroom) return null;
 
-    // Nur öffentliche Infos zurückgeben
     return {
       _id: classroom._id,
       name: classroom.name,
@@ -123,25 +134,24 @@ export const getByInviteCode = query({
   },
 });
 
-// Mitglieder einer Klasse mit Fortschritt
+// Mitglieder einer Klasse mit Fortschritt — nur Teacher/Admin (Kinder-PII).
 export const getMembers = query({
   args: { classroomId: v.id("classrooms") },
   handler: async (ctx, args) => {
+    await requireClassroomOwner(ctx, args.classroomId);
+
     const members = await ctx.db
       .query("classroomMembers")
       .withIndex("by_classroom", (q) => q.eq("classroomId", args.classroomId))
       .collect();
 
-    // Assignments für diese Klasse
     const assignments = await ctx.db
       .query("classroomAssignments")
       .withIndex("by_classroom", (q) => q.eq("classroomId", args.classroomId))
       .collect();
 
-    // Für jeden Schüler: Fortschritt bei allen Assignments
     const membersWithProgress = await Promise.all(
       members.map(async (member) => {
-        // Fortschritt für alle zugewiesenen Welten
         const progressByWorld: Record<string, { xp: number; completed: boolean }> = {};
 
         for (const assignment of assignments) {
@@ -158,7 +168,6 @@ export const getMembers = query({
           };
         }
 
-        // Gesamt-XP
         const allProgress = await ctx.db
           .query("progress")
           .withIndex("by_user_world", (q) => q.eq("userId", member.userId))
@@ -183,24 +192,23 @@ export const getMembers = query({
 // CLASSROOM MUTATIONS
 // ============================================================================
 
-// Neue Klasse erstellen
+// Neue Klasse erstellen — nur Teacher/Admin. teacherId = angemeldeter Nutzer.
 export const create = mutation({
   args: {
     name: v.string(),
     description: v.optional(v.string()),
-    teacherId: v.string(),
     gradeLevel: v.optional(v.string()),
     subject: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    // Generiere eindeutigen Invite-Code
+    const user = await requireTeacher(ctx);
+
     let inviteCode = generateInviteCode();
     let existing = await ctx.db
       .query("classrooms")
       .withIndex("by_invite_code", (q) => q.eq("inviteCode", inviteCode))
       .first();
 
-    // Falls Code schon existiert, neuen generieren
     while (existing) {
       inviteCode = generateInviteCode();
       existing = await ctx.db
@@ -212,7 +220,7 @@ export const create = mutation({
     const classroomId = await ctx.db.insert("classrooms", {
       name: args.name,
       description: args.description,
-      teacherId: args.teacherId,
+      teacherId: user.clerkId,
       inviteCode,
       gradeLevel: args.gradeLevel,
       subject: args.subject,
@@ -223,7 +231,7 @@ export const create = mutation({
   },
 });
 
-// Klasse aktualisieren
+// Klasse aktualisieren — nur besitzender Teacher/Admin.
 export const update = mutation({
   args: {
     classroomId: v.id("classrooms"),
@@ -234,19 +242,22 @@ export const update = mutation({
     isArchived: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
+    await requireClassroomOwner(ctx, args.classroomId);
     const { classroomId, ...updates } = args;
     const filtered = Object.fromEntries(
-      Object.entries(updates).filter(([, v]) => v !== undefined)
+      Object.entries(updates).filter(([, val]) => val !== undefined)
     );
     await ctx.db.patch(classroomId, filtered);
     return { success: true };
   },
 });
 
-// Invite-Code neu generieren
+// Invite-Code neu generieren — nur besitzender Teacher/Admin.
 export const regenerateInviteCode = mutation({
   args: { classroomId: v.id("classrooms") },
   handler: async (ctx, args) => {
+    await requireClassroomOwner(ctx, args.classroomId);
+
     let inviteCode = generateInviteCode();
     let existing = await ctx.db
       .query("classrooms")
@@ -266,11 +277,12 @@ export const regenerateInviteCode = mutation({
   },
 });
 
-// Klasse löschen
+// Klasse löschen — nur besitzender Teacher/Admin.
 export const remove = mutation({
   args: { classroomId: v.id("classrooms") },
   handler: async (ctx, args) => {
-    // Lösche alle Mitgliedschaften
+    await requireClassroomOwner(ctx, args.classroomId);
+
     const members = await ctx.db
       .query("classroomMembers")
       .withIndex("by_classroom", (q) => q.eq("classroomId", args.classroomId))
@@ -279,7 +291,6 @@ export const remove = mutation({
       await ctx.db.delete(member._id);
     }
 
-    // Lösche alle Assignments
     const assignments = await ctx.db
       .query("classroomAssignments")
       .withIndex("by_classroom", (q) => q.eq("classroomId", args.classroomId))
@@ -288,7 +299,6 @@ export const remove = mutation({
       await ctx.db.delete(assignment._id);
     }
 
-    // Lösche die Klasse
     await ctx.db.delete(args.classroomId);
     return { success: true };
   },
@@ -298,16 +308,19 @@ export const remove = mutation({
 // MEMBERSHIP MUTATIONS
 // ============================================================================
 
-// Mit Invite-Code beitreten
+// Mit Invite-Code beitreten — als angemeldeter Nutzer (userId = ctx.auth).
 export const joinWithCode = mutation({
   args: {
     inviteCode: v.string(),
-    userId: v.string(),
   },
   handler: async (ctx, args) => {
+    const user = await requireUser(ctx);
+
     const classroom = await ctx.db
       .query("classrooms")
-      .withIndex("by_invite_code", (q) => q.eq("inviteCode", args.inviteCode.toUpperCase()))
+      .withIndex("by_invite_code", (q) =>
+        q.eq("inviteCode", args.inviteCode.toUpperCase())
+      )
       .first();
 
     if (!classroom) {
@@ -318,11 +331,10 @@ export const joinWithCode = mutation({
       return { success: false, error: "Diese Klasse ist archiviert" };
     }
 
-    // Prüfe ob User schon Mitglied ist
     const existing = await ctx.db
       .query("classroomMembers")
       .withIndex("by_classroom_user", (q) =>
-        q.eq("classroomId", classroom._id).eq("userId", args.userId)
+        q.eq("classroomId", classroom._id).eq("userId", user.clerkId)
       )
       .first();
 
@@ -330,14 +342,13 @@ export const joinWithCode = mutation({
       return { success: false, error: "Du bist bereits Mitglied dieser Klasse" };
     }
 
-    // Prüfe ob User der Teacher ist
-    if (classroom.teacherId === args.userId) {
+    if (classroom.teacherId === user.clerkId) {
       return { success: false, error: "Du bist der Lehrer dieser Klasse" };
     }
 
     await ctx.db.insert("classroomMembers", {
       classroomId: classroom._id,
-      userId: args.userId,
+      userId: user.clerkId,
       role: "student",
       joinedAt: Date.now(),
     });
@@ -346,13 +357,15 @@ export const joinWithCode = mutation({
   },
 });
 
-// Mitglied entfernen
+// Mitglied entfernen — nur besitzender Teacher/Admin.
 export const removeMember = mutation({
   args: {
     classroomId: v.id("classrooms"),
     userId: v.string(),
   },
   handler: async (ctx, args) => {
+    await requireClassroomOwner(ctx, args.classroomId);
+
     const member = await ctx.db
       .query("classroomMembers")
       .withIndex("by_classroom_user", (q) =>
@@ -368,17 +381,18 @@ export const removeMember = mutation({
   },
 });
 
-// Klasse verlassen (als Schüler)
+// Klasse verlassen (als Schüler) — entfernt nur die eigene Mitgliedschaft.
 export const leave = mutation({
   args: {
     classroomId: v.id("classrooms"),
-    userId: v.string(),
   },
   handler: async (ctx, args) => {
+    const user = await requireUser(ctx);
+
     const member = await ctx.db
       .query("classroomMembers")
       .withIndex("by_classroom_user", (q) =>
-        q.eq("classroomId", args.classroomId).eq("userId", args.userId)
+        q.eq("classroomId", args.classroomId).eq("userId", user.clerkId)
       )
       .first();
 
@@ -394,19 +408,19 @@ export const leave = mutation({
 // ASSIGNMENT MUTATIONS
 // ============================================================================
 
-// Welt einer Klasse zuweisen
+// Welt einer Klasse zuweisen — nur besitzender Teacher/Admin.
 export const assignWorld = mutation({
   args: {
     classroomId: v.id("classrooms"),
     worldId: v.id("worlds"),
-    assignedBy: v.string(),
     title: v.optional(v.string()),
     instructions: v.optional(v.string()),
     dueDate: v.optional(v.number()),
     isRequired: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    // Prüfe ob Assignment schon existiert
+    const { user } = await requireClassroomOwner(ctx, args.classroomId);
+
     const existing = await ctx.db
       .query("classroomAssignments")
       .withIndex("by_classroom", (q) => q.eq("classroomId", args.classroomId))
@@ -420,7 +434,7 @@ export const assignWorld = mutation({
     const assignmentId = await ctx.db.insert("classroomAssignments", {
       classroomId: args.classroomId,
       worldId: args.worldId,
-      assignedBy: args.assignedBy,
+      assignedBy: user.clerkId,
       title: args.title,
       instructions: args.instructions,
       dueDate: args.dueDate,
@@ -432,7 +446,7 @@ export const assignWorld = mutation({
   },
 });
 
-// Assignment aktualisieren
+// Assignment aktualisieren — nur Teacher/Admin der zugehörigen Klasse.
 export const updateAssignment = mutation({
   args: {
     assignmentId: v.id("classroomAssignments"),
@@ -442,19 +456,30 @@ export const updateAssignment = mutation({
     isRequired: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
+    const assignment = await ctx.db.get(args.assignmentId);
+    if (!assignment) {
+      throw new Error("Zuweisung nicht gefunden.");
+    }
+    await requireClassroomOwner(ctx, assignment.classroomId);
+
     const { assignmentId, ...updates } = args;
     const filtered = Object.fromEntries(
-      Object.entries(updates).filter(([, v]) => v !== undefined)
+      Object.entries(updates).filter(([, val]) => val !== undefined)
     );
     await ctx.db.patch(assignmentId, filtered);
     return { success: true };
   },
 });
 
-// Assignment entfernen
+// Assignment entfernen — nur Teacher/Admin der zugehörigen Klasse.
 export const removeAssignment = mutation({
   args: { assignmentId: v.id("classroomAssignments") },
   handler: async (ctx, args) => {
+    const assignment = await ctx.db.get(args.assignmentId);
+    if (!assignment) {
+      return { success: true };
+    }
+    await requireClassroomOwner(ctx, assignment.classroomId);
     await ctx.db.delete(args.assignmentId);
     return { success: true };
   },
@@ -464,13 +489,14 @@ export const removeAssignment = mutation({
 // TEACHER DASHBOARD QUERIES
 // ============================================================================
 
-// Übersicht für Teacher Dashboard
+// Übersicht für Teacher Dashboard — Identität serverseitig.
 export const getTeacherOverview = query({
-  args: { teacherId: v.string() },
-  handler: async (ctx, args) => {
+  args: {},
+  handler: async (ctx) => {
+    const user = await requireUser(ctx);
     const classrooms = await ctx.db
       .query("classrooms")
-      .withIndex("by_teacher", (q) => q.eq("teacherId", args.teacherId))
+      .withIndex("by_teacher", (q) => q.eq("teacherId", user.clerkId))
       .collect();
 
     let totalStudents = 0;
@@ -482,21 +508,18 @@ export const getTeacherOverview = query({
     }> = [];
 
     for (const classroom of classrooms) {
-      // Zähle Schüler
       const members = await ctx.db
         .query("classroomMembers")
         .withIndex("by_classroom", (q) => q.eq("classroomId", classroom._id))
         .collect();
       totalStudents += members.length;
 
-      // Zähle Assignments
       const assignments = await ctx.db
         .query("classroomAssignments")
         .withIndex("by_classroom", (q) => q.eq("classroomId", classroom._id))
         .collect();
       totalAssignments += assignments.length;
 
-      // Sammle neueste Beitritte
       for (const member of members.slice(-3)) {
         recentActivity.push({
           type: "join",
@@ -506,7 +529,6 @@ export const getTeacherOverview = query({
       }
     }
 
-    // Sortiere Activity nach Zeit
     recentActivity.sort((a, b) => b.timestamp - a.timestamp);
     recentActivity = recentActivity.slice(0, 10);
 

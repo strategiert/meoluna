@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
+import { requireUser, requireAdmin } from "./lib/auth";
 import {
   DEFAULT_CONVERSION_RATE,
   DEFAULT_XP_PER_MODULE,
@@ -117,18 +118,29 @@ async function updateUserStats(
 
 // ============================================================================
 // QUERIES
+//
+// Sicherheitsfix: Fortschritt/XP sind Kinder-PII. Kein Endpoint darf einen
+// client-gelieferten `userId` mehr entgegennehmen — die Identität kommt
+// ausschließlich aus `ctx.auth` (requireUser). Jede Abfrage liefert daher nur
+// die eigenen Daten des angemeldeten Nutzers zurück. Lehrer sehen
+// Schüler-Fortschritt weiterhin nur über den bereits abgesicherten
+// `classrooms.getMembers` (requireClassroomOwner).
 // ============================================================================
 
 /**
  * NEU: Schnelle User-Statistiken aus denormalisierter userStats Tabelle
+ * Nur die eigenen Statistiken des angemeldeten Nutzers.
  */
 export const getUserStats = query({
-  args: { userId: v.string() },
-  handler: async (ctx, args) => {
+  args: {},
+  handler: async (ctx) => {
+    const caller = await requireUser(ctx);
+    const userId = caller.clerkId;
+
     // Versuche aus userStats zu lesen (schnell, denormalisiert)
     const stats = await ctx.db
       .query("userStats")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .first();
 
     if (stats) {
@@ -137,7 +149,7 @@ export const getUserStats = query({
       // Zähle abgeschlossene Welten
       const progressList = await ctx.db
         .query("progress")
-        .withIndex("by_user", (q) => q.eq("userId", args.userId))
+        .withIndex("by_user", (q) => q.eq("userId", userId))
         .collect();
 
       const completedWorlds = progressList.filter(p => p.completedAt).length;
@@ -157,7 +169,7 @@ export const getUserStats = query({
     // Fallback: Berechne aus progress (für Migration/Abwärtskompatibilität)
     const progressList = await ctx.db
       .query("progress")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .collect();
 
     const totalXP = progressList.reduce((sum, p) => sum + (p.xpEarned ?? p.xp), 0);
@@ -177,13 +189,14 @@ export const getUserStats = query({
   },
 });
 
-// Alle Fortschritte eines Users (Legacy + erweitert)
+// Alle Fortschritte des angemeldeten Nutzers (Legacy + erweitert)
 export const getByUser = query({
-  args: { userId: v.string() },
-  handler: async (ctx, args) => {
+  args: {},
+  handler: async (ctx) => {
+    const caller = await requireUser(ctx);
     const progressList = await ctx.db
       .query("progress")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .withIndex("by_user", (q) => q.eq("userId", caller.clerkId))
       .collect();
 
     // Berechne Gesamt-XP und Level (nutze xpEarned wenn vorhanden)
@@ -200,17 +213,17 @@ export const getByUser = query({
   },
 });
 
-// Fortschritt für eine spezifische Welt
+// Fortschritt für eine spezifische Welt — nur der eigene Fortschritt.
 export const getByWorld = query({
   args: {
-    userId: v.string(),
     worldId: v.id("worlds"),
   },
   handler: async (ctx, args) => {
+    const caller = await requireUser(ctx);
     const progress = await ctx.db
       .query("progress")
       .withIndex("by_user_world", (q) =>
-        q.eq("userId", args.userId).eq("worldId", args.worldId)
+        q.eq("userId", caller.clerkId).eq("worldId", args.worldId)
       )
       .first();
 
@@ -218,14 +231,17 @@ export const getByWorld = query({
   },
 });
 
-// Gesamt-XP und Level eines Users (Legacy - nutzt jetzt getUserStats intern)
+// Gesamt-XP und Level des angemeldeten Nutzers (Legacy - nutzt jetzt getUserStats intern)
 export const getStats = query({
-  args: { userId: v.string() },
-  handler: async (ctx, args) => {
+  args: {},
+  handler: async (ctx) => {
+    const caller = await requireUser(ctx);
+    const userId = caller.clerkId;
+
     // Versuche aus userStats zu lesen
     const stats = await ctx.db
       .query("userStats")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .first();
 
     if (stats) {
@@ -233,7 +249,7 @@ export const getStats = query({
 
       const progressList = await ctx.db
         .query("progress")
-        .withIndex("by_user", (q) => q.eq("userId", args.userId))
+        .withIndex("by_user", (q) => q.eq("userId", userId))
         .collect();
 
       const completedWorlds = progressList.filter(p => p.completedAt).length;
@@ -251,7 +267,7 @@ export const getStats = query({
     // Fallback für bestehende User ohne userStats
     const progressList = await ctx.db
       .query("progress")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .withIndex("by_user", (q) => q.eq("userId", userId))
       .collect();
 
     const totalXP = progressList.reduce((sum, p) => sum + (p.xpEarned ?? p.xp), 0);
@@ -272,6 +288,10 @@ export const getStats = query({
 
 // ============================================================================
 // MUTATIONS
+//
+// Sicherheitsfix: `userId` kommt nie mehr vom Client. Jede Mutation schreibt
+// ausschließlich unter der Identität des angemeldeten Nutzers
+// (requireUser(ctx).clerkId).
 // ============================================================================
 
 /**
@@ -280,7 +300,6 @@ export const getStats = query({
  */
 export const reportScore = mutation({
   args: {
-    userId: v.string(),
     worldId: v.id("worlds"),
     worldScore: v.number(),           // Rohpunkte der Welt
     eventType: v.union(
@@ -291,6 +310,9 @@ export const reportScore = mutation({
     moduleIndex: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    const caller = await requireUser(ctx);
+    const userId = caller.clerkId;
+
     // 1. WorldConfig laden (Conversion Rate)
     const worldConfig = await ctx.db
       .query("worldConfig")
@@ -310,7 +332,7 @@ export const reportScore = mutation({
     const existing = await ctx.db
       .query("progress")
       .withIndex("by_user_world", (q) =>
-        q.eq("userId", args.userId).eq("worldId", args.worldId)
+        q.eq("userId", userId).eq("worldId", args.worldId)
       )
       .first();
 
@@ -334,7 +356,7 @@ export const reportScore = mutation({
       });
     } else {
       await ctx.db.insert("progress", {
-        userId: args.userId,
+        userId,
         worldId: args.worldId,
         xp: xpAwarded, // Legacy
         worldScore: args.worldScore,
@@ -348,7 +370,7 @@ export const reportScore = mutation({
     }
 
     // 4. UserStats aktualisieren
-    const statsResult = await updateUserStats(ctx, args.userId, xpAwarded);
+    const statsResult = await updateUserStats(ctx, userId, xpAwarded);
 
     // 5. Return result
     return {
@@ -365,17 +387,19 @@ export const reportScore = mutation({
 // XP für eine Welt hinzufügen/aktualisieren (Legacy - ruft reportScore auf)
 export const addXP = mutation({
   args: {
-    userId: v.string(),
     worldId: v.id("worlds"),
     xpEarned: v.number(),
     moduleIndex: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    const caller = await requireUser(ctx);
+    const userId = caller.clerkId;
+
     // Prüfe ob bereits Fortschritt existiert
     const existing = await ctx.db
       .query("progress")
       .withIndex("by_user_world", (q) =>
-        q.eq("userId", args.userId).eq("worldId", args.worldId)
+        q.eq("userId", userId).eq("worldId", args.worldId)
       )
       .first();
 
@@ -395,7 +419,7 @@ export const addXP = mutation({
       });
 
       // UserStats aktualisieren
-      const statsResult = await updateUserStats(ctx, args.userId, args.xpEarned);
+      const statsResult = await updateUserStats(ctx, userId, args.xpEarned);
 
       return {
         success: true,
@@ -406,7 +430,7 @@ export const addXP = mutation({
     } else {
       // Neuen Fortschritt erstellen
       await ctx.db.insert("progress", {
-        userId: args.userId,
+        userId,
         worldId: args.worldId,
         xp: args.xpEarned,
         xpEarned: args.xpEarned,
@@ -416,7 +440,7 @@ export const addXP = mutation({
       });
 
       // UserStats aktualisieren
-      const statsResult = await updateUserStats(ctx, args.userId, args.xpEarned);
+      const statsResult = await updateUserStats(ctx, userId, args.xpEarned);
 
       return {
         success: true,
@@ -431,15 +455,17 @@ export const addXP = mutation({
 // Welt als abgeschlossen markieren
 export const completeWorld = mutation({
   args: {
-    userId: v.string(),
     worldId: v.id("worlds"),
     bonusXP: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    const caller = await requireUser(ctx);
+    const userId = caller.clerkId;
+
     const existing = await ctx.db
       .query("progress")
       .withIndex("by_user_world", (q) =>
-        q.eq("userId", args.userId).eq("worldId", args.worldId)
+        q.eq("userId", userId).eq("worldId", args.worldId)
       )
       .first();
 
@@ -467,7 +493,7 @@ export const completeWorld = mutation({
         });
 
         // UserStats aktualisieren
-        const statsResult = await updateUserStats(ctx, args.userId, bonusXP);
+        const statsResult = await updateUserStats(ctx, userId, bonusXP);
 
         return {
           success: true,
@@ -482,12 +508,12 @@ export const completeWorld = mutation({
         alreadyCompleted: true,
         xpAwarded: 0,
         leveledUp: false,
-        newLevel: calculateLevel((await ensureUserStats(ctx, args.userId)).totalXP),
+        newLevel: calculateLevel((await ensureUserStats(ctx, userId)).totalXP),
       };
     } else {
       // Neuen Fortschritt mit Abschluss erstellen
       await ctx.db.insert("progress", {
-        userId: args.userId,
+        userId,
         worldId: args.worldId,
         xp: bonusXP,
         xpEarned: bonusXP,
@@ -499,7 +525,7 @@ export const completeWorld = mutation({
       });
 
       // UserStats aktualisieren
-      const statsResult = await updateUserStats(ctx, args.userId, bonusXP);
+      const statsResult = await updateUserStats(ctx, userId, bonusXP);
 
       return {
         success: true,
@@ -512,13 +538,26 @@ export const completeWorld = mutation({
   },
 });
 
-// Progress zurücksetzen (für Debugging/Admin)
+// Progress zurücksetzen (für Debugging/Admin).
+// Standardmäßig setzt jeder Nutzer nur seinen eigenen Fortschritt zurück.
+// Nur wenn explizit ein `userId` (Fremd-Ziel) übergeben wird, ist Admin
+// erforderlich — so bleibt das Debug-Tool für Admins nutzbar, ohne dass
+// normale Nutzer fremde Fortschritte manipulieren können.
 export const reset = mutation({
   args: {
-    userId: v.string(),
+    userId: v.optional(v.string()),
     worldId: v.optional(v.id("worlds")),
   },
   handler: async (ctx, args) => {
+    let targetUserId: string;
+    if (args.userId) {
+      await requireAdmin(ctx);
+      targetUserId = args.userId;
+    } else {
+      const caller = await requireUser(ctx);
+      targetUserId = caller.clerkId;
+    }
+
     let xpToRemove = 0;
 
     if (args.worldId) {
@@ -527,7 +566,7 @@ export const reset = mutation({
       const progress = await ctx.db
         .query("progress")
         .withIndex("by_user_world", (q) =>
-          q.eq("userId", args.userId).eq("worldId", worldId)
+          q.eq("userId", targetUserId).eq("worldId", worldId)
         )
         .first();
       if (progress) {
@@ -538,7 +577,7 @@ export const reset = mutation({
       // Alle Progress für User
       const progressList = await ctx.db
         .query("progress")
-        .withIndex("by_user", (q) => q.eq("userId", args.userId))
+        .withIndex("by_user", (q) => q.eq("userId", targetUserId))
         .collect();
       for (const p of progressList) {
         xpToRemove += p.xpEarned ?? p.xp;
@@ -550,7 +589,7 @@ export const reset = mutation({
     if (xpToRemove > 0) {
       const stats = await ctx.db
         .query("userStats")
-        .withIndex("by_user", (q) => q.eq("userId", args.userId))
+        .withIndex("by_user", (q) => q.eq("userId", targetUserId))
         .first();
 
       if (stats) {
@@ -574,12 +613,16 @@ export const reset = mutation({
 // ============================================================================
 
 /**
- * Migration: UserStats für bestehende User erstellen
- * Sollte einmalig nach Schema-Update ausgeführt werden
+ * Migration: UserStats für bestehende User erstellen.
+ * Schreibt/patcht Progress-Zeilen eines beliebigen Ziel-Users — daher
+ * Admin-only (kein normaler Nutzer darf fremde Progress-Datensätze anfassen).
+ * Sollte einmalig nach Schema-Update von einem Admin ausgeführt werden.
  */
 export const migrateUserStats = mutation({
   args: { userId: v.string() },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
     // Prüfe ob bereits userStats existiert
     const existing = await ctx.db
       .query("userStats")
@@ -630,12 +673,15 @@ export const migrateUserStats = mutation({
 });
 
 /**
- * Initialisiere UserStats für einen User (für automatische Migration bei Login)
+ * Initialisiere UserStats für den angemeldeten Nutzer (für automatische
+ * Migration bei Login). Immer self-service — es gibt keinen legitimen Grund,
+ * warum ein Client die UserStats eines anderen Nutzers initialisieren müsste.
  */
 export const initializeUserStats = mutation({
-  args: { userId: v.string() },
-  handler: async (ctx, args) => {
-    await ensureUserStats(ctx, args.userId);
+  args: {},
+  handler: async (ctx) => {
+    const caller = await requireUser(ctx);
+    await ensureUserStats(ctx, caller.clerkId);
     return { success: true };
   },
 });

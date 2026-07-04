@@ -6,7 +6,6 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { Doc } from "../../convex/_generated/dataModel";
 import { motion } from "framer-motion";
 import { Search, Filter, Sparkles, TrendingUp, Clock, Star, Eye, Heart } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -67,13 +66,15 @@ export default function Explore() {
   const worlds = useQuery(api.worlds.listPublic);
 
   // Filter and sort worlds
+  // listPublic liefert bewusst nur nicht-sensible Felder (kein Doc<"worlds">
+  // mehr) — daher hier ohne explizite Doc-Typannotation, per Inferenz.
   const filteredWorlds = worlds
-    ?.filter((world: Doc<"worlds">) => {
+    ?.filter((world) => {
       const matchesSearch = world.title.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesSubject = selectedSubject === "all" || world.subject === selectedSubject;
       return matchesSearch && matchesSubject;
     })
-    .sort((a: Doc<"worlds">, b: Doc<"worlds">) => {
+    .sort((a, b) => {
       switch (sortBy) {
         case "popular":
           return (b.views || 0) - (a.views || 0);
@@ -81,7 +82,7 @@ export default function Explore() {
           return (b.likes || 0) - (a.likes || 0);
         case "newest":
         default:
-          return b._creationTime - a._creationTime;
+          return (b.createdAt ?? 0) - (a.createdAt ?? 0);
       }
     });
 
@@ -205,7 +206,7 @@ export default function Explore() {
             transition={{ delay: 0.2 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
-            {filteredWorlds?.map((world: Doc<"worlds">, index: number) => {
+            {filteredWorlds?.map((world, index: number) => {
               const subjectColor = subjectColors[world.subject || "allgemein"] || subjectColors.allgemein;
 
               return (
@@ -264,7 +265,7 @@ export default function Explore() {
 
                         {/* Date */}
                         <p className="text-xs text-muted-foreground mt-2">
-                          {new Date(world._creationTime).toLocaleDateString("de-DE", {
+                          {new Date(world.createdAt ?? Date.now()).toLocaleDateString("de-DE", {
                             day: "numeric",
                             month: "short",
                             year: "numeric",

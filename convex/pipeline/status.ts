@@ -4,7 +4,8 @@
 
 import { v } from "convex/values";
 import { query, mutation, internalMutation } from "../_generated/server";
-import { api, internal } from "../_generated/api";
+import { internal } from "../_generated/api";
+import { requireUser } from "../lib/auth";
 
 // --- Mutations (client-facing) ---
 
@@ -25,33 +26,51 @@ export const startGeneration = mutation({
       audience: v.optional(v.string()),
       guidance: v.optional(v.string()),
     })),
-    userId: v.string(),
     sessionId: v.string(),
   },
   handler: async (ctx, args) => {
-    await ctx.scheduler.runAfter(0, api.pipeline.orchestrator.generateWorldV2, args);
+    // Identitaet serverseitig aus dem Clerk-JWT ableiten, nie vom Client
+    // uebernehmen. Geplante (scheduler.runAfter) Funktionsaufrufe behalten
+    // den Auth-Kontext des Aufrufers NICHT bei, deshalb rufen wir hier die
+    // interne, vertrauenswuerdige Variante der Pipeline-Action auf und
+    // reichen die bereits verifizierte userId explizit durch.
+    const user = await requireUser(ctx);
+    await ctx.scheduler.runAfter(0, internal.pipeline.orchestrator.generateWorldV2Internal, {
+      ...args,
+      userId: user.clerkId,
+    });
     return { sessionId: args.sessionId };
   },
 });
 
 // --- Queries ---
 
+// sessionId ist zwar ein unerratbarer Zufallstoken, gehoert aber trotzdem
+// einem konkreten Nutzer. Wir verlangen Authentifizierung und geben die
+// Session nur an ihren Eigentuemer (oder einen Admin) heraus.
 export const getSession = query({
   args: { sessionId: v.string() },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const user = await requireUser(ctx);
+    const session = await ctx.db
       .query("generationSessions")
       .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
       .first();
+    if (!session) return null;
+    if (session.userId !== user.clerkId && user.role !== "admin") {
+      throw new Error("Nicht autorisiert für diese Session.");
+    }
+    return session;
   },
 });
 
 export const getActiveSession = query({
-  args: { userId: v.string() },
-  handler: async (ctx, args) => {
+  args: {},
+  handler: async (ctx) => {
+    const user = await requireUser(ctx);
     return await ctx.db
       .query("generationSessions")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .withIndex("by_user", (q) => q.eq("userId", user.clerkId))
       .filter((q) => q.eq(q.field("status"), "running"))
       .first();
   },

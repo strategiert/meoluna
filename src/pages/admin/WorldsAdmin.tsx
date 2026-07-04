@@ -96,11 +96,11 @@ export default function WorldsAdmin() {
 
   const convexUser = useQuery(
     api.users.getUser,
-    user?.id ? { clerkId: user.id } : "skip",
+    user?.id ? {} : "skip",
   );
   const worlds = useQuery(
     api.admin.listWorlds,
-    user?.id && convexUser?.role === "admin" ? { userId: user.id } : "skip",
+    user?.id && convexUser?.role === "admin" ? {} : "skip",
   );
 
   const adminWorlds = (worlds ?? []) as AdminWorld[];

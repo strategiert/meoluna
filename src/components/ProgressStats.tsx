@@ -44,7 +44,9 @@ function getLevelColor(level: number): string {
 
 export function ProgressStats({ userId, variant = 'full', className = '' }: ProgressStatsProps) {
   // Nutze getUserStats für schnellere, denormalisierte Daten
-  const stats = useQuery(api.progress.getUserStats, { userId });
+  // Identität wird jetzt serverseitig aus der Clerk-Session abgeleitet;
+  // userId dient nur noch als Gate, ob überhaupt abgefragt wird.
+  const stats = useQuery(api.progress.getUserStats, userId ? {} : 'skip');
 
   if (stats === undefined) {
     return <ProgressStatsSkeleton variant={variant} />;

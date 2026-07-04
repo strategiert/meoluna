@@ -37,10 +37,12 @@ export default function JoinClassroom() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Preview der Klasse wenn Code eingegeben
+  // Preview der Klasse wenn Code eingegeben. Erst nach Login abfragen —
+  // die Query verlangt serverseitig einen eingeloggten User und würde für
+  // Gäste werfen (z. B. bei Link /join?code=XYZ vor der Anmeldung).
   const classroomPreview = useQuery(
     api.classrooms.getByInviteCode,
-    code.length === 6 ? { inviteCode: code.toUpperCase() } : 'skip'
+    user && code.length === 6 ? { inviteCode: code.toUpperCase() } : 'skip'
   );
 
   const joinClassroom = useMutation(api.classrooms.joinWithCode);
@@ -55,7 +57,6 @@ export default function JoinClassroom() {
     try {
       const result = await joinClassroom({
         inviteCode: code.toUpperCase(),
-        userId: user.id,
       });
 
       if (result.success) {

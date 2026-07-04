@@ -16,6 +16,30 @@ const SITE_HOST = "meoluna.com";
 const KEY = process.env.INDEXNOW_KEY ?? "031ffd58553158d766845bc2e78a9ba7";
 const ENDPOINT = "https://api.indexnow.org/indexnow";
 
+// Stößt den Rebuild der statischen Marketing-Site (meoluna-web) an, wenn die
+// Env PAGES_DEPLOY_HOOK_URL gesetzt ist. Aktuell ungesetzt: meoluna-web deployt
+// per GitHub Actions (Direct Upload, CF-Deploy-Hooks gehen da nicht); neue
+// Blog-Posts kommen über den nächtlichen Scheduled-Build (03:00 UTC) live,
+// sofort per: gh workflow run deploy.yml (im meoluna-web-Repo).
+export const triggerSiteRebuild = internalAction({
+  args: {},
+  handler: async () => {
+    const hook = process.env.PAGES_DEPLOY_HOOK_URL;
+    if (!hook) {
+      console.warn("[deployhook] PAGES_DEPLOY_HOOK_URL nicht gesetzt — Rebuild übersprungen");
+      return { triggered: false };
+    }
+    try {
+      const res = await fetch(hook, { method: "POST" });
+      if (!res.ok) console.warn(`[deployhook] unexpected status ${res.status}`);
+      return { triggered: res.ok, status: res.status };
+    } catch (e) {
+      console.warn(`[deployhook] failed: ${e instanceof Error ? e.message : String(e)}`);
+      return { triggered: false, error: true };
+    }
+  },
+});
+
 export const pingUrls = internalAction({
   args: { urls: v.array(v.string()) },
   handler: async (_ctx, args) => {
