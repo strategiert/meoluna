@@ -10,7 +10,7 @@ import numpy as np
 from typing import Optional
 from PIL import Image
 
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from paddleocr import PaddleOCR
@@ -20,6 +20,30 @@ from pdf2image import convert_from_bytes
 OCR_LANGUAGE = os.getenv("OCR_LANGUAGE", "german")
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB max
 
+# Server-zu-Server-API-Key. Wird vom Convex-Backend als X-API-Key-Header
+# gesendet. Ohne gesetzten Key laeuft der Dienst offen (nur fuer lokale Tests).
+API_KEY = os.getenv("PADDLEOCR_API_KEY")
+
+
+def require_api_key(x_api_key: Optional[str] = Header(default=None)):
+    """Schuetzt teure OCR-Endpunkte vor unautorisierter Nutzung."""
+    if API_KEY:
+        if not x_api_key or x_api_key != API_KEY:
+            raise HTTPException(status_code=401, detail="Invalid or missing API key")
+    return True
+
+
+# Erlaubte Ursprünge (kein Wildcard). OCR-Aufrufe kommen server-zu-server
+# vom Convex-Backend; Browser-Origins werden nur fuer lokale Tests benoetigt.
+ALLOWED_ORIGINS = [
+    o.strip()
+    for o in os.getenv(
+        "ALLOWED_ORIGINS",
+        "https://meoluna.com,https://www.meoluna.com,http://localhost:5173",
+    ).split(",")
+    if o.strip()
+]
+
 # Initialize FastAPI
 app = FastAPI(
     title="PaddleOCR Service",
@@ -27,13 +51,13 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# CORS middleware - allow Meoluna frontend
+# CORS middleware - restrict to Meoluna domains
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production: restrict to Meoluna domains
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["GET", "POST"],
-    allow_headers=["*"],
+    allow_headers=["Content-Type", "X-API-Key"],
 )
 
 # Initialize PaddleOCR with language support
@@ -157,7 +181,7 @@ async def health_check():
 
 
 @app.post("/extract-pdf", response_model=OCRResponse)
-async def extract_pdf(file: UploadFile = File(...)):
+async def extract_pdf(file: UploadFile = File(...), _auth: bool = Depends(require_api_key)):
     """
     Extract text from uploaded PDF file
 
@@ -186,7 +210,7 @@ async def extract_pdf(file: UploadFile = File(...)):
 
 
 @app.post("/extract-base64", response_model=OCRResponse)
-async def extract_base64(request: Base64Request):
+async def extract_base64(request: Base64Request, _auth: bool = Depends(require_api_key)):
     """
     Extract text from base64-encoded PDF
 
@@ -221,7 +245,7 @@ async def extract_base64(request: Base64Request):
 
 
 @app.post("/extract-image", response_model=OCRResponse)
-async def extract_image(file: UploadFile = File(...)):
+async def extract_image(file: UploadFile = File(...), _auth: bool = Depends(require_api_key)):
     """
     Extract text from uploaded image file
 
