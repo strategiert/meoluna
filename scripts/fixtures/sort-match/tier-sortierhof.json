@@ -1,0 +1,160 @@
+{
+  "engine": "sort-match",
+  "seed": "tier-sortierhof",
+  "learningBrief": {
+    "inputMode": "curriculum",
+    "subject": "sachunterricht",
+    "gradeLevel": "2",
+    "rawTopic": "Tiere nach Eigenschaften und Lebensraum einordnen",
+    "extractedTasks": ["Ausreisser in Tiergruppen finden", "Tiere nach Größe und Lebensraum einordnen", "Tiere nach Lebensraum sortieren"],
+    "learningGoals": ["gemeinsame Eigenschaften einer Tiergruppe erkennen", "zwei Merkmale gleichzeitig einordnen (Größe und Lebensraum)"],
+    "likelyMisconceptions": ["ein Tier wird nach nur einem Merkmal statt nach beiden Achsen einsortiert", "Krokodile und andere Grenzfälle werden geraten statt begründet"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Der Tier-Sortierhof",
+    "coreMetaphor": "Auf dem Sortierhof bekommt jedes Tier seinen Platz - nach Gruppe, nach Größe und nach Zuhause.",
+    "setting": "Ein bunter Bauernhof mit Ställen, Sortiertischen und einem großen Raster-Feld.",
+    "visualStyle": {
+      "palette": ["#79c7f5", "#8fd16c", "#ffd84d", "#ff7a59", "#27324a"],
+      "mood": "hell, neugierig, ordentlich",
+      "shapes": "Tier-Karten, Sortiertische, Raster-Felder",
+      "effects": "Karten schnappen ein, Konfetti beim Gelingen"
+    },
+    "guide": { "name": "Luno", "role": "Hof-Sortiermeister", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "wortfamilie", "title": "Die Tiergruppen", "purpose": "Den Ausreisser in der Tiergruppe finden.", "scene": "Vier Tiere, eins passt nicht.", "reward": "Gruppen-Kenner" },
+      { "id": "tierraster", "title": "Das Sortier-Raster", "purpose": "Tiere nach Größe und Lebensraum einordnen.", "scene": "Ein Raster mit vier Feldern.", "reward": "Raster-Profi" },
+      { "id": "meisterhof", "title": "Der Meisterhof", "purpose": "Tiere nach Lebensraum sortieren.", "scene": "Zwei große Ställe: Land und Wasser.", "reward": "Sortierhof-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Das Kind ordnet Tiere nach Gefühl statt nach der gemeinsamen Eigenschaft der Gruppe.",
+    "embodiedMetaphor": "Der Sortierhof hat feste Plätze: eine Gruppe teilt eine Eigenschaft, ein Raster zeigt zwei Eigenschaften gleichzeitig.",
+    "successInsight": "Wenn ich weiß, was eine Gruppe verbindet, finde ich den Ausreisser und den richtigen Platz sofort."
+  },
+  "rooms": [
+    {
+      "roomId": "wortfamilie",
+      "objective": "Finde das Tier, das nicht zur Gruppe passt!",
+      "mode": "odd-one-out",
+      "rounds": [
+        {
+          "objective": "Drei sind Haustiere - eins nicht!",
+          "cards": [
+            { "id": "w1", "label": "Hund", "emoji": "🐶" },
+            { "id": "w2", "label": "Katze", "emoji": "🐱" },
+            { "id": "w3", "label": "Hamster", "emoji": "🐹" },
+            { "id": "w4", "label": "Löwe", "emoji": "🦁" }
+          ],
+          "oddIndex": 3,
+          "reason": "Hund, Katze und Hamster sind Haustiere, der Löwe lebt wild."
+        },
+        {
+          "objective": "Drei können fliegen - eins nicht!",
+          "cards": [
+            { "id": "w5", "label": "Vogel", "emoji": "🐦" },
+            { "id": "w6", "label": "Schmetterling", "emoji": "🦋" },
+            { "id": "w7", "label": "Biene", "emoji": "🐝" },
+            { "id": "w8", "label": "Elefant", "emoji": "🐘" }
+          ],
+          "oddIndex": 3,
+          "reason": "Vogel, Schmetterling und Biene können fliegen, der Elefant nicht."
+        }
+      ],
+      "feedback": {
+        "correct": "Genau die richtige Karte gefunden!",
+        "wrongBasket": "In diesen Korb gehört die Karte nicht.",
+        "wrongPair": "Die beiden gehören nicht zusammen.",
+        "wrongOdd": "Diese Karte passt sogar zur Gruppe. Schau nach der gemeinsamen Eigenschaft!",
+        "tryAgain": "Überlege: Was haben drei der vier Tiere gemeinsam?"
+      },
+      "explanationAfterSuccess": "Wenn drei Tiere etwas gemeinsam haben, ist das vierte der Ausreisser."
+    },
+    {
+      "roomId": "tierraster",
+      "objective": "Sortiere jedes Tier in das richtige Feld!",
+      "mode": "two-axis",
+      "rounds": [
+        {
+          "objective": "Klein oder groß? Wasser oder Land?",
+          "xAxis": { "negative": "klein", "positive": "groß" },
+          "yAxis": { "negative": "Wasser", "positive": "Land" },
+          "cards": [
+            { "id": "r1", "label": "Maus", "emoji": "🐭", "x": "negative", "y": "positive" },
+            { "id": "r2", "label": "Elefant", "emoji": "🐘", "x": "positive", "y": "positive" },
+            { "id": "r3", "label": "Fisch", "emoji": "🐟", "x": "negative", "y": "negative" },
+            { "id": "r4", "label": "Wal", "emoji": "🐋", "x": "positive", "y": "negative" }
+          ]
+        },
+        {
+          "objective": "Jetzt mit sechs Tieren!",
+          "xAxis": { "negative": "klein", "positive": "groß" },
+          "yAxis": { "negative": "Wasser", "positive": "Land" },
+          "cards": [
+            { "id": "r5", "label": "Ameise", "emoji": "🐜", "x": "negative", "y": "positive" },
+            { "id": "r6", "label": "Giraffe", "emoji": "🦒", "x": "positive", "y": "positive" },
+            { "id": "r7", "label": "Garnele", "emoji": "🦐", "x": "negative", "y": "negative" },
+            { "id": "r8", "label": "Hai", "emoji": "🦈", "x": "positive", "y": "negative" },
+            { "id": "r9", "label": "Eichhörnchen", "emoji": "🐿️", "x": "negative", "y": "positive" },
+            { "id": "r10", "label": "Krokodil", "emoji": "🐊", "x": "positive", "y": "negative" }
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": "Genau ins richtige Feld getroffen!",
+        "wrongBasket": "In diesen Korb gehört die Karte nicht.",
+        "wrongPair": "Die beiden gehören nicht zusammen.",
+        "wrongQuadrant": "Das ist nicht das richtige Feld. Schau auf beide Fragen: Wie groß? Wo lebt es?",
+        "tryAgain": "Beantworte erst 'klein oder groß?', dann 'Wasser oder Land?'."
+      },
+      "explanationAfterSuccess": "Jedes Tier hat zwei Antworten: eine Größe und ein Zuhause - zusammen ergeben sie das Feld."
+    },
+    {
+      "roomId": "meisterhof",
+      "objective": "Die Meisterprüfung: Land oder Wasser?",
+      "mode": "baskets",
+      "rounds": [
+        {
+          "objective": "Sortiere die ersten sechs Tiere!",
+          "categories": [
+            { "id": "land", "label": "Landtier", "emoji": "🏞️" },
+            { "id": "wasser", "label": "Wassertier", "emoji": "🌊" }
+          ],
+          "cards": [
+            { "id": "m1", "label": "Hund", "emoji": "🐶", "categoryId": "land" },
+            { "id": "m2", "label": "Fisch", "emoji": "🐟", "categoryId": "wasser" },
+            { "id": "m3", "label": "Löwe", "emoji": "🦁", "categoryId": "land" },
+            { "id": "m4", "label": "Wal", "emoji": "🐋", "categoryId": "wasser" },
+            { "id": "m5", "label": "Katze", "emoji": "🐱", "categoryId": "land" },
+            { "id": "m6", "label": "Hai", "emoji": "🦈", "categoryId": "wasser" }
+          ]
+        },
+        {
+          "objective": "Und jetzt die letzten sechs!",
+          "categories": [
+            { "id": "land", "label": "Landtier", "emoji": "🏞️" },
+            { "id": "wasser", "label": "Wassertier", "emoji": "🌊" }
+          ],
+          "cards": [
+            { "id": "m7", "label": "Zebra", "emoji": "🦓", "categoryId": "land" },
+            { "id": "m8", "label": "Delfin", "emoji": "🐬", "categoryId": "wasser" },
+            { "id": "m9", "label": "Eichhörnchen", "emoji": "🐿️", "categoryId": "land" },
+            { "id": "m10", "label": "Tintenfisch", "emoji": "🐙", "categoryId": "wasser" },
+            { "id": "m11", "label": "Igel", "emoji": "🦔", "categoryId": "land" },
+            { "id": "m12", "label": "Robbe", "emoji": "🦭", "categoryId": "wasser" }
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": "Meisterhaft sortiert!",
+        "wrongBasket": "In diesen Stall gehört das Tier nicht. Wo lebt es die meiste Zeit?",
+        "wrongPair": "Die beiden gehören nicht zusammen.",
+        "wrongOdd": "Diese Karte passt zur Gruppe.",
+        "tryAgain": "Überlege: Kann das Tier schwimmen oder braucht es festen Boden?"
+      },
+      "explanationAfterSuccess": "Land oder Wasser - jedes Tier hat sein Zuhause, und jetzt kennst du es sicher."
+    }
+  ]
+}

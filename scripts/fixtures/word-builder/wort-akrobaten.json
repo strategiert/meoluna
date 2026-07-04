@@ -1,0 +1,104 @@
+{
+  "engine": "word-builder",
+  "seed": "wort-akrobaten",
+  "learningBrief": {
+    "inputMode": "curriculum",
+    "subject": "deutsch",
+    "gradeLevel": "1",
+    "rawTopic": "Woerter durcheinandergewuerfelt bauen und nach Gehoer schreiben",
+    "extractedTasks": ["Buchstaben in richtige Reihenfolge bringen", "Woerter nach Gehoer bauen"],
+    "learningGoals": ["Buchstabenfolge unabhaengig von der Praesentation erkennen", "Laute in Buchstaben umsetzen ohne Bildhilfe"],
+    "likelyMisconceptions": ["Buchstaben werden von links nach rechts geraten statt gelesen", "ohne Bild fehlt der Ankerpunkt zum Schreiben"],
+    "focus": "practice",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Die Wort-Akrobaten",
+    "coreMetaphor": "Buchstaben-Akrobaten wirbeln durcheinander und muessen sich in der richtigen Reihenfolge aufstellen.",
+    "setting": "Ein bunter Zirkuswagen voller Buchstaben-Akrobaten.",
+    "visualStyle": {
+      "palette": ["#79c7f5", "#ffd84d", "#ff7a9c", "#54b865", "#27324a"],
+      "mood": "verspielt, quirlig, zirkushaft",
+      "shapes": "Buchstaben-Akrobaten, Zirkuswagen, Konfetti",
+      "effects": "Buchstaben purzeln beim Einordnen, Konfetti beim Gelingen"
+    },
+    "guide": { "name": "Luno", "role": "Zirkusdirektor", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "aufwaermen", "title": "Aufwaermen", "purpose": "Kurze Woerter aus Buchstaben bauen.", "scene": "Tier-Woerter zum Einstieg.", "reward": "Buchstaben-Lehrling" },
+      { "id": "wirbel", "title": "Der Buchstabenwirbel", "purpose": "Durcheinandergewuerfelte Buchstaben richtig ordnen.", "scene": "Die Akrobaten purzeln durcheinander.", "reward": "Ordnungs-Akrobat" },
+      { "id": "hoerecke", "title": "Die Hoerecke", "purpose": "Woerter nur nach Gehoer bauen, ohne Bild.", "scene": "Die Manege ist dunkel - nur die Ohren helfen.", "reward": "Hoer-Meister" },
+      { "id": "meister", "title": "Die Silben-Meisterpruefung", "purpose": "Laengere Woerter aus Silben bauen.", "scene": "Die grosse Zirkusshow.", "reward": "Akrobaten-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Das Kind erkennt die Buchstabenfolge eines Wortes nur, wenn sie bereits in Lese-Reihenfolge vorgegeben ist, nicht wenn sie gemischt oder nur gehoert wird.",
+    "embodiedMetaphor": "Wie Akrobaten, die sich aus dem Durcheinander in die richtige Reihenfolge aufstellen, ordnet das Kind Buchstaben unabhaengig davon, wie sie ihm begegnen.",
+    "successInsight": "Ein Wort bleibt dasselbe Wort, ob ich es lese, durcheinandergewuerfelt sehe oder nur hoere."
+  },
+  "rooms": [
+    {
+      "roomId": "aufwaermen",
+      "objective": "Bau die kurzen Woerter aus Buchstaben!",
+      "mode": "letters",
+      "rounds": [
+        { "objective": "Bau das Wort zum Bild!", "word": "Hase", "emoji": "🐰", "chips": ["H", "a", "s", "e"] },
+        { "objective": "Und dieser Vogel?", "word": "Vogel", "emoji": "🐦", "chips": ["V", "o", "g", "e", "l"] }
+      ],
+      "feedback": {
+        "correct": "Perfekt gebaut!",
+        "wrongChip": "Dieser Buchstabe gehoert nicht hierher. Hoere genau auf den naechsten Laut.",
+        "wrongOrder": "Der Buchstabe stimmt, aber er kommt spaeter dran.",
+        "tryAgain": "Sprich das Wort langsam und hoere, welcher Laut zuerst kommt."
+      },
+      "explanationAfterSuccess": "Hase: H-a-s-e. Buchstabe fuer Buchstabe wird daraus ein Wort."
+    },
+    {
+      "roomId": "wirbel",
+      "objective": "Ordne die durcheinandergewuerfelten Buchstaben!",
+      "mode": "scramble",
+      "rounds": [
+        { "objective": "Die Buchstaben sind durcheinander!", "word": "Fisch", "emoji": "🐟", "chips": ["F", "i", "s", "c", "h"] },
+        { "objective": "Noch ein Wirbel!", "word": "Baum", "emoji": "🌳", "chips": ["B", "a", "u", "m"], "distractors": ["e"] }
+      ],
+      "feedback": {
+        "correct": "Perfekt geordnet!",
+        "wrongChip": "Dieser Buchstabe gehoert nicht ins Wort. Schau genau hin.",
+        "wrongOrder": "Richtiger Buchstabe, aber er kommt spaeter dran.",
+        "tryAgain": "Sprich das Wort langsam und ordne Buchstabe fuer Buchstabe."
+      },
+      "explanationAfterSuccess": "Auch durcheinandergewuerfelt bleibt Fisch immer F-i-s-c-h."
+    },
+    {
+      "roomId": "hoerecke",
+      "objective": "Bau das Wort nur nach Gehoer!",
+      "mode": "listen-and-build",
+      "rounds": [
+        { "objective": "Hoer genau hin!", "word": "Ball", "chips": ["B", "a", "l", "l"], "distractors": ["F"] },
+        { "objective": "Und jetzt dieses Wort!", "word": "Mond", "chips": ["M", "o", "n", "d"] }
+      ],
+      "feedback": {
+        "correct": "Klasse gehoert!",
+        "wrongChip": "Dieser Buchstabe passt nicht zum gehoerten Wort. Hoer es dir noch einmal an.",
+        "wrongOrder": "Richtiger Buchstabe, aber er kommt spaeter dran.",
+        "tryAgain": "Tippe auf den Lautsprecher und hoer das Wort noch einmal."
+      },
+      "explanationAfterSuccess": "Auch ohne Bild kann ich ein Wort bauen, wenn ich genau hinhoere."
+    },
+    {
+      "roomId": "meister",
+      "objective": "Die Silben-Meisterpruefung: lange Woerter aus Silben!",
+      "mode": "syllables",
+      "rounds": [
+        { "objective": "Ein Tier mit langem Hals!", "word": "Giraffe", "emoji": "🦒", "chips": ["Gi", "raf", "fe"] },
+        { "objective": "Das grosse Finale!", "word": "Schmetterling", "emoji": "🦋", "chips": ["Schmet", "ter", "ling"], "distractors": ["fal"] }
+      ],
+      "feedback": {
+        "correct": "Meisterhaft gebaut!",
+        "wrongChip": "Diese Silbe gehoert nicht ins Wort.",
+        "wrongOrder": "Richtige Silbe, aber sie kommt spaeter dran.",
+        "tryAgain": "Klatsche das Wort in Silben und hoer die erste."
+      },
+      "explanationAfterSuccess": "Schmet-ter-ling: auch lange Woerter sind nur Silben in der richtigen Reihenfolge."
+    }
+  ]
+}

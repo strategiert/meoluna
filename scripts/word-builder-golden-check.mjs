@@ -50,9 +50,9 @@ async function main() {
     }
   }
 
-  if (ENGINE_NAMES.length !== 7) {
+  if (ENGINE_NAMES.length !== 14) {
     failed += 1;
-    console.error(`FAIL registry: expected 7 engines, got ${ENGINE_NAMES.length}`);
+    console.error(`FAIL registry: expected 14 engines, got ${ENGINE_NAMES.length}`);
   }
   if (pickEngineByKeywords({ prompt: "Rechtschreibung: Woerter richtig schreiben" }) !== "word-builder") {
     failed += 1;

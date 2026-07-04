@@ -1,5 +1,5 @@
-import type { SortEngineSpec, SortRoom } from "./sortMatchTypes";
-import { isBasketsRoom, isPairsRoom } from "./sortMatchTypes";
+import type { OddOneOutRound, SortEngineSpec, SortRoom, TwoAxisRound } from "./sortMatchTypes";
+import { isBasketsRoom, isOddOneOutRoom, isPairsRoom, isTwoAxisRoom } from "./sortMatchTypes";
 
 export type SortValidationResult = {
   passed: boolean;
@@ -11,6 +11,10 @@ const MIN_ROOMS = 2;
 const MAX_ROOMS = 6;
 const MAX_ROUNDS_PER_ROOM = 4;
 const MIN_TOTAL_ROUNDS = 6;
+// Ab so vielen Raeumen muss die Welt mindestens 2 verschiedene Modi nutzen
+// (strukturelle Varianz erzwingen, nicht nur Content-Varianz). Beide
+// bestehenden Fixtures erfuellen das bereits (baskets+pairs gemischt).
+const MODE_DIVERSITY_MIN_ROOMS = 3;
 
 function hasText(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
@@ -20,11 +24,105 @@ function roomLabel(room: SortRoom): string {
   return room.roomId || "unknown";
 }
 
+const MIN_ODD_CARDS = 4;
+const MAX_ODD_CARDS = 6;
+
+function validateOddOneOutRound(round: OddOneOutRound, roundLabel: string, violations: string[]): void {
+  if (!Array.isArray(round.cards) || round.cards.length < MIN_ODD_CARDS || round.cards.length > MAX_ODD_CARDS) {
+    violations.push(`E_ROOM_${roundLabel}: odd-one-out needs ${MIN_ODD_CARDS}-${MAX_ODD_CARDS} cards`);
+    return;
+  }
+  const cardIds = new Set<string>();
+  const seenSignatures = new Set<string>();
+  for (const card of round.cards) {
+    if (!hasText(card.id) || !hasText(card.label) || !hasText(card.emoji)) {
+      violations.push(`E_ROOM_${roundLabel}: every card needs id, label and emoji`);
+    }
+    if (cardIds.has(card.id)) {
+      violations.push(`E_ROOM_${roundLabel}: duplicate card id ${card.id}`);
+    }
+    cardIds.add(card.id);
+    // Zwei identische Karten (gleiches Label+Emoji) machen die Ausreisser-Karte
+    // mehrdeutig -> nicht maschinell eindeutig loesbar.
+    const signature = `${card.label}::${card.emoji}`;
+    if (seenSignatures.has(signature)) {
+      violations.push(`E_ROOM_${roundLabel}: duplicate card "${card.label}" makes the odd one ambiguous`);
+    }
+    seenSignatures.add(signature);
+  }
+  if (typeof round.oddIndex !== "number" || round.oddIndex < 0 || round.oddIndex >= round.cards.length) {
+    violations.push(`E_ROOM_${roundLabel}: oddIndex out of range`);
+  }
+  if (!hasText(round.reason)) {
+    violations.push(`E_ROOM_${roundLabel}: reason is required (explains why the odd card doesn't fit)`);
+  }
+}
+
+const MIN_TWO_AXIS_CARDS = 4;
+const MAX_TWO_AXIS_CARDS = 8;
+
+function validateTwoAxisRound(round: TwoAxisRound, roundLabel: string, violations: string[]): void {
+  if (!hasText(round.xAxis?.negative) || !hasText(round.xAxis?.positive)) {
+    violations.push(`E_ROOM_${roundLabel}: xAxis needs negative and positive labels`);
+  } else if (round.xAxis.negative === round.xAxis.positive) {
+    violations.push(`E_ROOM_${roundLabel}: xAxis labels must differ`);
+  }
+  if (!hasText(round.yAxis?.negative) || !hasText(round.yAxis?.positive)) {
+    violations.push(`E_ROOM_${roundLabel}: yAxis needs negative and positive labels`);
+  } else if (round.yAxis.negative === round.yAxis.positive) {
+    violations.push(`E_ROOM_${roundLabel}: yAxis labels must differ`);
+  }
+  if (!Array.isArray(round.cards) || round.cards.length < MIN_TWO_AXIS_CARDS || round.cards.length > MAX_TWO_AXIS_CARDS) {
+    violations.push(`E_ROOM_${roundLabel}: two-axis needs ${MIN_TWO_AXIS_CARDS}-${MAX_TWO_AXIS_CARDS} cards`);
+    return;
+  }
+  const cardIds = new Set<string>();
+  const quadrants = new Set<string>();
+  const xValues = new Set<string>();
+  const yValues = new Set<string>();
+  for (const card of round.cards) {
+    if (!hasText(card.id) || !hasText(card.label) || !hasText(card.emoji)) {
+      violations.push(`E_ROOM_${roundLabel}: every card needs id, label and emoji`);
+    }
+    if (cardIds.has(card.id)) {
+      violations.push(`E_ROOM_${roundLabel}: duplicate card id ${card.id}`);
+    }
+    cardIds.add(card.id);
+    if (card.x !== "negative" && card.x !== "positive") {
+      violations.push(`E_ROOM_${roundLabel}: card ${card.id} needs x = negative|positive`);
+    } else {
+      xValues.add(card.x);
+    }
+    if (card.y !== "negative" && card.y !== "positive") {
+      violations.push(`E_ROOM_${roundLabel}: card ${card.id} needs y = negative|positive`);
+    } else {
+      yValues.add(card.y);
+    }
+    quadrants.add(`${card.x}:${card.y}`);
+  }
+  // Jede Karte hat durch (x,y) genau einen Quadranten -> per Konstruktion
+  // eindeutig. Beide Achsen muessen aber tatsaechlich unterscheiden, sonst
+  // ist das Raster degeneriert (z.B. alle Karten auf derselben Seite einer
+  // Achse -> die Achse traegt nichts zur Aufgabe bei).
+  if (xValues.size < 2) {
+    violations.push(`E_ROOM_${roundLabel}: cards must use both sides of the x axis`);
+  }
+  if (yValues.size < 2) {
+    violations.push(`E_ROOM_${roundLabel}: cards must use both sides of the y axis`);
+  }
+  if (quadrants.size < 2) {
+    violations.push(`E_ROOM_${roundLabel}: cards must cover at least 2 different quadrants`);
+  }
+}
+
 export function validateSortEngineSpec(spec: SortEngineSpec): SortValidationResult {
   const violations: string[] = [];
 
   if (spec.engine !== "sort-match") {
     violations.push("E_ENGINE: engine must be sort-match");
+  }
+  if (spec.seed !== undefined && !hasText(spec.seed)) {
+    violations.push("E_SEED: seed must be a non-empty string when present");
   }
 
   if (!hasText(spec.concept?.learningProblem)) {
@@ -135,8 +233,16 @@ export function validateSortEngineSpec(spec: SortEngineSpec): SortValidationResu
           }
         }
       });
+    } else if (isOddOneOutRoom(room)) {
+      room.rounds.forEach((round, roundIndex) => {
+        validateOddOneOutRound(round, `${label}[${roundIndex}]`, violations);
+      });
+    } else if (isTwoAxisRoom(room)) {
+      room.rounds.forEach((round, roundIndex) => {
+        validateTwoAxisRound(round, `${label}[${roundIndex}]`, violations);
+      });
     } else {
-      violations.push(`E_ROOM_${label}: mode must be baskets or pairs`);
+      violations.push(`E_ROOM_${label}: mode must be baskets, pairs, odd-one-out or two-axis`);
     }
 
     // Nur das vom Modus tatsaechlich gerenderte Feedback ist Pflicht.
@@ -144,7 +250,19 @@ export function validateSortEngineSpec(spec: SortEngineSpec): SortValidationResu
     if (!hasText(room.feedback?.tryAgain)) violations.push(`E_ROOM_${label}: tryAgain feedback missing`);
     if (isBasketsRoom(room) && !hasText(room.feedback?.wrongBasket)) violations.push(`E_ROOM_${label}: wrongBasket feedback missing`);
     if (isPairsRoom(room) && !hasText(room.feedback?.wrongPair)) violations.push(`E_ROOM_${label}: wrongPair feedback missing`);
+    if (isOddOneOutRoom(room) && !hasText(room.feedback?.wrongOdd)) violations.push(`E_ROOM_${label}: wrongOdd feedback missing`);
+    if (isTwoAxisRoom(room) && !hasText(room.feedback?.wrongQuadrant)) violations.push(`E_ROOM_${label}: wrongQuadrant feedback missing`);
     if (!hasText(room.explanationAfterSuccess)) violations.push(`E_ROOM_${label}: explanationAfterSuccess missing`);
+  }
+
+  // Strukturelle Varianz: ab MODE_DIVERSITY_MIN_ROOMS Raeumen mindestens
+  // 2 verschiedene Modi. Beide bestehenden Fixtures erfuellen das bereits
+  // (baskets+pairs gemischt), daher additiv sicher.
+  if (spec.rooms.length >= MODE_DIVERSITY_MIN_ROOMS) {
+    const distinctModes = new Set(spec.rooms.map((room) => room.mode));
+    if (distinctModes.size < 2) {
+      violations.push(`E_STRUCTURE: worlds with ${MODE_DIVERSITY_MIN_ROOMS}+ rooms need at least 2 distinct modes (got only "${spec.rooms[0]?.mode}")`);
+    }
   }
 
   if (totalRounds < MIN_TOTAL_ROUNDS) {

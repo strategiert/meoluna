@@ -1,0 +1,79 @@
+{
+  "engine": "pattern",
+  "seed": "stern-baumeister",
+  "learningBrief": {
+    "inputMode": "freitext",
+    "subject": "mathematik",
+    "gradeLevel": "1",
+    "rawTopic": "Muster bauen und wachsende Muster",
+    "extractedTasks": ["Muster fortsetzen", "Muster selbst bauen", "wachsende Muster erkennen"],
+    "learningGoals": ["die Periode eines Musters nachbauen", "die Regel wachsender Reihen erkennen"],
+    "likelyMisconceptions": ["nur das letzte Teil kopieren statt die ganze Gruppe", "beim Wachsen immer nur eins dazulegen"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Die Stern-Baumeister",
+    "coreMetaphor": "Am Nachthimmel bauen kleine Baumeister Sternenketten - jede Kette folgt einer Bau-Regel.",
+    "setting": "Ein funkelnder Nachthimmel mit Werkbaenken aus Wolken.",
+    "visualStyle": { "palette": ["#232a5c", "#ffe27a", "#5aa7f0", "#ff7a9c", "#ffffff"], "mood": "verspielt, nachtblau, funkelnd", "shapes": "Sterne, Monde, Kometen", "effects": "Sternschnuppen beim Gelingen" },
+    "guide": { "name": "Luno", "role": "Baumeister", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "kette", "title": "Die Sternenkette", "purpose": "Muster fortsetzen.", "scene": "Welcher Stern kommt als Naechstes?", "reward": "Ketten-Lehrling" },
+      { "id": "luecke", "title": "Das Wolkenloch", "purpose": "Luecken im Muster fuellen.", "scene": "Eine Wolke verdeckt ein Teil.", "reward": "Lueckenfinder" },
+      { "id": "werkbank", "title": "Die Werkbank", "purpose": "Die naechste Gruppe selbst bauen.", "scene": "Baue die Kette weiter.", "reward": "Stern-Baumeister" },
+      { "id": "turm", "title": "Der Wachsturm", "purpose": "Wachsende Muster legen.", "scene": "Jede Etage wird groesser.", "reward": "Turm-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Das Kind kopiert einzelne Teile, statt die Bau-Regel der ganzen Gruppe zu erkennen.",
+    "embodiedMetaphor": "Eine Sternenkette wird gebaut wie eine Perlenkette - immer dieselbe Gruppe, Stueck fuer Stueck.",
+    "successInsight": "Wenn ich die Bau-Gruppe kenne, kann ich jede Kette beliebig weit weiterbauen."
+  },
+  "rooms": [
+    {
+      "roomId": "kette",
+      "objective": "Setze die Sternenkette fort!",
+      "mode": "continue",
+      "rounds": [
+        { "objective": "Was kommt als Naechstes?", "sequence": ["⭐", "🌙", "⭐", "🌙"], "gapIndex": 3, "options": ["⭐", "🌙"] },
+        { "objective": "Und hier?", "sequence": ["☄️", "⭐", "⭐", "☄️", "⭐", "⭐"], "gapIndex": 5, "options": ["☄️", "⭐"] }
+      ],
+      "feedback": { "correct": "Die Kette funkelt weiter!", "wrongPiece": "Welcher Stern passt in den Takt der Kette?", "tryAgain": "Lies die Kette von vorne mit." },
+      "explanationAfterSuccess": "Stern, Mond, Stern, Mond - die Kette folgt immer derselben Bau-Regel."
+    },
+    {
+      "roomId": "luecke",
+      "objective": "Welches Teil verdeckt die Wolke?",
+      "mode": "fill",
+      "rounds": [
+        { "objective": "Fuelle das Wolkenloch!", "sequence": ["🌟", "🪐", "🌟", "🪐", "🌟", "🪐"], "gapIndex": 3, "options": ["🌟", "🪐"] },
+        { "objective": "Und hier?", "sequence": ["🌙", "🌙", "⭐", "🌙", "🌙", "⭐"], "gapIndex": 4, "options": ["🌙", "⭐"] }
+      ],
+      "feedback": { "correct": "Das Loch ist gestopft!", "wrongPiece": "Schau links und rechts der Wolke - was passt in den Takt?", "tryAgain": "Lies die Kette von vorne und tippe mit." },
+      "explanationAfterSuccess": "Auch hinter der Wolke gilt die Bau-Regel der Kette."
+    },
+    {
+      "roomId": "werkbank",
+      "objective": "Baue die naechste Gruppe der Kette selbst!",
+      "mode": "build",
+      "rounds": [
+        { "objective": "Baue weiter!", "sequence": ["⭐", "🌙", "⭐", "🌙"], "options": ["⭐", "🌙"] },
+        { "objective": "Jetzt mit drei Teilen!", "sequence": ["☄️", "⭐", "🌙", "☄️", "⭐", "🌙"], "options": ["☄️", "⭐", "🌙"] }
+      ],
+      "feedback": { "correct": "Perfekt gebaut, die Kette waechst!", "wrongPiece": "Baue genau die Gruppe nach, die sich wiederholt.", "tryAgain": "Schau dir die erste Gruppe der Kette genau an." },
+      "explanationAfterSuccess": "Wer die Bau-Gruppe kennt, baut die Kette beliebig weit."
+    },
+    {
+      "roomId": "turm",
+      "objective": "Lege die naechste Etage des Wachsturms!",
+      "mode": "grow",
+      "rounds": [
+        { "objective": "Wie viele Sterne braucht die naechste Etage?", "growElement": "⭐", "growSizes": [1, 2, 3, 4] },
+        { "objective": "Der Turm waechst schneller!", "growElement": "🌟", "growSizes": [2, 4, 6, 8] }
+      ],
+      "feedback": { "correct": "Der Turm waechst genau richtig!", "wrongPiece": "Zaehle, um wie viel jede Etage groesser wird.", "tryAgain": "Vergleiche zwei Etagen nebeneinander - wie viele kommen dazu?" },
+      "explanationAfterSuccess": "Jede Etage waechst um denselben Schritt - das ist die Regel des Turms."
+    }
+  ]
+}

@@ -1,6 +1,9 @@
 import type { LearningBrief, WorldSpec } from "./movementSpaceTypes";
 
-export type WordMode = "letters" | "syllables";
+// v2: "scramble" (Buchstaben durcheinander, in Reihenfolge tippen) und
+// "listen-and-build" (kein Wortbild, nur Vorlesen + Hoerverstehen) kommen
+// additiv zu letters/syllables dazu. Alte Specs bleiben gueltig.
+export type WordMode = "letters" | "syllables" | "scramble" | "listen-and-build";
 
 // Eine Runde = ein Wort, das aus Bausteinen (Buchstaben bzw. Silben) in der
 // richtigen Reihenfolge gebaut wird. chips stehen in KORREKTER Reihenfolge,
@@ -8,7 +11,9 @@ export type WordMode = "letters" | "syllables";
 export type WordRound = {
   objective?: string;
   word: string;          // Zielwort (z.B. "Hund" oder "Sommer")
-  emoji: string;         // Bild-Hinweis aufs Wort
+  // Bild-Hinweis aufs Wort. Bei "listen-and-build" bewusst optional/ungenutzt,
+  // da dort kein Wortbild gezeigt wird (nur Vorlesen).
+  emoji?: string;
   chips: string[];       // korrekte Bausteine in Reihenfolge (z.B. ["H","u","n","d"] / ["Som","mer"])
   distractors?: string[]; // optionale falsche Bausteine zum Erschweren
 };
@@ -31,6 +36,9 @@ export type WordRoom = {
 
 export type WordEngineSpec = {
   engine: "word-builder";
+  // Optional: deterministischer Seed fuer Kosmetik-Varianz (Theme, Deko).
+  // Fehlt er, faellt der Renderer auf worldName zurueck.
+  seed?: string;
   learningBrief: LearningBrief;
   world: WorldSpec;
   concept: {

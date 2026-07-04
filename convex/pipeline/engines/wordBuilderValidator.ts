@@ -20,12 +20,37 @@ function roomLabel(room: WordRoom): string {
   return room.roomId || "unknown";
 }
 
+const VALID_MODES = ["letters", "syllables", "scramble", "listen-and-build"] as const;
+// scramble/listen-and-build sind reine Buchstaben-Bau-Modi (keine Silben):
+// jeder Chip genau ein deutscher Buchstabe, das Zielwort 2-10 Zeichen lang.
+const GERMAN_LETTER_WORD_RE = /^[a-zA-ZÄÖÜäöüß]+$/;
+const GERMAN_LETTER_RE = /^[a-zA-ZÄÖÜäöüß]$/;
+const LETTER_ONLY_MODES = new Set(["scramble", "listen-and-build"]);
+
+function validateLetterOnlyRules(mode: string, r: WordRoom["rounds"][number], rl: string, violations: string[]): void {
+  if (!LETTER_ONLY_MODES.has(mode)) return;
+  const word = r.word || "";
+  if (word.length < 2 || word.length > 10) {
+    violations.push(`E_ROOM_${rl}: word must be 2-10 characters for mode "${mode}" (got ${word.length})`);
+  }
+  if (!GERMAN_LETTER_WORD_RE.test(word)) {
+    violations.push(`E_ROOM_${rl}: word must contain only German letters (a-z, Umlaute, ss) for mode "${mode}"`);
+  }
+  if (Array.isArray(r.chips) && r.chips.some((c) => typeof c !== "string" || !GERMAN_LETTER_RE.test(c))) {
+    violations.push(`E_ROOM_${rl}: chips must be single German letters for mode "${mode}"`);
+  }
+  if (r.distractors && r.distractors.some((d) => typeof d !== "string" || !GERMAN_LETTER_RE.test(d))) {
+    violations.push(`E_ROOM_${rl}: distractors must be single German letters for mode "${mode}"`);
+  }
+}
+
 export function validateWordEngineSpec(spec: WordEngineSpec): WordValidationResult {
   const violations: string[] = [];
 
   if (spec.engine !== "word-builder") {
     violations.push("E_ENGINE: engine must be word-builder");
   }
+  if (spec.seed !== undefined && !hasText(spec.seed)) violations.push("E_SEED: seed must be a non-empty string when present");
 
   if (!hasText(spec.concept?.learningProblem)) violations.push("E_CONCEPT: learningProblem is required");
   if (!hasText(spec.concept?.embodiedMetaphor)) violations.push("E_CONCEPT: embodiedMetaphor is required");
@@ -44,8 +69,8 @@ export function validateWordEngineSpec(spec: WordEngineSpec): WordValidationResu
     const label = roomLabel(room);
 
     if (!hasText(room.objective)) violations.push(`E_ROOM_${label}: objective is required`);
-    if (room.mode !== "letters" && room.mode !== "syllables") {
-      violations.push(`E_ROOM_${label}: mode must be letters or syllables`);
+    if (!VALID_MODES.includes(room.mode as (typeof VALID_MODES)[number])) {
+      violations.push(`E_ROOM_${label}: mode must be one of ${VALID_MODES.join("/")}`);
     }
     if (!Array.isArray(room.rounds) || room.rounds.length === 0) {
       violations.push(`E_ROOM_${label}: at least one round is required`);
@@ -60,7 +85,10 @@ export function validateWordEngineSpec(spec: WordEngineSpec): WordValidationResu
         violations.push(`E_ROOM_${rl}: word is required`);
         return;
       }
-      if (!hasText(round.emoji)) violations.push(`E_ROOM_${rl}: emoji hint is required`);
+      // "listen-and-build" zeigt bewusst KEIN Wortbild - emoji ist dort optional.
+      if (room.mode !== "listen-and-build" && !hasText(round.emoji)) {
+        violations.push(`E_ROOM_${rl}: emoji hint is required`);
+      }
       if (!Array.isArray(round.chips) || round.chips.length < 2 || round.chips.length > 9) {
         violations.push(`E_ROOM_${rl}: needs 2-9 chips`);
         return;
@@ -79,6 +107,7 @@ export function validateWordEngineSpec(spec: WordEngineSpec): WordValidationResu
           violations.push(`E_ROOM_${rl}: each distractor must be non-empty and at most 6 chars`);
         }
       }
+      validateLetterOnlyRules(room.mode, round, rl, violations);
     });
 
     if (!hasText(room.feedback?.correct)) violations.push(`E_ROOM_${label}: correct feedback missing`);

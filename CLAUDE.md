@@ -568,4 +568,32 @@ e4c8252 feat: Add Node.js topic import script
 
 ---
 
-*Letztes Update: 2026-02-05 22:00 UTC*
+## 2026-07-04 - Engine-Upgrade Wave 0+1 (kidKit, Uniqueness-Check, neue Modi)
+
+### Architektur-Entscheidungen (Synthese deep-reasoner + Codex, unabhängige Audits)
+- **kidKit** (`convex/pipeline/engines/kidKit.ts`): Shared-UI-Fragmente als Build-Time-String-Komposition, inline in den emittierten Sandbox-Code. KEIN Runtime-Import, kein Sandbox-Umbau. Enthält: seeded PRNG (mulberry32+djb2), 5 Backdrop-Themes (wiese/dämmerung/weltraum/unterwasser/wald), WebAudio-Sound (default STUMM + Toggle), StreakMeter, Luno/Sky/SpeechBubble/etc.
+- **Seed-Kosmetik**: optionales Spec-Feld `seed` (Fallback: worldName-Hash) wählt Theme deterministisch — Varianz ohne Extra-Token, replay-sicher.
+- **Uniqueness messbar**: `structureSignature.ts` (Skelett-Hash ohne Content) + `npm run uniqueness-check` (Fixture-Signaturen paarweise verschieden + Theme-Spread). Speicherzeit-Gate bewusst vertagt.
+- **Spec-Evolution nur additiv**: neue Felder optional, Legacy-Fixtures bleiben für immer als Backward-Compat-Beweis.
+- Harte Regeln: jede Drag-Mechanik braucht Tipp-Fallback (Kl. 1); Sound startet stumm (Klassenraum).
+
+### Engine-Upgrades (Wave 1)
+| Engine | Neu |
+|--------|-----|
+| pattern | Modi **build** (nächste Periode selbst bauen) + **grow** (wachsende Muster), Kachel-Töne/Melodie, Modus-Diversitäts-Validator |
+| sort-match | Modi **odd-one-out** + **two-axis** (2x2-Raster), kidKit, seeded Pair-Shuffle (Math.random-Fix) |
+| word-builder | Modi **scramble** + **listen-and-build** (Phonics), kidKit, Math.random → seeded PRNG (Determinismus-Fix) |
+
+### Tests (alle grün)
+Alle 14 Golden-Checks, playthrough-smoke (Klick→XP-Contract), uniqueness-check, visual-regression (Baselines aktualisiert), tsc.
+
+### Offene Waves (Priorisierung aus Synthese)
+- Wave 2: counting, money, clock, building-construct (+ Math.random-Fix building/movement/timeSequence/focusedArithmetic)
+- Wave 3: mixing-balance, detective-evidence, time-sequence, map, chart, diagram
+- Wave 4: movement-space auf kidKit nachziehen; optional Speicherzeit-Fingerprint-Gate
+
+### Agent: Claude Code (Fable, Orchestrator) + deep-reasoner + Codex + 2× fast-worker
+
+---
+
+*Letztes Update: 2026-07-04*
