@@ -3,14 +3,19 @@
   "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "redirects": [
+    { "source": "/blog", "destination": "https://meoluna.com/blog/", "permanent": true },
+    { "source": "/blog/:slug", "destination": "https://meoluna.com/blog/:slug/", "permanent": true },
+    { "source": "/about", "destination": "https://meoluna.com/ueber-uns/", "permanent": true },
+    { "source": "/contact", "destination": "https://meoluna.com/kontakt/", "permanent": true },
+    { "source": "/privacy", "destination": "https://meoluna.com/datenschutz/", "permanent": true },
+    { "source": "/imprint", "destination": "https://meoluna.com/impressum/", "permanent": true },
+    { "source": "/terms", "destination": "https://meoluna.com/agb/", "permanent": true }
+  ],
   "rewrites": [
     {
       "source": "/api/:path*",
       "destination": "/api/:path*"
-    },
-    {
-      "source": "/sitemap.xml",
-      "destination": "/api/sitemap"
     },
     {
       "source": "/((?!api/).*)",

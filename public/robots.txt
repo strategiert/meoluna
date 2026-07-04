@@ -1,6 +1,4 @@
 # app.meoluna.com ist die reine App-Domain — nicht für den Google-Index bestimmt.
-# SEO läuft über meoluna.com (Marketing-Site, eigenes Repo meoluna-web).
-# Ausnahme: /blog bleibt crawlbar, bis der Blog auf die Marketing-Site umzieht.
+# SEO (inkl. Blog) läuft über meoluna.com (Marketing-Site, Repo meoluna-web).
 User-agent: *
-Allow: /blog
 Disallow: /
