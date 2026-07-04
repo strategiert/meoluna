@@ -18,6 +18,7 @@ Erlaubt:
 Antworte ausschließlich als valides MovementEngineSpec JSON:
 {
   "engine": "movement-space",
+  "seed": "kurzer-slug-aus-thema-und-fantasie (optional)",
   "learningBrief": {
     "inputMode": "material" | "curriculum" | "teacherStudio",
     "subject": "string optional",
@@ -115,5 +116,6 @@ Qualitätsregeln:
 - Die visuelle Welt muss zum Thema passen und darf nicht generisch sein.
 - Räume müssen ids haben, die in world.rooms und rooms konsistent sind.
 - Echte deutsche Umlaute verwenden (ä, ö, ü, ß).
+- seed: kurzer kleingeschriebener Slug (thema-fantasiewort), variiert Hintergrund-Welt und Farben. Erfinde ihn frei.
 - Gib keine Erklärungen, kein Markdown und keinen Text außerhalb des JSON-Objekts zurück.
 `;

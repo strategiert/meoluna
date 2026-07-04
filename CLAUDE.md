@@ -587,12 +587,44 @@ e4c8252 feat: Add Node.js topic import script
 ### Tests (alle grün)
 Alle 14 Golden-Checks, playthrough-smoke (Klick→XP-Contract), uniqueness-check, visual-regression (Baselines aktualisiert), tsc.
 
-### Offene Waves (Priorisierung aus Synthese)
-- Wave 2: counting, money, clock, building-construct (+ Math.random-Fix building/movement/timeSequence/focusedArithmetic)
-- Wave 3: mixing-balance, detective-evidence, time-sequence, map, chart, diagram
-- Wave 4: movement-space auf kidKit nachziehen; optional Speicherzeit-Fingerprint-Gate
-
 ### Agent: Claude Code (Fable, Orchestrator) + deep-reasoner + Codex + 2× fast-worker
+
+---
+
+## 2026-07-04 - Engine-Upgrade Waves 2-4 komplett (alle 14 Engines auf kidKit)
+
+### Umgesetzt (5 parallele fast-worker, Pipeline-Modus)
+| Wave | Engine | Neue Modi / Änderungen |
+|------|--------|------------------------|
+| 2 | counting | **ten-frame** (Zehnerfeld) + **make-equal** |
+| 2 | money | **shopping** (Korb + bezahlen); "change" existierte schon |
+| 2 | clock | **duration** (Endzeit rechnen); set bekam **minuteStep** 5/15/30 |
+| 2 | building-construct | **find-error** + Math.random→seeded (compose-Pool) |
+| 3 | map | **route** (Stationsfolge + SVG-Polyline) |
+| 3 | chart | **build** (Balken auf Zielwerte bauen) |
+| 3 | diagram | **place** (Labels auf Marker setzen) |
+| 3 | mixing-balance | **compare** (welche Seite schwerer) |
+| 3 | detective-evidence | **contradiction** (Aussage widerspricht Beweis) |
+| 3 | time-sequence | **missing-event** + Math.random→seeded |
+| 4 | movement-space | NUR kidKit + Math.random→seeded (Referenz-Engine, keine Mechanik-Änderung) |
+| 4 | focusedArithmeticMiniApp | Math.random→deterministische Rotation |
+
+Alle 14 Engines: kidKit (seeded Themes, Sound stumm+Toggle, Streak), optionales seed-Feld, additive Validatoren, je 1 neue v2-Fixture, Legacy-Fixtures unangetastet.
+
+### Wichtige Erkenntnisse
+- Emittierter Code ist ES-Modul: doppelte Top-Level-Deklarationen (eigene Sky/Luno neben Kit-Fragment) = Syntaxfehler → Engines benennen eigene Varianten um (MovementSky), dokumentiert in kidKit.ts.
+- playthrough-smoke nimmt die alphabetisch ERSTE Fixture pro Engine → neue Fixtures alphabetisch NACH den Bestand benennen.
+- Diversitätsregel (≥2 Modi ab 3 Räumen) überall AUSSER time-sequence (2 Bestands-Fixtures uniform) und word-builder.
+- Kein Math.random mehr in convex/pipeline/engines (voll deterministisch bei gleicher Spec).
+
+### Tests (alle grün)
+18 Check-Scripts (14 Golden + uniqueness + arithmetic-movement + focused-intervention + golden-check), playthrough-smoke (8/8 + counting-Fix), visual-regression (14/14 rendern, Baselines aktualisiert), tsc.
+
+### Offen
+- Optional (bewusst vertagt): Speicherzeit-Fingerprint-Gate (structureSignature beim Speichern erzwingen)
+- Wave-2+-Ideen aus Synthese, nicht umgesetzt: sort-match conveyor, dnd-kit-Drag-Varianten
+
+### Agent: Claude Code (Fable, Orchestrator) + 5× fast-worker
 
 ---
 

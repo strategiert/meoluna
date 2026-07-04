@@ -80,7 +80,10 @@ function makePractice(seed, factor) {
   const result = first + second;
   const turnedAround = first - second;
   const choices = [result, Math.abs(result), turnedAround === result ? result - 10 : turnedAround];
-  return { first, second, result, choices: choices.sort(() => Math.random() - 0.5) };
+  // Deterministische Rotation statt Zufalls-Shuffle: gleiche Aufgabe ergibt
+  // dieselbe Antwort-Reihenfolge (replay-sicher), variiert aber pro Aufgabe.
+  const rot = ((Math.abs(first) + Math.abs(second)) % 3 + 3) % 3;
+  return { first, second, result, choices: choices.slice(rot).concat(choices.slice(0, rot)) };
 }
 
 const PRACTICE_GOAL = 5;

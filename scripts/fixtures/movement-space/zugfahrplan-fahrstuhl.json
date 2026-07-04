@@ -1,0 +1,111 @@
+{
+  "engine": "movement-space",
+  "seed": "zugfahrplan-fahrstuhl",
+  "learningBrief": {
+    "inputMode": "material",
+    "subject": "Mathematik",
+    "gradeLevel": "5",
+    "rawTopic": "Positive und negative Stockwerke im Fahrstuhl",
+    "extractedTasks": [
+      "Stockwerke als Bewegung nach oben und unten verstehen"
+    ],
+    "learningGoals": [
+      "Positive Zahlen als Bewegung nach oben, negative als Bewegung nach unten verstehen"
+    ],
+    "likelyMisconceptions": [
+      "Negative Stockwerke als 'kleinere positive Zahl' statt als eigene Richtung lesen"
+    ],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Der Fahrstuhl-Turm",
+    "coreMetaphor": "Jede Zahl ist eine Fahrt im Fahrstuhl - positiv rauf, negativ runter.",
+    "setting": "Ein hoher Turm mit Stockwerken von -10 bis 10 und einem glaesernen Fahrstuhl.",
+    "visualStyle": {
+      "palette": [
+        "#0f172a",
+        "#334155",
+        "#f59e0b",
+        "#38bdf8",
+        "#f8fafc"
+      ],
+      "mood": "ruhig, klar, technisch",
+      "shapes": "Fahrstuhlschacht, Stockwerk-Markierungen, Anzeige",
+      "effects": "Anzeige leuchtet beim Ankommen"
+    },
+    "guide": {
+      "name": "Nera",
+      "role": "Fahrstuhlfuehrerin",
+      "personality": "praezise, ruhig und direkt"
+    },
+    "rooms": [
+      { "id": "eingewoehnen", "title": "Eingewoehnen", "purpose": "Kurze Fahrten nach oben und unten.", "scene": "Der Fahrstuhl faehrt zum ersten Mal.", "reward": "Fahrstuhl-Lehrling" },
+      { "id": "keller", "title": "In den Keller", "purpose": "Fahrten unter das Erdgeschoss.", "scene": "Der Fahrstuhl faehrt in den Keller.", "reward": "Keller-Profi" },
+      { "id": "meister", "title": "Meisterpruefung", "purpose": "Ganze Fahrtrouten selbst bauen.", "scene": "Zwei Fahrten hintereinander planen.", "reward": "Turm-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Negative Stockwerke werden als kleinere Zahl statt als eigene Richtung (nach unten) verstanden.",
+    "embodiedMetaphor": "Jede Fahrstuhlfahrt ist eine Bewegung: positiv nach oben, negativ nach unten.",
+    "successInsight": "Ich addiere Fahrten wie Bewegungen: rauf zaehlt dazu, runter zieht ab."
+  },
+  "coordinateSystem": {
+    "dimensions": "1d-vertical",
+    "min": -10,
+    "max": 10,
+    "unitLabel": "Stockwerke",
+    "negativeDirectionLabel": "Runter",
+    "positiveDirectionLabel": "Rauf"
+  },
+  "rooms": [
+    {
+      "roomId": "eingewoehnen",
+      "objective": "Fahr zwei kurze Strecken!",
+      "rounds": [
+        { "startPosition": 0, "moves": [{ "value": 3, "label": "3 Stockwerke rauf", "meaning": "+3" }], "targetPosition": 3 },
+        { "startPosition": 3, "moves": [{ "value": -2, "label": "2 Stockwerke runter", "meaning": "-2" }], "targetPosition": 1 }
+      ],
+      "interaction": "choose-direction",
+      "feedback": {
+        "correct": "Perfekt gefahren!",
+        "wrongDirection": "Schau auf das Vorzeichen: plus heisst rauf, minus heisst runter.",
+        "wrongDistance": "Die Richtung stimmt, aber die Anzahl der Stockwerke noch nicht.",
+        "signConfusion": "Ein Minus vor der Zahl bedeutet eine Fahrt nach unten, keine Umkehr."
+      },
+      "explanationAfterSuccess": "3 rauf, dann 2 runter - das macht zusammen 1 Stockwerk ueber dem Erdgeschoss."
+    },
+    {
+      "roomId": "keller",
+      "objective": "Fahr in den Keller!",
+      "rounds": [
+        { "startPosition": 0, "moves": [{ "value": -4, "label": "4 Stockwerke runter", "meaning": "-4" }], "targetPosition": -4 },
+        { "startPosition": -4, "moves": [{ "value": -3, "label": "3 weitere Stockwerke runter", "meaning": "-3" }], "targetPosition": -7 }
+      ],
+      "interaction": "choose-direction",
+      "feedback": {
+        "correct": "Genau im Keller angekommen!",
+        "wrongDirection": "Der Keller liegt unter dem Erdgeschoss - das ist die negative Richtung.",
+        "wrongDistance": "Die Richtung stimmt, aber die Anzahl der Stockwerke noch nicht.",
+        "signConfusion": "Noch ein Minus bedeutet noch eine Fahrt nach unten, nicht zurueck nach oben."
+      },
+      "explanationAfterSuccess": "-4 und dann -3 ergeben zusammen -7 - du bist 7 Stockwerke unter dem Erdgeschoss."
+    },
+    {
+      "roomId": "meister",
+      "objective": "Baue die ganze Fahrtroute selbst!",
+      "rounds": [
+        { "startPosition": 0, "moves": [{ "value": 5, "label": "5 Stockwerke rauf", "meaning": "+5" }, { "value": -2, "label": "2 Stockwerke runter", "meaning": "-2" }], "targetPosition": 3 },
+        { "startPosition": 2, "moves": [{ "value": -6, "label": "6 Stockwerke runter", "meaning": "-6" }, { "value": 4, "label": "4 Stockwerke rauf", "meaning": "+4" }], "targetPosition": 0 }
+      ],
+      "interaction": "step-sequencer",
+      "feedback": {
+        "correct": "Meisterhaft gefahren!",
+        "wrongDirection": "Baue die Fahrten in der richtigen Reihenfolge mit dem richtigen Vorzeichen.",
+        "wrongDistance": "Die Reihenfolge stimmt, die Anzahl der Stockwerke noch nicht.",
+        "signConfusion": "Ein Minuszeichen bleibt eine Fahrt nach unten, auch mitten in der Route."
+      },
+      "explanationAfterSuccess": "Jede Fahrt zaehlt einzeln: rauf addiert, runter zieht ab - Schritt fuer Schritt zur Zielhoehe."
+    }
+  ]
+}

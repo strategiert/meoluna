@@ -77,6 +77,9 @@ export type MovementRoom = {
 
 export type MovementEngineSpec = {
   engine: "movement-space";
+  // Optional: deterministischer Seed fuer Kosmetik-Varianz (Theme, Deko).
+  // Fehlt er, faellt der Renderer auf worldName zurueck.
+  seed?: string;
   learningBrief: LearningBrief;
   world: WorldSpec;
   concept: {

@@ -1,5 +1,6 @@
 import type { MovementEngineSpec } from "./movementSpaceTypes";
 import { validateMovementEngineSpec } from "./movementSpaceValidator";
+import { KID_KIT_CORE } from "./kidKit";
 
 export function buildMovementSpaceWorldCode(spec: MovementEngineSpec): string {
   const validation = validateMovementEngineSpec(spec);
@@ -14,27 +15,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 
 const SPEC = ${dataJson};
-
-// "Bilderbuch-Tag": helle, freundliche Spielwelt für Kinder ab 5.
-// Session-Format v2: Räume enthalten mehrere Runden mit steigender Schwierigkeit.
-const KID = {
-  skyTop: '#79c7f5',
-  skyBottom: '#e9f8ff',
-  hillBack: '#a8dd8a',
-  hillFront: '#7ec463',
-  path: '#fbe3b2',
-  pathEdge: '#d9b178',
-  ink: '#27324a',
-  coral: '#ff7a59',
-  coralDark: '#c95a3f',
-  blue: '#3f9bf0',
-  blueDark: '#2c79c2',
-  green: '#54b865',
-  greenDark: '#3c8f4b',
-  sun: '#ffd84d',
-  card: '#ffffff',
-};
-
+` + KID_KIT_CORE + `
 function valueOf(position) {
   return typeof position === 'number' ? position : position.x;
 }
@@ -76,24 +57,10 @@ function positiveWord() {
   return SPEC.coordinateSystem.positiveDirectionLabel || 'Nach Osten';
 }
 
-function speak(text) {
-  try {
-    if (!window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'de-DE';
-    utterance.rate = 0.92;
-    window.speechSynthesis.speak(utterance);
-  } catch (error) {}
-}
-
-function KidStyles() {
-  return (
-    <style>{"@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap'); .kid-font{font-family:'Baloo 2','Comic Sans MS','Segoe UI',sans-serif;}"}</style>
-  );
-}
-
-function Sky() {
+// Eigener Name (nicht "Sky"), damit dieses Modul-scope-lokale Fragment nicht
+// mit dem gleichnamigen Fragment aus KID_KIT_CORE kollidiert - ES-Module
+// erlauben keine doppelte Top-Level-Deklaration desselben Bezeichners.
+function MovementSky() {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
       <motion.div
@@ -109,7 +76,9 @@ function Sky() {
   );
 }
 
-function Luno({ mood, hopping, dir }) {
+// Eigener Name (nicht "Luno"): braucht hopping/dir-Props fuer die Huepf-
+// Animation, die KID_KIT_CORE's Luno (nur mood) nicht kennt.
+function MovementLuno({ mood, hopping, dir }) {
   const eyeShift = dir < 0 ? -2.4 : dir > 0 ? 2.4 : 0;
   return (
     <motion.div
@@ -134,56 +103,6 @@ function Luno({ mood, hopping, dir }) {
         <path d="M 52 12 Q 60 6 64 14 Q 58 14 56 20 Z" fill="#ffd84d" stroke="#27324a" strokeWidth="2.5" />
       </svg>
     </motion.div>
-  );
-}
-
-function SpeechBubble({ text }) {
-  return (
-    <div className="relative mx-auto w-full max-w-3xl">
-      <div className="flex items-center gap-3 rounded-3xl border-4 px-4 py-3 shadow-lg sm:px-6 sm:py-4" style={{ background: KID.card, borderColor: KID.ink }}>
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-2xl" style={{ background: '#fff1c4' }}>🌙</div>
-        <p className="grow text-lg font-bold leading-snug sm:text-2xl" style={{ color: KID.ink }}>{text}</p>
-        <button
-          type="button"
-          onClick={() => speak(text)}
-          aria-label="Vorlesen"
-          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-2xl transition-transform active:scale-90"
-          style={{ background: KID.blue, boxShadow: '0 4px 0 ' + KID.blueDark }}
-        >🔊</button>
-      </div>
-      <div className="absolute -bottom-3 left-10 h-6 w-6 rotate-45 border-b-4 border-r-4" style={{ background: KID.card, borderColor: KID.ink }} />
-    </div>
-  );
-}
-
-function BigButton({ onClick, color, colorDark, children, disabled }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className="kid-font min-h-[64px] rounded-3xl px-6 py-3 text-xl font-extrabold text-white transition-all active:translate-y-1 disabled:opacity-40 sm:text-2xl"
-      style={{ background: color, boxShadow: '0 6px 0 ' + colorDark, textShadow: '0 1px 2px rgba(0,0,0,0.25)' }}
-    >{children}</button>
-  );
-}
-
-function StarRow({ stars }) {
-  return (
-    <div className="flex items-center gap-1 rounded-full border-2 px-3 py-1 text-xl" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink }}>
-      <span>⭐</span>
-      <span className="kid-font font-extrabold">{stars}</span>
-    </div>
-  );
-}
-
-function RoundDots({ total, current }) {
-  return (
-    <div className="flex items-center gap-1.5 rounded-full border-2 px-3 py-1.5" style={{ background: KID.card, borderColor: KID.ink }}>
-      {Array.from({ length: total }).map((entry, index) => (
-        <div key={index} className="h-3.5 w-3.5 rounded-full border-2" style={{ background: index < current ? KID.green : index === current ? KID.sun : '#e3e8f0', borderColor: KID.ink }} />
-      ))}
-    </div>
   );
 }
 
@@ -237,13 +156,13 @@ function PathScene({ round, stepIndex, phase, displayPos, hopping, hopCount, lan
       className="relative w-full overflow-hidden rounded-[2rem] border-4"
       style={{ height: 'min(46vh, 24rem)', borderColor: KID.ink, background: 'linear-gradient(180deg, ' + KID.skyTop + ', ' + KID.skyBottom + ' 70%)' }}
     >
-      <Sky />
+      <MovementSky />
       <div className="pointer-events-none absolute -left-10 bottom-[16%] h-40 w-[60%] rounded-[50%]" style={{ background: KID.hillBack }} />
       <div className="pointer-events-none absolute -right-16 bottom-[12%] h-44 w-[70%] rounded-[50%]" style={{ background: KID.hillFront }} />
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[26%]" style={{ background: KID.hillFront }} />
 
       {horizontal && (
-        <div className="absolute inset-x-[4%] bottom-[22%] h-12 rounded-full border-4" style={{ background: KID.path, borderColor: KID.pathEdge }}>
+        <div className="absolute inset-x-[4%] bottom-[22%] h-12 rounded-full border-4" style={{ background: KID.band, borderColor: KID.bandEdge }}>
           {ticks.map((tick) => (
             <div key={tick} className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 text-center" style={{ left: axisPercent(tick, cs) + '%' }}>
               <div className={'kid-font rounded-xl border-2 px-2 py-0.5 text-sm font-extrabold sm:text-base ' + (tick === 0 ? 'scale-110' : '')} style={{ background: tick === 0 ? KID.sun : KID.card, borderColor: KID.ink, color: KID.ink }}>{tick}</div>
@@ -259,7 +178,7 @@ function PathScene({ round, stepIndex, phase, displayPos, hopping, hopCount, lan
       )}
 
       {!horizontal && (
-        <div className="absolute bottom-[16%] left-1/2 top-[8%] w-12 -translate-x-1/2 rounded-full border-4" style={{ background: KID.path, borderColor: KID.pathEdge }}>
+        <div className="absolute bottom-[16%] left-1/2 top-[8%] w-12 -translate-x-1/2 rounded-full border-4" style={{ background: KID.band, borderColor: KID.bandEdge }}>
           {ticks.map((tick) => (
             <div key={tick} className="absolute left-1/2 -translate-x-1/2 translate-y-1/2" style={{ bottom: axisPercent(tick, cs) + '%' }}>
               <div className="kid-font rounded-xl border-2 px-2 py-0.5 text-sm font-extrabold" style={{ background: tick === 0 ? KID.sun : KID.card, borderColor: KID.ink, color: KID.ink }}>{tick}</div>
@@ -286,14 +205,14 @@ function PathScene({ round, stepIndex, phase, displayPos, hopping, hopCount, lan
               onClick={(event) => { event.stopPropagation(); onPickLanding(option); }}
               className="kid-font pointer-events-auto absolute z-30 flex h-16 w-16 -translate-x-1/2 items-center justify-center rounded-full border-4 text-xl font-extrabold transition-transform active:scale-90 sm:h-20 sm:w-20 sm:text-2xl"
               style={horizontal
-                ? { left: stonePositions[option] + '%', bottom: '3%', background: selectedPosition === option ? KID.sun : KID.card, borderColor: KID.ink, color: KID.ink, boxShadow: '0 5px 0 ' + KID.pathEdge }
-                : { left: '68%', bottom: Math.max(6, Math.min(80, stonePositions[option])) + '%', background: selectedPosition === option ? KID.sun : KID.card, borderColor: KID.ink, color: KID.ink, boxShadow: '0 5px 0 ' + KID.pathEdge }}
+                ? { left: stonePositions[option] + '%', bottom: '3%', background: selectedPosition === option ? KID.sun : KID.card, borderColor: KID.ink, color: KID.ink, boxShadow: '0 5px 0 ' + KID.bandEdge }
+                : { left: '68%', bottom: Math.max(6, Math.min(80, stonePositions[option])) + '%', background: selectedPosition === option ? KID.sun : KID.card, borderColor: KID.ink, color: KID.ink, boxShadow: '0 5px 0 ' + KID.bandEdge }}
             >{option}</motion.button>
           ))}
         </AnimatePresence>
 
         <motion.div className="absolute z-20 -translate-x-1/2" animate={charStyle} transition={{ duration: hopping ? Math.min(2.4, 0.8 + Math.abs(moveValue || 10) / 40) : 0.4, ease: 'easeInOut' }}>
-          <Luno mood={mood} hopping={hopping} dir={hopping ? dir : 0} />
+          <MovementLuno mood={mood} hopping={hopping} dir={hopping ? dir : 0} />
           <div className="kid-font mx-auto -mt-1 w-fit rounded-full border-2 px-3 py-0.5 text-base font-extrabold" style={{ background: phase === 'land' ? KID.sun : KID.card, borderColor: KID.ink, color: KID.ink }}>
             {hopping ? hopCount : phase === 'land' ? '?' : displayPos}
           </div>
@@ -362,7 +281,7 @@ function chipText(value) {
   return value < 0 ? '⬅️ ' + abs : abs + ' ➡️';
 }
 
-function buildSequencerPool(round) {
+function buildSequencerPool(round, seedKey) {
   const pool = round.moves.map((move, index) => ({ poolId: 'm' + index, value: valueOf(move.value) }));
   round.moves.forEach((move, index) => {
     const mirrored = -valueOf(move.value);
@@ -370,7 +289,7 @@ function buildSequencerPool(round) {
       pool.push({ poolId: 'd' + index, value: mirrored });
     }
   });
-  return pool.sort(() => Math.random() - 0.5);
+  return seededShuffle(makeRng(seedKey), pool);
 }
 
 // Mechanik "Weg bauen": Bewegungs-Chips in der richtigen Reihenfolge in
@@ -398,7 +317,7 @@ function SequencerPanel({ round, slots, onPickChip, onClearSlot, onRun, running,
             disabled={usedPoolIds.includes(chip.poolId) || running}
             onClick={() => onPickChip(chip)}
             className="kid-font flex h-16 min-w-[6rem] items-center justify-center rounded-2xl border-4 px-3 text-xl font-extrabold transition-all active:translate-y-1 disabled:opacity-30"
-            style={{ background: KID.card, borderColor: KID.ink, color: KID.ink, boxShadow: '0 5px 0 ' + KID.pathEdge }}
+            style={{ background: KID.card, borderColor: KID.ink, color: KID.ink, boxShadow: '0 5px 0 ' + KID.bandEdge }}
           >{chipText(chip.value)}</button>
         ))}
       </div>
@@ -407,7 +326,7 @@ function SequencerPanel({ round, slots, onPickChip, onClearSlot, onRun, running,
   );
 }
 
-function RoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
+function RoomScene({ room, roomMeta, stars, streak, onStreak, onBack, onComplete, onStar }) {
   const isSequencer = room.interaction === 'step-sequencer';
   const [roundIndex, setRoundIndex] = useState(0);
   const round = room.rounds[roundIndex];
@@ -420,9 +339,10 @@ function RoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
   const [selectedPosition, setSelectedPosition] = useState(null);
   const [bubble, setBubble] = useState('');
   const [landing, setLanding] = useState({ options: [], wrongDirection: null });
-  const [pool, setPool] = useState(() => isSequencer ? buildSequencerPool(round) : []);
+  const [pool, setPool] = useState(() => isSequencer ? buildSequencerPool(round, KID_SEED + ':' + room.roomId + ':' + roundIndex) : []);
   const [slots, setSlots] = useState(() => round.moves.map(() => null));
   const [revealed, setRevealed] = useState(0);
+  const [misses, setMisses] = useState(0);
   const hopTimer = useRef(null);
 
   const currentMove = round.moves[stepIndex];
@@ -445,9 +365,10 @@ function RoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
     setDisplayPos(valueOf(nextRound.startPosition));
     setSelectedPosition(null);
     setRevealed(0);
+    setMisses(0);
     setLanding({ options: [], wrongDirection: null });
     if (isSequencer) {
-      setPool(buildSequencerPool(nextRound));
+      setPool(buildSequencerPool(nextRound, KID_SEED + ':' + room.roomId + ':' + nextIndex));
       setSlots(nextRound.moves.map(() => null));
     }
   }
@@ -455,6 +376,9 @@ function RoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
   function finishRound() {
     setRevealed(round.moves.length);
     setMood('cheer');
+    Sound.success();
+    const nextStreak = misses === 0 ? streak + 1 : 0;
+    onStreak(nextStreak);
     Meoluna.reportScore(10, { action: 'movement-round-correct', roomId: room.roomId, roundIndex });
     onStar();
     if (roundIndex + 1 >= room.rounds.length) {
@@ -462,11 +386,11 @@ function RoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
       setBubble(room.feedback.correct + ' ' + room.explanationAfterSuccess);
       Meoluna.reportScore(25, { action: 'movement-room-complete', roomId: room.roomId });
       Meoluna.completeModule(room.roomId, 25);
-      confetti({ particleCount: 110, spread: 75, origin: { y: 0.6 } });
+      confetti({ particleCount: nextStreak >= 3 ? 160 : 110, spread: 75, origin: { y: 0.6 } });
     } else {
       setPhase('roundDone');
       setBubble(room.feedback.correct + ' Bereit für die nächste Aufgabe?');
-      confetti({ particleCount: 50, spread: 60, origin: { y: 0.65 } });
+      confetti({ particleCount: nextStreak >= 3 ? 90 : 50, spread: 60, origin: { y: 0.65 } });
     }
     setTimeout(() => setMood('happy'), 1200);
   }
@@ -474,10 +398,13 @@ function RoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
   function chooseDirection(dir) {
     if (phase !== 'direction') return;
     if (dir === Math.sign(moveValue)) {
+      Sound.thunk();
       setMood('happy');
       setPhase('hop');
       setBubble('Super! Drücke auf Hüpfen!');
     } else {
+      Sound.miss();
+      setMisses((value) => value + 1);
       setMood('sad');
       setBubble(stepIndex > 0 ? room.feedback.signConfusion : room.feedback.wrongDirection);
       setTimeout(() => setMood('happy'), 700);
@@ -517,6 +444,7 @@ function RoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
     const target = stepTargetPosition(round, stepIndex);
     setSelectedPosition(option);
     if (option === target) {
+      Sound.tone(Sound.noteFor(stepIndex), 0.16);
       Meoluna.reportScore(5, { action: 'movement-step-correct', roomId: room.roomId, roundIndex, stepIndex });
       if (stepIndex + 1 >= round.moves.length) {
         finishRound();
@@ -529,6 +457,8 @@ function RoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
         setTimeout(() => setMood('happy'), 700);
       }
     } else {
+      Sound.miss();
+      setMisses((value) => value + 1);
       setMood('sad');
       setBubble(option === landing.wrongDirection
         ? (stepIndex > 0 ? room.feedback.signConfusion : room.feedback.wrongDirection)
@@ -545,10 +475,12 @@ function RoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
   function pickChip(chip) {
     const firstEmpty = slots.findIndex((slot) => !slot);
     if (firstEmpty === -1) return;
+    Sound.thunk();
     setSlots((list) => list.map((slot, index) => index === firstEmpty ? chip : slot));
   }
 
   function clearSlot(index) {
+    Sound.thunk();
     setSlots((list) => list.map((slot, i) => i === index ? null : slot));
   }
 
@@ -558,6 +490,8 @@ function RoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
     const chosen = slots.map((slot) => slot.value);
     const wrongIndex = expected.findIndex((value, index) => chosen[index] !== value);
     if (wrongIndex !== -1) {
+      Sound.miss();
+      setMisses((value) => value + 1);
       setMood('sad');
       setBubble(chosen[wrongIndex] === -expected[wrongIndex] ? room.feedback.signConfusion : room.feedback.wrongDistance);
       setTimeout(() => setMood('happy'), 700);
@@ -580,11 +514,13 @@ function RoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
       <KidStyles />
       <div className="mx-auto flex max-w-5xl flex-col gap-4">
         <div className="flex items-center justify-between gap-3">
-          <button type="button" onClick={onBack} className="rounded-2xl border-2 px-4 py-2 text-lg font-extrabold transition-all active:translate-y-0.5" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink, boxShadow: '0 4px 0 ' + KID.pathEdge }}>← Karte</button>
+          <button type="button" onClick={onBack} className="rounded-2xl border-2 px-4 py-2 text-lg font-extrabold transition-all active:translate-y-0.5" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink, boxShadow: '0 4px 0 ' + KID.bandEdge }}>← Karte</button>
           <div className="rounded-2xl border-2 px-4 py-2 text-lg font-extrabold" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink }}>{roomMeta.title || room.roomId}</div>
           <div className="flex items-center gap-2">
+            <StreakMeter streak={streak} />
             <RoundDots total={room.rounds.length} current={phase === 'done' ? room.rounds.length : roundIndex} />
             <StarRow stars={stars} />
+            <SoundToggle />
           </div>
         </div>
 
@@ -637,9 +573,9 @@ function Hub({ completedRooms, stars, onStart }) {
     <div className="kid-font min-h-screen p-4 sm:p-8" style={{ background: 'linear-gradient(180deg, ' + KID.skyTop + ', ' + KID.skyBottom + ' 55%, #f0fbe8)' }}>
       <KidStyles />
       <div className="relative mx-auto max-w-4xl">
-        <Sky />
+        <MovementSky />
         <div className="relative rounded-[2rem] border-4 p-6 text-center shadow-xl" style={{ background: KID.card, borderColor: KID.ink }}>
-          <div className="mx-auto -mt-14 w-fit"><Luno mood="happy" hopping={false} dir={0} /></div>
+          <div className="mx-auto -mt-14 w-fit"><MovementLuno mood="happy" hopping={false} dir={0} /></div>
           <h1 className="text-3xl font-extrabold sm:text-5xl" style={{ color: KID.ink }}>{SPEC.world.worldName}</h1>
           <p className="mx-auto mt-2 max-w-xl text-lg font-bold" style={{ color: '#5d6b85' }}>{SPEC.concept.embodiedMetaphor}</p>
           <div className="mx-auto mt-3 w-fit"><StarRow stars={stars} /></div>
@@ -657,7 +593,7 @@ function Hub({ completedRooms, stars, onStart }) {
                 disabled={locked}
                 onClick={() => onStart(index)}
                 className="rounded-[1.8rem] border-4 p-5 text-center transition-all active:translate-y-1 disabled:opacity-50"
-                style={{ background: done ? '#e8f9e4' : KID.card, borderColor: KID.ink, boxShadow: '0 6px 0 ' + KID.pathEdge }}
+                style={{ background: done ? '#e8f9e4' : KID.card, borderColor: KID.ink, boxShadow: '0 6px 0 ' + KID.bandEdge }}
               >
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full text-3xl" style={{ background: done ? KID.green : locked ? '#dde3ec' : KID.sun }}>
                   {done ? '⭐' : locked ? '🔒' : isLast ? '🏆' : index + 1}
@@ -678,6 +614,7 @@ export default function App() {
   const [activeRoomIndex, setActiveRoomIndex] = useState(null);
   const [completedRooms, setCompletedRooms] = useState([]);
   const [stars, setStars] = useState(0);
+  const [streak, setStreak] = useState(0);
 
   function completeActiveRoom() {
     const room = SPEC.rooms[activeRoomIndex];
@@ -697,6 +634,8 @@ export default function App() {
         room={room}
         roomMeta={roomMeta}
         stars={stars}
+        streak={streak}
+        onStreak={setStreak}
         onBack={() => setActiveRoomIndex(null)}
         onComplete={completeActiveRoom}
         onStar={() => setStars((value) => value + 1)}

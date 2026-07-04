@@ -64,6 +64,9 @@ export function validateMovementEngineSpec(spec: MovementEngineSpec): MovementVa
   if (spec.engine !== "movement-space") {
     violations.push("E_ENGINE: engine must be movement-space");
   }
+  if (spec.seed !== undefined && !hasText(spec.seed)) {
+    violations.push("E_SEED: seed must be a non-empty string when present");
+  }
 
   if (!hasText(spec.concept?.learningProblem)) {
     violations.push("E_CONCEPT: learningProblem is required");

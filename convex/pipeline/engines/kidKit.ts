@@ -12,6 +12,10 @@
 //   verweisen (Reihenfolge: PRNG -> THEMES -> Rest, siehe KID_KIT_CORE).
 // - Aenderungen hier betreffen ALLE angeschlossenen Engines: Golden-Checks
 //   aller angeschlossenen Engines laufen lassen.
+// - Namenskollisionen: Der emittierte Code ist ein ES-Modul — doppelte
+//   Top-Level-Deklarationen (z.B. eine eigene Sky/Luno-Funktion neben dem
+//   Kit-Fragment) sind ein Syntaxfehler, kein "letzter gewinnt". Engines mit
+//   eigener Variante benennen ihre um (z.B. MovementSky), statt zu ueberschreiben.
 
 // Deterministischer PRNG (mulberry32) + String-Hash (djb2).
 // Seed-Quelle: SPEC.seed (optional) sonst worldName -> gleiche Spec ergibt

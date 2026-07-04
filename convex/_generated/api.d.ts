@@ -10,6 +10,7 @@
 
 import type * as admin from "../admin.js";
 import type * as analytics_eventTracking from "../analytics/eventTracking.js";
+import type * as analytics_hash from "../analytics/hash.js";
 import type * as analytics_identityResolution from "../analytics/identityResolution.js";
 import type * as analytics_serverSideCollector from "../analytics/serverSideCollector.js";
 import type * as blog from "../blog.js";
@@ -19,6 +20,7 @@ import type * as documents from "../documents.js";
 import type * as generate from "../generate.js";
 import type * as http from "../http.js";
 import type * as indexnow from "../indexnow.js";
+import type * as lib_auth from "../lib/auth.js";
 import type * as messages from "../messages.js";
 import type * as pipeline_engines_arithmeticMovementSpec from "../pipeline/engines/arithmeticMovementSpec.js";
 import type * as pipeline_engines_buildingConstructRenderer from "../pipeline/engines/buildingConstructRenderer.js";
@@ -49,6 +51,7 @@ import type * as pipeline_engines_engineRegistry from "../pipeline/engines/engin
 import type * as pipeline_engines_focusedArithmeticMiniApp from "../pipeline/engines/focusedArithmeticMiniApp.js";
 import type * as pipeline_engines_focusedInterventionGate from "../pipeline/engines/focusedInterventionGate.js";
 import type * as pipeline_engines_focusedInterventionRouter from "../pipeline/engines/focusedInterventionRouter.js";
+import type * as pipeline_engines_kidKit from "../pipeline/engines/kidKit.js";
 import type * as pipeline_engines_mapRenderer from "../pipeline/engines/mapRenderer.js";
 import type * as pipeline_engines_mapTopicRouter from "../pipeline/engines/mapTopicRouter.js";
 import type * as pipeline_engines_mapTypes from "../pipeline/engines/mapTypes.js";
@@ -73,6 +76,7 @@ import type * as pipeline_engines_sortMatchRenderer from "../pipeline/engines/so
 import type * as pipeline_engines_sortMatchTypes from "../pipeline/engines/sortMatchTypes.js";
 import type * as pipeline_engines_sortMatchValidator from "../pipeline/engines/sortMatchValidator.js";
 import type * as pipeline_engines_sortTopicRouter from "../pipeline/engines/sortTopicRouter.js";
+import type * as pipeline_engines_structureSignature from "../pipeline/engines/structureSignature.js";
 import type * as pipeline_engines_timeSequenceRenderer from "../pipeline/engines/timeSequenceRenderer.js";
 import type * as pipeline_engines_timeSequenceTypes from "../pipeline/engines/timeSequenceTypes.js";
 import type * as pipeline_engines_timeSequenceValidator from "../pipeline/engines/timeSequenceValidator.js";
@@ -143,6 +147,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   admin: typeof admin;
   "analytics/eventTracking": typeof analytics_eventTracking;
+  "analytics/hash": typeof analytics_hash;
   "analytics/identityResolution": typeof analytics_identityResolution;
   "analytics/serverSideCollector": typeof analytics_serverSideCollector;
   blog: typeof blog;
@@ -152,6 +157,7 @@ declare const fullApi: ApiFromModules<{
   generate: typeof generate;
   http: typeof http;
   indexnow: typeof indexnow;
+  "lib/auth": typeof lib_auth;
   messages: typeof messages;
   "pipeline/engines/arithmeticMovementSpec": typeof pipeline_engines_arithmeticMovementSpec;
   "pipeline/engines/buildingConstructRenderer": typeof pipeline_engines_buildingConstructRenderer;
@@ -182,6 +188,7 @@ declare const fullApi: ApiFromModules<{
   "pipeline/engines/focusedArithmeticMiniApp": typeof pipeline_engines_focusedArithmeticMiniApp;
   "pipeline/engines/focusedInterventionGate": typeof pipeline_engines_focusedInterventionGate;
   "pipeline/engines/focusedInterventionRouter": typeof pipeline_engines_focusedInterventionRouter;
+  "pipeline/engines/kidKit": typeof pipeline_engines_kidKit;
   "pipeline/engines/mapRenderer": typeof pipeline_engines_mapRenderer;
   "pipeline/engines/mapTopicRouter": typeof pipeline_engines_mapTopicRouter;
   "pipeline/engines/mapTypes": typeof pipeline_engines_mapTypes;
@@ -206,6 +213,7 @@ declare const fullApi: ApiFromModules<{
   "pipeline/engines/sortMatchTypes": typeof pipeline_engines_sortMatchTypes;
   "pipeline/engines/sortMatchValidator": typeof pipeline_engines_sortMatchValidator;
   "pipeline/engines/sortTopicRouter": typeof pipeline_engines_sortTopicRouter;
+  "pipeline/engines/structureSignature": typeof pipeline_engines_structureSignature;
   "pipeline/engines/timeSequenceRenderer": typeof pipeline_engines_timeSequenceRenderer;
   "pipeline/engines/timeSequenceTypes": typeof pipeline_engines_timeSequenceTypes;
   "pipeline/engines/timeSequenceValidator": typeof pipeline_engines_timeSequenceValidator;
