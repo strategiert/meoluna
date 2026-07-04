@@ -5,6 +5,43 @@
 
 ---
 
+## Orchestration Workflow — meoluna.com
+
+You (Fable) are the orchestrator: plan, decompose, synthesize. If a task is trivial (one file, under 5 minutes, no architectural impact), just do it yourself — no delegation overhead.
+
+Subagent definitions: `.claude/agents/deep-reasoner.md` (Opus) and `.claude/agents/fast-worker.md` (Sonnet). Kickoff prompts per track: `docs/kickoff-prompts.md`.
+
+### Active tracks
+1. **Game engines** — extend the existing deterministic engines (currently 14 renderers in `convex/pipeline/engines/`): larger scope, more interactivity, higher production value and visual appeal. Every change must preserve Meoluna's core differentiator: no two generated worlds are ever structurally identical.
+2. **Security audit** — the platform runs in schools and handles children's data. This is the highest-stakes track in this repo; treat it accordingly.
+3. **Programmatic SEO pages** — one landing page per curriculum topic, generated at scale. Each page: SEO content, an embedded example game, flashcards, example tasks, and three downloadable PDFs (class test, learning-objective check, homework) — all matched to the stored curriculum.
+
+### Delegation rules
+- Architecture, engine/game design, curriculum data-model design, analysis of a fully packaged security finding → **deep-reasoner**
+- Boilerplate, per-topic page/PDF generation, tests, formatting, mechanical edits → **fast-worker**
+- Live/iterative debugging, or anything too entangled with prior conversation to package cleanly → handle yourself, don't delegate
+- Independent second opinion, adversarial review, isolated patch → **Codex** (via CLI: `codex exec "<task>"`; the `/codex:rescue` plugin skill is not installed), treated as a peer, not a subordinate
+
+### Track-specific routing
+- **Engines**: new mechanics and anything touching the uniqueness architecture → deep-reasoner. Wiring an engine into the existing generation pipeline/sandbox → fast-worker. Get Codex's independent take on any engine architecture change in parallel with deep-reasoner (high blast radius — affects every future world).
+- **Security**: dispatch deep-reasoner and Codex as two fully independent audits of the same scope, no shared context between them. Synthesize: findings confirmed by both first, then single-source findings with your own confidence rating. Anything touching PII, auth, session handling, data retention, or third-party data flows is high severity by default until shown otherwise.
+- **SEO pages**: template/data-model design (what a page needs, how curriculum fields map to content) → deep-reasoner, once. Then batch generation of pages/PDFs → fast-worker, sample-first (3–5 pages across different subjects/grades) before scaling to the full curriculum.
+
+### Conflict avoidance
+fast-worker and Codex never write to the same working tree at the same time. Give Codex its own worktree, or keep it to analysis/read-only when fast-worker is active.
+
+### High-stakes parallel synthesis (exception, not default)
+For irreversible or broad-blast-radius decisions — engine architecture, anything affecting how children's data is stored/transmitted, the curriculum data model: dispatch deep-reasoner and Codex in parallel with no cross-visibility, then synthesize explicitly where they agree and disagree before acting.
+
+### Output standards
+- deep-reasoner returns: assumptions, confidence (high/medium/low), recommendation, open questions.
+- fast-worker returns: diff summary, test result (pass/fail), any deviation from the plan — flagged, not silently decided.
+
+### Your own context
+Summarize subagent output before acting on it. Don't mirror full subagent reasoning traces back into your own context.
+
+---
+
 ## 🤝 KOORDINATION: Fünf Agents, ein Repo
 
 **OpenClaw + Claude Code + Goose arbeiten zusammen.**
