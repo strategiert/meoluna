@@ -1,4 +1,4 @@
-import type { DiagramEngineSpec, DiagramRoom, LabelRound, FindRound } from "./diagramTypes";
+import type { DiagramEngineSpec, DiagramRoom, LabelRound, FindRound, PlaceRound } from "./diagramTypes";
 import { inStage, tooClose } from "./diagramTypes";
 
 export type DiagramValidationResult = { passed: boolean; violations: string[] };
@@ -9,6 +9,8 @@ const MAX_ROUNDS_PER_ROOM = 4;
 const MIN_TOTAL_ROUNDS = 6;
 const MIN_MARKERS = 3;
 const MAX_MARKERS = 8;
+const MIN_PLACE_MARKERS = 2;
+const MAX_PLACE_MARKERS = 5;
 
 function hasText(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
@@ -21,6 +23,7 @@ export function validateDiagramEngineSpec(spec: DiagramEngineSpec): DiagramValid
   const violations: string[] = [];
 
   if (spec.engine !== "diagram") violations.push("E_ENGINE: engine must be diagram");
+  if (spec.seed !== undefined && !hasText(spec.seed)) violations.push("E_SEED: seed must be a non-empty string when present");
   if (!hasText(spec.concept?.learningProblem)) violations.push("E_CONCEPT: learningProblem is required");
   if (!hasText(spec.concept?.embodiedMetaphor)) violations.push("E_CONCEPT: embodiedMetaphor is required");
   if (!hasText(spec.concept?.successInsight)) violations.push("E_CONCEPT: successInsight is required");
@@ -37,7 +40,7 @@ export function validateDiagramEngineSpec(spec: DiagramEngineSpec): DiagramValid
   for (const room of spec.rooms) {
     const label = roomLabel(room);
     if (!hasText(room.objective)) violations.push(`E_ROOM_${label}: objective is required`);
-    if (room.mode !== "label" && room.mode !== "find") violations.push(`E_ROOM_${label}: mode must be label or find`);
+    if (room.mode !== "label" && room.mode !== "find" && room.mode !== "place") violations.push(`E_ROOM_${label}: mode must be label, find or place`);
     if (!hasText(room.backdrop)) violations.push(`E_ROOM_${label}: backdrop symbol is required`);
 
     if (!Array.isArray(room.markers) || room.markers.length < MIN_MARKERS || room.markers.length > MAX_MARKERS) {
@@ -95,10 +98,22 @@ export function validateDiagramEngineSpec(spec: DiagramEngineSpec): DiagramValid
         if (lr.options.some((o) => !inventory.has(o))) {
           violations.push(`E_ROOM_${rl}: options must be terms from the diagram's own markers`);
         }
-      } else {
+      } else if (room.mode === "find") {
         const fr = r as FindRound;
         if (typeof fr.targetIndex !== "number" || fr.targetIndex < 0 || fr.targetIndex >= room.markers.length) {
           violations.push(`E_ROOM_${rl}: targetIndex out of range`);
+        }
+      } else {
+        const pr = r as PlaceRound;
+        if (!Array.isArray(pr.placeMarkerIds) || pr.placeMarkerIds.length < MIN_PLACE_MARKERS || pr.placeMarkerIds.length > MAX_PLACE_MARKERS) {
+          violations.push(`E_ROOM_${rl}: place mode needs ${MIN_PLACE_MARKERS}-${MAX_PLACE_MARKERS} placeMarkerIds`);
+          return;
+        }
+        if (new Set(pr.placeMarkerIds).size !== pr.placeMarkerIds.length) {
+          violations.push(`E_ROOM_${rl}: placeMarkerIds must be unique`);
+        }
+        if (pr.placeMarkerIds.some((idx) => typeof idx !== "number" || !Number.isInteger(idx) || idx < 0 || idx >= room.markers.length)) {
+          violations.push(`E_ROOM_${rl}: placeMarkerIds must reference existing markers of this room`);
         }
       }
     });

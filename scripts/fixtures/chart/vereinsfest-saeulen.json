@@ -1,0 +1,86 @@
+{
+  "engine": "chart",
+  "seed": "vereinsfest-saeulen",
+  "learningBrief": {
+    "inputMode": "curriculum",
+    "subject": "mathematik",
+    "gradeLevel": "3",
+    "rawTopic": "Diagramme lesen und selbst Daten einzeichnen",
+    "extractedTasks": ["Werte ablesen", "Werte selbst als Balken einzeichnen", "groessten und kleinsten Wert finden"],
+    "learningGoals": ["Balkenhoehe als Wert lesen", "eine gegebene Zahl als Balken darstellen", "Werte vergleichen"],
+    "likelyMisconceptions": ["Balken zaehlen statt Wert ablesen", "beim Einzeichnen zu viel oder zu wenig einzeichnen"],
+    "focus": "practice",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Lunos Vereinsfest",
+    "coreMetaphor": "Beim Vereinsfest wertet Luno die Anmeldungen aus und zeichnet die Ergebnisse selbst in die grosse Tafel ein.",
+    "setting": "Ein bunter Sportplatz mit einer grossen Anzeigetafel.",
+    "visualStyle": { "palette": ["#27324a", "#3f9bf0", "#ff7a59", "#54b865", "#ffd84d"], "mood": "lebhaft, sportlich, freundlich", "shapes": "Balken, Tafel, Stifte", "effects": "Konfetti beim Gelingen" },
+    "guide": { "name": "Luno", "role": "Fest-Auswerter", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "ablesen", "title": "Die Anmeldeliste", "purpose": "Werte ablesen.", "scene": "Wie viele haben sich angemeldet?", "reward": "Diagramm-Lehrling" },
+      { "id": "einzeichnen", "title": "Die Anzeigetafel", "purpose": "Werte selbst einzeichnen.", "scene": "Trage die Zahlen als Balken ein!", "reward": "Zeichen-Profi" },
+      { "id": "meister", "title": "Meisterpruefung", "purpose": "Werte vergleichen.", "scene": "Welche Frucht gibt es am Kuchenstand am meisten?", "reward": "Fest-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Kinder koennen Balken zwar ablesen, tun sich aber schwer, eine gegebene Zahl selbst als Balken darzustellen.",
+    "embodiedMetaphor": "Ablesen ist wie Zuhoeren, Einzeichnen ist wie Sprechen - beides gehoert zum Verstehen eines Diagramms.",
+    "successInsight": "Ich kann eine Zahl nicht nur ablesen, sondern auch selbst genau als Balken einzeichnen."
+  },
+  "rooms": [
+    {
+      "roomId": "ablesen",
+      "objective": "Lies den Wert ab!",
+      "mode": "read",
+      "chartType": "bar",
+      "categories": [
+        { "label": "Fussball", "value": 7 },
+        { "label": "Schwimmen", "value": 5 },
+        { "label": "Tanzen", "value": 3 },
+        { "label": "Malen", "value": 6 }
+      ],
+      "rounds": [
+        { "objective": "Wie viele haben sich fuer Fussball angemeldet?", "categoryIndex": 0, "options": [7, 6, 5] },
+        { "objective": "Und fuer Malen?", "categoryIndex": 3, "options": [6, 5, 7] }
+      ],
+      "feedback": { "correct": "Genau abgelesen!", "wrongValue": "Schau auf die Hoehe des Balkens.", "tryAgain": "Folge dem Balken nach oben bis zur Zahl." },
+      "explanationAfterSuccess": "Der Fussball-Balken reicht bis 7 - 7 Kinder haben sich angemeldet."
+    },
+    {
+      "roomId": "einzeichnen",
+      "objective": "Trage die Zahlen selbst als Balken ein!",
+      "mode": "build",
+      "chartType": "bar",
+      "categories": [
+        { "label": "Montag", "value": 3 },
+        { "label": "Dienstag", "value": 5 },
+        { "label": "Mittwoch", "value": 2 }
+      ],
+      "rounds": [
+        { "objective": "Zeichne die Woche ein: Montag 4, Dienstag 6, Mittwoch 1.", "targets": [4, 6, 1] },
+        { "objective": "Noch eine Woche: Montag 7, Dienstag 2, Mittwoch 5.", "targets": [7, 2, 5] }
+      ],
+      "feedback": { "correct": "Perfekt eingezeichnet!", "wrongValue": "Zaehle noch einmal genau mit +/- nach.", "tryAgain": "Baue jeden Balken einzeln auf die genannte Zahl." },
+      "explanationAfterSuccess": "Jede Zahl wird zu einem Balken in genau dieser Hoehe - Ablesen und Einzeichnen sind zwei Seiten derselben Sache."
+    },
+    {
+      "roomId": "meister",
+      "objective": "Vergleiche die Werte!",
+      "mode": "find",
+      "chartType": "picto",
+      "categories": [
+        { "label": "Kirschen", "value": 4, "emoji": "🍒" },
+        { "label": "Erdbeeren", "value": 7, "emoji": "🍓" },
+        { "label": "Blaubeeren", "value": 2, "emoji": "🫐" }
+      ],
+      "rounds": [
+        { "objective": "Welche Frucht gibt es am MEISTEN?", "ask": "most" },
+        { "objective": "Und am WENIGSTEN?", "ask": "least" }
+      ],
+      "feedback": { "correct": "Meisterhaft verglichen!", "wrongValue": "Die laengste Bilder-Reihe ist am meisten, die kuerzeste am wenigsten.", "tryAgain": "Zaehle die Bilder jeder Reihe und vergleiche." },
+      "explanationAfterSuccess": "Erdbeeren haben die laengste Reihe (7), Blaubeeren die kuerzeste (2)."
+    }
+  ]
+}

@@ -4,33 +4,41 @@ Du erzeugst eine chart Lernwelt (Diagramm ablesen) fuer Klasse 2-6: ein Balken- 
 
 Ein Diagramm hat 3-6 Kategorien, jede mit Label und ganzzahligem Wert. chartType "bar" (Balken, Werte bis 100) oder "picto" (Piktogramm aus Emojis, Werte bis 12, jede Kategorie braucht ein emoji).
 
-Zwei Raum-Modi:
+Drei Raum-Modi:
 - "read": eine Kategorie ist hervorgehoben, das Kind liest ihren Wert ab und waehlt ihn aus 2-4 Zahlen.
 - "find": das Kind tippt die Kategorie mit dem GROESSTEN (most) oder KLEINSTEN (least) Wert an.
+- "build": das Kind zeichnet Daten selbst ein, statt nur abzulesen. Pro Kategorie gibt es einen Zielwert (targets), das Kind baut jeden Balken bzw. jedes Piktogramm mit +/- auf genau diese Hoehe/Anzahl und bestaetigt dann.
 
 Verboten: Tortendiagramme, Liniendiagramme, Prozente, erfundene Achsen ohne Werte, reine Textkarten.
 
 Antworte ausschliesslich als valides ChartEngineSpec JSON:
 {
   "engine": "chart",
+  "seed": "kurzer-slug-aus-thema-und-fantasie (optional)",
   "learningBrief": { "inputMode": "...", "subject": "mathematik", "gradeLevel": "...", "rawTopic": "...", "extractedTasks": ["..."], "learningGoals": ["..."], "likelyMisconceptions": ["..."], "focus": "understand", "confidence": "high" },
   "world": { "worldName": "...", "coreMetaphor": "...", "setting": "...", "visualStyle": { "palette": ["#hex","#hex","#hex","#hex","#hex"], "mood": "...", "shapes": "...", "effects": "..." }, "guide": { "name": "Luno", "role": "...", "personality": "..." }, "rooms": [ { "id": "...", "title": "...", "purpose": "...", "scene": "...", "reward": "..." } ] },
   "concept": { "learningProblem": "...", "embodiedMetaphor": "...", "successInsight": "..." },
   "rooms": [
     { "roomId": "...", "objective": "...", "mode": "read", "chartType": "bar", "categories": [ { "label": "...", "value": number } ], "rounds": [ { "objective": "...", "categoryIndex": number, "options": [number, number] } ], "feedback": { "correct": "...", "wrongValue": "...", "tryAgain": "..." }, "explanationAfterSuccess": "..." },
-    { "roomId": "...", "objective": "...", "mode": "find", "chartType": "picto", "categories": [ { "label": "...", "value": number, "emoji": "ein Emoji" } ], "rounds": [ { "objective": "...", "ask": "most" } ], "feedback": { "correct": "...", "wrongValue": "...", "tryAgain": "..." }, "explanationAfterSuccess": "..." }
+    { "roomId": "...", "objective": "...", "mode": "find", "chartType": "picto", "categories": [ { "label": "...", "value": number, "emoji": "ein Emoji" } ], "rounds": [ { "objective": "...", "ask": "most" } ], "feedback": { "correct": "...", "wrongValue": "...", "tryAgain": "..." }, "explanationAfterSuccess": "..." },
+    { "roomId": "...", "objective": "...", "mode": "build", "chartType": "bar", "categories": [ { "label": "...", "value": number } ], "rounds": [ { "objective": "...", "targets": [number, number, number] } ], "feedback": { "correct": "...", "wrongValue": "...", "tryAgain": "..." }, "explanationAfterSuccess": "..." }
   ]
 }
+
+Beispiel-Runde "build" (3 Kategorien -> genau 3 targets, gleiche Reihenfolge):
+{ "objective": "Zeichne die Woche ein!", "targets": [4, 9, 2] }
 
 Regeln (HART, sonst unspielbar):
 - 3 bis 6 Kategorien pro Raum. Labels verschieden. value ganzzahlig >= 1; bei "bar" hoechstens 100, bei "picto" hoechstens 12. Bei "picto" hat JEDE Kategorie ein emoji.
 - read: categoryIndex zeigt auf eine Kategorie. options 2-4 positive Ganzzahlen, enthalten den korrekten Wert, alle verschieden. Distraktoren nah am echten Wert.
 - find: ask "most" oder "least" - der groesste bzw. kleinste Wert muss EINDEUTIG sein (kein Gleichstand an der Spitze bzw. am Ende).
+- build: targets hat GENAU so viele Eintraege wie categories, in DERSELBEN Reihenfolge. Jeder Wert ganzzahlig >= 1, im selben Wertebereich wie categories.value (bar <= 100, picto <= 12). Die categories dieses Raums liefern nur Labels/emoji als Vorlage - die tatsaechlich einzuzeichnende Zahl ist targets, nicht categories.value.
+- seed: kurzer kleingeschriebener Slug (thema-fantasiewort), variiert Hintergrund-Welt und Farben. Erfinde ihn frei.
 
 Session-Format (10-15 Minuten):
-- 3 bis 6 Raeume, vom Aufwaermen (kleine Diagramme ablesen) bis zur Meisterpruefung (vergleichen).
+- 3 bis 6 Raeume, vom Aufwaermen (kleine Diagramme ablesen) bis zur Meisterpruefung (vergleichen oder selbst einzeichnen).
 - Jeder Raum 2 bis 4 Runden, insgesamt mindestens 6 Runden.
-- Mische die Modi: read UND find vertreten.
+- Mische die Modi: read UND find vertreten. Setze build gezielt als anspruchsvolleren Raum ein (z.B. Meisterpruefung).
 
 Qualitaet:
 - Echte, kindnahe Daten (z.B. "Lieblingstier der Klasse: Hund 8, Katze 6, Hase 3").

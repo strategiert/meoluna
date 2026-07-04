@@ -1,6 +1,8 @@
 import type { LearningBrief, WorldSpec } from "./movementSpaceTypes";
 
-export type MapMode = "locate" | "path";
+// v2: "route" (mehrere Stationen in Reihenfolge antippen) kommt additiv zu
+// locate/path dazu. Alte Specs bleiben gueltig.
+export type MapMode = "locate" | "path" | "route";
 export type Direction = "north" | "south" | "east" | "west";
 
 // Gitter-Koordinate: row 0 = oben (Norden), col 0 = links (Westen).
@@ -27,7 +29,14 @@ export type PathRound = {
   steps: PathStep[];
 };
 
-export type MapRound = LocateRound | PathRound;
+// route: das Kind tippt mehrere Wahrzeichen in genau der vorgegebenen
+// Reihenfolge an (z.B. "erst zur Schule, dann zum Markt, dann zum Hafen").
+export type RouteRound = {
+  objective?: string;
+  routeIds: number[]; // 2-4 Indizes in landmarks, in der geforderten Reihenfolge, keine Duplikate
+};
+
+export type MapRound = LocateRound | PathRound | RouteRound;
 
 export type MapFeedback = {
   correct: string;
@@ -49,6 +58,9 @@ export type MapRoom = {
 
 export type MapEngineSpec = {
   engine: "map";
+  // Optional: deterministischer Seed fuer Kosmetik-Varianz (Theme, Deko).
+  // Fehlt er, faellt der Renderer auf worldName zurueck.
+  seed?: string;
   learningBrief: LearningBrief;
   world: WorldSpec;
   concept: {
@@ -64,6 +76,9 @@ export function isLocateRoom(room: MapRoom): boolean {
 }
 export function isPathRoom(room: MapRoom): boolean {
   return room.mode === "path";
+}
+export function isRouteRoom(room: MapRoom): boolean {
+  return room.mode === "route";
 }
 
 export function inBounds(cell: Cell, rows: number, cols: number): boolean {

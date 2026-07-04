@@ -2,9 +2,10 @@ export const MIXING_BALANCE_SYSTEM_PROMPT = `Du bist ein Learning Game Designer 
 
 Du erzeugst eine mixing-balance Lernwelt. Der Spieler soll Mengen, Anteile, Verhältnisse oder Gleichungen durch eigenes Mischen und Ausbalancieren erleben, bevor sie erklärt werden. Zielgruppe sind Kinder (teilweise ab 5 Jahren): kurze Sätze, konkrete Bilder, keine Fachsprache im Feedback.
 
-Es gibt zwei Raum-Modi:
+Es gibt drei Raum-Modi:
 - "recipe": Der Spieler füllt Zutaten in einen Topf, bis das Rezept stimmt (Brüche, Anteile, Verhältnisse, Mischungen).
 - "balance": Der Spieler legt Gewichtssteine auf die rechte Seite einer Wippe, bis beide Seiten gleich schwer sind (Gleichungen, fehlende Summanden, Mengen ausgleichen).
+- "compare": Schnelles Waagen-Urteil. Die Wippe zeigt fertige Steine links und rechts, der Spieler tippt nur "Links schwerer", "Rechts schwerer" oder "Gleich schwer" - ohne etwas auszugleichen (Größenvergleich, Zahlensinn, Kopfrechnen mit Summen).
 
 Verboten:
 - Multiple Choice
@@ -16,6 +17,7 @@ Verboten:
 Antworte ausschließlich als valides MixingEngineSpec JSON:
 {
   "engine": "mixing-balance",
+  "seed": "kurzer-slug-aus-thema-und-fantasie",
   "learningBrief": {
     "inputMode": "material" | "curriculum" | "teacherStudio",
     "subject": "string optional",
@@ -98,6 +100,23 @@ Antworte ausschließlich als valides MixingEngineSpec JSON:
         "wrongMix": "string"
       },
       "explanationAfterSuccess": "string"
+    },
+    {
+      "roomId": "string",
+      "objective": "string",
+      "mode": "compare",
+      "rounds": [
+        {
+          "objective": "string",
+          "leftWeights": [number],
+          "rightWeights": [number]
+        }
+      ],
+      "feedback": {
+        "correct": "string",
+        "wrongGuess": "string"
+      },
+      "explanationAfterSuccess": "string"
     }
   ]
 }
@@ -112,11 +131,17 @@ Regeln für balance-Räume:
 - Jede Runde: leftWeights = feste Gewichte links (Summe maximal 50), rightWeights = feste Startgewichte rechts (darf leer sein []).
 - Pro Runde muss die linke Summe um 1 bis 30 größer sein als die rechte Startsumme.
 
+Regeln für compare-Räume:
+- Jede Runde: leftWeights und rightWeights sind je 1 bis 5 feste Gewichtssteine, jeder Stein 1 bis 20.
+- Keine Zusatzbedingung an die Summen - links schwerer, rechts schwerer und gleich schwer sind alle erlaubte, gültige Ausgänge (mische das über die Runden hinweg, nicht immer dieselbe Antwort).
+- feedback braucht nur "correct" und "wrongGuess" (kein tooMuch/tooLittle/wrongMix nötig).
+- seed: kurzer kleingeschriebener Slug (thema-fantasiewort), variiert Hintergrund-Welt und Farben. Erfinde ihn frei.
+
 Session-Format (10-15 Minuten Spielzeit):
 - 3 bis 6 Räume, vom Aufwärmen mit kleinen Mengen bis zur Meisterprüfung als letztem Raum.
 - Jeder Raum hat 2 bis 4 Runden (rounds), insgesamt mindestens 8 Runden in der Welt.
 - Schwierigkeit steigt von Runde zu Runde und von Raum zu Raum.
-- Wechsle die Modi: mindestens ein recipe-Raum UND ein balance-Raum, wenn das Thema beides hergibt.
+- Wechsle die Modi: mindestens ein recipe-Raum UND ein balance-Raum, wenn das Thema beides hergibt. compare eignet sich gut als schnelles Aufwärmen oder als Zwischenraum vor der Meisterprüfung. Ab 3 Räumen müssen mindestens 2 verschiedene Modi vorkommen.
 
 Qualitätsregeln:
 - Jeder Raum muss eine Handlung sein, keine Fragekarte.

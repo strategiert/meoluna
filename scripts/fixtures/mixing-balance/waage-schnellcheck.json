@@ -1,0 +1,73 @@
+{
+  "engine": "mixing-balance",
+  "seed": "waage-schnellcheck",
+  "learningBrief": {
+    "inputMode": "freitext",
+    "subject": "mathematik",
+    "gradeLevel": "2",
+    "rawTopic": "Gewichte vergleichen, ausgleichen und Mengen mischen",
+    "extractedTasks": ["Gewichte auf einen Blick vergleichen", "eine Waage exakt ausgleichen", "ein Rezept nach Anteilen mischen"],
+    "learningGoals": ["Summen von Gewichten schnell abschätzen und vergleichen", "fehlende Mengen durch Ausgleichen finden", "ein Mischverhältnis exakt umsetzen"],
+    "likelyMisconceptions": ["nur die Anzahl der Steine statt ihrer Werte vergleichen", "beim Ausgleichen zu grob raten statt zu rechnen"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Der Marktplatz der Waagen",
+    "coreMetaphor": "Auf dem Marktplatz prüft Luno jeden Tag Gewichte, gleicht Waagen aus und mischt Rezepte für die Marktstände.",
+    "setting": "Ein bunter Marktplatz mit Waagen an jedem Stand.",
+    "visualStyle": { "palette": ["#27324a", "#ff7a59", "#3f9bf0", "#54b865", "#ffd84d"], "mood": "geschäftig, freundlich, klar", "shapes": "Waagen, Gewichtssteine, Marktstände", "effects": "Konfetti beim Gelingen" },
+    "guide": { "name": "Luno", "role": "Marktmeister", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "schnellblick", "title": "Der Schnellblick", "purpose": "Gewichte auf einen Blick vergleichen.", "scene": "Welche Seite der Waage ist schwerer?", "reward": "Blick-Profi" },
+      { "id": "ausgleich", "title": "Der Ausgleich", "purpose": "Die Waage exakt austarieren.", "scene": "Lege Gewichte auf, bis beide Seiten gleich schwer sind.", "reward": "Ausgleichs-Meister" },
+      { "id": "gewuerzstand", "title": "Der Gewürzstand", "purpose": "Ein Rezept nach Anteilen mischen.", "scene": "Mische die Gewürze im richtigen Verhältnis.", "reward": "Misch-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Kinder vergleichen oft die Anzahl der Steine statt ihrer Werte und schätzen Gewichte dadurch falsch ein.",
+    "embodiedMetaphor": "Wie ein Marktmeister prüfst du erst mit dem Auge, dann mit der Waage, dann mit dem Löffel.",
+    "successInsight": "Ich vergleiche Summen, nicht die Anzahl der Steine - und kann Mengen dadurch schnell und genau einschätzen."
+  },
+  "rooms": [
+    {
+      "roomId": "schnellblick",
+      "objective": "Welche Seite ist schwerer?",
+      "mode": "compare",
+      "rounds": [
+        { "objective": "Schau genau hin - welche Seite gewinnt?", "leftWeights": [5, 3], "rightWeights": [7] },
+        { "objective": "Und jetzt?", "leftWeights": [6], "rightWeights": [6] },
+        { "objective": "Diesmal ganz genau rechnen!", "leftWeights": [4, 4, 2], "rightWeights": [9] }
+      ],
+      "feedback": { "correct": "Genau erkannt!", "wrongGuess": "Zähl die Werte auf jeder Seite zusammen, bevor du urteilst." },
+      "explanationAfterSuccess": "Zähle immer die Summe aller Steine zusammen, nicht nur, wie viele Steine dort liegen."
+    },
+    {
+      "roomId": "ausgleich",
+      "objective": "Gleiche die Waage aus!",
+      "mode": "balance",
+      "chips": [1, 5],
+      "rounds": [
+        { "objective": "Wie viel fehlt rechts?", "leftWeights": [10], "rightWeights": [4] },
+        { "objective": "Und hier?", "leftWeights": [12], "rightWeights": [7] }
+      ],
+      "feedback": { "correct": "Perfekt ausgeglichen!", "tooMuch": "Das ist zu viel - nimm einen Stein herunter.", "tooLittle": "Es fehlt noch etwas.", "wrongMix": "Schau dir die Differenz genau an." },
+      "explanationAfterSuccess": "Die fehlende Menge ist genau der Unterschied zwischen beiden Seiten."
+    },
+    {
+      "roomId": "gewuerzstand",
+      "objective": "Mische die Gewürze im richtigen Verhältnis!",
+      "mode": "recipe",
+      "ingredients": [
+        { "id": "kurkuma", "label": "Kurkuma", "emoji": "🟡", "color": "#f3b84c" },
+        { "id": "paprika", "label": "Paprika", "emoji": "🔴", "color": "#e0523c" }
+      ],
+      "rounds": [
+        { "objective": "2 Teile Kurkuma, 1 Teil Paprika.", "targetParts": { "kurkuma": 2, "paprika": 1 } },
+        { "objective": "3 Teile Kurkuma, 2 Teile Paprika.", "targetParts": { "kurkuma": 3, "paprika": 2 } }
+      ],
+      "feedback": { "correct": "Perfekt gemischt!", "tooMuch": "Da ist zu viel von einer Zutat drin.", "tooLittle": "Es fehlt noch etwas Menge.", "wrongMix": "Das Verhältnis stimmt noch nicht ganz." },
+      "explanationAfterSuccess": "2 zu 1 heißt: auf jede 1 Portion Paprika kommen 2 Portionen Kurkuma."
+    }
+  ]
+}

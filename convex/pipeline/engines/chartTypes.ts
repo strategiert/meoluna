@@ -1,6 +1,7 @@
 import type { LearningBrief, WorldSpec } from "./movementSpaceTypes";
 
-export type ChartMode = "read" | "find";
+// v2: "build" kommt additiv zu read/find dazu. Alte Specs bleiben gueltig.
+export type ChartMode = "read" | "find" | "build";
 export type ChartType = "bar" | "picto";
 export type Extremum = "most" | "least";
 
@@ -23,7 +24,15 @@ export type FindRound = {
   ask: Extremum;
 };
 
-export type ChartRound = ReadRound | FindRound;
+// build: das Kind zeichnet die Daten selbst ein - pro Kategorie den Balken
+// bzw. das Piktogramm per +/- auf die Ziel-Hoehe/-Anzahl bringen.
+// targets hat genau so viele Eintraege wie room.categories, gleiche Reihenfolge.
+export type BuildRound = {
+  objective?: string;
+  targets: number[];
+};
+
+export type ChartRound = ReadRound | FindRound | BuildRound;
 
 export type ChartFeedback = {
   correct: string;
@@ -44,6 +53,9 @@ export type ChartRoom = {
 
 export type ChartEngineSpec = {
   engine: "chart";
+  // Optional: deterministischer Seed fuer Kosmetik-Varianz (Theme, Deko).
+  // Fehlt er, faellt der Renderer auf worldName zurueck.
+  seed?: string;
   learningBrief: LearningBrief;
   world: WorldSpec;
   concept: {

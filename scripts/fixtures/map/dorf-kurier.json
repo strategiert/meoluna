@@ -1,0 +1,90 @@
+{
+  "engine": "map",
+  "seed": "dorf-kurier",
+  "learningBrief": {
+    "inputMode": "curriculum",
+    "subject": "sachunterricht",
+    "gradeLevel": "3",
+    "rawTopic": "Karte lesen und Routen in der richtigen Reihenfolge planen",
+    "extractedTasks": ["Orte auf der Karte finden", "eine Route mit mehreren Stationen ablaufen", "Wegen nach Himmelsrichtungen folgen"],
+    "learningGoals": ["eine Gitterkarte lesen", "mehrere Ziele in der richtigen Reihenfolge ansteuern"],
+    "likelyMisconceptions": ["Stationen in falscher Reihenfolge anlaufen", "eine Station der Route vergessen"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Der Dorf-Kurier",
+    "coreMetaphor": "Luno liefert Botschaften im Dorf und muss dabei jede Station in der richtigen Reihenfolge anlaufen.",
+    "setting": "Ein kleines Dorf mit Marktplatz, Schule, Hafen und Baeckerei.",
+    "visualStyle": { "palette": ["#27324a", "#ffd84d", "#54b865", "#3f9bf0", "#ff7a59"], "mood": "geschaeftig, freundlich, warm", "shapes": "Gitter, Wahrzeichen, Kompass", "effects": "Konfetti beim Gelingen" },
+    "guide": { "name": "Luno", "role": "Dorf-Kurier", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "dorfplatz", "title": "Am Dorfplatz", "purpose": "Orte auf der Karte finden.", "scene": "Die wichtigsten Orte im Dorf suchen.", "reward": "Karten-Lehrling" },
+      { "id": "botengang", "title": "Der Botengang", "purpose": "Mehrere Stationen in der richtigen Reihenfolge anlaufen.", "scene": "Erst hier, dann dort - die Route planen.", "reward": "Routen-Profi" },
+      { "id": "meisterweg", "title": "Meisterpruefung", "purpose": "Einem laengeren Weg nach Himmelsrichtungen folgen.", "scene": "Der laengste Lieferweg im Dorf.", "reward": "Dorf-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Das Kind findet einzelne Orte, verliert aber die Reihenfolge, wenn mehrere Stationen hintereinander wichtig sind.",
+    "embodiedMetaphor": "Ein Kurier liefert nicht wahllos, sondern besucht jede Station genau in der geplanten Reihenfolge.",
+    "successInsight": "Eine Route merkt man sich Station fuer Station - erst die eine, dann die naechste."
+  },
+  "rooms": [
+    {
+      "roomId": "dorfplatz",
+      "objective": "Finde den Ort auf der Karte!",
+      "mode": "locate",
+      "rows": 5,
+      "cols": 5,
+      "landmarks": [
+        { "emoji": "🏫", "label": "Schule", "row": 0, "col": 0 },
+        { "emoji": "🏪", "label": "Markt", "row": 0, "col": 4 },
+        { "emoji": "⚓", "label": "Hafen", "row": 4, "col": 4 },
+        { "emoji": "🥖", "label": "Baeckerei", "row": 4, "col": 0 }
+      ],
+      "rounds": [
+        { "objective": "Wo steht sie?", "targetIndex": 0 },
+        { "objective": "Und wo ist das?", "targetIndex": 2 }
+      ],
+      "feedback": { "correct": "Genau gefunden!", "wrongCell": "Schau nochmal genau auf das gesuchte Emoji.", "tryAgain": "Suche das gleiche Bild wie in der Frage." },
+      "explanationAfterSuccess": "Jeder Ort hat seine feste Zelle auf der Karte - du hast sie gefunden."
+    },
+    {
+      "roomId": "botengang",
+      "objective": "Laufe die Stationen in der richtigen Reihenfolge an!",
+      "mode": "route",
+      "rows": 5,
+      "cols": 5,
+      "landmarks": [
+        { "emoji": "🏫", "label": "Schule", "row": 0, "col": 0 },
+        { "emoji": "🏪", "label": "Markt", "row": 0, "col": 4 },
+        { "emoji": "⚓", "label": "Hafen", "row": 4, "col": 4 },
+        { "emoji": "🥖", "label": "Baeckerei", "row": 4, "col": 0 }
+      ],
+      "rounds": [
+        { "objective": "Bring die Post zu drei Stationen!", "routeIds": [0, 1, 2] },
+        { "objective": "Jetzt eine andere Reihenfolge!", "routeIds": [3, 0, 1, 2] }
+      ],
+      "feedback": { "correct": "Route perfekt eingehalten!", "wrongCell": "Das ist nicht die naechste Station der Route.", "tryAgain": "Schau auf die Liste: welche Station kommt jetzt dran?" },
+      "explanationAfterSuccess": "Eine Route laeuft man Station fuer Station ab - genau in der geplanten Reihenfolge."
+    },
+    {
+      "roomId": "meisterweg",
+      "objective": "Folge dem langen Lieferweg!",
+      "mode": "path",
+      "rows": 5,
+      "cols": 5,
+      "landmarks": [
+        { "emoji": "🏠", "label": "Kurierhaus", "row": 4, "col": 0 },
+        { "emoji": "📦", "label": "Paketziel", "row": 0, "col": 4 },
+        { "emoji": "🌳", "label": "Grosser Baum", "row": 2, "col": 2 }
+      ],
+      "rounds": [
+        { "objective": "Wo kommst du an?", "startIndex": 0, "steps": [ { "dir": "east", "count": 4 }, { "dir": "north", "count": 4 } ] },
+        { "objective": "Und hier?", "startIndex": 2, "steps": [ { "dir": "north", "count": 2 }, { "dir": "east", "count": 2 } ] }
+      ],
+      "feedback": { "correct": "Meisterhaft geliefert!", "wrongCell": "Osten ist rechts, Norden ist oben - zaehle genau.", "tryAgain": "Gehe Schritt fuer Schritt: erst die eine Richtung, dann die naechste." },
+      "explanationAfterSuccess": "Auch ein langer Lieferweg klappt Schritt fuer Schritt nach Kompass."
+    }
+  ]
+}

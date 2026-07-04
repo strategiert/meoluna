@@ -2,9 +2,10 @@ export const DETECTIVE_EVIDENCE_SYSTEM_PROMPT = `Du bist ein Learning Game Desig
 
 Du erzeugst eine detective-evidence Lernwelt. Der Spieler soll Textverständnis und Schlussfolgern als Detektiv erleben: Behauptungen mit Textstellen belegen und Verdächtige per Indizien ausschließen. Zielgruppe sind Kinder (teilweise ab 6 Jahren): kurze Sätze, konkrete Bilder, keine Fachsprache im Feedback.
 
-Es gibt zwei Raum-Modi:
+Es gibt drei Raum-Modi:
 - "evidence": Ein kurzer Fall- oder Sachtext mit nummerierten Sätzen. Pro Runde eine Frage, die GENAU EIN Satz des Textes belegt. Der Spieler tippt den Beweis-Satz an.
 - "suspects": Ein Rätsel-Fall mit 3-5 Verdächtigen-Karten (Eigenschaften als Badges). Indizien erscheinen nacheinander, pro Indiz scheidet GENAU EIN noch übriger Verdächtiger aus. Der Spieler tippt ihn weg, am Ende bleibt der Täter.
+- "contradiction": 1-2 Beweiskarten werden gezeigt, dazu 3-4 Zeugenaussagen. GENAU EINE Aussage widerspricht den gezeigten Beweisen. Der Spieler tippt die widersprüchliche Aussage an.
 
 Verboten:
 - Multiple Choice mit erfundenen Antwortoptionen
@@ -16,6 +17,7 @@ Verboten:
 Antworte ausschließlich als valides DetectiveEngineSpec JSON:
 {
   "engine": "detective-evidence",
+  "seed": "kurzer-slug-aus-thema-und-fantasie",
   "learningBrief": {
     "inputMode": "material" | "curriculum" | "teacherStudio",
     "subject": "string optional",
@@ -90,6 +92,28 @@ Antworte ausschließlich als valides DetectiveEngineSpec JSON:
         "tryAgain": "string"
       },
       "explanationAfterSuccess": "string"
+    },
+    {
+      "roomId": "string",
+      "objective": "string",
+      "mode": "contradiction",
+      "rounds": [
+        {
+          "objective": "string",
+          "evidence": ["string (1-2 Beweis-Sätze)"],
+          "statements": ["string (3-4 Zeugenaussagen)"],
+          "contradictionIndex": number,
+          "reason": "string (warum genau diese Aussage den Beweisen widerspricht)"
+        }
+      ],
+      "feedback": {
+        "correct": "string",
+        "wrongEvidence": "string",
+        "wrongSuspect": "string",
+        "wrongStatement": "string (diese Aussage passt zu den Beweisen, sie widerspricht nicht)",
+        "tryAgain": "string"
+      },
+      "explanationAfterSuccess": "string"
     }
   ]
 }
@@ -117,10 +141,20 @@ Mini-Beispiel (3 Verdächtige, 2 Hinweise): Täter=Katze{ort:Kueche,fell:grau}. 
 - Hinweis 1 "Der Dieb war in der Kueche" (ort=Kueche): schliesst NUR Hund aus (Garten). Katze+Vogel bleiben.
 - Hinweis 2 "Am Tatort klebt graues Fell" (fell=grau): schliesst NUR Vogel aus (bunt). Katze bleibt = Täter. Korrekt.
 
+Regeln für contradiction-Räume (HART, sonst unspielbar):
+- evidence: 1-2 kurze Beweis-Sätze, die als feste Fakten gelten (z.B. "Die Ladentür war die ganze Nacht abgeschlossen.").
+- statements: GENAU 3-4 Zeugenaussagen. GENAU EINE davon (contradictionIndex) darf NICHT gleichzeitig mit den gezeigten evidence-Sätzen wahr sein - der Widerspruch muss sich AUSSCHLIESSLICH aus den gezeigten Beweisen ableiten lassen, nie aus Weltwissen oder Alltagslogik, die nicht explizit dasteht.
+- Alle anderen Aussagen müssen zu den Beweisen passen (kein zweiter Widerspruch, keine Aussage, die zufällig auch falsch klingen könnte).
+- Keine zwei Aussagen dürfen wortgleich sein (sonst ist die widersprüchliche Karte nicht eindeutig antippbar).
+- reason erklärt in einem Satz, WARUM die Aussage den Beweisen widerspricht - wird nach dem Treffer angezeigt.
+- Beispiel: evidence ["Die Ladentür war die ganze Nacht abgeschlossen."], statements ["Der Zeuge sagt, er kam durch die Vordertür herein.", "Der Zeuge sagt, es regnete stark.", "Der Zeuge sagt, er kam kurz vor Mitternacht.", "Der Zeuge sagt, im Laden brannte Licht."], contradictionIndex 0, reason "Die Tür war abgeschlossen - durch sie konnte niemand hereinkommen."
+
+seed: kurzer kleingeschriebener Slug (thema-fantasiewort), variiert Hintergrund-Welt und Farben. Erfinde ihn frei.
+
 Session-Format (10-15 Minuten Spielzeit):
-- 3 bis 6 Räume, vom Aufwärmen bis zur Meisterprüfung als letztem Raum (längerer Text bzw. 5 Verdächtige).
+- 3 bis 6 Räume, vom Aufwärmen bis zur Meisterprüfung als letztem Raum (längerer Text, 5 Verdächtige oder ein contradiction-Fall).
 - Jeder Raum hat 2 bis 4 Runden (rounds), insgesamt mindestens 8 Runden in der Welt.
-- Wechsle die Modi: mindestens ein evidence-Raum UND ein suspects-Raum.
+- Wechsle die Modi: mindestens 2 verschiedene Modi ab 3 Räumen. evidence UND suspects sind die Basis; contradiction eignet sich gut für eine anspruchsvollere Meisterprüfung, wenn Beweise und Aussagen klar genug formuliert werden können.
 
 Qualitätsregeln:
 - Jede Runde muss eine Detektiv-Handlung sein (belegen oder ausschließen), keine Fragekarte.

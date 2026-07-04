@@ -1,5 +1,5 @@
-import type { DetectiveEngineSpec, DetectiveRoom, SuspectsRound } from "./detectiveEvidenceTypes";
-import { isEvidenceRoom, isSuspectsRoom } from "./detectiveEvidenceTypes";
+import type { ContradictionRound, DetectiveEngineSpec, DetectiveRoom, SuspectsRound } from "./detectiveEvidenceTypes";
+import { isContradictionRoom, isEvidenceRoom, isSuspectsRoom } from "./detectiveEvidenceTypes";
 
 export type DetectiveValidationResult = {
   passed: boolean;
@@ -11,6 +11,14 @@ const MIN_ROOMS = 2;
 const MAX_ROOMS = 6;
 const MAX_ROUNDS_PER_ROOM = 4;
 const MIN_TOTAL_ROUNDS = 6;
+const MIN_EVIDENCE_CARDS = 1;
+const MAX_EVIDENCE_CARDS = 2;
+const MIN_STATEMENTS = 3;
+const MAX_STATEMENTS = 4;
+// Ab so vielen Raeumen muss die Welt mindestens 2 verschiedene Modi nutzen
+// (strukturelle Varianz erzwingen, nicht nur Content-Varianz). Beide
+// bestehenden Fixtures erfuellen das bereits (evidence+suspects gemischt).
+const MODE_DIVERSITY_MIN_ROOMS = 3;
 
 function hasText(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
@@ -18,6 +26,40 @@ function hasText(value: unknown): value is string {
 
 function roomLabel(room: DetectiveRoom): string {
   return room.roomId || "unknown";
+}
+
+// contradiction: die Spec macht alles explizit (evidence + statements +
+// contradictionIndex + reason) - keine Weltwissen-Ableitung noetig. Wir
+// pruefen nur Struktur/Eindeutigkeit, nicht die inhaltliche Logik der
+// Beweise (die liegt in der Verantwortung des Prompts).
+function validateContradictionRound(round: ContradictionRound, roundLabel: string, violations: string[]): void {
+  if (!Array.isArray(round.evidence) || round.evidence.length < MIN_EVIDENCE_CARDS || round.evidence.length > MAX_EVIDENCE_CARDS) {
+    violations.push(`E_ROOM_${roundLabel}: needs ${MIN_EVIDENCE_CARDS}-${MAX_EVIDENCE_CARDS} evidence cards`);
+  } else if (round.evidence.some((e) => !hasText(e))) {
+    violations.push(`E_ROOM_${roundLabel}: every evidence card must be non-empty`);
+  }
+  if (!Array.isArray(round.statements) || round.statements.length < MIN_STATEMENTS || round.statements.length > MAX_STATEMENTS) {
+    violations.push(`E_ROOM_${roundLabel}: needs ${MIN_STATEMENTS}-${MAX_STATEMENTS} statements`);
+    return;
+  }
+  const seen = new Set<string>();
+  for (const statement of round.statements) {
+    if (!hasText(statement)) {
+      violations.push(`E_ROOM_${roundLabel}: every statement must be non-empty`);
+      continue;
+    }
+    // Zwei identische Aussagen machen die widersprechende Karte mehrdeutig.
+    if (seen.has(statement)) {
+      violations.push(`E_ROOM_${roundLabel}: duplicate statement makes the contradiction ambiguous`);
+    }
+    seen.add(statement);
+  }
+  if (!Number.isInteger(round.contradictionIndex) || round.contradictionIndex < 0 || round.contradictionIndex >= round.statements.length) {
+    violations.push(`E_ROOM_${roundLabel}: contradictionIndex out of range`);
+  }
+  if (!hasText(round.reason)) {
+    violations.push(`E_ROOM_${roundLabel}: reason is required (explains why the statement contradicts the evidence)`);
+  }
 }
 
 // Simuliert das Ausschluss-Spiel: jeder Hinweis muss genau einen der noch
@@ -64,6 +106,9 @@ export function validateDetectiveEngineSpec(spec: DetectiveEngineSpec): Detectiv
 
   if (spec.engine !== "detective-evidence") {
     violations.push("E_ENGINE: engine must be detective-evidence");
+  }
+  if (spec.seed !== undefined && !hasText(spec.seed)) {
+    violations.push("E_SEED: seed must be a non-empty string when present");
   }
 
   if (!hasText(spec.concept?.learningProblem)) {
@@ -152,8 +197,12 @@ export function validateDetectiveEngineSpec(spec: DetectiveEngineSpec): Detectiv
           violations.push(`E_ROOM_${roundLabel}: ${problem}`);
         }
       });
+    } else if (isContradictionRoom(room)) {
+      room.rounds.forEach((round, roundIndex) => {
+        validateContradictionRound(round, `${label}[${roundIndex}]`, violations);
+      });
     } else {
-      violations.push(`E_ROOM_${label}: mode must be evidence or suspects`);
+      violations.push(`E_ROOM_${label}: mode must be evidence, suspects or contradiction`);
     }
 
     // Nur das vom Modus tatsaechlich gerenderte Feedback ist Pflicht.
@@ -161,7 +210,17 @@ export function validateDetectiveEngineSpec(spec: DetectiveEngineSpec): Detectiv
     if (!hasText(room.feedback?.tryAgain)) violations.push(`E_ROOM_${label}: tryAgain feedback missing`);
     if (isEvidenceRoom(room) && !hasText(room.feedback?.wrongEvidence)) violations.push(`E_ROOM_${label}: wrongEvidence feedback missing`);
     if (isSuspectsRoom(room) && !hasText(room.feedback?.wrongSuspect)) violations.push(`E_ROOM_${label}: wrongSuspect feedback missing`);
+    if (isContradictionRoom(room) && !hasText(room.feedback?.wrongStatement)) violations.push(`E_ROOM_${label}: wrongStatement feedback missing`);
     if (!hasText(room.explanationAfterSuccess)) violations.push(`E_ROOM_${label}: explanationAfterSuccess missing`);
+  }
+
+  // Strukturelle Varianz: ab MODE_DIVERSITY_MIN_ROOMS Raeumen mindestens
+  // 2 verschiedene Modi. Beide bestehenden Fixtures erfuellen das bereits.
+  if (spec.rooms.length >= MODE_DIVERSITY_MIN_ROOMS) {
+    const distinctModes = new Set(spec.rooms.map((room) => room.mode));
+    if (distinctModes.size < 2) {
+      violations.push(`E_STRUCTURE: worlds with ${MODE_DIVERSITY_MIN_ROOMS}+ rooms need at least 2 distinct modes (got only "${spec.rooms[0]?.mode}")`);
+    }
   }
 
   if (totalRounds < MIN_TOTAL_ROUNDS) {

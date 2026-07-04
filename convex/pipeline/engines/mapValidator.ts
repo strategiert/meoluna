@@ -1,4 +1,4 @@
-import type { MapEngineSpec, MapRoom, LocateRound, PathRound } from "./mapTypes";
+import type { MapEngineSpec, MapRoom, LocateRound, PathRound, RouteRound } from "./mapTypes";
 import { inBounds, resolvePath } from "./mapTypes";
 
 export type MapValidationResult = { passed: boolean; violations: string[] };
@@ -10,6 +10,12 @@ const MIN_TOTAL_ROUNDS = 6;
 const MIN_GRID = 3;
 const MAX_GRID = 6;
 const VALID_DIRS = ["north", "south", "east", "west"];
+const MIN_ROUTE_STATIONS = 2;
+const MAX_ROUTE_STATIONS = 4;
+// Ab so vielen Raeumen muss die Welt mindestens 2 verschiedene Modi nutzen
+// (strukturelle Varianz erzwingen, nicht nur Content-Varianz). Beide
+// bestehenden Fixtures erfuellen das bereits (locate+path gemischt).
+const MODE_DIVERSITY_MIN_ROOMS = 3;
 
 function hasText(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
@@ -22,6 +28,7 @@ export function validateMapEngineSpec(spec: MapEngineSpec): MapValidationResult 
   const violations: string[] = [];
 
   if (spec.engine !== "map") violations.push("E_ENGINE: engine must be map");
+  if (spec.seed !== undefined && !hasText(spec.seed)) violations.push("E_SEED: seed must be a non-empty string when present");
   if (!hasText(spec.concept?.learningProblem)) violations.push("E_CONCEPT: learningProblem is required");
   if (!hasText(spec.concept?.embodiedMetaphor)) violations.push("E_CONCEPT: embodiedMetaphor is required");
   if (!hasText(spec.concept?.successInsight)) violations.push("E_CONCEPT: successInsight is required");
@@ -38,7 +45,9 @@ export function validateMapEngineSpec(spec: MapEngineSpec): MapValidationResult 
   for (const room of spec.rooms) {
     const label = roomLabel(room);
     if (!hasText(room.objective)) violations.push(`E_ROOM_${label}: objective is required`);
-    if (room.mode !== "locate" && room.mode !== "path") violations.push(`E_ROOM_${label}: mode must be locate or path`);
+    if (room.mode !== "locate" && room.mode !== "path" && room.mode !== "route") {
+      violations.push(`E_ROOM_${label}: mode must be locate, path or route`);
+    }
 
     const rows = room.rows;
     const cols = room.cols;
@@ -78,6 +87,24 @@ export function validateMapEngineSpec(spec: MapEngineSpec): MapValidationResult 
         if (typeof loc.targetIndex !== "number" || loc.targetIndex < 0 || loc.targetIndex >= room.landmarks.length) {
           violations.push(`E_ROOM_${rl}: targetIndex out of range`);
         }
+      } else if (room.mode === "route") {
+        const route = r as RouteRound;
+        if (!Array.isArray(route.routeIds) || route.routeIds.length < MIN_ROUTE_STATIONS || route.routeIds.length > MAX_ROUTE_STATIONS) {
+          violations.push(`E_ROOM_${rl}: route needs ${MIN_ROUTE_STATIONS}-${MAX_ROUTE_STATIONS} routeIds`);
+          return;
+        }
+        const seenStations = new Set<number>();
+        for (const idx of route.routeIds) {
+          if (typeof idx !== "number" || !Number.isInteger(idx) || idx < 0 || idx >= room.landmarks.length) {
+            violations.push(`E_ROOM_${rl}: routeIds must reference an existing landmark`);
+            return;
+          }
+          if (seenStations.has(idx)) {
+            violations.push(`E_ROOM_${rl}: routeIds must not visit the same landmark twice`);
+            return;
+          }
+          seenStations.add(idx);
+        }
       } else {
         const path = r as PathRound;
         if (typeof path.startIndex !== "number" || path.startIndex < 0 || path.startIndex >= room.landmarks.length) {
@@ -106,6 +133,15 @@ export function validateMapEngineSpec(spec: MapEngineSpec): MapValidationResult 
     if (!hasText(room.feedback?.wrongCell)) violations.push(`E_ROOM_${label}: wrongCell feedback missing`);
     if (!hasText(room.feedback?.tryAgain)) violations.push(`E_ROOM_${label}: tryAgain feedback missing`);
     if (!hasText(room.explanationAfterSuccess)) violations.push(`E_ROOM_${label}: explanationAfterSuccess missing`);
+  }
+
+  // Strukturelle Varianz: ab MODE_DIVERSITY_MIN_ROOMS Raeumen mindestens
+  // 2 verschiedene Modi. Beide bestehenden Fixtures erfuellen das bereits.
+  if (spec.rooms.length >= MODE_DIVERSITY_MIN_ROOMS) {
+    const distinctModes = new Set(spec.rooms.map((room) => room.mode));
+    if (distinctModes.size < 2) {
+      violations.push(`E_STRUCTURE: worlds with ${MODE_DIVERSITY_MIN_ROOMS}+ rooms need at least 2 distinct modes (got only "${spec.rooms[0]?.mode}")`);
+    }
   }
 
   if (totalRounds < MIN_TOTAL_ROUNDS) {

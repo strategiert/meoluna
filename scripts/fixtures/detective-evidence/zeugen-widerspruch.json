@@ -1,0 +1,144 @@
+{
+  "engine": "detective-evidence",
+  "seed": "zeugen-widerspruch",
+  "learningBrief": {
+    "inputMode": "material",
+    "subject": "deutsch",
+    "gradeLevel": "4",
+    "rawTopic": "Textverständnis: Beweise, Ausschließen und Widersprüche erkennen",
+    "extractedTasks": ["Belegstellen finden", "Verdächtige ausschließen", "Widersprüchliche Aussagen erkennen"],
+    "learningGoals": ["Behauptungen mit Textstellen belegen", "Indizien kombinieren", "eine Aussage gegen feste Beweise prüfen"],
+    "likelyMisconceptions": ["Raten statt im Text nachsehen", "eine Aussage fuer wahr halten, nur weil sie plausibel klingt"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Die Widerspruchs-Detektei",
+    "coreMetaphor": "Ein guter Detektiv findet nicht nur Beweise - er erkennt auch die eine Aussage, die nicht dazu passt.",
+    "setting": "Ein kleines Detektivbuero am Marktplatz. Neue knifflige Faelle warten.",
+    "visualStyle": {
+      "palette": ["#79c7f5", "#fff9ec", "#ffd84d", "#ff7a59", "#27324a"],
+      "mood": "hell, spannend, konzentriert",
+      "shapes": "Fall-Akten, Zeugen-Karten, Lupen",
+      "effects": "Lupen-Stempel auf Beweise, Konfetti beim Gelingen"
+    },
+    "guide": { "name": "Luno", "role": "Chef-Detektiv", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "ladenfall", "title": "Der Ladendiebstahl", "purpose": "Beweise im Text finden.", "scene": "In der Nacht wurde die Kasse geleert.", "reward": "Spür-Nase" },
+      { "id": "hofverhoer", "title": "Das Hof-Verhör", "purpose": "Verdächtige per Indiz ausschließen.", "scene": "Wer war es wirklich?", "reward": "Indizien-Profi" },
+      { "id": "widerspruch", "title": "Der Widerspruch", "purpose": "Die Aussage finden, die nicht zu den Beweisen passt.", "scene": "Ein Zeuge lügt - welche Aussage verrät ihn?", "reward": "Widerspruchs-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Das Kind glaubt jede Zeugenaussage, statt sie gegen die festen Beweise zu pruefen.",
+    "embodiedMetaphor": "Jede Aussage muss zu den Beweisen passen - passt eine nicht, hat der Zeuge sich verplappert.",
+    "successInsight": "Eine Aussage zaehlt nur, wenn sie nicht den Beweisen widerspricht."
+  },
+  "rooms": [
+    {
+      "roomId": "ladenfall",
+      "objective": "Lies den Fall und tippe die Beweis-Sätze an!",
+      "mode": "evidence",
+      "caseText": {
+        "title": "Der Ladendiebstahl",
+        "sentences": [
+          "Am Montagabend schloss Frau Berg den Laden um 20 Uhr ab.",
+          "Die Kasse war am Morgen leer, aber die Vordertür war unversehrt.",
+          "Am Fenster hinten fehlte eine Schraube am Riegel.",
+          "Unter dem Fenster lag ein Stück blauer Stoff.",
+          "Herr Klein trug an diesem Abend eine blaue Jacke."
+        ]
+      },
+      "rounds": [
+        { "question": "Wie kam der Dieb wahrscheinlich herein?", "evidenceIndex": 2 },
+        { "question": "Welcher Beweis deutet auf Herrn Klein?", "evidenceIndex": 4 }
+      ],
+      "feedback": {
+        "correct": "Beweis gefunden!",
+        "wrongEvidence": "Dieser Satz belegt das nicht. Lies die Frage nochmal und such weiter.",
+        "wrongSuspect": "Der bleibt verdächtig.",
+        "tryAgain": "Tipp: Lies jeden Satz langsam. Welcher beantwortet GENAU die Frage?"
+      },
+      "explanationAfterSuccess": "Du hast nicht geraten, du hast gezeigt, wo es steht. Das ist ein Beweis."
+    },
+    {
+      "roomId": "hofverhoer",
+      "objective": "Schließe nach jedem Hinweis einen Verdächtigen aus!",
+      "mode": "suspects",
+      "rounds": [
+        {
+          "intro": "Im Hühnerstall fehlt ein Ei.",
+          "suspects": [
+            { "id": "fuchs", "name": "Fritz Fuchs", "emoji": "🦊", "traits": { "ort": "Wald", "schwanz": "buschig" } },
+            { "id": "katze", "name": "Kira Katze", "emoji": "🐱", "traits": { "ort": "Hof", "schwanz": "duenn" } },
+            { "id": "hase", "name": "Otto Hase", "emoji": "🐰", "traits": { "ort": "Hof", "schwanz": "kurz" } }
+          ],
+          "clues": [
+            { "text": "Der Dieb war auf dem Hof.", "attribute": "ort", "value": "Hof" },
+            { "text": "Am Zaun hing ein duenner Schwanzabdruck.", "attribute": "schwanz", "value": "duenn" }
+          ],
+          "culpritId": "katze"
+        },
+        {
+          "intro": "Im Garten wurde eine Möhre ausgebuddelt.",
+          "suspects": [
+            { "id": "eichhoernchen", "name": "Ecki Eichhörnchen", "emoji": "🐿️", "traits": { "ort": "Baum", "pfoten": "klein" } },
+            { "id": "maus", "name": "Mimi Maus", "emoji": "🐭", "traits": { "ort": "Garten", "pfoten": "winzig" } },
+            { "id": "igel", "name": "Iggy Igel", "emoji": "🦔", "traits": { "ort": "Garten", "pfoten": "klein" } }
+          ],
+          "clues": [
+            { "text": "Der Dieb war im Garten.", "attribute": "ort", "value": "Garten" },
+            { "text": "Die Spuren waren klein, nicht winzig.", "attribute": "pfoten", "value": "klein" }
+          ],
+          "culpritId": "igel"
+        }
+      ],
+      "feedback": {
+        "correct": "Der Fall ist gelöst!",
+        "wrongEvidence": "Das belegt es nicht.",
+        "wrongSuspect": "Halt! Der passt zum Hinweis, der bleibt verdächtig. Wer passt NICHT?",
+        "tryAgain": "Lies den Hinweis genau: Welche Karte hat etwas ANDERES?"
+      },
+      "explanationAfterSuccess": "Hinweis für Hinweis scheiden die Falschen aus. Wer übrig bleibt, war es."
+    },
+    {
+      "roomId": "widerspruch",
+      "objective": "Finde die Aussage, die nicht zu den Beweisen passt!",
+      "mode": "contradiction",
+      "rounds": [
+        {
+          "objective": "Ein Zeuge widerspricht sich selbst.",
+          "evidence": ["Die Ladentür war die ganze Nacht abgeschlossen."],
+          "statements": [
+            "Der Zeuge sagt, er kam durch die Vordertür herein.",
+            "Der Zeuge sagt, es regnete stark in der Nacht.",
+            "Der Zeuge sagt, er kam kurz vor Mitternacht vorbei.",
+            "Der Zeuge sagt, im Laden brannte kein Licht."
+          ],
+          "contradictionIndex": 0,
+          "reason": "Die Tür war die ganze Nacht abgeschlossen - durch sie konnte niemand hereinkommen."
+        },
+        {
+          "objective": "Noch ein Zeuge, noch ein Widerspruch.",
+          "evidence": ["Der Hofhund war die ganze Nacht angekettet.", "Die Kette reicht nur bis zum Gartentor."],
+          "statements": [
+            "Der Zeuge sagt, der Hund habe im Gemüsebeet gebuddelt.",
+            "Der Zeuge sagt, es war eine klare Sternennacht.",
+            "Der Zeuge sagt, der Hund habe laut gebellt.",
+            "Der Zeuge sagt, jemand sei am Zaun vorbeigegangen."
+          ],
+          "contradictionIndex": 0,
+          "reason": "Die Kette reicht nur bis zum Gartentor - bis zum Gemüsebeet konnte der Hund gar nicht kommen."
+        }
+      ],
+      "feedback": {
+        "correct": "Genau die richtige Aussage entlarvt!",
+        "wrongEvidence": "Das belegt es nicht.",
+        "wrongSuspect": "Der bleibt verdächtig.",
+        "wrongStatement": "Diese Aussage passt zu den Beweisen. Welche andere passt NICHT?",
+        "tryAgain": "Vergleiche jede Aussage einzeln mit den Beweisen oben."
+      },
+      "explanationAfterSuccess": "Eine Aussage, die den Beweisen widerspricht, kann nicht stimmen - so entlarvt man einen Zeugen."
+    }
+  ]
+}

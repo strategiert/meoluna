@@ -1,4 +1,4 @@
-import type { TimeEngineSpec, TimeRoom } from "./timeSequenceTypes";
+import type { TimeEngineSpec, TimeEvent, TimeRoom, TimeRound } from "./timeSequenceTypes";
 
 export type TimeValidationResult = {
   passed: boolean;
@@ -12,6 +12,8 @@ const MAX_ROUNDS_PER_ROOM = 4;
 const MIN_TOTAL_ROUNDS = 6;
 const MIN_EVENTS = 3;
 const MAX_EVENTS = 6;
+const MIN_GAP_OPTIONS = 3;
+const MAX_GAP_OPTIONS = 4;
 
 function hasText(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
@@ -21,11 +23,62 @@ function roomLabel(room: TimeRoom): string {
   return room.roomId || "unknown";
 }
 
+// Gemeinsame Regeln für eine Liste von Ereignis-Karten (events ODER options):
+// id/label/emoji Pflicht, ids innerhalb der Liste eindeutig, Label max 40 Zeichen.
+function validateEventList(list: unknown, label: string, violations: string[]): list is TimeEvent[] {
+  if (!Array.isArray(list)) return false;
+  const ids = new Set<string>();
+  let ok = true;
+  list.forEach((event, index) => {
+    const e = (event || {}) as Partial<TimeEvent>;
+    if (!hasText(e.id) || !hasText(e.label) || !hasText(e.emoji)) {
+      violations.push(`E_ROOM_${label}[${index}]: id, label and emoji are required`);
+      ok = false;
+    }
+    if (e.id && ids.has(e.id)) {
+      violations.push(`E_ROOM_${label}: duplicate id ${e.id}`);
+      ok = false;
+    }
+    if (e.id) ids.add(e.id);
+    if (e.label && e.label.length > 40) {
+      violations.push(`E_ROOM_${label}[${index}]: label too long for a card (max 40 chars)`);
+    }
+  });
+  return ok;
+}
+
+// missing-event: gapIndex muss strikt innen liegen, options müssen genau eine
+// zur Lücke passende Karte enthalten (gleiche id/label/emoji) und eindeutig sein.
+function validateMissingEventRound(round: TimeRound, roundLabel: string, violations: string[]): void {
+  const events = round.events;
+  if (typeof round.gapIndex !== "number" || round.gapIndex <= 0 || round.gapIndex >= events.length - 1) {
+    violations.push(`E_ROOM_${roundLabel}: missing-event mode requires gapIndex strictly between the first and last event (got ${round.gapIndex})`);
+    return;
+  }
+  const expected = events[round.gapIndex];
+
+  if (!Array.isArray(round.options) || round.options.length < MIN_GAP_OPTIONS || round.options.length > MAX_GAP_OPTIONS) {
+    violations.push(`E_ROOM_${roundLabel}: missing-event mode needs ${MIN_GAP_OPTIONS}-${MAX_GAP_OPTIONS} options`);
+    return;
+  }
+  if (!validateEventList(round.options, `${roundLabel}.options`, violations)) return;
+
+  const matches = round.options.filter((option) => option.id === expected.id);
+  if (matches.length !== 1) {
+    violations.push(`E_ROOM_${roundLabel}: options must contain exactly one card matching the missing event "${expected.id}"`);
+  } else if (matches[0].label !== expected.label || matches[0].emoji !== expected.emoji) {
+    violations.push(`E_ROOM_${roundLabel}: the option matching the missing event must have the same label and emoji as events[gapIndex]`);
+  }
+}
+
 export function validateTimeEngineSpec(spec: TimeEngineSpec): TimeValidationResult {
   const violations: string[] = [];
 
   if (spec.engine !== "time-sequence") {
     violations.push("E_ENGINE: engine must be time-sequence");
+  }
+  if (spec.seed !== undefined && !hasText(spec.seed)) {
+    violations.push("E_SEED: seed must be a non-empty string when present");
   }
 
   if (!hasText(spec.concept?.learningProblem)) {
@@ -57,8 +110,8 @@ export function validateTimeEngineSpec(spec: TimeEngineSpec): TimeValidationResu
     if (!hasText(room.objective)) {
       violations.push(`E_ROOM_${label}: objective is required`);
     }
-    if (room.mode !== "timeline" && room.mode !== "chain") {
-      violations.push(`E_ROOM_${label}: mode must be timeline or chain`);
+    if (room.mode !== "timeline" && room.mode !== "chain" && room.mode !== "missing-event") {
+      violations.push(`E_ROOM_${label}: mode must be timeline, chain or missing-event`);
     }
     if (!Array.isArray(room.rounds) || room.rounds.length === 0) {
       violations.push(`E_ROOM_${label}: at least one round is required`);
@@ -78,19 +131,11 @@ export function validateTimeEngineSpec(spec: TimeEngineSpec): TimeValidationResu
         violations.push(`E_ROOM_${roundLabel}: needs ${MIN_EVENTS}-${MAX_EVENTS} events`);
         return;
       }
-      const ids = new Set<string>();
-      round.events.forEach((event, eventIndex) => {
-        if (!hasText(event.id) || !hasText(event.label) || !hasText(event.emoji)) {
-          violations.push(`E_ROOM_${roundLabel}.events[${eventIndex}]: id, label and emoji are required`);
-        }
-        if (ids.has(event.id)) {
-          violations.push(`E_ROOM_${roundLabel}: duplicate event id ${event.id}`);
-        }
-        ids.add(event.id);
-        if (event.label && event.label.length > 40) {
-          violations.push(`E_ROOM_${roundLabel}.events[${eventIndex}]: label too long for a card (max 40 chars)`);
-        }
-      });
+      if (!validateEventList(round.events, `${roundLabel}.events`, violations)) return;
+
+      if (room.mode === "missing-event") {
+        validateMissingEventRound(round, roundLabel, violations);
+      }
     });
 
     // Nur das vom Modus tatsaechlich gerenderte Feedback ist Pflicht.
@@ -98,6 +143,7 @@ export function validateTimeEngineSpec(spec: TimeEngineSpec): TimeValidationResu
     if (!hasText(room.feedback?.tryAgain)) violations.push(`E_ROOM_${label}: tryAgain feedback missing`);
     if (room.mode === "timeline" && !hasText(room.feedback?.wrongOrder)) violations.push(`E_ROOM_${label}: wrongOrder feedback missing`);
     if (room.mode === "chain" && !hasText(room.feedback?.wrongLink)) violations.push(`E_ROOM_${label}: wrongLink feedback missing`);
+    if (room.mode === "missing-event" && !hasText(room.feedback?.wrongGap)) violations.push(`E_ROOM_${label}: wrongGap feedback missing`);
     if (!hasText(room.explanationAfterSuccess)) violations.push(`E_ROOM_${label}: explanationAfterSuccess missing`);
   }
 

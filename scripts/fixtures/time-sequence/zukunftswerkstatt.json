@@ -1,0 +1,194 @@
+{
+  "engine": "time-sequence",
+  "seed": "zukunftswerkstatt-mond",
+  "learningBrief": {
+    "inputMode": "teacherStudio",
+    "subject": "sachunterricht",
+    "gradeLevel": "3",
+    "rawTopic": "Technische Abläufe: den fehlenden Schritt in einer bekannten Kette erkennen",
+    "extractedTasks": ["Ablauf ordnen", "Ursache-Wirkungs-Kette bauen", "fehlenden Schritt in einer Kette finden"],
+    "learningGoals": ["erkennen, welcher Schritt in einer Kette fehlt", "Reihenfolge und Ursache-Wirkung anwenden statt nur auswendig zu lernen"],
+    "likelyMisconceptions": ["jeder beliebige Schritt passt irgendwo in die Lücke", "die Lücke lässt sich ohne Blick auf davor und danach raten"],
+    "focus": "practice",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Die Zukunftswerkstatt",
+    "coreMetaphor": "In der Werkstatt bauen kleine Tüftler Maschinen und Abläufe zusammen - manchmal fehlt ein Teil in der Kette.",
+    "setting": "Eine helle Werkstatt voller kleiner Erfindungen und surrender Maschinen.",
+    "visualStyle": {
+      "palette": ["#79c7f5", "#ffd84d", "#3f9bf0", "#ff7a59", "#27324a"],
+      "mood": "hell, tüftlerisch, neugierig",
+      "shapes": "Zahnräder, Ereignis-Karten, Werkbänke",
+      "effects": "Karten schnappen ein, Konfetti beim Gelingen"
+    },
+    "guide": { "name": "Luno", "role": "Werkstatt-Tüftler", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "werkbank", "title": "Die Werkbank", "purpose": "Alltags-Abläufe ordnen.", "scene": "Erst aufwärmen mit bekannten Abläufen.", "reward": "Werkstatt-Lehrling" },
+      { "id": "schaltkreis", "title": "Der Schaltkreis", "purpose": "Ursache-Wirkungs-Ketten bauen.", "scene": "Was passiert, wenn Strom fließt?", "reward": "Schaltkreis-Kenner" },
+      { "id": "luecke", "title": "Die Ersatzteil-Suche", "purpose": "Das fehlende Teil in der Kette finden.", "scene": "Ein Teil der Kette ist verschwunden!", "reward": "Ersatzteil-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Das Kind erkennt nicht, dass in einer bekannten Kette genau EIN bestimmter Schritt fehlt und nicht irgendeiner passt.",
+    "embodiedMetaphor": "Eine Kette hat eine Werkbank-Lücke: nur ein Ersatzteil passt wirklich genau hinein.",
+    "successInsight": "Ich schaue mir an, was VORHER und NACHHER passiert - nur das passende Teil schließt die Lücke."
+  },
+  "rooms": [
+    {
+      "roomId": "werkbank",
+      "objective": "Ordne die Werkstatt-Abläufe!",
+      "mode": "timeline",
+      "rounds": [
+        {
+          "objective": "Wie wird ein Toast gemacht?",
+          "title": "Der Toast",
+          "events": [
+            { "id": "brot", "label": "Brot wird eingelegt", "emoji": "🍞" },
+            { "id": "toasten", "label": "Toaster wird eingeschaltet", "emoji": "🔥" },
+            { "id": "fertig", "label": "Toast springt heraus", "emoji": "🟤" }
+          ]
+        },
+        {
+          "objective": "Und ein Fahrrad reparieren?",
+          "title": "Die Reifenpanne",
+          "events": [
+            { "id": "loch", "label": "Loch im Reifen finden", "emoji": "🔍" },
+            { "id": "flicken", "label": "Flicken aufkleben", "emoji": "🩹" },
+            { "id": "pumpen", "label": "Reifen aufpumpen", "emoji": "💨" },
+            { "id": "fahren", "label": "Losfahren", "emoji": "🚲" }
+          ]
+        },
+        {
+          "objective": "So wird ein Kuchen fertig!",
+          "title": "Der Werkstatt-Kuchen",
+          "events": [
+            { "id": "zutaten", "label": "Zutaten werden abgewogen", "emoji": "🥣" },
+            { "id": "ruehren", "label": "Teig wird gerührt", "emoji": "🥄" },
+            { "id": "backen", "label": "Kuchen backt im Ofen", "emoji": "🔥" },
+            { "id": "kuehlen", "label": "Kuchen kühlt aus", "emoji": "🧊" }
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": "Die Reihenfolge stimmt!",
+        "wrongOrder": "Diese Karte kommt noch nicht dran. Was passiert davor?",
+        "wrongLink": "Das folgt nicht direkt daraus.",
+        "wrongGap": "Schau dir an, was vorher und nachher passiert.",
+        "tryAgain": "Fang ganz am Anfang an und geh Schritt für Schritt."
+      },
+      "explanationAfterSuccess": "Jeder Ablauf hat feste Schritte - keiner darf übersprungen werden."
+    },
+    {
+      "roomId": "schaltkreis",
+      "objective": "Baue die Ursache-Wirkungs-Ketten! Die erste Karte liegt schon.",
+      "mode": "chain",
+      "rounds": [
+        {
+          "objective": "Was macht der Lichtschalter?",
+          "title": "Der Lichtschalter",
+          "events": [
+            { "id": "schalter", "label": "Schalter wird gedrückt", "emoji": "🔘" },
+            { "id": "strom", "label": "Strom fließt durchs Kabel", "emoji": "⚡" },
+            { "id": "lampe", "label": "Lampe leuchtet auf", "emoji": "💡" }
+          ]
+        },
+        {
+          "objective": "Wie weckt der Wecker?",
+          "title": "Der Wecker",
+          "events": [
+            { "id": "batterie", "label": "Batterie liefert Strom", "emoji": "🔋" },
+            { "id": "zeiger", "label": "Zeiger erreicht die Weckzeit", "emoji": "⏰" },
+            { "id": "klingeln", "label": "Wecker klingelt laut", "emoji": "🔔" },
+            { "id": "aufwachen", "label": "Kind wacht auf", "emoji": "🥱" }
+          ]
+        },
+        {
+          "objective": "Was macht der Roboterarm?",
+          "title": "Der Roboterarm",
+          "events": [
+            { "id": "einschalten", "label": "Strom wird eingeschaltet", "emoji": "🔌" },
+            { "id": "motor", "label": "Motor startet", "emoji": "⚙️" },
+            { "id": "greifen", "label": "Arm greift das Teil", "emoji": "🦾" },
+            { "id": "ablegen", "label": "Teil wird abgelegt", "emoji": "📦" }
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": "Die Kette stimmt!",
+        "wrongOrder": "Das kommt noch nicht dran.",
+        "wrongLink": "Das passiert nicht dadurch. Was folgt wirklich aus der letzten Karte?",
+        "wrongGap": "Schau dir an, was vorher und nachher passiert.",
+        "tryAgain": "Frag dich bei jeder Karte: Passiert das WEGEN der Karte davor?"
+      },
+      "explanationAfterSuccess": "Jedes Glied passiert wegen des vorherigen - eine echte Ursache-Wirkungs-Kette."
+    },
+    {
+      "roomId": "luecke",
+      "objective": "Die Meisterprüfung: finde das fehlende Teil in der Kette!",
+      "mode": "missing-event",
+      "rounds": [
+        {
+          "objective": "Ein Teil der Raketen-Kette fehlt!",
+          "title": "Die Rakete startet",
+          "events": [
+            { "id": "zuendung", "label": "Zündung wird gestartet", "emoji": "🔥" },
+            { "id": "abheben", "label": "Rakete hebt vom Boden ab", "emoji": "🚀" },
+            { "id": "steigen", "label": "Rakete steigt durch die Wolken", "emoji": "☁️" },
+            { "id": "orbit", "label": "Rakete erreicht die Umlaufbahn", "emoji": "🛰️" }
+          ],
+          "gapIndex": 2,
+          "options": [
+            { "id": "steigen", "label": "Rakete steigt durch die Wolken", "emoji": "☁️" },
+            { "id": "landen", "label": "Rakete landet wieder", "emoji": "🛬" },
+            { "id": "start", "label": "Countdown läuft", "emoji": "⏱️" },
+            { "id": "schweben", "label": "Rakete schwebt im All", "emoji": "🌌" }
+          ]
+        },
+        {
+          "objective": "Ein Teil vom Papierflieger fehlt!",
+          "title": "Der Papierflieger fliegt",
+          "events": [
+            { "id": "falten", "label": "Papier wird gefaltet", "emoji": "📄" },
+            { "id": "werfen", "label": "Flieger wird geworfen", "emoji": "🤾" },
+            { "id": "gleiten", "label": "Flieger gleitet durch die Luft", "emoji": "🪽" },
+            { "id": "landen2", "label": "Flieger landet auf dem Boden", "emoji": "🛬" }
+          ],
+          "gapIndex": 1,
+          "options": [
+            { "id": "werfen", "label": "Flieger wird geworfen", "emoji": "🤾" },
+            { "id": "drucken", "label": "Papier wird bedruckt", "emoji": "🖨️" },
+            { "id": "schneiden", "label": "Papier wird zerschnitten", "emoji": "✂️" },
+            { "id": "kleben", "label": "Papier wird geklebt", "emoji": "🧴" }
+          ]
+        },
+        {
+          "objective": "Ein Teil der Fahrstuhl-Kette fehlt!",
+          "title": "Der Fahrstuhl fährt",
+          "events": [
+            { "id": "knopf", "label": "Knopf wird gedrückt", "emoji": "🔘" },
+            { "id": "tueren_zu", "label": "Türen schließen sich", "emoji": "🚪" },
+            { "id": "hochfahren", "label": "Kabine fährt nach oben", "emoji": "⬆️" },
+            { "id": "anhalten", "label": "Kabine hält im Stockwerk", "emoji": "🛑" },
+            { "id": "tueren_auf", "label": "Türen öffnen sich", "emoji": "🚪" }
+          ],
+          "gapIndex": 2,
+          "options": [
+            { "id": "hochfahren", "label": "Kabine fährt nach oben", "emoji": "⬆️" },
+            { "id": "runterfahren", "label": "Kabine fährt nach unten", "emoji": "⬇️" },
+            { "id": "klingeln", "label": "Alarm klingelt", "emoji": "🔔" },
+            { "id": "warten", "label": "Leute warten im Flur", "emoji": "🧍" }
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": "Genau das richtige Ersatzteil!",
+        "wrongOrder": "Das kommt noch nicht dran.",
+        "wrongLink": "Das folgt nicht daraus.",
+        "wrongGap": "Schau dir an, was vorher und nachher passiert - nur ein Teil passt genau.",
+        "tryAgain": "Vergleiche jede Karte mit dem, was direkt davor und danach liegt."
+      },
+      "explanationAfterSuccess": "Nur ein Ersatzteil schließt die Lücke wirklich - alle anderen passen nicht in diese Kette."
+    }
+  ]
+}

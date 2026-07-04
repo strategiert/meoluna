@@ -1,5 +1,6 @@
 import type { MapEngineSpec } from "./mapTypes";
 import { validateMapEngineSpec } from "./mapValidator";
+import { KID_KIT_CORE } from "./kidKit";
 
 export function buildMapWorldCode(spec: MapEngineSpec): string {
   const validation = validateMapEngineSpec(spec);
@@ -16,14 +17,7 @@ import confetti from 'canvas-confetti';
 const SPEC = ${dataJson};
 const DIR_DE = { north: 'Norden', south: 'Sueden', east: 'Osten', west: 'Westen' };
 const DIR_ARROW = { north: '⬆️', south: '⬇️', east: '➡️', west: '⬅️' };
-
-const KID = {
-  skyTop: '#79c7f5', skyBottom: '#e9f8ff', hillBack: '#a8dd8a', hillFront: '#7ec463',
-  band: '#fbe3b2', bandEdge: '#d9b178', ink: '#27324a',
-  coral: '#ff7a59', coralDark: '#c95a3f', blue: '#3f9bf0', blueDark: '#2c79c2',
-  green: '#54b865', greenDark: '#3c8f4b', sun: '#ffd84d', card: '#ffffff',
-};
-
+` + KID_KIT_CORE + `
 function resolvePath(start, steps, rows, cols) {
   let row = start.row; let col = start.col;
   for (const s of steps) {
@@ -34,33 +28,6 @@ function resolvePath(start, steps, rows, cols) {
     }
   }
   return { row, col };
-}
-
-function speak(text) {
-  try { if (!window.speechSynthesis) return; window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text); u.lang = 'de-DE'; u.rate = 0.9; window.speechSynthesis.speak(u);
-  } catch (e) {}
-}
-
-function KidStyles() {
-  return (<style>{"@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap'); .kid-font{font-family:'Baloo 2','Comic Sans MS','Segoe UI',sans-serif;}"}</style>);
-}
-
-function Luno({ mood }) {
-  return (
-    <motion.div animate={mood === 'sad' ? { x: [0, -7, 7, -5, 5, 0] } : mood === 'cheer' ? { y: [0, -16, 0] } : { y: [0, -3, 0] }} transition={mood === 'cheer' ? { duration: 0.5, repeat: 2 } : mood === 'sad' ? { duration: 0.5 } : { duration: 2.4, repeat: Infinity }}>
-      <svg width="68" height="72" viewBox="0 0 74 78" aria-hidden="true">
-        <ellipse cx="37" cy="74" rx="20" ry="4" fill="rgba(39,50,74,0.18)" />
-        <ellipse cx="26" cy="68" rx="7" ry="6" fill="#f3b34c" /><ellipse cx="48" cy="68" rx="7" ry="6" fill="#f3b34c" />
-        <circle cx="37" cy="38" r="30" fill="#fff6e0" stroke="#27324a" strokeWidth="3.5" />
-        <circle cx="27" cy="36" r="5.6" fill="#27324a" /><circle cx="47" cy="36" r="5.6" fill="#27324a" />
-        <circle cx="29" cy="34" r="1.8" fill="#ffffff" /><circle cx="49" cy="34" r="1.8" fill="#ffffff" />
-        <circle cx="19" cy="46" r="4.6" fill="#ffb3a0" opacity="0.85" /><circle cx="55" cy="46" r="4.6" fill="#ffb3a0" opacity="0.85" />
-        {mood === 'sad' ? <path d="M 30 54 Q 37 49 44 54" fill="none" stroke="#27324a" strokeWidth="3.5" strokeLinecap="round" /> : <path d="M 29 51 Q 37 59 45 51" fill="none" stroke="#27324a" strokeWidth="3.5" strokeLinecap="round" />}
-        <path d="M 52 12 Q 60 6 64 14 Q 58 14 56 20 Z" fill="#ffd84d" stroke="#27324a" strokeWidth="2.5" />
-      </svg>
-    </motion.div>
-  );
 }
 
 function Compass() {
@@ -77,55 +44,45 @@ function Compass() {
   );
 }
 
-function SpeechBubble({ text }) {
-  return (
-    <div className="relative mx-auto w-full max-w-3xl">
-      <div className="flex items-center gap-3 rounded-3xl border-4 px-4 py-3 shadow-lg sm:px-6 sm:py-4" style={{ background: KID.card, borderColor: KID.ink }}>
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-2xl" style={{ background: '#fff1c4' }}>🌙</div>
-        <p className="grow text-lg font-bold leading-snug sm:text-2xl" style={{ color: KID.ink }}>{text}</p>
-        <button type="button" onClick={() => speak(text)} aria-label="Vorlesen" className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-2xl transition-transform active:scale-90" style={{ background: KID.blue, boxShadow: '0 4px 0 ' + KID.blueDark }}>🔊</button>
-      </div>
-      <div className="absolute -bottom-3 left-10 h-6 w-6 rotate-45 border-b-4 border-r-4" style={{ background: KID.card, borderColor: KID.ink }} />
-    </div>
-  );
-}
-
-function BigButton({ onClick, color, colorDark, children, disabled }) {
-  return (<button type="button" onClick={onClick} disabled={disabled} className="kid-font min-h-[64px] rounded-3xl px-5 py-3 text-xl font-extrabold text-white transition-all active:translate-y-1 disabled:opacity-40 sm:text-2xl" style={{ background: color, boxShadow: '0 6px 0 ' + colorDark, textShadow: '0 1px 2px rgba(0,0,0,0.25)' }}>{children}</button>);
-}
-
-function StarRow({ stars }) {
-  return (<div className="flex items-center gap-1 rounded-full border-2 px-3 py-1 text-xl" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink }}><span>⭐</span><span className="kid-font font-extrabold">{stars}</span></div>);
-}
-
-function RoundDots({ total, current }) {
-  return (<div className="flex items-center gap-1.5 rounded-full border-2 px-3 py-1.5" style={{ background: KID.card, borderColor: KID.ink }}>{Array.from({ length: total }).map((e, i) => (<div key={i} className="h-3.5 w-3.5 rounded-full border-2" style={{ background: i < current ? KID.green : i === current ? KID.sun : '#e3e8f0', borderColor: KID.ink }} />))}</div>);
-}
-
-function MapGrid({ room, target, startCell, solved, picked, onPick }) {
+function MapGrid({ room, target, startCell, solved, picked, onPick, routeVisited }) {
   const lmAt = {};
   room.landmarks.forEach((lm) => { lmAt[lm.row + ',' + lm.col] = lm; });
+  const visited = routeVisited || [];
   return (
-    <div className="mx-auto grid gap-1.5 rounded-[2rem] border-4 p-3" style={{ borderColor: KID.ink, background: '#eaf6df', gridTemplateColumns: 'repeat(' + room.cols + ', minmax(0,1fr))', maxWidth: room.cols * 84 + 40 }}>
-      {Array.from({ length: room.rows }).map((er, r) => (
-        Array.from({ length: room.cols }).map((ec, c) => {
-          const key = r + ',' + c;
-          const lm = lmAt[key];
-          const isStart = startCell && startCell.row === r && startCell.col === c;
-          const isTarget = solved && target && target.row === r && target.col === c;
-          const isPicked = picked && picked.row === r && picked.col === c;
-          return (
-            <button key={key} type="button" disabled={solved} onClick={() => onPick({ row: r, col: c })} className="kid-font flex aspect-square items-center justify-center rounded-xl border-2 text-2xl font-extrabold transition-all active:translate-y-0.5 disabled:cursor-default sm:text-3xl" style={{ background: isTarget ? KID.green : isStart ? '#ffe7a3' : isPicked ? '#ffd4c8' : KID.card, borderColor: KID.ink }}>
-              {lm ? lm.emoji : isStart ? '🧭' : ''}
-            </button>
-          );
-        })
-      ))}
+    <div className="relative mx-auto" style={{ maxWidth: room.cols * 84 + 40 }}>
+      <div className="grid gap-1.5 rounded-[2rem] border-4 p-3" style={{ borderColor: KID.ink, background: '#eaf6df', gridTemplateColumns: 'repeat(' + room.cols + ', minmax(0,1fr))' }}>
+        {Array.from({ length: room.rows }).map((er, r) => (
+          Array.from({ length: room.cols }).map((ec, c) => {
+            const key = r + ',' + c;
+            const lm = lmAt[key];
+            const isStart = startCell && startCell.row === r && startCell.col === c;
+            const isTarget = solved && target && target.row === r && target.col === c;
+            const isPicked = picked && picked.row === r && picked.col === c;
+            const isVisited = visited.some((v) => v.row === r && v.col === c);
+            return (
+              <button key={key} type="button" disabled={solved} onClick={() => onPick({ row: r, col: c })} className="kid-font flex aspect-square items-center justify-center rounded-xl border-2 text-2xl font-extrabold transition-all active:translate-y-0.5 disabled:cursor-default sm:text-3xl" style={{ background: isTarget || isVisited ? KID.green : isStart ? '#ffe7a3' : isPicked ? '#ffd4c8' : KID.card, borderColor: KID.ink }}>
+                {lm ? lm.emoji : isStart ? '🧭' : ''}
+              </button>
+            );
+          })
+        ))}
+      </div>
+      {visited.length > 1 && (
+        <svg className="pointer-events-none absolute inset-3" viewBox="0 0 100 100" preserveAspectRatio="none" style={{ width: 'calc(100% - 1.5rem)', height: 'calc(100% - 1.5rem)' }}>
+          <polyline points={visited.map((v) => ((v.col + 0.5) / room.cols * 100) + ',' + ((v.row + 0.5) / room.rows * 100)).join(' ')} fill="none" stroke={KID.coral} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      )}
     </div>
   );
 }
 
-function MapRoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
+function routeStationText(room, routeIds) {
+  const stations = routeIds.map((idx) => room.landmarks[idx].emoji + ' ' + room.landmarks[idx].label);
+  if (stations.length === 1) return 'Tippe ' + stations[0] + ' an';
+  return 'Erst zu ' + stations.slice(0, -1).join(', dann zu ') + ', dann zu ' + stations[stations.length - 1];
+}
+
+function MapRoomScene({ room, roomMeta, stars, streak, onStreak, onBack, onComplete, onStar }) {
   const [bubble, setBubble] = useState(room.objective);
   const [mood, setMood] = useState('happy');
   const [roundIndex, setRoundIndex] = useState(0);
@@ -133,19 +90,25 @@ function MapRoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
   const [solved, setSolved] = useState(false);
   const [misses, setMisses] = useState(0);
   const [picked, setPicked] = useState(null);
+  const [routeProgress, setRouteProgress] = useState(0);
+  const [routeVisited, setRouteVisited] = useState([]);
 
   const round = room.rounds[roundIndex];
   const isPath = room.mode === 'path';
+  const isRoute = room.mode === 'route';
   const startLm = isPath ? room.landmarks[round.startIndex] : null;
   const startCell = startLm ? { row: startLm.row, col: startLm.col } : null;
-  const target = isPath
+  const routeCells = isRoute ? round.routeIds.map((idx) => ({ row: room.landmarks[idx].row, col: room.landmarks[idx].col })) : null;
+  const target = isRoute ? null : isPath
     ? resolvePath(startCell, round.steps, room.rows, room.cols)
     : { row: room.landmarks[round.targetIndex].row, col: room.landmarks[round.targetIndex].col };
 
   useEffect(() => {
-    setSolved(false); setMisses(0); setPicked(null);
+    setSolved(false); setMisses(0); setPicked(null); setRouteProgress(0); setRouteVisited([]);
     const r = room.rounds[roundIndex];
-    if (isPath) {
+    if (isRoute) {
+      setBubble((r.objective || room.objective) + ' ' + routeStationText(room, r.routeIds) + '. Tippe die Orte in dieser Reihenfolge an!');
+    } else if (isPath) {
       const sl = room.landmarks[r.startIndex];
       const stepsText = r.steps.map((s) => s.count + ' nach ' + DIR_DE[s.dir]).join(', ');
       setBubble((r.objective || room.objective) + ' Start bei ' + sl.emoji + ' ' + sl.label + ': ' + stepsText + '. Wo kommst du an?');
@@ -155,27 +118,55 @@ function MapRoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
     }
   }, [roundIndex]);
 
+  function finishRound(finalMisses) {
+    setSolved(true); setMood('cheer'); Sound.success();
+    const nextStreak = finalMisses === 0 ? streak + 1 : 0;
+    onStreak(nextStreak);
+    Meoluna.reportScore(10, { action: 'map-round-correct', roomId: room.roomId, roundIndex, mode: room.mode, firstTry: finalMisses === 0 });
+    onStar();
+    if (roundIndex + 1 >= room.rounds.length) {
+      setPhase('done');
+      setBubble(room.feedback.correct + ' ' + room.explanationAfterSuccess);
+      Meoluna.reportScore(25, { action: 'map-room-complete', roomId: room.roomId, mode: room.mode });
+      Meoluna.completeModule(room.roomId, 25);
+      confetti({ particleCount: nextStreak >= 3 ? 160 : 100, spread: 75, origin: { y: 0.6 } });
+    } else {
+      setPhase('roundDone');
+      setBubble(room.feedback.correct + ' Bereit fuer das naechste Ziel?');
+      confetti({ particleCount: nextStreak >= 3 ? 90 : 50, spread: 60, origin: { y: 0.65 } });
+    }
+    setTimeout(() => setMood('happy'), 1200);
+  }
+
   function pickCell(cell) {
     if (solved) return;
+    if (isRoute) {
+      const expected = routeCells[routeProgress];
+      if (expected && cell.row === expected.row && cell.col === expected.col) {
+        const nextVisited = routeVisited.concat([cell]);
+        setRouteVisited(nextVisited);
+        Sound.tone(Sound.noteFor(routeProgress), 0.14);
+        setMood('cheer');
+        setTimeout(() => setMood('happy'), 400);
+        const nextProgress = routeProgress + 1;
+        setRouteProgress(nextProgress);
+        if (nextProgress >= routeCells.length) {
+          finishRound(misses);
+        } else {
+          setBubble('Richtig! Weiter zur naechsten Station.');
+        }
+      } else {
+        const mm = misses + 1; setMisses(mm); setMood('sad'); Sound.miss();
+        setBubble(mm >= 2 ? room.feedback.tryAgain : room.feedback.wrongCell);
+        setTimeout(() => setMood('happy'), 700);
+      }
+      return;
+    }
     setPicked(cell);
     if (target && cell.row === target.row && cell.col === target.col) {
-      setSolved(true); setMood('cheer');
-      Meoluna.reportScore(10, { action: 'map-round-correct', roomId: room.roomId, roundIndex });
-      onStar();
-      if (roundIndex + 1 >= room.rounds.length) {
-        setPhase('done');
-        setBubble(room.feedback.correct + ' ' + room.explanationAfterSuccess);
-        Meoluna.reportScore(25, { action: 'map-room-complete', roomId: room.roomId });
-        Meoluna.completeModule(room.roomId, 25);
-        confetti({ particleCount: 100, spread: 75, origin: { y: 0.6 } });
-      } else {
-        setPhase('roundDone');
-        setBubble(room.feedback.correct + ' Bereit fuer das naechste Ziel?');
-        confetti({ particleCount: 50, spread: 60, origin: { y: 0.65 } });
-      }
-      setTimeout(() => setMood('happy'), 1200);
+      finishRound(misses);
     } else {
-      const mm = misses + 1; setMisses(mm); setMood('sad');
+      const mm = misses + 1; setMisses(mm); setMood('sad'); Sound.miss();
       setBubble(mm >= 2 ? room.feedback.tryAgain : room.feedback.wrongCell);
       setTimeout(() => { setMood('happy'); setPicked(null); }, 700);
     }
@@ -187,16 +178,16 @@ function MapRoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
       <KidStyles />
       <div className="mx-auto flex max-w-5xl flex-col gap-4">
         <div className="flex items-center justify-between gap-3">
-          <button type="button" onClick={onBack} className="rounded-2xl border-2 px-4 py-2 text-lg font-extrabold transition-all active:translate-y-0.5" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink, boxShadow: '0 4px 0 ' + KID.bandEdge }}>← Karte</button>
+          <button type="button" onClick={() => { Sound.thunk(); onBack(); }} className="rounded-2xl border-2 px-4 py-2 text-lg font-extrabold transition-all active:translate-y-0.5" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink, boxShadow: '0 4px 0 ' + KID.bandEdge }}>← Karte</button>
           <div className="flex items-center gap-3">
             <div className="rounded-2xl border-2 px-4 py-2 text-lg font-extrabold" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink }}>{roomMeta.title || room.roomId}</div>
             <Luno mood={mood} />
           </div>
-          <div className="flex items-center gap-2"><RoundDots total={room.rounds.length} current={phase === 'done' ? room.rounds.length : roundIndex} /><StarRow stars={stars} /></div>
+          <div className="flex items-center gap-2"><StreakMeter streak={streak} /><RoundDots total={room.rounds.length} current={phase === 'done' ? room.rounds.length : roundIndex} /><StarRow stars={stars} /><SoundToggle /></div>
         </div>
         <SpeechBubble text={bubble} />
         <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-start sm:justify-center">
-          <MapGrid room={room} target={target} startCell={startCell} solved={solved} picked={picked} onPick={pickCell} />
+          <MapGrid room={room} target={target} startCell={startCell} solved={solved} picked={picked} onPick={pickCell} routeVisited={isRoute ? routeVisited : undefined} />
           <div className="flex shrink-0 flex-col items-center gap-1 rounded-2xl border-4 p-2" style={{ background: KID.card, borderColor: KID.ink }}>
             <Compass />
             <span className="kid-font text-sm font-extrabold" style={{ color: '#8a93a6' }}>Himmelsrichtungen</span>
@@ -205,6 +196,13 @@ function MapRoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
         {isPath && phase !== 'done' && (
           <div className="flex flex-wrap items-center justify-center gap-2">
             {round.steps.map((s, i) => (<span key={i} className="kid-font rounded-2xl border-2 px-3 py-1.5 text-lg font-extrabold" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink }}>{DIR_ARROW[s.dir]} {s.count} {DIR_DE[s.dir]}</span>))}
+          </div>
+        )}
+        {isRoute && phase !== 'done' && (
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            {round.routeIds.map((idx, i) => (
+              <span key={i} className="kid-font rounded-2xl border-2 px-3 py-1.5 text-lg font-extrabold" style={{ background: i < routeProgress ? '#dcf5e1' : KID.card, borderColor: KID.ink, color: KID.ink }}>{i + 1}. {room.landmarks[idx].emoji} {room.landmarks[idx].label}</span>
+            ))}
           </div>
         )}
         {phase === 'roundDone' && (<BigButton onClick={nextRound} color={KID.blue} colorDark={KID.blueDark}>➡️ Naechstes Ziel!</BigButton>)}
@@ -231,13 +229,15 @@ function Hub({ completedRooms, stars, onStart }) {
             const done = completedRooms.includes(room.roomId);
             const locked = index > 0 && !completedRooms.includes(SPEC.rooms[index - 1].roomId);
             const isLast = index === SPEC.rooms.length - 1;
-            const icon = done ? '⭐' : locked ? '🔒' : isLast ? '🏆' : room.mode === 'path' ? '🧭' : '🗺️';
+            const modeIcon = room.mode === 'path' ? '🧭' : room.mode === 'route' ? '🚩' : '🗺️';
+            const icon = done ? '⭐' : locked ? '🔒' : isLast ? '🏆' : modeIcon;
+            const modeLabel = room.mode === 'path' ? 'Weg finden' : room.mode === 'route' ? 'Route planen' : 'suchen';
             return (
               <button key={room.roomId} type="button" disabled={locked} onClick={() => onStart(index)} className="rounded-[1.8rem] border-4 p-5 text-center transition-all active:translate-y-1 disabled:opacity-50" style={{ background: done ? '#e8f9e4' : KID.card, borderColor: KID.ink, boxShadow: '0 6px 0 ' + KID.bandEdge }}>
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full text-3xl" style={{ background: done ? KID.green : locked ? '#dde3ec' : KID.sun }}>{icon}</div>
                 <p className="mt-3 text-xl font-extrabold" style={{ color: KID.ink }}>{meta.title || 'Welt ' + (index + 1)}</p>
                 <p className="mt-1 text-sm font-bold" style={{ color: '#5d6b85' }}>{meta.purpose || room.objective}</p>
-                <p className="mt-2 text-sm font-extrabold" style={{ color: '#8a93a6' }}>{room.rounds.length} Ziele · {room.mode === 'path' ? 'Weg finden' : 'suchen'}</p>
+                <p className="mt-2 text-sm font-extrabold" style={{ color: '#8a93a6' }}>{room.rounds.length} Ziele · {modeLabel}</p>
               </button>
             );
           })}
@@ -251,6 +251,7 @@ export default function App() {
   const [activeRoomIndex, setActiveRoomIndex] = useState(null);
   const [completedRooms, setCompletedRooms] = useState([]);
   const [stars, setStars] = useState(0);
+  const [streak, setStreak] = useState(0);
 
   function completeActiveRoom() {
     const room = SPEC.rooms[activeRoomIndex];
@@ -264,7 +265,7 @@ export default function App() {
   if (activeRoomIndex !== null) {
     const room = SPEC.rooms[activeRoomIndex];
     const roomMeta = SPEC.world.rooms.find((e) => e.id === room.roomId) || {};
-    return (<MapRoomScene key={room.roomId} room={room} roomMeta={roomMeta} stars={stars} onBack={() => setActiveRoomIndex(null)} onComplete={completeActiveRoom} onStar={() => setStars((v) => v + 1)} />);
+    return (<MapRoomScene key={room.roomId} room={room} roomMeta={roomMeta} stars={stars} streak={streak} onStreak={setStreak} onBack={() => setActiveRoomIndex(null)} onComplete={completeActiveRoom} onStar={() => setStars((v) => v + 1)} />);
   }
   return <Hub completedRooms={completedRooms} stars={stars} onStart={setActiveRoomIndex} />;
 }

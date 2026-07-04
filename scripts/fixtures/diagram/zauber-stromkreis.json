@@ -1,0 +1,94 @@
+{
+  "engine": "diagram",
+  "seed": "zauber-stromkreis",
+  "learningBrief": {
+    "inputMode": "curriculum",
+    "subject": "sachunterricht",
+    "gradeLevel": "4",
+    "rawTopic": "Aufbau eines einfachen Stromkreises",
+    "extractedTasks": ["Bauteile eines Stromkreises benennen", "Bauteile im Schaubild finden", "einen vollstaendigen Stromkreis beschriften"],
+    "learningGoals": ["Batterie, Kabel, Lampe, Schalter, Pluspol kennen", "die Bauteile aktiv auf einem Schaubild platzieren"],
+    "likelyMisconceptions": ["Schalter und Batterie verwechseln", "Pluspol und Minuspol vertauschen"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Lunos Stromkreis-Werkstatt",
+    "coreMetaphor": "Luno baut in der Werkstatt einen Stromkreis und benennt jedes Bauteil.",
+    "setting": "Eine kleine Elektro-Werkstatt voller Kabel, Lampen und Batterien.",
+    "visualStyle": { "palette": ["#27324a", "#ffd84d", "#3f9bf0", "#ff7a59", "#54b865"], "mood": "neugierig, hell, technisch", "shapes": "Batterie, Kabel, Lampe, Schalter", "effects": "Konfetti beim Gelingen, Lampe blinkt beim richtigen Tipp" },
+    "guide": { "name": "Luno", "role": "Elektro-Tuefteler", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "kreis", "title": "Der Stromkreis", "purpose": "Bauteile benennen.", "scene": "Einen einfachen Stromkreis beschriften.", "reward": "Strom-Lehrling" },
+      { "id": "pruef", "title": "Der Pruefstand", "purpose": "Bauteile finden.", "scene": "Einen zweiten Stromkreis genau kennen.", "reward": "Strom-Profi" },
+      { "id": "werkstatt", "title": "Die Meister-Werkstatt", "purpose": "Alle Bauteile selbst platzieren.", "scene": "Ein leerer Bauplan wartet auf die Bauteile.", "reward": "Strom-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Kinder kennen die Namen der Bauteile oft nur einzeln, ordnen sie aber nicht sicher der richtigen Stelle im Stromkreis zu.",
+    "embodiedMetaphor": "Jedes Bauteil hat seinen festen Platz im Kreis - erst wenn alle richtig sitzen, fliesst der Strom.",
+    "successInsight": "Ein Stromkreis besteht aus Batterie, Kabel, Lampe und Schalter - jedes Teil hat seinen Platz."
+  },
+  "rooms": [
+    {
+      "roomId": "kreis",
+      "objective": "Benenne das markierte Bauteil!",
+      "mode": "label",
+      "backdrop": "🔌",
+      "caption": "Ein einfacher Stromkreis",
+      "markers": [
+        { "label": "Batterie", "x": 20, "y": 50 },
+        { "label": "Kabel", "x": 50, "y": 20 },
+        { "label": "Lampe", "x": 80, "y": 50 },
+        { "label": "Schalter", "x": 50, "y": 80 },
+        { "label": "Pluspol", "x": 35, "y": 35 }
+      ],
+      "rounds": [
+        { "objective": "Was gibt den Strom?", "markerIndex": 0, "options": ["Batterie", "Lampe", "Schalter"] },
+        { "objective": "Und was leuchtet?", "markerIndex": 2, "options": ["Lampe", "Kabel"] }
+      ],
+      "feedback": { "correct": "Genau benannt!", "wrongSpot": "Schau genau: welches Bauteil macht was im Kreis?", "tryAgain": "Die Batterie gibt den Strom, die Lampe leuchtet." },
+      "explanationAfterSuccess": "Die Batterie liefert den Strom, das Kabel leitet ihn, die Lampe leuchtet, der Schalter schaltet an und aus."
+    },
+    {
+      "roomId": "pruef",
+      "objective": "Finde das Bauteil im Schaubild!",
+      "mode": "find",
+      "backdrop": "🔋",
+      "caption": "Ein zweiter Stromkreis",
+      "markers": [
+        { "label": "Pluspol", "x": 30, "y": 30 },
+        { "label": "Minuspol", "x": 70, "y": 30 },
+        { "label": "Draht", "x": 50, "y": 50 },
+        { "label": "Gluehbirne", "x": 50, "y": 80 },
+        { "label": "Kontakt", "x": 15, "y": 70 }
+      ],
+      "rounds": [
+        { "objective": "Tippe den Draht an.", "targetIndex": 2 },
+        { "objective": "Wo ist die Gluehbirne?", "targetIndex": 3 }
+      ],
+      "feedback": { "correct": "Stark gefunden!", "wrongSpot": "Der Draht verbindet die Pole, die Gluehbirne sitzt am Ende.", "tryAgain": "Folge dem Kabel von Pol zu Pol." },
+      "explanationAfterSuccess": "Pluspol und Minuspol sind die Enden der Batterie, der Draht verbindet sie mit der Gluehbirne."
+    },
+    {
+      "roomId": "werkstatt",
+      "objective": "Platziere alle Bauteile am richtigen Platz!",
+      "mode": "place",
+      "backdrop": "🧰",
+      "caption": "Der leere Bauplan",
+      "markers": [
+        { "label": "Batterie", "x": 50, "y": 15 },
+        { "label": "Schalter", "x": 20, "y": 45 },
+        { "label": "Lampe", "x": 80, "y": 45 },
+        { "label": "Kabel", "x": 50, "y": 70 },
+        { "label": "Pluspol", "x": 50, "y": 45 }
+      ],
+      "rounds": [
+        { "objective": "Setze erst diese drei Bauteile an ihren Platz!", "placeMarkerIds": [0, 1, 2] },
+        { "objective": "Jetzt der ganze Bauplan mit allen Bauteilen!", "placeMarkerIds": [0, 1, 2, 3, 4] }
+      ],
+      "feedback": { "correct": "Genau am richtigen Platz!", "wrongSpot": "Dieses Wort passt nicht zu dieser Stelle. Vergleiche noch einmal genau.", "tryAgain": "Schau dir den Bauplan von oben nach unten an." },
+      "explanationAfterSuccess": "Wenn jedes Bauteil an seinem festen Platz sitzt, ist der Stromkreis vollstaendig und der Strom kann fliessen."
+    }
+  ]
+}

@@ -4,21 +4,24 @@ Du erzeugst eine diagram Lernwelt (Schaubild beschriften) fuer Klasse 2-8: die T
 
 Ein Schaubild hat ein grosses Hintergrund-Symbol (backdrop = ein Emoji fuer das Ganze) und mehrere Marker. Jeder Marker sitzt auf einer relativen Position (x, y in Prozent, 0-100; x: links->rechts, y: oben->unten) und traegt den korrekten Begriff (label).
 
-Zwei Raum-Modi:
+Drei Raum-Modi:
 - "label": eine markierte Stelle ist hervorgehoben, das Kind waehlt den richtigen Begriff aus 2-4 Optionen.
 - "find": ein Begriff ist genannt, das Kind tippt die richtige Stelle auf dem Schaubild an.
+- "place": mehrere Stellen sind leer (nur "?"), eine Wort-Leiste zeigt die passenden Begriffe. Das Kind tippt erst ein Wort, dann die Stelle, zu der es gehoert - so lange, bis alle Woerter sitzen.
 
 Verboten: echte detaillierte Geografie/Anatomie als Pixel-Bild (wir haben nur Marker auf einer Buehne), externe Bild-URLs, reine Textkarten.
 
 Antworte ausschliesslich als valides DiagramEngineSpec JSON:
 {
   "engine": "diagram",
+  "seed": "string optional (kurzer stabiler Text, steuert nur Kosmetik/Theme, nie die Aufgaben)",
   "learningBrief": { "inputMode": "...", "subject": "...", "gradeLevel": "...", "rawTopic": "...", "extractedTasks": ["..."], "learningGoals": ["..."], "likelyMisconceptions": ["..."], "focus": "understand", "confidence": "high" },
   "world": { "worldName": "...", "coreMetaphor": "...", "setting": "...", "visualStyle": { "palette": ["#hex","#hex","#hex","#hex","#hex"], "mood": "...", "shapes": "...", "effects": "..." }, "guide": { "name": "Luno", "role": "...", "personality": "..." }, "rooms": [ { "id": "...", "title": "...", "purpose": "...", "scene": "...", "reward": "..." } ] },
   "concept": { "learningProblem": "...", "embodiedMetaphor": "...", "successInsight": "..." },
   "rooms": [
     { "roomId": "...", "objective": "...", "mode": "label", "backdrop": "ein Emoji", "caption": "kurze Bildunterschrift", "markers": [ { "label": "...", "x": number, "y": number } ], "rounds": [ { "objective": "...", "markerIndex": number, "options": ["...","..."] } ], "feedback": { "correct": "...", "wrongSpot": "...", "tryAgain": "..." }, "explanationAfterSuccess": "..." },
-    { "roomId": "...", "objective": "...", "mode": "find", "backdrop": "ein Emoji", "caption": "...", "markers": [ { "label": "...", "x": number, "y": number } ], "rounds": [ { "objective": "...", "targetIndex": number } ], "feedback": { "correct": "...", "wrongSpot": "...", "tryAgain": "..." }, "explanationAfterSuccess": "..." }
+    { "roomId": "...", "objective": "...", "mode": "find", "backdrop": "ein Emoji", "caption": "...", "markers": [ { "label": "...", "x": number, "y": number } ], "rounds": [ { "objective": "...", "targetIndex": number } ], "feedback": { "correct": "...", "wrongSpot": "...", "tryAgain": "..." }, "explanationAfterSuccess": "..." },
+    { "roomId": "...", "objective": "...", "mode": "place", "backdrop": "ein Emoji", "caption": "...", "markers": [ { "label": "...", "x": number, "y": number } ], "rounds": [ { "objective": "...", "placeMarkerIds": [number, number] } ], "feedback": { "correct": "...", "wrongSpot": "...", "tryAgain": "..." }, "explanationAfterSuccess": "..." }
   ]
 }
 
@@ -27,11 +30,12 @@ Regeln (HART, sonst unspielbar):
 - backdrop ist EIN Emoji, das das Ganze zeigt (🌱 Pflanze, 🔌 Stromkreis, 💧 Wasserkreislauf, 🌍 Erde, 🫀 Koerper ...).
 - label-Modus: markerIndex zeigt auf einen Marker. options 2-4, enthalten den korrekten label, alle verschieden, ALLE aus den labels DIESES Raums (keine fremden Begriffe).
 - find-Modus: targetIndex zeigt auf einen Marker.
+- place-Modus: placeMarkerIds ist eine Liste von 2 bis 5 Indizes in die markers DIESES Raums, alle verschieden, alle gueltig (0 bis Anzahl markers minus 1). Jede Runde darf eine andere Teilmenge der markers verwenden. Gut fuer eine Meisterpruefung als letzte Runde eines Raums: placeMarkerIds mit ALLEN markers des Raums.
 
 Session-Format (10-15 Minuten):
-- 3 bis 6 Raeume, vom Aufwaermen (label mit wenigen Teilen) bis zur Meisterpruefung (find, mehr Teile).
+- 3 bis 6 Raeume, vom Aufwaermen (label mit wenigen Teilen) bis zur Meisterpruefung (place oder find, mehr Teile).
 - Jeder Raum 2 bis 4 Runden, insgesamt mindestens 6 Runden.
-- Mische die Modi: label UND find vertreten.
+- Mische die Modi: label UND find sollten vertreten sein. place ist ein guter Meisterpruefungs-Raum, wenn das Thema mehrere klar benennbare Teile hat.
 
 Qualitaet:
 - Fachlich korrekte Begriffe und plausible Positionen.

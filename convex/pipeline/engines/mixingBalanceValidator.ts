@@ -1,5 +1,15 @@
 import type { MixingEngineSpec, MixingRoom } from "./mixingBalanceTypes";
-import { isBalanceRoom, isRecipeRoom, sumWeights, totalTargetParts } from "./mixingBalanceTypes";
+import {
+  isBalanceRoom,
+  isCompareRoom,
+  isRecipeRoom,
+  sumWeights,
+  totalTargetParts,
+  COMPARE_WEIGHT_MIN,
+  COMPARE_WEIGHT_MAX,
+  COMPARE_STONES_MIN,
+  COMPARE_STONES_MAX,
+} from "./mixingBalanceTypes";
 
 export type MixingValidationResult = {
   passed: boolean;
@@ -11,6 +21,10 @@ const MIN_ROOMS = 2;
 const MAX_ROOMS = 6;
 const MAX_ROUNDS_PER_ROOM = 4;
 const MIN_TOTAL_ROUNDS = 6;
+// Ab so vielen Raeumen muss die Welt mindestens 2 verschiedene Modi nutzen.
+// Geprueft gegen alle 4 Bestands-Fixtures: jede hat nur 2 Raeume, die Regel
+// greift dort also nicht (kein Bestands-Fixture wird dadurch ungueltig).
+const MODE_DIVERSITY_MIN_ROOMS = 3;
 
 function hasText(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
@@ -42,8 +56,12 @@ function roomLabel(room: MixingRoom): string {
 
 function validateFeedback(room: MixingRoom, violations: string[]): void {
   const label = roomLabel(room);
-  // Nur das vom Modus tatsaechlich gerenderte Feedback ist Pflicht.
   if (!hasText(room.feedback?.correct)) violations.push(`E_ROOM_${label}: correct feedback missing`);
+  if (isCompareRoom(room)) {
+    // compare ist ein einzelnes Urteil: nur correct + wrongGuess sind relevant.
+    if (!hasText(room.feedback?.wrongGuess)) violations.push(`E_ROOM_${label}: wrongGuess feedback missing`);
+    return;
+  }
   if (!hasText(room.feedback?.tooMuch)) violations.push(`E_ROOM_${label}: tooMuch feedback missing`);
   if (isRecipeRoom(room) && !hasText(room.feedback?.tooLittle)) violations.push(`E_ROOM_${label}: tooLittle feedback missing`);
   if (isRecipeRoom(room) && !hasText(room.feedback?.wrongMix)) violations.push(`E_ROOM_${label}: wrongMix feedback missing`);
@@ -55,6 +73,9 @@ export function validateMixingEngineSpec(spec: MixingEngineSpec): MixingValidati
 
   if (spec.engine !== "mixing-balance") {
     violations.push("E_ENGINE: engine must be mixing-balance");
+  }
+  if (spec.seed !== undefined && !hasText(spec.seed)) {
+    violations.push("E_SEED: seed must be a non-empty string when present");
   }
 
   if (!hasText(spec.concept?.learningProblem)) {
@@ -162,11 +183,42 @@ export function validateMixingEngineSpec(spec: MixingEngineSpec): MixingValidati
           violations.push(`E_ROOM_${roundLabel}: missing amount ${diff} cannot be built from chips ${room.chips.join(",")}`);
         }
       });
+    } else if (isCompareRoom(room)) {
+      room.rounds.forEach((round, roundIndex) => {
+        const roundLabel = `${label}[${roundIndex}]`;
+        if (
+          !Array.isArray(round.leftWeights) ||
+          round.leftWeights.length < COMPARE_STONES_MIN ||
+          round.leftWeights.length > COMPARE_STONES_MAX ||
+          !round.leftWeights.every((w) => isPositiveInt(w) && w >= COMPARE_WEIGHT_MIN && w <= COMPARE_WEIGHT_MAX)
+        ) {
+          violations.push(`E_ROOM_${roundLabel}: leftWeights needs ${COMPARE_STONES_MIN}-${COMPARE_STONES_MAX} integers between ${COMPARE_WEIGHT_MIN} and ${COMPARE_WEIGHT_MAX}`);
+        }
+        if (
+          !Array.isArray(round.rightWeights) ||
+          round.rightWeights.length < COMPARE_STONES_MIN ||
+          round.rightWeights.length > COMPARE_STONES_MAX ||
+          !round.rightWeights.every((w) => isPositiveInt(w) && w >= COMPARE_WEIGHT_MIN && w <= COMPARE_WEIGHT_MAX)
+        ) {
+          violations.push(`E_ROOM_${roundLabel}: rightWeights needs ${COMPARE_STONES_MIN}-${COMPARE_STONES_MAX} integers between ${COMPARE_WEIGHT_MIN} and ${COMPARE_WEIGHT_MAX}`);
+        }
+        // Keine Zusatzbedingung an die Summen: links schwerer, rechts schwerer
+        // und gleich schwer sind alle erlaubte, eindeutige Ausgaenge.
+      });
     } else {
-      violations.push(`E_ROOM_${label}: mode must be recipe or balance`);
+      violations.push(`E_ROOM_${label}: mode must be recipe, balance or compare`);
     }
 
     validateFeedback(room, violations);
+  }
+
+  // Strukturelle Varianz: ab MODE_DIVERSITY_MIN_ROOMS Raeumen mindestens
+  // 2 verschiedene Modi.
+  if (spec.rooms.length >= MODE_DIVERSITY_MIN_ROOMS) {
+    const distinctModes = new Set(spec.rooms.map((room) => room.mode));
+    if (distinctModes.size < 2) {
+      violations.push(`E_STRUCTURE: worlds with ${MODE_DIVERSITY_MIN_ROOMS}+ rooms need at least 2 distinct modes (got only "${spec.rooms[0]?.mode}")`);
+    }
   }
 
   if (totalRounds < MIN_TOTAL_ROUNDS) {
