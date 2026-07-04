@@ -4,35 +4,43 @@ Du erzeugst eine money Lernwelt (Geld & Bezahlen) fuer Klasse 1-3: mit Euro-Muen
 
 Alle Betraege werden in CENT angegeben (1 € = 100 ct). Erlaubte Stueckelungen (Cent): 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000.
 
-Zwei Raum-Modi:
+Drei Raum-Modi:
 - "pay": das Kind legt genau den Zielbetrag (targetCents) mit den verfuegbaren Stueckelungen (denoms).
 - "change": ein Preis (priceCents) wird mit einem groesseren Betrag (paidCents) bezahlt, das Kind legt das Rueckgeld (paid - price) mit den denoms.
+- "shopping": das Kind bekommt einen Einkaufszettel (buyNames, 1-3 Artikel aus items) und tippt zuerst die richtigen Artikel aus dem Regal in den Korb (falscher Artikel = Fehlversuch), dann legt es die Gesamtsumme der gekauften Artikel mit den denoms.
 
 Verboten: krumme Betraege ueber 20 € (2000 ct), Stueckelungen ausserhalb der Liste, reine Rechenkarten ohne Geldlegen.
 
 Antworte ausschliesslich als valides MoneyEngineSpec JSON:
 {
   "engine": "money",
+  "seed": "kurzer-slug-aus-thema-und-fantasie (optional)",
   "learningBrief": { "inputMode": "...", "subject": "mathematik", "gradeLevel": "...", "rawTopic": "...", "extractedTasks": ["..."], "learningGoals": ["..."], "likelyMisconceptions": ["..."], "focus": "understand", "confidence": "high" },
   "world": { "worldName": "...", "coreMetaphor": "...", "setting": "...", "visualStyle": { "palette": ["#hex","#hex","#hex","#hex","#hex"], "mood": "...", "shapes": "...", "effects": "..." }, "guide": { "name": "Luno", "role": "...", "personality": "..." }, "rooms": [ { "id": "...", "title": "...", "purpose": "...", "scene": "...", "reward": "..." } ] },
   "concept": { "learningProblem": "...", "embodiedMetaphor": "...", "successInsight": "..." },
   "rooms": [
     { "roomId": "...", "objective": "...", "mode": "pay", "rounds": [ { "objective": "...", "targetCents": number, "denoms": [number, number] } ], "feedback": { "correct": "...", "wrongAmount": "...", "tryAgain": "..." }, "explanationAfterSuccess": "..." },
-    { "roomId": "...", "objective": "...", "mode": "change", "rounds": [ { "objective": "...", "priceCents": number, "paidCents": number, "denoms": [number, number] } ], "feedback": { "correct": "...", "wrongAmount": "...", "tryAgain": "..." }, "explanationAfterSuccess": "..." }
+    { "roomId": "...", "objective": "...", "mode": "change", "rounds": [ { "objective": "...", "priceCents": number, "paidCents": number, "denoms": [number, number] } ], "feedback": { "correct": "...", "wrongAmount": "...", "tryAgain": "..." }, "explanationAfterSuccess": "..." },
+    { "roomId": "...", "objective": "...", "mode": "shopping", "rounds": [ { "objective": "...", "items": [ { "name": "...", "emoji": "...", "priceCents": number } ], "buyNames": ["..."], "denoms": [number, number] } ], "feedback": { "correct": "...", "wrongAmount": "...", "wrongItem": "...", "tryAgain": "..." }, "explanationAfterSuccess": "..." }
   ]
 }
+
+Beispiel-Runde "shopping" (Einkaufszettel: Apfel + Keks):
+{ "objective": "Kaufe fuer die Pause ein!", "items": [ { "name": "Apfel", "emoji": "🍎", "priceCents": 40 }, { "name": "Keks", "emoji": "🍪", "priceCents": 35 }, { "name": "Saft", "emoji": "🧃", "priceCents": 90 } ], "buyNames": ["Apfel", "Keks"], "denoms": [5, 10, 20, 50] }
 
 Regeln (HART, sonst unspielbar):
 - Alle Betraege ganzzahlig in Cent, hoechstens 2000 (20 €). denoms nur aus der erlaubten Liste, mindestens eine Stueckelung.
 - pay: targetCents muss mit den denoms EXAKT legbar sein (unbegrenzter Vorrat). Beispiel gut: targetCents 70, denoms [10,20,50]. Schlecht: targetCents 3, denoms [10,20] (nicht legbar).
 - change: paidCents groesser als priceCents; das Rueckgeld (paidCents - priceCents) muss mit den denoms EXAKT legbar sein.
-- Steigere die Schwierigkeit: erst kleine glatte Betraege mit grossen Muenzen, dann gemischte Betraege, dann Rueckgeld.
+- shopping: items hat 2 bis 6 Artikel mit eindeutigem name, emoji und priceCents (1 bis 2000 ct). buyNames ist eine ECHTE Teilmenge von items (1 bis 3 Artikel, keine Duplikate). Die Summe der gekauften Artikel muss mit den denoms EXAKT legbar sein und darf 2000 ct nicht ueberschreiten. feedback.wrongItem ist optional (Text bei falschem Artikel im Korb), sonst wird wrongAmount verwendet.
+- Steigere die Schwierigkeit: erst kleine glatte Betraege mit grossen Muenzen, dann gemischte Betraege, dann Rueckgeld oder Einkaufszettel mit mehreren Artikeln.
 - Damit es legbar bleibt: nimm immer mindestens eine kleine Stueckelung (1, 2 oder 5 ct) in denoms, wenn der Betrag nicht glatt durch die groesseren teilbar ist.
+- seed: kurzer kleingeschriebener Slug (thema-fantasiewort), variiert Hintergrund-Welt und Farben. Erfinde ihn frei.
 
 Session-Format (10-15 Minuten):
-- 3 bis 6 Raeume, vom Aufwaermen (glatte Betraege legen) bis zur Meisterpruefung (Rueckgeld geben).
+- 3 bis 6 Raeume, vom Aufwaermen (glatte Betraege legen) bis zur Meisterpruefung (Rueckgeld geben oder groesserer Einkaufszettel).
 - Jeder Raum 2 bis 4 Runden, insgesamt mindestens 6 Runden.
-- Mische die Modi: pay UND change vertreten.
+- Mische die Modi: pay UND change vertreten. Setze shopping gezielt ein, wenn ein Einkaufs-Szenario im Thema steckt.
 
 Qualitaet:
 - Verankere in echten Einkaufs-Szenen (Apfel 60 ct, Brot 1,20 € ...).

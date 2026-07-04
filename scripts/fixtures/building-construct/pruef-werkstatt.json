@@ -1,0 +1,123 @@
+{
+  "engine": "building-construct",
+  "seed": "pruef-werkstatt",
+  "learningBrief": {
+    "inputMode": "curriculum",
+    "subject": "mathematik",
+    "gradeLevel": "2",
+    "rawTopic": "Flächen bauen, Formen zusammensetzen und Baupläne genau prüfen",
+    "extractedTasks": ["Rechtecke im Raster bauen", "Figuren aus Formen zusammensetzen", "einen Bauplan genau kontrollieren"],
+    "learningGoals": ["Breite mal Höhe als Fläche verstehen", "Figuren in Grundformen zerlegen", "eine Abweichung vom Plan erkennen"],
+    "likelyMisconceptions": ["Farbe und Form werden verwechselt", "eine falsche Stelle wird für richtig gehalten, weil die Form stimmt"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Die Bau-Prüfer",
+    "coreMetaphor": "Erst wird gebaut, dann wird jeder Bauplan streng kontrolliert.",
+    "setting": "Eine kleine Baustelle mit Beeten, Häusern und einer Prüf-Werkstatt.",
+    "visualStyle": {
+      "palette": ["#79c7f5", "#8fd16c", "#ffd84d", "#d9a05e", "#27324a"],
+      "mood": "hell, ordentlich, konzentriert",
+      "shapes": "Raster-Beete, Häuser, geprüfte Bauwerke",
+      "effects": "Konfetti beim Gelingen, roter Blitz beim falschen Tipp"
+    },
+    "guide": { "name": "Luno", "role": "Bauprüfer", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "beet", "title": "Beet anlegen", "purpose": "Maße einstellen: breit und hoch.", "scene": "Kleine Beete im Raster.", "reward": "Beet-Lehrling" },
+      { "id": "haus", "title": "Häuser bauen", "purpose": "Figuren aus Formen zusammensetzen.", "scene": "Haus und Baum aus Grundformen.", "reward": "Formen-Baumeister" },
+      { "id": "kontrolle", "title": "Die Prüf-Werkstatt", "purpose": "Einen fertigen Bauplan genau kontrollieren.", "scene": "Ein Stein passt nicht zum Plan.", "reward": "Bau-Prüfer" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Das Kind baut zwar korrekt, prüft ein fertiges Bauwerk aber nicht genau genug gegen den eigentlichen Plan.",
+    "embodiedMetaphor": "Erst selbst bauen, dann wie ein echter Prüfer jedes Teil mit dem Plan vergleichen.",
+    "successInsight": "Ein guter Bauplan hat für jeden Stein eine genaue Form, Farbe und Stelle - weicht nur eine Sache ab, muss man sie finden."
+  },
+  "rooms": [
+    {
+      "roomId": "beet",
+      "objective": "Stelle das Beet genau richtig ein!",
+      "mode": "area",
+      "grid": { "cols": 6, "rows": 5 },
+      "tileEmoji": "🌱",
+      "rounds": [
+        { "objective": "Baue ein Beet: 3 breit und 2 hoch!", "goal": { "type": "exact", "width": 3, "height": 2 } },
+        { "objective": "Baue ein Beet mit genau 8 Feldern!", "goal": { "type": "area", "area": 8 } },
+        { "objective": "Baue ein Beet mit genau 12 Zaunteilen!", "goal": { "type": "perimeter", "perimeter": 12 } }
+      ],
+      "feedback": {
+        "correct": "Genau richtig gebaut!",
+        "tooSmall": "Dein Beet ist noch zu klein. Schau auf das Ziel und baue weiter.",
+        "tooBig": "Dein Beet ist zu groß geworden. Mach es wieder kleiner.",
+        "wrongShape": "Die Felderzahl stimmt, aber Breite und Höhe sind vertauscht oder anders. Schau genau hin!"
+      },
+      "explanationAfterSuccess": "Breite und Höhe bestimmen das Beet. 3 breit und 2 hoch sind 2 Reihen mit je 3 Feldern."
+    },
+    {
+      "roomId": "haus",
+      "objective": "Baue die Gebäude aus den richtigen Teilen!",
+      "mode": "compose",
+      "rounds": [
+        {
+          "objective": "Baue das Haus: erst die Wand, dann das Dach!",
+          "figureName": "Haus",
+          "slots": [
+            { "shape": "rectangle", "x": 28, "y": 50, "w": 44, "h": 36, "color": "#ffd9a8" },
+            { "shape": "triangle", "x": 24, "y": 26, "w": 52, "h": 24, "color": "#ff9d7a" }
+          ]
+        },
+        {
+          "objective": "Baue den Baum: erst der Stamm, dann die Krone!",
+          "figureName": "Baum",
+          "slots": [
+            { "shape": "rectangle", "x": 44, "y": 56, "w": 12, "h": 30, "color": "#c98d4f" },
+            { "shape": "circle", "x": 27, "y": 16, "w": 46, "h": 44, "color": "#8fd16c" }
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": "Das Gebäude steht!",
+        "tooSmall": "Da fehlt noch ein Teil.",
+        "tooBig": "Das ist ein Teil zu viel.",
+        "wrongShape": "Das Teil passt hier nicht. Schau auf die gestrichelte Form: welches Teil hat diese Form?"
+      },
+      "explanationAfterSuccess": "Ein Haus ist ein Rechteck mit einem Dreieck obendrauf. Formen stecken überall!"
+    },
+    {
+      "roomId": "kontrolle",
+      "objective": "Finde den Stein, der nicht zum Bauplan passt!",
+      "mode": "find-error",
+      "rounds": [
+        {
+          "objective": "Dieses Haus wurde falsch gebaut. Welcher Stein stimmt nicht?",
+          "figureName": "Haus",
+          "slots": [
+            { "shape": "rectangle", "x": 28, "y": 50, "w": 44, "h": 36, "color": "#ffd9a8" },
+            { "shape": "triangle", "x": 24, "y": 26, "w": 52, "h": 24, "color": "#5aa7f0" }
+          ],
+          "errorIndex": 1,
+          "correctSlot": { "shape": "triangle", "x": 24, "y": 26, "w": 52, "h": 24, "color": "#ff9d7a" }
+        },
+        {
+          "objective": "Diese Rakete wurde falsch gebaut. Welcher Stein stimmt nicht?",
+          "figureName": "Rakete",
+          "slots": [
+            { "shape": "rectangle", "x": 39, "y": 34, "w": 22, "h": 42, "color": "#e8edf5" },
+            { "shape": "triangle", "x": 39, "y": 12, "w": 22, "h": 22, "color": "#ff7a59" },
+            { "shape": "circle", "x": 58, "y": 44, "w": 12, "h": 12, "color": "#9ecbff" }
+          ],
+          "errorIndex": 2,
+          "correctSlot": { "shape": "circle", "x": 44, "y": 44, "w": 12, "h": 12, "color": "#9ecbff" }
+        }
+      ],
+      "feedback": {
+        "correct": "Genau der richtige Stein!",
+        "tooSmall": "Dieses Feedback wird in diesem Modus nicht angezeigt.",
+        "tooBig": "Dieses Feedback wird in diesem Modus nicht angezeigt.",
+        "wrongShape": "Dieser Stein stimmt schon mit dem Bauplan überein. Vergleiche Farbe und Stelle noch einmal genau."
+      },
+      "explanationAfterSuccess": "Ein Bauplan legt für jeden Stein Form, Farbe und Stelle fest. Ein guter Prüfer vergleicht alle drei genau."
+    }
+  ]
+}

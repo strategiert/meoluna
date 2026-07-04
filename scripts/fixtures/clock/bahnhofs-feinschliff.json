@@ -1,0 +1,67 @@
+{
+  "engine": "clock",
+  "seed": "bahnhofs-feinschliff",
+  "learningBrief": {
+    "inputMode": "freitext",
+    "subject": "mathematik",
+    "gradeLevel": "3",
+    "rawTopic": "Uhrzeiten fein stellen und mit Dauer rechnen",
+    "extractedTasks": ["Uhrzeiten ablesen", "Uhr in 5-Minuten-Schritten stellen", "Ankunftszeit aus Start und Dauer berechnen"],
+    "learningGoals": ["die Uhr praezise stellen", "Endzeiten aus Start und Dauer berechnen"],
+    "likelyMisconceptions": ["bei der Dauer den Stundenuebertrag vergessen", "beim Stellen zu grob raten statt gezielt zu zaehlen"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Der Bahnhof von Luno",
+    "coreMetaphor": "Auf dem Bahnhof haelt Luno alle Uhren genau und berechnet, wann die Zuege ankommen.",
+    "setting": "Ein belebter kleiner Bahnhof mit grossen Uhren auf jedem Bahnsteig.",
+    "visualStyle": { "palette": ["#27324a", "#3f9bf0", "#ffd84d", "#54b865", "#ff7a59"], "mood": "geschaeftig, freundlich, praezise", "shapes": "Zifferblaetter, Fahrplantafeln, Zuege", "effects": "Konfetti beim Gelingen" },
+    "guide": { "name": "Luno", "role": "Bahnhofsvorsteher", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "ablesen", "title": "Die Bahnsteiguhr", "purpose": "Uhrzeiten ablesen.", "scene": "Welche Uhrzeit zeigt die grosse Bahnsteiguhr?", "reward": "Ablese-Profi" },
+      { "id": "feinstellen", "title": "Die Werkstattuhr", "purpose": "Die Uhr in feinen Schritten stellen.", "scene": "Luno repariert die Uhr - stelle sie genau ein.", "reward": "Fein-Steller" },
+      { "id": "fahrplan", "title": "Der Fahrplan", "purpose": "Ankunftszeiten berechnen.", "scene": "Ein Zug faehrt ab - wann kommt er an?", "reward": "Fahrplan-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Kinder stellen Uhren oft nur grob und vergessen beim Rechnen mit Dauer den Uebertrag auf die naechste Stunde.",
+    "embodiedMetaphor": "Wie ein Bahnhofsvorsteher zaehlst du jede Minute genau, damit kein Zug zu frueh oder zu spaet ankommt.",
+    "successInsight": "Wenn ich Minute fuer Minute genau zaehle, kenne ich die Uhrzeit immer exakt - egal ob ich sie ablese, stelle oder berechne."
+  },
+  "rooms": [
+    {
+      "roomId": "ablesen",
+      "objective": "Lies die Bahnsteiguhr ab!",
+      "mode": "read",
+      "rounds": [
+        { "objective": "Wie spaet ist es?", "hour": 9, "minute": 0, "options": [ { "hour": 9, "minute": 0 }, { "hour": 10, "minute": 0 }, { "hour": 9, "minute": 30 } ] },
+        { "objective": "Und jetzt?", "hour": 4, "minute": 30, "options": [ { "hour": 4, "minute": 30 }, { "hour": 4, "minute": 0 }, { "hour": 5, "minute": 30 } ] }
+      ],
+      "feedback": { "correct": "Genau abgelesen!", "wrongTime": "Schau zuerst auf den kleinen Zeiger - der zeigt die Stunde.", "tryAgain": "Kleiner Zeiger zuerst, dann der grosse fuer die Minuten." },
+      "explanationAfterSuccess": "Der kleine Zeiger zeigt die Stunde, der grosse die Minuten."
+    },
+    {
+      "roomId": "feinstellen",
+      "objective": "Stelle die Werkstattuhr genau ein!",
+      "mode": "set",
+      "rounds": [
+        { "objective": "Stelle die Uhr auf 6:25.", "hour": 6, "minute": 25, "minuteStep": 5 },
+        { "objective": "Stelle die Uhr auf 11:10.", "hour": 11, "minute": 10, "minuteStep": 5 }
+      ],
+      "feedback": { "correct": "Perfekt eingestellt!", "wrongTime": "Zaehle in Fuenferschritten weiter, bis die Minute stimmt.", "tryAgain": "Stelle erst die Stunde, dann zaehle die Minuten in Fuenferschritten." },
+      "explanationAfterSuccess": "Mit Fuenferschritten kannst du die Uhr ganz genau stellen, nicht nur auf volle Viertelstunden."
+    },
+    {
+      "roomId": "fahrplan",
+      "objective": "Berechne die Ankunftszeit!",
+      "mode": "duration",
+      "rounds": [
+        { "objective": "Der Zug faehrt um 8:00 ab und braucht 45 Minuten. Wann kommt er an?", "startHour": 8, "startMinute": 0, "durationMinutes": 45, "options": [ { "hour": 8, "minute": 45 }, { "hour": 9, "minute": 0 }, { "hour": 8, "minute": 30 } ] },
+        { "objective": "Die zweite Bahn faehrt um 11:30 ab und braucht 40 Minuten. Wann kommt sie an?", "startHour": 11, "startMinute": 30, "durationMinutes": 40, "options": [ { "hour": 12, "minute": 10 }, { "hour": 11, "minute": 50 }, { "hour": 12, "minute": 0 } ] }
+      ],
+      "feedback": { "correct": "Fahrplan stimmt genau!", "wrongTime": "Zaehle die Dauer Minute fuer Minute von der Startzeit weiter.", "tryAgain": "Wenn die Minuten ueber 60 gehen, wird daraus eine volle Stunde mehr." },
+      "explanationAfterSuccess": "Endzeit = Startzeit plus Dauer - geht die Minutenzahl ueber 60, zaehlt eine Stunde mehr dazu."
+    }
+  ]
+}

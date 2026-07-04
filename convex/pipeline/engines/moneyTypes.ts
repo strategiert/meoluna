@@ -1,6 +1,7 @@
 import type { LearningBrief, WorldSpec } from "./movementSpaceTypes";
 
-export type MoneyMode = "pay" | "change";
+// v2: "shopping" kommt additiv zu pay/change dazu. Alte Specs bleiben gueltig.
+export type MoneyMode = "pay" | "change" | "shopping";
 
 // Euro-Stueckelung in Cent (Muenzen + kleine Scheine).
 export const EURO_DENOMS = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000];
@@ -20,12 +21,31 @@ export type ChangeRound = {
   denoms: number[];
 };
 
-export type MoneyRound = PayRound | ChangeRound;
+// Ein Artikel im Regal (shopping-Modus).
+export type ShoppingItem = {
+  name: string;
+  emoji: string;
+  priceCents: number;
+};
+
+// shopping: das Kind waehlt zuerst die richtigen Artikel (buyNames, Teilmenge
+// von items) in den Korb, dann legt es die Gesamtsumme mit Muenzen/Scheinen.
+export type ShoppingRound = {
+  objective?: string;
+  items: ShoppingItem[];
+  buyNames: string[]; // Teilmenge von items[].name, 1-3 Artikel = der Einkaufsauftrag
+  denoms: number[];
+};
+
+export type MoneyRound = PayRound | ChangeRound | ShoppingRound;
 
 export type MoneyFeedback = {
   correct: string;
   wrongAmount: string;
   tryAgain: string;
+  // shopping: falscher Artikel im Korb. Optional, faellt sonst auf
+  // wrongAmount zurueck (additiv, bestehende Fixtures bleiben gueltig).
+  wrongItem?: string;
 };
 
 export type MoneyRoom = {
@@ -39,6 +59,9 @@ export type MoneyRoom = {
 
 export type MoneyEngineSpec = {
   engine: "money";
+  // Optional: deterministischer Seed fuer Kosmetik-Varianz (Theme, Deko).
+  // Fehlt er, faellt der Renderer auf worldName zurueck.
+  seed?: string;
   learningBrief: LearningBrief;
   world: WorldSpec;
   concept: {

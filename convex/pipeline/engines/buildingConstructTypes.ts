@@ -1,6 +1,6 @@
 import type { LearningBrief, WorldSpec } from "./movementSpaceTypes";
 
-export type BuildingMode = "area" | "compose";
+export type BuildingMode = "area" | "compose" | "find-error";
 
 // Ziel eines Raster-Bau-Auftrags: exakte Maße, Ziel-Fläche (mehrere Lösungen
 // möglich -> Faktoren-Verständnis) oder Ziel-Umfang (Zaun).
@@ -32,6 +32,18 @@ export type BuildingComposeRound = {
   slots: BuildingSlot[];
 };
 
+// find-error: die fertig gebaute Figur wird gezeigt, slots[errorIndex] weicht
+// vom Bauplan ab (Farbe ODER Position, nie Form/Größe). correctSlot ist die
+// Bauplan-Variante des abweichenden Steins - die Abweichung steht explizit im
+// Spec, nichts wird zur Laufzeit erraten.
+export type BuildingFindErrorRound = {
+  objective?: string;
+  figureName: string;
+  slots: BuildingSlot[];
+  errorIndex: number;
+  correctSlot: BuildingSlot;
+};
+
 export type BuildingFeedback = {
   correct: string;
   tooSmall: string;
@@ -59,10 +71,22 @@ export type BuildingComposeRoom = {
   explanationAfterSuccess: string;
 };
 
-export type BuildingRoom = BuildingAreaRoom | BuildingComposeRoom;
+export type BuildingFindErrorRoom = {
+  roomId: string;
+  objective: string;
+  mode: "find-error";
+  rounds: BuildingFindErrorRound[];
+  feedback: BuildingFeedback;
+  explanationAfterSuccess: string;
+};
+
+export type BuildingRoom = BuildingAreaRoom | BuildingComposeRoom | BuildingFindErrorRoom;
 
 export type BuildingEngineSpec = {
   engine: "building-construct";
+  // Optional: deterministischer Seed fuer Kosmetik-Varianz (Theme, Deko,
+  // Bau-Pool-Reihenfolge). Fehlt er, faellt der Renderer auf worldName zurueck.
+  seed?: string;
   learningBrief: LearningBrief;
   world: WorldSpec;
   concept: {
@@ -79,6 +103,10 @@ export function isAreaRoom(room: BuildingRoom): room is BuildingAreaRoom {
 
 export function isComposeRoom(room: BuildingRoom): room is BuildingComposeRoom {
   return room.mode === "compose";
+}
+
+export function isFindErrorRoom(room: BuildingRoom): room is BuildingFindErrorRoom {
+  return room.mode === "find-error";
 }
 
 export const BUILDING_SHAPES: BuildingShape[] = ["square", "rectangle", "triangle", "circle", "semicircle"];

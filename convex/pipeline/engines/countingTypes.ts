@@ -1,6 +1,8 @@
 import type { LearningBrief, WorldSpec } from "./movementSpaceTypes";
 
-export type CountMode = "count" | "make" | "compare";
+// v2: ten-frame (Zehnerfeld) und make-equal (Mengen angleichen) kommen
+// additiv zu count/make/compare dazu. Alte Specs bleiben gueltig.
+export type CountMode = "count" | "make" | "compare" | "ten-frame" | "make-equal";
 
 // count: N Objekte erscheinen, Kind tippt die richtige Anzahl.
 export type CountRound = {
@@ -24,6 +26,22 @@ export type CompareRound = {
   rightEmoji: string;
   rightCount: number;
   ask: "more" | "less" | "equal"; // wonach gefragt wird
+};
+
+// ten-frame: Zehnerfeld (2 Reihen a 5 Felder). Kind tippt leere Felder an, bis
+// genau target Felder gefuellt sind (Tipp auf gefuelltes Feld leert es wieder).
+export type TenFrameRound = {
+  objective?: string;
+  target: number; // 1-10
+};
+
+// make-equal: links eine feste Menge, rechts eine Start-Menge. Kind gleicht
+// rechts per Hinzufuegen/Wegnehmen an, bis beide Seiten gleich viele sind.
+export type MakeEqualRound = {
+  objective?: string;
+  element: string; // ein Emoji, auf beiden Seiten gleich
+  leftCount: number;  // 1-10, feste linke Menge
+  rightStart: number; // 0-10, Start-Menge rechts, != leftCount
 };
 
 export type CountFeedback = {
@@ -60,10 +78,31 @@ export type CountCompareRoom = {
   explanationAfterSuccess: string;
 };
 
-export type CountRoom = CountCountRoom | CountMakeRoom | CountCompareRoom;
+export type CountTenFrameRoom = {
+  roomId: string;
+  objective: string;
+  mode: "ten-frame";
+  rounds: TenFrameRound[];
+  feedback: CountFeedback;
+  explanationAfterSuccess: string;
+};
+
+export type CountMakeEqualRoom = {
+  roomId: string;
+  objective: string;
+  mode: "make-equal";
+  rounds: MakeEqualRound[];
+  feedback: CountFeedback;
+  explanationAfterSuccess: string;
+};
+
+export type CountRoom = CountCountRoom | CountMakeRoom | CountCompareRoom | CountTenFrameRoom | CountMakeEqualRoom;
 
 export type CountEngineSpec = {
   engine: "counting";
+  // Optional: deterministischer Seed fuer Kosmetik-Varianz (Theme, Deko).
+  // Fehlt er, faellt der Renderer auf worldName zurueck.
+  seed?: string;
   learningBrief: LearningBrief;
   world: WorldSpec;
   concept: {
@@ -82,6 +121,12 @@ export function isMakeRoom(room: CountRoom): room is CountMakeRoom {
 }
 export function isCompareRoom(room: CountRoom): room is CountCompareRoom {
   return room.mode === "compare";
+}
+export function isTenFrameRoom(room: CountRoom): room is CountTenFrameRoom {
+  return room.mode === "ten-frame";
+}
+export function isMakeEqualRoom(room: CountRoom): room is CountMakeEqualRoom {
+  return room.mode === "make-equal";
 }
 
 export const COUNT_MAX = 20;

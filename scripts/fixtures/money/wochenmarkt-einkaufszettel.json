@@ -1,0 +1,88 @@
+{
+  "engine": "money",
+  "seed": "wochenmarkt-einkaufszettel",
+  "learningBrief": {
+    "inputMode": "curriculum",
+    "subject": "mathematik",
+    "gradeLevel": "2",
+    "rawTopic": "Mit Einkaufszettel einkaufen, richtige Artikel waehlen und genau bezahlen",
+    "extractedTasks": ["Artikel nach Einkaufszettel auswaehlen", "Gesamtsumme berechnen und legen", "Rueckgeld geben"],
+    "learningGoals": ["mehrere Preise zu einer Summe addieren", "nur die richtigen Artikel kaufen", "Wechselgeld bestimmen"],
+    "likelyMisconceptions": ["falsche Artikel mit einpacken", "Summe mehrerer Artikel falsch addieren"],
+    "focus": "practice",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Lunos Einkaufszettel",
+    "coreMetaphor": "Luno geht mit einem Einkaufszettel durch den Wochenmarkt und muss genau die richtigen Sachen einpacken und bezahlen.",
+    "setting": "Ein bunter Marktstand mit Obst, Brot und kleinen Leckereien.",
+    "visualStyle": { "palette": ["#27324a", "#54b865", "#ffd84d", "#ff7a59", "#3f9bf0"], "mood": "warm, lebhaft, ordentlich", "shapes": "Einkaufszettel, Regal, Muenzen", "effects": "Konfetti beim Gelingen" },
+    "guide": { "name": "Luno", "role": "Markt-Einkaeufer", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "kiosk", "title": "Am Kiosk", "purpose": "Glatte Betraege legen.", "scene": "Kleine Preise zum Aufwaermen.", "reward": "Muenz-Lehrling" },
+      { "id": "regal", "title": "Das Marktregal", "purpose": "Nach Einkaufszettel einkaufen und bezahlen.", "scene": "Nur die richtigen Artikel einpacken!", "reward": "Einkaufs-Profi" },
+      { "id": "kasse", "title": "Meisterpruefung an der Kasse", "purpose": "Rueckgeld richtig geben.", "scene": "Du stehst heute an der Kasse.", "reward": "Markt-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Kinder packen manchmal falsche Artikel ein oder verrechnen sich beim Zusammenzaehlen mehrerer Preise.",
+    "embodiedMetaphor": "Ein Einkaufszettel sagt genau, was in den Korb kommt - erst waehlen, dann die Summe legen.",
+    "successInsight": "Erst pruefen, ob der Artikel auf dem Zettel steht, dann die Preise zusammenzaehlen und genau bezahlen."
+  },
+  "rooms": [
+    {
+      "roomId": "kiosk",
+      "objective": "Lege den Betrag genau!",
+      "mode": "pay",
+      "rounds": [
+        { "objective": "Sticker fuer 50 ct.", "targetCents": 50, "denoms": [10, 20, 50] },
+        { "objective": "Radiergummi fuer 80 ct.", "targetCents": 80, "denoms": [10, 20, 50] }
+      ],
+      "feedback": { "correct": "Genau bezahlt!", "wrongAmount": "Zaehle die Muenzen zusammen.", "tryAgain": "Lege grosse Muenzen zuerst, dann fuelle mit kleinen auf." },
+      "explanationAfterSuccess": "50 + 20 + 10 = 80 ct - die Muenzen zusammen ergeben genau den Preis."
+    },
+    {
+      "roomId": "regal",
+      "objective": "Kaufe genau die Artikel vom Einkaufszettel!",
+      "mode": "shopping",
+      "rounds": [
+        {
+          "objective": "Der erste Einkaufszettel!",
+          "items": [
+            { "name": "Apfel", "emoji": "🍎", "priceCents": 40 },
+            { "name": "Brot", "emoji": "🍞", "priceCents": 120 },
+            { "name": "Milch", "emoji": "🥛", "priceCents": 85 },
+            { "name": "Keks", "emoji": "🍪", "priceCents": 35 }
+          ],
+          "buyNames": ["Apfel", "Keks"],
+          "denoms": [5, 10, 20, 50]
+        },
+        {
+          "objective": "Noch ein Einkaufszettel!",
+          "items": [
+            { "name": "Birne", "emoji": "🍐", "priceCents": 45 },
+            { "name": "Brezel", "emoji": "🥨", "priceCents": 60 },
+            { "name": "Kaese", "emoji": "🧀", "priceCents": 150 },
+            { "name": "Ei", "emoji": "🥚", "priceCents": 25 },
+            { "name": "Saft", "emoji": "🧃", "priceCents": 90 }
+          ],
+          "buyNames": ["Brezel", "Ei"],
+          "denoms": [5, 10, 20, 50]
+        }
+      ],
+      "feedback": { "correct": "Perfekt eingekauft!", "wrongAmount": "Zaehle die Preise der gekauften Artikel zusammen.", "wrongItem": "Das steht nicht auf deinem Einkaufszettel! Schau nochmal nach.", "tryAgain": "Lies den Einkaufszettel noch einmal genau durch." },
+      "explanationAfterSuccess": "Erst pruefen, was auf dem Zettel steht, dann die Preise zusammenzaehlen - so kaufst du genau richtig ein."
+    },
+    {
+      "roomId": "kasse",
+      "objective": "Gib das richtige Rueckgeld!",
+      "mode": "change",
+      "rounds": [
+        { "objective": "Preis 60 ct, bezahlt 1 €.", "priceCents": 60, "paidCents": 100, "denoms": [10, 20] },
+        { "objective": "Preis 1,50 €, bezahlt 2 €.", "priceCents": 150, "paidCents": 200, "denoms": [10, 20, 50] }
+      ],
+      "feedback": { "correct": "Meisterhaft gewechselt!", "wrongAmount": "Rueckgeld = bezahlt minus Preis. Lege genau diesen Rest.", "tryAgain": "Rechne: bezahlt minus Preis. Lege genau so viel zurueck." },
+      "explanationAfterSuccess": "Rueckgeld ist der Rest: bezahlt minus Preis - den legst du der Kundin zurueck."
+    }
+  ]
+}

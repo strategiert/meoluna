@@ -1,0 +1,67 @@
+{
+  "engine": "counting",
+  "seed": "keks-werkstatt",
+  "learningBrief": {
+    "inputMode": "curriculum",
+    "subject": "mathematik",
+    "gradeLevel": "1",
+    "rawTopic": "Zehnerfeld aufbauen und Mengen angleichen",
+    "extractedTasks": ["Zehnerfeld fuellen", "Mengen angleichen", "Anzahl bestimmen"],
+    "learningGoals": ["das Zehner-Bild fuer Mengen bis 10 aufbauen", "erkennen wie viele fehlen oder zu viel sind"],
+    "likelyMisconceptions": ["beim Zehnerfeld Felder doppelt oder gar nicht zaehlen", "beim Angleichen nur in eine Richtung denken (nur hinzufuegen)"],
+    "focus": "understand",
+    "confidence": "high"
+  },
+  "world": {
+    "worldName": "Die Keks-Werkstatt",
+    "coreMetaphor": "In der Werkstatt fuellt Luno das Zehnerblech und gleicht Keksdosen an, bis alles genau passt.",
+    "setting": "Eine gemuetliche Backstube mit einem großen Zehner-Backblech und zwei Keksdosen.",
+    "visualStyle": { "palette": ["#79c7f5", "#ffd84d", "#d9a05e", "#8fd16c", "#27324a"], "mood": "hell, gemuetlich, freundlich", "shapes": "Kekse, Backbleche, Dosen", "effects": "Kekse ploppen rein, Konfetti beim Gelingen" },
+    "guide": { "name": "Luno", "role": "Werkstatt-Baecker", "personality": "kurz, warm, ermutigend" },
+    "rooms": [
+      { "id": "zehnerfeld", "title": "Das Zehnerblech", "purpose": "Genau so viele Felder fuellen.", "scene": "Ein Blech mit zehn Plaetzen.", "reward": "Zehner-Kenner" },
+      { "id": "angleichen", "title": "Die Keksdosen", "purpose": "Zwei Dosen gleich voll machen.", "scene": "Links fest, rechts anpassen.", "reward": "Gleichmacher" },
+      { "id": "backstube", "title": "Die Backstube", "purpose": "Frisch gebackene Kekse zaehlen.", "scene": "Wie viele sind auf dem Blech?", "reward": "Zaehl-Meister" }
+    ]
+  },
+  "concept": {
+    "learningProblem": "Das Kind fuellt Mengen ungenau und erkennt nicht, wie viel zum Angleichen fehlt oder zu viel ist.",
+    "embodiedMetaphor": "Das Zehnerblech zeigt jede Menge als festes Bild, und zwei Dosen werden gleich voll gemacht wie beim echten Backen.",
+    "successInsight": "Wenn ich das Zehner-Bild kenne, sehe ich sofort, wie viel fehlt oder zu viel ist."
+  },
+  "rooms": [
+    {
+      "roomId": "zehnerfeld",
+      "objective": "Fuelle genau so viele Felder wie gefordert!",
+      "mode": "ten-frame",
+      "rounds": [
+        { "objective": "Fuelle das halbe Blech!", "target": 5 },
+        { "objective": "Fast das ganze Blech!", "target": 8 }
+      ],
+      "feedback": { "correct": "Genau richtig gefuellt!", "tooMany": "Zu viele Felder gefuellt. Tippe eins wieder leer.", "tooFew": "Noch nicht genug. Fuelle noch mehr Felder.", "tryAgain": "Zaehle die gefuellten Felder einzeln durch." },
+      "explanationAfterSuccess": "Das Zehnerblech zeigt jede Zahl als festes Bild - so siehst du Mengen auf einen Blick."
+    },
+    {
+      "roomId": "angleichen",
+      "objective": "Mach beide Dosen gleich voll!",
+      "mode": "make-equal",
+      "rounds": [
+        { "objective": "Links sind schon Kekse drin - mach rechts genauso viele!", "element": "🍪", "leftCount": 6, "rightStart": 2 },
+        { "objective": "Hier sind rechts zu viele - nimm welche weg!", "element": "🥛", "leftCount": 4, "rightStart": 7 }
+      ],
+      "feedback": { "correct": "Beide Dosen gleich voll!", "tooMany": "Jetzt sind es rechts zu viele. Nimm welche weg.", "tooFew": "Rechts fehlen noch welche. Leg mehr dazu.", "tryAgain": "Zaehle links, dann zaehle rechts und vergleiche." },
+      "explanationAfterSuccess": "Angleichen heisst: erst zaehlen, dann genau den Unterschied ausgleichen."
+    },
+    {
+      "roomId": "backstube",
+      "objective": "Zaehle die frischen Kekse!",
+      "mode": "count",
+      "rounds": [
+        { "objective": "Wie viele Muffins?", "emoji": "🧁", "count": 6 },
+        { "objective": "Wie viele Donuts?", "emoji": "🍩", "count": 9 }
+      ],
+      "feedback": { "correct": "Genau richtig gezaehlt!", "tooMany": "Das ist zu viel. Zaehle jeden Keks einzeln.", "tooFew": "Das ist zu wenig. Zaehle nochmal alle.", "tryAgain": "Tippe jeden Keks gedanklich einmal an: eins, zwei, drei ..." },
+      "explanationAfterSuccess": "Frisch gebackene Kekse zaehlt man genauso wie alles andere: eins nach dem anderen."
+    }
+  ]
+}

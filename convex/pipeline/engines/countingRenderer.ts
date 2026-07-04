@@ -1,5 +1,6 @@
 import type { CountEngineSpec } from "./countingTypes";
 import { validateCountEngineSpec } from "./countingValidator";
+import { KID_KIT_CORE } from "./kidKit";
 
 export function buildCountingWorldCode(spec: CountEngineSpec): string {
   const validation = validateCountEngineSpec(spec);
@@ -15,88 +16,11 @@ import confetti from 'canvas-confetti';
 
 const SPEC = ${dataJson};
 const COUNT_MAX = 20;
-
-const KID = {
-  skyTop: '#79c7f5', skyBottom: '#e9f8ff', hillBack: '#a8dd8a', hillFront: '#7ec463',
-  meadow: '#bdeba0', meadowEdge: '#7ec463', ink: '#27324a',
-  coral: '#ff7a59', coralDark: '#c95a3f', blue: '#3f9bf0', blueDark: '#2c79c2',
-  green: '#54b865', greenDark: '#3c8f4b', sun: '#ffd84d', card: '#ffffff',
-};
-
-function speak(text) {
-  try { if (!window.speechSynthesis) return; window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text); u.lang = 'de-DE'; u.rate = 0.9; window.speechSynthesis.speak(u);
-  } catch (e) {}
-}
-
-function KidStyles() {
-  return (<style>{"@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap'); .kid-font{font-family:'Baloo 2','Comic Sans MS','Segoe UI',sans-serif;}"}</style>);
-}
-
-function Sky() {
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      <motion.div className="absolute right-8 top-5 h-16 w-16 rounded-full sm:h-24 sm:w-24" style={{ background: KID.sun, boxShadow: '0 0 50px 14px rgba(255,216,77,0.55)' }} animate={{ scale: [1, 1.06, 1] }} transition={{ duration: 4, repeat: Infinity }} />
-      <motion.div className="absolute left-[10%] top-8 h-9 w-28 rounded-full bg-white/90" animate={{ x: [0, 26, 0] }} transition={{ duration: 18, repeat: Infinity }} />
-      <motion.div className="absolute left-[55%] top-14 h-7 w-20 rounded-full bg-white/80" animate={{ x: [0, -20, 0] }} transition={{ duration: 24, repeat: Infinity }} />
-      <div className="absolute -left-10 bottom-[6%] h-32 w-[60%] rounded-[50%]" style={{ background: KID.hillBack }} />
-      <div className="absolute -right-16 bottom-[2%] h-36 w-[70%] rounded-[50%]" style={{ background: KID.hillFront }} />
-      <div className="absolute inset-x-0 bottom-0 h-[16%]" style={{ background: KID.hillFront }} />
-    </div>
-  );
-}
-
-function Luno({ mood }) {
-  return (
-    <motion.div animate={mood === 'sad' ? { x: [0, -7, 7, -5, 5, 0] } : mood === 'cheer' ? { y: [0, -16, 0] } : { y: [0, -3, 0] }} transition={mood === 'cheer' ? { duration: 0.5, repeat: 2 } : mood === 'sad' ? { duration: 0.5 } : { duration: 2.4, repeat: Infinity }}>
-      <svg width="68" height="72" viewBox="0 0 74 78" aria-hidden="true">
-        <ellipse cx="37" cy="74" rx="20" ry="4" fill="rgba(39,50,74,0.18)" />
-        <ellipse cx="26" cy="68" rx="7" ry="6" fill="#f3b34c" /><ellipse cx="48" cy="68" rx="7" ry="6" fill="#f3b34c" />
-        <circle cx="37" cy="38" r="30" fill="#fff6e0" stroke="#27324a" strokeWidth="3.5" />
-        <circle cx="27" cy="36" r="5.6" fill="#27324a" /><circle cx="47" cy="36" r="5.6" fill="#27324a" />
-        <circle cx="29" cy="34" r="1.8" fill="#ffffff" /><circle cx="49" cy="34" r="1.8" fill="#ffffff" />
-        <circle cx="19" cy="46" r="4.6" fill="#ffb3a0" opacity="0.85" /><circle cx="55" cy="46" r="4.6" fill="#ffb3a0" opacity="0.85" />
-        {mood === 'sad' ? <path d="M 30 54 Q 37 49 44 54" fill="none" stroke="#27324a" strokeWidth="3.5" strokeLinecap="round" /> : <path d="M 29 51 Q 37 59 45 51" fill="none" stroke="#27324a" strokeWidth="3.5" strokeLinecap="round" />}
-        <path d="M 52 12 Q 60 6 64 14 Q 58 14 56 20 Z" fill="#ffd84d" stroke="#27324a" strokeWidth="2.5" />
-      </svg>
-    </motion.div>
-  );
-}
-
-function SpeechBubble({ text }) {
-  return (
-    <div className="relative mx-auto w-full max-w-3xl">
-      <div className="flex items-center gap-3 rounded-3xl border-4 px-4 py-3 shadow-lg sm:px-6 sm:py-4" style={{ background: KID.card, borderColor: KID.ink }}>
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-2xl" style={{ background: '#fff1c4' }}>🌙</div>
-        <p className="grow text-lg font-bold leading-snug sm:text-2xl" style={{ color: KID.ink }}>{text}</p>
-        <button type="button" onClick={() => speak(text)} aria-label="Vorlesen" className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-2xl transition-transform active:scale-90" style={{ background: KID.blue, boxShadow: '0 4px 0 ' + KID.blueDark }}>🔊</button>
-      </div>
-      <div className="absolute -bottom-3 left-10 h-6 w-6 rotate-45 border-b-4 border-r-4" style={{ background: KID.card, borderColor: KID.ink }} />
-    </div>
-  );
-}
-
-function BigButton({ onClick, color, colorDark, children, disabled }) {
-  return (
-    <button type="button" onClick={onClick} disabled={disabled} className="kid-font min-h-[64px] rounded-3xl px-5 py-3 text-xl font-extrabold text-white transition-all active:translate-y-1 disabled:opacity-40 sm:text-2xl" style={{ background: color, boxShadow: '0 6px 0 ' + colorDark, textShadow: '0 1px 2px rgba(0,0,0,0.25)' }}>{children}</button>
-  );
-}
-
-function StarRow({ stars }) {
-  return (<div className="flex items-center gap-1 rounded-full border-2 px-3 py-1 text-xl" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink }}><span>⭐</span><span className="kid-font font-extrabold">{stars}</span></div>);
-}
-
-function RoundDots({ total, current }) {
-  return (
-    <div className="flex items-center gap-1.5 rounded-full border-2 px-3 py-1.5" style={{ background: KID.card, borderColor: KID.ink }}>
-      {Array.from({ length: total }).map((e, i) => (<div key={i} className="h-3.5 w-3.5 rounded-full border-2" style={{ background: i < current ? KID.green : i === current ? KID.sun : '#e3e8f0', borderColor: KID.ink }} />))}
-    </div>
-  );
-}
-
+const TEN_FRAME_MAX = 10;
+` + KID_KIT_CORE + `
 function ObjectField({ emoji, n, highlightUpTo }) {
   return (
-    <div className="flex flex-wrap items-center justify-center gap-2 rounded-2xl border-4 p-3" style={{ background: KID.meadow, borderColor: KID.meadowEdge, minHeight: '6rem' }}>
+    <div className="flex flex-wrap items-center justify-center gap-2 rounded-2xl border-4 p-3" style={{ background: KID.band, borderColor: KID.bandEdge, minHeight: '6rem' }}>
       {Array.from({ length: n }).map((e, i) => (
         <motion.span key={i} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: i * 0.04 }} className="text-3xl sm:text-4xl" style={{ opacity: highlightUpTo !== undefined && i >= highlightUpTo ? 0.35 : 1 }}>{emoji}</motion.span>
       ))}
@@ -131,10 +55,10 @@ function CountRoom({ room, roundIndex, onRoundWin, setBubble, setMood }) {
   function pick(n) {
     if (solved) return;
     if (n === round.count) {
-      setSolved(true); setMood('cheer'); speak(String(round.count));
-      onRoundWin();
+      setSolved(true); setMood('cheer'); speak(String(round.count)); Sound.success();
+      onRoundWin(misses);
     } else {
-      const m = misses + 1; setMisses(m); setMood('sad');
+      const m = misses + 1; setMisses(m); setMood('sad'); Sound.miss();
       setBubble(m >= 2 ? room.feedback.tryAgain : (n > round.count ? room.feedback.tooMany : room.feedback.tooFew));
       setTimeout(() => setMood('happy'), 700);
     }
@@ -148,7 +72,7 @@ function CountRoom({ room, roundIndex, onRoundWin, setBubble, setMood }) {
       </div>
       <div className="grid grid-cols-4 gap-3">
         {choices.map((n) => (
-          <button key={n} type="button" disabled={solved} onClick={() => pick(n)} className="kid-font min-h-[64px] rounded-3xl border-4 text-3xl font-extrabold transition-all active:translate-y-1 disabled:opacity-40" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink, boxShadow: '0 6px 0 ' + KID.meadowEdge }}>{n}</button>
+          <button key={n} type="button" disabled={solved} onClick={() => pick(n)} className="kid-font min-h-[64px] rounded-3xl border-4 text-3xl font-extrabold transition-all active:translate-y-1 disabled:opacity-40" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink, boxShadow: '0 6px 0 ' + KID.bandEdge }}>{n}</button>
         ))}
       </div>
       <div className="rounded-3xl border-4 p-4" style={{ background: KID.card, borderColor: KID.ink }}>
@@ -174,9 +98,9 @@ function MakeRoom({ room, roundIndex, onRoundWin, setBubble, setMood }) {
   function check() {
     if (solved) return;
     if (n === round.target) {
-      setSolved(true); setMood('cheer'); speak(String(round.target)); onRoundWin();
+      setSolved(true); setMood('cheer'); speak(String(round.target)); Sound.success(); onRoundWin(misses);
     } else {
-      const m = misses + 1; setMisses(m); setMood('sad');
+      const m = misses + 1; setMisses(m); setMood('sad'); Sound.miss();
       setBubble(m >= 2 ? room.feedback.tryAgain : (n > round.target ? room.feedback.tooMany : room.feedback.tooFew));
       setTimeout(() => setMood('happy'), 700);
     }
@@ -193,8 +117,8 @@ function MakeRoom({ room, roundIndex, onRoundWin, setBubble, setMood }) {
         </div>
       </div>
       <div className="grid grid-cols-2 gap-3">
-        <BigButton onClick={() => { if (!solved && n < COUNT_MAX) setN(n + 1); }} color={KID.green} colorDark={KID.greenDark} disabled={solved}>{round.emoji} dazu</BigButton>
-        <BigButton onClick={() => { if (!solved && n > 0) setN(n - 1); }} color={KID.coral} colorDark={KID.coralDark} disabled={solved || n === 0}>↩️ weg</BigButton>
+        <BigButton onClick={() => { if (!solved && n < COUNT_MAX) { setN(n + 1); Sound.tone(Sound.noteFor(n + 1), 0.12); } }} color={KID.green} colorDark={KID.greenDark} disabled={solved}>{round.emoji} dazu</BigButton>
+        <BigButton onClick={() => { if (!solved && n > 0) { setN(n - 1); Sound.thunk(); } }} color={KID.coral} colorDark={KID.coralDark} disabled={solved || n === 0}>↩️ weg</BigButton>
       </div>
       <BigButton onClick={check} color={KID.blue} colorDark={KID.blueDark} disabled={solved || n === 0}>✅ Fertig!</BigButton>
     </>
@@ -217,9 +141,9 @@ function CompareRoom({ room, roundIndex, onRoundWin, setBubble, setMood }) {
   function pick(choice) {
     if (solved) return;
     if (choice === answer) {
-      setSolved(true); setMood('cheer'); onRoundWin();
+      setSolved(true); setMood('cheer'); Sound.success(); onRoundWin(misses);
     } else {
-      const m = misses + 1; setMisses(m); setMood('sad');
+      const m = misses + 1; setMisses(m); setMood('sad'); Sound.miss();
       setBubble(m >= 2 ? room.feedback.tryAgain : 'Zaehle beide Gruppen genau und vergleiche.');
       setTimeout(() => setMood('happy'), 700);
     }
@@ -238,7 +162,7 @@ function CompareRoom({ room, roundIndex, onRoundWin, setBubble, setMood }) {
           </button>
         </div>
       </div>
-      <BigButton onClick={() => pick('equal')} color={KID.sun} colorDark={KID.meadowEdge} disabled={solved}><span style={{ color: KID.ink }}>⚖️ Gleich viele</span></BigButton>
+      <BigButton onClick={() => pick('equal')} color={KID.sun} colorDark={KID.bandEdge} disabled={solved}><span style={{ color: KID.ink }}>⚖️ Gleich viele</span></BigButton>
       <div className="rounded-3xl border-4 p-4" style={{ background: KID.card, borderColor: KID.ink }}>
         <p className="kid-font text-sm font-extrabold uppercase tracking-wide" style={{ color: '#8a93a6' }}>Aus dem Vergleichen wird</p>
         <span className="kid-font mt-2 inline-block rounded-2xl border-2 px-3 py-1.5 text-xl font-extrabold sm:text-2xl" style={{ background: solved ? '#dcf5e1' : '#eef1f6', borderColor: solved ? KID.ink : '#c6cdd9', color: solved ? KID.ink : '#9aa3b5' }}>{solved ? round.leftCount + (round.leftCount > round.rightCount ? ' > ' : round.leftCount < round.rightCount ? ' < ' : ' = ') + round.rightCount : '? ? ?'}</span>
@@ -247,50 +171,160 @@ function CompareRoom({ room, roundIndex, onRoundWin, setBubble, setMood }) {
   );
 }
 
-function RoomScene({ room, roomMeta, stars, onBack, onComplete, onStar }) {
+// ten-frame: Zehnerfeld, zwei Reihen a fuenf Feldern. Tippen fuellt/leert.
+function TenFrameRoom({ room, roundIndex, onRoundWin, setBubble, setMood }) {
+  const round = room.rounds[roundIndex];
+  const [filled, setFilled] = useState(() => Array(TEN_FRAME_MAX).fill(false));
+  const [solved, setSolved] = useState(false);
+  const [misses, setMisses] = useState(0);
+
+  useEffect(() => {
+    setFilled(Array(TEN_FRAME_MAX).fill(false));
+    setSolved(false); setMisses(0);
+    setBubble((room.rounds[roundIndex].objective || room.objective) + ' Fuelle genau ' + room.rounds[roundIndex].target + ' Felder!');
+  }, [roundIndex]);
+
+  function toggle(index) {
+    if (solved) return;
+    setFilled((list) => {
+      const next = list.slice();
+      next[index] = !next[index];
+      Sound.tone(Sound.noteFor(next.filter(Boolean).length), 0.12);
+      return next;
+    });
+  }
+
+  function check() {
+    if (solved) return;
+    const n = filled.filter(Boolean).length;
+    if (n === round.target) {
+      setSolved(true); setMood('cheer'); speak(String(round.target)); Sound.success(); onRoundWin(misses);
+    } else {
+      const m = misses + 1; setMisses(m); setMood('sad'); Sound.miss();
+      setBubble(m >= 2 ? room.feedback.tryAgain : (n > round.target ? room.feedback.tooMany : room.feedback.tooFew));
+      setTimeout(() => setMood('happy'), 700);
+    }
+  }
+
+  const n = filled.filter(Boolean).length;
+
+  return (
+    <>
+      <div className="relative w-full overflow-hidden rounded-[2rem] border-4 p-4" style={{ minHeight: '15rem', borderColor: KID.ink, background: 'linear-gradient(180deg, ' + KID.skyTop + ', ' + KID.skyBottom + ' 70%)' }}>
+        <Sky />
+        <div className="relative z-10 flex flex-col items-center gap-3">
+          <span className="kid-font rounded-full border-2 px-4 py-1 text-lg font-extrabold" style={{ background: KID.sun, borderColor: KID.ink, color: KID.ink }}>Ziel: {round.target}</span>
+          <div className="grid grid-cols-5 gap-2 rounded-2xl border-4 p-3" style={{ background: KID.band, borderColor: KID.bandEdge }}>
+            {filled.map((isFilled, i) => (
+              <button key={i} type="button" onClick={() => toggle(i)} disabled={solved} className="flex h-12 w-12 items-center justify-center rounded-xl border-4 text-2xl transition-all active:translate-y-1 sm:h-14 sm:w-14" style={{ background: isFilled ? KID.sun : KID.card, borderColor: KID.ink }}>
+                {isFilled ? '⭐' : ''}
+              </button>
+            ))}
+          </div>
+          <span className="kid-font rounded-full border-2 px-4 py-1 text-xl font-extrabold" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink }}>Du hast: {n}</span>
+        </div>
+      </div>
+      <BigButton onClick={check} color={KID.blue} colorDark={KID.blueDark} disabled={solved || n === 0}>✅ Fertig!</BigButton>
+      <div className="rounded-3xl border-4 p-4" style={{ background: KID.card, borderColor: KID.ink }}>
+        <p className="kid-font text-sm font-extrabold uppercase tracking-wide" style={{ color: '#8a93a6' }}>Aus dem Zaehlen wird</p>
+        <span className="kid-font mt-2 inline-block rounded-2xl border-2 px-3 py-1.5 text-xl font-extrabold sm:text-2xl" style={{ background: solved ? '#dcf5e1' : '#eef1f6', borderColor: solved ? KID.ink : '#c6cdd9', color: solved ? KID.ink : '#9aa3b5' }}>{solved ? '⭐ = ' + round.target : '⭐ = ?'}</span>
+      </div>
+    </>
+  );
+}
+
+// make-equal: links eine feste Menge, rechts angleichen bis gleich viele.
+function MakeEqualRoom({ room, roundIndex, onRoundWin, setBubble, setMood }) {
+  const round = room.rounds[roundIndex];
+  const [right, setRight] = useState(0);
+  const [solved, setSolved] = useState(false);
+  const [misses, setMisses] = useState(0);
+
+  useEffect(() => {
+    const r = room.rounds[roundIndex];
+    setRight(r.rightStart); setSolved(false); setMisses(0);
+    setBubble((r.objective || room.objective) + ' Mach rechts genau so viele wie links!');
+  }, [roundIndex]);
+
+  function check() {
+    if (solved) return;
+    if (right === round.leftCount) {
+      setSolved(true); setMood('cheer'); speak(String(round.leftCount)); Sound.success(); onRoundWin(misses);
+    } else {
+      const m = misses + 1; setMisses(m); setMood('sad'); Sound.miss();
+      setBubble(m >= 2 ? room.feedback.tryAgain : (right > round.leftCount ? room.feedback.tooMany : room.feedback.tooFew));
+      setTimeout(() => setMood('happy'), 700);
+    }
+  }
+
+  return (
+    <>
+      <div className="relative w-full overflow-hidden rounded-[2rem] border-4 p-4" style={{ minHeight: '15rem', borderColor: KID.ink, background: 'linear-gradient(180deg, ' + KID.skyTop + ', ' + KID.skyBottom + ' 70%)' }}>
+        <Sky />
+        <div className="relative z-10 grid grid-cols-2 gap-3">
+          <div className="flex flex-col items-center gap-2">
+            <span className="kid-font rounded-full border-2 px-3 py-1 text-base font-extrabold" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink }}>Links: {round.leftCount}</span>
+            <ObjectField emoji={round.element} n={round.leftCount} />
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <span className="kid-font rounded-full border-2 px-3 py-1 text-base font-extrabold" style={{ background: KID.sun, borderColor: KID.ink, color: KID.ink }}>Rechts: {right}</span>
+            <ObjectField emoji={round.element} n={right} />
+          </div>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <BigButton onClick={() => { if (!solved && right < COUNT_MAX) { setRight(right + 1); Sound.tone(Sound.noteFor(right + 1), 0.12); } }} color={KID.green} colorDark={KID.greenDark} disabled={solved}>{round.element} dazu</BigButton>
+        <BigButton onClick={() => { if (!solved && right > 0) { setRight(right - 1); Sound.thunk(); } }} color={KID.coral} colorDark={KID.coralDark} disabled={solved || right === 0}>↩️ weg</BigButton>
+      </div>
+      <BigButton onClick={check} color={KID.blue} colorDark={KID.blueDark} disabled={solved}>✅ Fertig!</BigButton>
+    </>
+  );
+}
+
+function RoomScene({ room, roomMeta, stars, streak, onStreak, onBack, onComplete, onStar }) {
   const [bubble, setBubble] = useState(room.objective);
   const [mood, setMood] = useState('happy');
   const [roundIndex, setRoundIndex] = useState(0);
   const [phase, setPhase] = useState('play');
 
-  function handleRoundWin() {
+  function handleRoundWin(misses) {
     setMood('cheer');
-    Meoluna.reportScore(10, { action: 'counting-round-correct', roomId: room.roomId, roundIndex });
+    const nextStreak = misses === 0 ? streak + 1 : 0;
+    onStreak(nextStreak);
+    Meoluna.reportScore(10, { action: 'counting-round-correct', roomId: room.roomId, roundIndex, mode: room.mode, firstTry: misses === 0 });
     onStar();
     if (roundIndex + 1 >= room.rounds.length) {
       setPhase('done');
       setBubble(room.feedback.correct + ' ' + room.explanationAfterSuccess);
-      Meoluna.reportScore(25, { action: 'counting-room-complete', roomId: room.roomId });
+      Meoluna.reportScore(25, { action: 'counting-room-complete', roomId: room.roomId, mode: room.mode });
       Meoluna.completeModule(room.roomId, 25);
-      confetti({ particleCount: 100, spread: 75, origin: { y: 0.6 } });
+      confetti({ particleCount: nextStreak >= 3 ? 160 : 100, spread: 75, origin: { y: 0.6 } });
     } else {
       setPhase('roundDone');
       setBubble(room.feedback.correct + ' Bereit fuer die naechste Aufgabe?');
-      confetti({ particleCount: 50, spread: 60, origin: { y: 0.65 } });
+      confetti({ particleCount: nextStreak >= 3 ? 90 : 50, spread: 60, origin: { y: 0.65 } });
     }
     setTimeout(() => setMood('happy'), 1200);
   }
 
   function nextRound() { setPhase('play'); setRoundIndex(roundIndex + 1); }
 
+  const RoomComponent = room.mode === 'count' ? CountRoom : room.mode === 'make' ? MakeRoom : room.mode === 'compare' ? CompareRoom : room.mode === 'ten-frame' ? TenFrameRoom : MakeEqualRoom;
+
   return (
     <div className="kid-font min-h-screen p-3 sm:p-6" style={{ background: 'linear-gradient(180deg, ' + KID.skyBottom + ', #f8fdf2)' }}>
       <KidStyles />
       <div className="mx-auto flex max-w-5xl flex-col gap-4">
         <div className="flex items-center justify-between gap-3">
-          <button type="button" onClick={onBack} className="rounded-2xl border-2 px-4 py-2 text-lg font-extrabold transition-all active:translate-y-0.5" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink, boxShadow: '0 4px 0 ' + KID.meadowEdge }}>← Karte</button>
+          <button type="button" onClick={onBack} className="rounded-2xl border-2 px-4 py-2 text-lg font-extrabold transition-all active:translate-y-0.5" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink, boxShadow: '0 4px 0 ' + KID.bandEdge }}>← Karte</button>
           <div className="flex items-center gap-3">
             <div className="rounded-2xl border-2 px-4 py-2 text-lg font-extrabold" style={{ background: KID.card, borderColor: KID.ink, color: KID.ink }}>{roomMeta.title || room.roomId}</div>
             <Luno mood={mood} />
           </div>
-          <div className="flex items-center gap-2"><RoundDots total={room.rounds.length} current={phase === 'done' ? room.rounds.length : roundIndex} /><StarRow stars={stars} /></div>
+          <div className="flex items-center gap-2"><StreakMeter streak={streak} /><RoundDots total={room.rounds.length} current={phase === 'done' ? room.rounds.length : roundIndex} /><StarRow stars={stars} /><SoundToggle /></div>
         </div>
         <SpeechBubble text={bubble} />
-        {phase !== 'done' && (room.mode === 'count'
-          ? <CountRoom key={roundIndex} room={room} roundIndex={roundIndex} onRoundWin={handleRoundWin} setBubble={setBubble} setMood={setMood} />
-          : room.mode === 'make'
-            ? <MakeRoom key={roundIndex} room={room} roundIndex={roundIndex} onRoundWin={handleRoundWin} setBubble={setBubble} setMood={setMood} />
-            : <CompareRoom key={roundIndex} room={room} roundIndex={roundIndex} onRoundWin={handleRoundWin} setBubble={setBubble} setMood={setMood} />)}
+        {phase !== 'done' && (<RoomComponent key={roundIndex} room={room} roundIndex={roundIndex} onRoundWin={handleRoundWin} setBubble={setBubble} setMood={setMood} />)}
         {phase === 'roundDone' && (<BigButton onClick={nextRound} color={KID.blue} colorDark={KID.blueDark}>➡️ Naechste Aufgabe!</BigButton>)}
         {phase === 'done' && (<BigButton onClick={onComplete} color={KID.green} colorDark={KID.greenDark}>🎉 Weiter!</BigButton>)}
       </div>
@@ -315,9 +349,10 @@ function Hub({ completedRooms, stars, onStart }) {
             const done = completedRooms.includes(room.roomId);
             const locked = index > 0 && !completedRooms.includes(SPEC.rooms[index - 1].roomId);
             const isLast = index === SPEC.rooms.length - 1;
-            const icon = done ? '⭐' : locked ? '🔒' : isLast ? '🏆' : room.mode === 'compare' ? '⚖️' : room.mode === 'make' ? '🧺' : '🔢';
+            const modeIcon = room.mode === 'compare' ? '⚖️' : room.mode === 'make' ? '🧺' : room.mode === 'ten-frame' ? '🔟' : room.mode === 'make-equal' ? '➕' : '🔢';
+            const icon = done ? '⭐' : locked ? '🔒' : isLast ? '🏆' : modeIcon;
             return (
-              <button key={room.roomId} type="button" disabled={locked} onClick={() => onStart(index)} className="rounded-[1.8rem] border-4 p-5 text-center transition-all active:translate-y-1 disabled:opacity-50" style={{ background: done ? '#e8f9e4' : KID.card, borderColor: KID.ink, boxShadow: '0 6px 0 ' + KID.meadowEdge }}>
+              <button key={room.roomId} type="button" disabled={locked} onClick={() => onStart(index)} className="rounded-[1.8rem] border-4 p-5 text-center transition-all active:translate-y-1 disabled:opacity-50" style={{ background: done ? '#e8f9e4' : KID.card, borderColor: KID.ink, boxShadow: '0 6px 0 ' + KID.bandEdge }}>
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full text-3xl" style={{ background: done ? KID.green : locked ? '#dde3ec' : KID.sun }}>{icon}</div>
                 <p className="mt-3 text-xl font-extrabold" style={{ color: KID.ink }}>{meta.title || 'Welt ' + (index + 1)}</p>
                 <p className="mt-1 text-sm font-bold" style={{ color: '#5d6b85' }}>{meta.purpose || room.objective}</p>
@@ -335,6 +370,7 @@ export default function App() {
   const [activeRoomIndex, setActiveRoomIndex] = useState(null);
   const [completedRooms, setCompletedRooms] = useState([]);
   const [stars, setStars] = useState(0);
+  const [streak, setStreak] = useState(0);
 
   function completeActiveRoom() {
     const room = SPEC.rooms[activeRoomIndex];
@@ -348,7 +384,7 @@ export default function App() {
   if (activeRoomIndex !== null) {
     const room = SPEC.rooms[activeRoomIndex];
     const roomMeta = SPEC.world.rooms.find((e) => e.id === room.roomId) || {};
-    return (<RoomScene key={room.roomId} room={room} roomMeta={roomMeta} stars={stars} onBack={() => setActiveRoomIndex(null)} onComplete={completeActiveRoom} onStar={() => setStars((v) => v + 1)} />);
+    return (<RoomScene key={room.roomId} room={room} roomMeta={roomMeta} stars={stars} streak={streak} onStreak={setStreak} onBack={() => setActiveRoomIndex(null)} onComplete={completeActiveRoom} onStar={() => setStars((v) => v + 1)} />);
   }
   return <Hub completedRooms={completedRooms} stars={stars} onStart={setActiveRoomIndex} />;
 }
