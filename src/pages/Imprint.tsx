@@ -13,26 +13,26 @@ export default function Imprint() {
         <h1 className="text-4xl font-bold mb-8">Impressum</h1>
         
         <div className="prose prose-lg dark:prose-invert max-w-none">
-          <h2>Angaben gemäß § 5 TMG</h2>
+          <h2>Angaben gemäß § 5 DDG</h2>
           <p>
-            [Name / Firma]<br />
-            [Straße Hausnummer]<br />
-            [PLZ Ort]<br />
+            Janike Arent<br />
+            Lavendelweg 7<br />
+            30880 Laatzen<br />
             Deutschland
           </p>
 
           <h2>Kontakt</h2>
           <p>
-            Telefon: [Telefonnummer]<br />
             E-Mail: <a href="mailto:hello@meoluna.com" className="text-primary">
               hello@meoluna.com
             </a>
           </p>
 
-          <h2>Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
+          <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
           <p>
-            [Name]<br />
-            [Adresse]
+            Janike Arent<br />
+            Lavendelweg 7<br />
+            30880 Laatzen
           </p>
 
           <h2>EU-Streitschlichtung</h2>
@@ -60,9 +60,9 @@ export default function Imprint() {
 
           <h2>Haftung für Inhalte</h2>
           <p>
-            Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte 
-            auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach 
-            §§ 8 bis 10 TMG sind wir als Diensteanbieter jedoch nicht verpflichtet, 
+            Als Diensteanbieter sind wir gemäß § 7 Abs.1 DDG für eigene Inhalte
+            auf diesen Seiten nach den allgemeinen Gesetzen verantwortlich. Nach
+            §§ 8 bis 10 DDG sind wir als Diensteanbieter jedoch nicht verpflichtet,
             übermittelte oder gespeicherte fremde Informationen zu überwachen oder 
             nach Umständen zu forschen, die auf eine rechtswidrige Tätigkeit hinweisen.
           </p>

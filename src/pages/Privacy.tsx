@@ -20,9 +20,10 @@ export default function Privacy() {
           <h2>1. Verantwortlicher</h2>
           <p>
             Verantwortlich für die Datenverarbeitung auf dieser Website ist:<br />
-            [Name/Firma]<br />
-            [Adresse]<br />
-            [E-Mail]
+            Janike Arent<br />
+            Lavendelweg 7<br />
+            30880 Laatzen<br />
+            E-Mail: privacy@meoluna.com
           </p>
 
           <h2>2. Erhebung und Speicherung personenbezogener Daten</h2>
