@@ -19,7 +19,7 @@
   body
 }
 
-#let doc-header(kind: "", topic-name: "", fach-display: "", klasse: 0) = {
+#let doc-header(kind: "", topic-name: "", fach-display: "", klasse: 0, arbeitszeit: none) = {
   grid(
     columns: (1fr, auto),
     align: (left, right),
@@ -34,6 +34,10 @@
   )
   v(0.4cm)
   text[Name: \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_ #h(1.2cm) Datum: \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_]
+  if arbeitszeit != none {
+    v(0.2cm)
+    text(size: 10pt, weight: "bold")[Arbeitszeit: #arbeitszeit Minuten]
+  }
   v(0.5cm)
   line(length: 100%, stroke: 0.6pt + meoluna-blue)
   v(0.4cm)

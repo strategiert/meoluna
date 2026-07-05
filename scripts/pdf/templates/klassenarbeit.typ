@@ -9,6 +9,7 @@
   topic-name: data.topicName,
   fach-display: data.fachDisplay,
   klasse: data.klasse,
+  arbeitszeit: data.arbeitszeitMinuten,
 )
 
 #for (i, a) in data.aufgaben.enumerate() {

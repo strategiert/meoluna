@@ -51,12 +51,19 @@ Datei: `meoluna-web/src/data/topic-content/<subjectSlug>/<slug>.json`
 }
 ```
 
-Mengen-Regeln pro Topic (Klaus-Feedback 2026-07-05: Aufgabenmenge und Komplexität steigen mit der Klassenstufe):
-- Klasse 1: 10–14 Aufgaben gesamt; `hausaufgabe` 3–5 (nur Schwierigkeit 1–2)
-- Klasse 2–4: 12–16 Aufgaben gesamt; `hausaufgabe` 5–8 (Schwierigkeit 1–2)
-- Ab Klasse 5: 12–18 Aufgaben gesamt; `hausaufgabe` 6–8, komplexere Transfer-/Begründungsaufgaben statt nur Reproduktion
-- Immer: ≥6 mit `klassenarbeit` (Mix Schwierigkeit 1–3, Punkte gesetzt; ab Kl. 5 ≥8), 4–6 mit `lzk`, 5–8 mit `web`
+Mengen-Regeln pro Topic (Klaus-Feedback 2026-07-05: Aufgabenmenge und Komplexität steigen mit der Klassenstufe; Klassenarbeiten haben real teils 30 Aufgaben, ab höheren Klassen Doppelstunde = 90 Minuten Arbeitsumfang):
+
+| Stufe | gesamt | `klassenarbeit` | `lzk` | `hausaufgabe` | `web` | KA-Arbeitszeit |
+|-------|--------|-----------------|-------|----------------|-------|----------------|
+| Kl. 1 | 14–18 | 8–12 | 5–8 | 3–5 (nur S1–2) | 5–8 | 30 min |
+| Kl. 2–4 | 20–28 | 12–20 (kleinteilig) | 8–12 | 5–8 | 6–10 | 45 min |
+| Kl. 5–7 | 22–30 | 15–25 | 8–12 | 6–8 | 6–10 | 45 min |
+| ab Kl. 8 | 25–35 | 20–30 (mehrteilige Transfer-/Begründungsaufgaben) | 10–14 | 6–10 | 6–10 | 90 min (Doppelstunde) |
+
+- Optionales Feld `arbeitszeitMinuten` (Zahl) im Content-JSON überschreibt den KA-Zeit-Default; Build-Script-Defaults: Kl. 1–2 → 30, Kl. 3–7 → 45, ab Kl. 8 → 90. Klassenarbeit-PDF zeigt „Arbeitszeit: X Minuten" im Kopf.
+- Punkte-Summe der Klassenarbeit soll grob zur Arbeitszeit passen (Faustregel ~1 Punkt/Minute ab Kl. 3).
 - Mehrfach-Tagging erlaubt und erwünscht
+- fast-worker-Batch-Größe wegen der größeren Pools: 8–12 Topics/Batch (GS), 5–8 (Sek)
 - Deutsch, echte Umlaute, kindgerecht für die Klassenstufe; Englisch-Topics: Aufgaben Englisch, Anweisungen Deutsch
 
 ## 3. PDF-Pipeline (App-Repo, Typst)

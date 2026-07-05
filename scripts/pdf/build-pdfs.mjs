@@ -125,6 +125,12 @@ function round2Half(x) {
   return Math.round(x * 2) / 2;
 }
 
+function defaultArbeitszeit(klasse) {
+  if (klasse <= 2) return 30;
+  if (klasse <= 7) return 45;
+  return 90;
+}
+
 function buildNotenschluessel(gesamtpunkte) {
   const pct = { 1: 0.96, 2: 0.8, 3: 0.6, 4: 0.45, 5: 0.2 };
   const schluessel = [1, 2, 3, 4, 5].map((note) => ({
@@ -244,6 +250,7 @@ function main() {
         let data;
         if (type === "klassenarbeit") {
           const gesamtpunkte = tagged.reduce((sum, a) => sum + (a.punkte || 0), 0);
+          const arbeitszeitMinuten = content.arbeitszeitMinuten ?? defaultArbeitszeit(content.klasse);
           data = {
             topicName,
             fachDisplay,
@@ -252,6 +259,7 @@ function main() {
             aufgaben: toTaskData(tagged),
             gesamtpunkte,
             notenschluessel: buildNotenschluessel(gesamtpunkte),
+            arbeitszeitMinuten,
           };
         } else if (type === "lernzielkontrolle") {
           data = {
