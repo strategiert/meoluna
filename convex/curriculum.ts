@@ -63,6 +63,34 @@ export const getTopicsBySubject = query({
   },
 });
 
+// Export für die SEO-Landingpages (Web-Repo, statischer Build via Astro).
+// Öffentliche Curriculum-Daten, kein Auth nötig. Liefert alle aktiven
+// Topics + alle Subjects, damit der Export-Script subjectId -> subjectSlug
+// auflösen kann. Additiv, nichts Bestehendes verändert.
+export const getAllTopicsForExport = query({
+  args: {},
+  handler: async (ctx) => {
+    const topics = await ctx.db
+      .query("topics")
+      .filter((q) => q.eq(q.field("isActive"), true))
+      .collect();
+
+    const subjects = await ctx.db.query("subjects").collect();
+
+    return {
+      topics: topics.map((t) => ({
+        name: t.name,
+        slug: t.slug,
+        gradeLevel: t.gradeLevel,
+        bundesland: t.bundesland ?? null,
+        keywords: t.keywords,
+        subjectId: t.subjectId,
+      })),
+      subjects: subjects.map((s) => ({ _id: s._id, slug: s.slug })),
+    };
+  },
+});
+
 // Curriculum-Quellen Status
 export const getCurriculumStatus = query({
   args: {},

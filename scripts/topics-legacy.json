@@ -1,0 +1,709 @@
+[
+  {
+    "subjectSlug": "mathematik",
+    "name": "Zahlen bis 20",
+    "slug": "zahlen-bis-20",
+    "gradeLevel": 1,
+    "keywords": [
+      "zählen",
+      "zahlenraum",
+      "mengen"
+    ]
+  },
+  {
+    "subjectSlug": "mathematik",
+    "name": "Addition bis 10",
+    "slug": "addition-bis-10",
+    "gradeLevel": 1,
+    "keywords": [
+      "plus",
+      "addieren",
+      "zusammenzählen"
+    ]
+  },
+  {
+    "subjectSlug": "mathematik",
+    "name": "Subtraktion bis 10",
+    "slug": "subtraktion-bis-10",
+    "gradeLevel": 1,
+    "keywords": [
+      "minus",
+      "abziehen",
+      "wegnehmen"
+    ]
+  },
+  {
+    "subjectSlug": "mathematik",
+    "name": "Formen erkennen",
+    "slug": "formen-erkennen-1",
+    "gradeLevel": 1,
+    "keywords": [
+      "kreis",
+      "dreieck",
+      "viereck",
+      "geometrie"
+    ]
+  },
+  {
+    "subjectSlug": "mathematik",
+    "name": "Größer und Kleiner",
+    "slug": "groesser-kleiner",
+    "gradeLevel": 1,
+    "keywords": [
+      "vergleichen",
+      "sortieren",
+      "ordnen"
+    ]
+  },
+  {
+    "subjectSlug": "mathematik",
+    "name": "Zahlen bis 100",
+    "slug": "zahlen-bis-100",
+    "gradeLevel": 2,
+    "keywords": [
+      "zahlenraum",
+      "bündeln",
+      "stellenwert"
+    ]
+  },
+  {
+    "subjectSlug": "mathematik",
+    "name": "Addition bis 100",
+    "slug": "addition-bis-100",
+    "gradeLevel": 2,
+    "keywords": [
+      "plus",
+      "addieren",
+      "rechnen"
+    ]
+  },
+  {
+    "subjectSlug": "mathematik",
+    "name": "Subtraktion bis 100",
+    "slug": "subtraktion-bis-100",
+    "gradeLevel": 2,
+    "keywords": [
+      "minus",
+      "abziehen",
+      "rechnen"
+    ]
+  },
+  {
+    "subjectSlug": "mathematik",
+    "name": "Einmaleins (1x1 bis 5x10)",
+    "slug": "einmaleins-1-5",
+    "gradeLevel": 2,
+    "keywords": [
+      "malrechnen",
+      "multiplizieren",
+      "mal"
+    ]
+  },
+  {
+    "subjectSlug": "mathematik",
+    "name": "Uhrzeit lesen",
+    "slug": "uhrzeit-lesen",
+    "gradeLevel": 2,
+    "keywords": [
+      "stunden",
+      "minuten",
+      "analog",
+      "digital"
+    ]
+  },
+  {
+    "subjectSlug": "mathematik",
+    "name": "Geld rechnen",
+    "slug": "geld-rechnen-2",
+    "gradeLevel": 2,
+    "keywords": [
+      "euro",
+      "cent",
+      "bezahlen",
+      "wechselgeld"
+    ]
+  },
+  {
+    "subjectSlug": "mathematik",
+    "name": "Zahlen bis 1000",
+    "slug": "zahlen-bis-1000",
+    "gradeLevel": 3,
+    "keywords": [
+      "zahlenraum",
+      "stellenwert",
+      "hunderter"
+    ]
+  },
+  {
+    "subjectSlug": "mathematik",
+    "name": "Schriftliche Addition",
+    "slug": "schriftliche-addition",
+    "gradeLevel": 3,
+    "keywords": [
+      "untereinander",
+      "übertrag",
+      "addieren"
+    ]
+  },
+  {
+    "subjectSlug": "mathematik",
+    "name": "Schriftliche Subtraktion",
+    "slug": "schriftliche-subtraktion",
+    "gradeLevel": 3,
+    "keywords": [
+      "untereinander",
+      "übertrag",
+      "abziehen"
+    ]
+  },
+  {
+    "subjectSlug": "mathematik",
+    "name": "Einmaleins (1x1 bis 10x10)",
+    "slug": "einmaleins-1-10",
+    "gradeLevel": 3,
+    "keywords": [
+      "malrechnen",
+      "multiplizieren",
+      "kernaufgaben"
+    ]
+  },
+  {
+    "subjectSlug": "mathematik",
+    "name": "Division mit Rest",
+    "slug": "division-mit-rest",
+    "gradeLevel": 3,
+    "keywords": [
+      "teilen",
+      "dividieren",
+      "rest"
+    ]
+  },
+  {
+    "subjectSlug": "mathematik",
+    "name": "Längen messen (cm, m, km)",
+    "slug": "laengen-messen",
+    "gradeLevel": 3,
+    "keywords": [
+      "meter",
+      "zentimeter",
+      "kilometer",
+      "umrechnen"
+    ]
+  },
+  {
+    "subjectSlug": "mathematik",
+    "name": "Gewichte (g, kg)",
+    "slug": "gewichte",
+    "gradeLevel": 3,
+    "keywords": [
+      "gramm",
+      "kilogramm",
+      "wiegen"
+    ]
+  },
+  {
+    "subjectSlug": "mathematik",
+    "name": "Zahlen bis 1.000.000",
+    "slug": "zahlen-bis-million",
+    "gradeLevel": 4,
+    "keywords": [
+      "million",
+      "stellenwert",
+      "große zahlen"
+    ]
+  },
+  {
+    "subjectSlug": "mathematik",
+    "name": "Schriftliche Multiplikation",
+    "slug": "schriftliche-multiplikation",
+    "gradeLevel": 4,
+    "keywords": [
+      "malrechnen",
+      "untereinander",
+      "zwischenergebnis"
+    ]
+  },
+  {
+    "subjectSlug": "mathematik",
+    "name": "Schriftliche Division",
+    "slug": "schriftliche-division",
+    "gradeLevel": 4,
+    "keywords": [
+      "teilen",
+      "untereinander",
+      "rest"
+    ]
+  },
+  {
+    "subjectSlug": "mathematik",
+    "name": "Brüche verstehen",
+    "slug": "brueche-verstehen",
+    "gradeLevel": 4,
+    "keywords": [
+      "halb",
+      "viertel",
+      "anteil",
+      "bruchteile"
+    ]
+  },
+  {
+    "subjectSlug": "mathematik",
+    "name": "Geometrie: Flächen und Umfang",
+    "slug": "flaechen-umfang",
+    "gradeLevel": 4,
+    "keywords": [
+      "rechteck",
+      "quadrat",
+      "berechnen"
+    ]
+  },
+  {
+    "subjectSlug": "mathematik",
+    "name": "Sachaufgaben lösen",
+    "slug": "sachaufgaben-4",
+    "gradeLevel": 4,
+    "keywords": [
+      "textaufgaben",
+      "verstehen",
+      "rechnen"
+    ]
+  },
+  {
+    "subjectSlug": "deutsch",
+    "name": "Buchstaben lernen",
+    "slug": "buchstaben-lernen",
+    "gradeLevel": 1,
+    "keywords": [
+      "abc",
+      "alphabet",
+      "laute"
+    ]
+  },
+  {
+    "subjectSlug": "deutsch",
+    "name": "Erste Wörter lesen",
+    "slug": "erste-woerter-lesen",
+    "gradeLevel": 1,
+    "keywords": [
+      "silben",
+      "lesen",
+      "verstehen"
+    ]
+  },
+  {
+    "subjectSlug": "deutsch",
+    "name": "Wörter schreiben",
+    "slug": "woerter-schreiben-1",
+    "gradeLevel": 1,
+    "keywords": [
+      "abschreiben",
+      "schrift",
+      "buchstaben"
+    ]
+  },
+  {
+    "subjectSlug": "deutsch",
+    "name": "Reimwörter",
+    "slug": "reimwoerter",
+    "gradeLevel": 1,
+    "keywords": [
+      "reimen",
+      "klang",
+      "gedichte"
+    ]
+  },
+  {
+    "subjectSlug": "deutsch",
+    "name": "Sätze lesen und verstehen",
+    "slug": "saetze-lesen-2",
+    "gradeLevel": 2,
+    "keywords": [
+      "sinnerfassung",
+      "lesen",
+      "verstehen"
+    ]
+  },
+  {
+    "subjectSlug": "deutsch",
+    "name": "Nomen und Artikel",
+    "slug": "nomen-artikel",
+    "gradeLevel": 2,
+    "keywords": [
+      "namenwörter",
+      "der die das",
+      "großschreibung"
+    ]
+  },
+  {
+    "subjectSlug": "deutsch",
+    "name": "Verben erkennen",
+    "slug": "verben-erkennen",
+    "gradeLevel": 2,
+    "keywords": [
+      "tunwörter",
+      "tätigkeiten",
+      "zeitwörter"
+    ]
+  },
+  {
+    "subjectSlug": "deutsch",
+    "name": "Geschichten schreiben",
+    "slug": "geschichten-schreiben-2",
+    "gradeLevel": 2,
+    "keywords": [
+      "erzählen",
+      "text",
+      "kreativ"
+    ]
+  },
+  {
+    "subjectSlug": "deutsch",
+    "name": "Leseverständnis",
+    "slug": "leseverstaendnis-3",
+    "gradeLevel": 3,
+    "keywords": [
+      "text",
+      "fragen",
+      "verstehen"
+    ]
+  },
+  {
+    "subjectSlug": "deutsch",
+    "name": "Rechtschreibung: Doppelkonsonanten",
+    "slug": "doppelkonsonanten",
+    "gradeLevel": 3,
+    "keywords": [
+      "nn",
+      "mm",
+      "ll",
+      "tt",
+      "regeln"
+    ]
+  },
+  {
+    "subjectSlug": "deutsch",
+    "name": "Satzarten",
+    "slug": "satzarten",
+    "gradeLevel": 3,
+    "keywords": [
+      "aussagesatz",
+      "fragesatz",
+      "ausrufesatz"
+    ]
+  },
+  {
+    "subjectSlug": "deutsch",
+    "name": "Wortarten bestimmen",
+    "slug": "wortarten-3",
+    "gradeLevel": 3,
+    "keywords": [
+      "nomen",
+      "verb",
+      "adjektiv"
+    ]
+  },
+  {
+    "subjectSlug": "deutsch",
+    "name": "Aufsätze schreiben",
+    "slug": "aufsaetze-3",
+    "gradeLevel": 3,
+    "keywords": [
+      "text",
+      "struktur",
+      "einleitung"
+    ]
+  },
+  {
+    "subjectSlug": "deutsch",
+    "name": "Leseverständnis (Sachtexte)",
+    "slug": "sachtexte-lesen",
+    "gradeLevel": 4,
+    "keywords": [
+      "informationen",
+      "verstehen",
+      "zusammenfassen"
+    ]
+  },
+  {
+    "subjectSlug": "deutsch",
+    "name": "Rechtschreibung: ie und i",
+    "slug": "ie-und-i",
+    "gradeLevel": 4,
+    "keywords": [
+      "langer",
+      "kurzer",
+      "vokal",
+      "regeln"
+    ]
+  },
+  {
+    "subjectSlug": "deutsch",
+    "name": "Zeitformen des Verbs",
+    "slug": "zeitformen-verb",
+    "gradeLevel": 4,
+    "keywords": [
+      "präsens",
+      "präteritum",
+      "perfekt",
+      "futur"
+    ]
+  },
+  {
+    "subjectSlug": "deutsch",
+    "name": "Satzglieder bestimmen",
+    "slug": "satzglieder",
+    "gradeLevel": 4,
+    "keywords": [
+      "subjekt",
+      "prädikat",
+      "objekt"
+    ]
+  },
+  {
+    "subjectSlug": "deutsch",
+    "name": "Berichte schreiben",
+    "slug": "berichte-schreiben",
+    "gradeLevel": 4,
+    "keywords": [
+      "sachlich",
+      "informieren",
+      "w-fragen"
+    ]
+  },
+  {
+    "subjectSlug": "sachunterricht",
+    "name": "Mein Körper",
+    "slug": "mein-koerper-1",
+    "gradeLevel": 1,
+    "keywords": [
+      "körperteile",
+      "sinne",
+      "gesundheit"
+    ]
+  },
+  {
+    "subjectSlug": "sachunterricht",
+    "name": "Die Jahreszeiten",
+    "slug": "jahreszeiten-1",
+    "gradeLevel": 1,
+    "keywords": [
+      "frühling",
+      "sommer",
+      "herbst",
+      "winter"
+    ]
+  },
+  {
+    "subjectSlug": "sachunterricht",
+    "name": "Tiere und Pflanzen",
+    "slug": "tiere-pflanzen-1",
+    "gradeLevel": 1,
+    "keywords": [
+      "natur",
+      "lebewesen",
+      "beobachten"
+    ]
+  },
+  {
+    "subjectSlug": "sachunterricht",
+    "name": "Wasser und seine Eigenschaften",
+    "slug": "wasser-eigenschaften",
+    "gradeLevel": 2,
+    "keywords": [
+      "flüssig",
+      "fest",
+      "gas",
+      "experiment"
+    ]
+  },
+  {
+    "subjectSlug": "sachunterricht",
+    "name": "Zeit und Kalender",
+    "slug": "zeit-kalender",
+    "gradeLevel": 2,
+    "keywords": [
+      "tag",
+      "woche",
+      "monat",
+      "jahr"
+    ]
+  },
+  {
+    "subjectSlug": "sachunterricht",
+    "name": "Mein Schulweg",
+    "slug": "schulweg",
+    "gradeLevel": 2,
+    "keywords": [
+      "verkehr",
+      "sicherheit",
+      "regeln"
+    ]
+  },
+  {
+    "subjectSlug": "sachunterricht",
+    "name": "Unser Bundesland",
+    "slug": "bundesland",
+    "gradeLevel": 3,
+    "keywords": [
+      "heimat",
+      "region",
+      "städte"
+    ]
+  },
+  {
+    "subjectSlug": "sachunterricht",
+    "name": "Strom und Energie",
+    "slug": "strom-energie",
+    "gradeLevel": 3,
+    "keywords": [
+      "elektrizität",
+      "stromkreis",
+      "sparen"
+    ]
+  },
+  {
+    "subjectSlug": "sachunterricht",
+    "name": "Feuer und Verbrennung",
+    "slug": "feuer-verbrennung",
+    "gradeLevel": 3,
+    "keywords": [
+      "flamme",
+      "wärme",
+      "sicherheit"
+    ]
+  },
+  {
+    "subjectSlug": "sachunterricht",
+    "name": "Deutschland",
+    "slug": "deutschland",
+    "gradeLevel": 4,
+    "keywords": [
+      "bundesländer",
+      "hauptstadt",
+      "landkarte"
+    ]
+  },
+  {
+    "subjectSlug": "sachunterricht",
+    "name": "Der menschliche Körper",
+    "slug": "menschlicher-koerper",
+    "gradeLevel": 4,
+    "keywords": [
+      "organe",
+      "verdauung",
+      "kreislauf"
+    ]
+  },
+  {
+    "subjectSlug": "sachunterricht",
+    "name": "Magnetismus",
+    "slug": "magnetismus",
+    "gradeLevel": 4,
+    "keywords": [
+      "anziehen",
+      "abstoßen",
+      "kompass"
+    ]
+  },
+  {
+    "subjectSlug": "sachunterricht",
+    "name": "Medien und Internet",
+    "slug": "medien-internet",
+    "gradeLevel": 4,
+    "keywords": [
+      "digital",
+      "sicherheit",
+      "recherche"
+    ]
+  },
+  {
+    "subjectSlug": "englisch",
+    "name": "Colours and Numbers",
+    "slug": "colours-numbers",
+    "gradeLevel": 3,
+    "keywords": [
+      "farben",
+      "zahlen",
+      "englisch"
+    ]
+  },
+  {
+    "subjectSlug": "englisch",
+    "name": "Animals",
+    "slug": "animals-3",
+    "gradeLevel": 3,
+    "keywords": [
+      "tiere",
+      "pets",
+      "farm animals"
+    ]
+  },
+  {
+    "subjectSlug": "englisch",
+    "name": "My Family",
+    "slug": "my-family",
+    "gradeLevel": 3,
+    "keywords": [
+      "familie",
+      "mother",
+      "father",
+      "sister"
+    ]
+  },
+  {
+    "subjectSlug": "englisch",
+    "name": "Food and Drinks",
+    "slug": "food-drinks",
+    "gradeLevel": 3,
+    "keywords": [
+      "essen",
+      "trinken",
+      "fruit",
+      "vegetables"
+    ]
+  },
+  {
+    "subjectSlug": "englisch",
+    "name": "My Day / Daily Routine",
+    "slug": "my-day",
+    "gradeLevel": 4,
+    "keywords": [
+      "tagesablauf",
+      "morning",
+      "evening"
+    ]
+  },
+  {
+    "subjectSlug": "englisch",
+    "name": "Clothes and Weather",
+    "slug": "clothes-weather",
+    "gradeLevel": 4,
+    "keywords": [
+      "kleidung",
+      "wetter",
+      "seasons"
+    ]
+  },
+  {
+    "subjectSlug": "englisch",
+    "name": "At School",
+    "slug": "at-school",
+    "gradeLevel": 4,
+    "keywords": [
+      "schule",
+      "classroom",
+      "subjects"
+    ]
+  },
+  {
+    "subjectSlug": "englisch",
+    "name": "Hobbies and Sports",
+    "slug": "hobbies-sports",
+    "gradeLevel": 4,
+    "keywords": [
+      "freizeit",
+      "spielen",
+      "activities"
+    ]
+  }
+]
