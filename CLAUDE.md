@@ -406,6 +406,45 @@ railway up --service meoluna
 
 ---
 
+## Code-Karte (Ergänzung)
+
+Die Struktur- und Datei-Übersicht oben ist die Haupt-Code-Karte. Hier nur die Lücken: echte Einstiegspunkte, Auth-Wiring, Styles/Config und die Generation-Pipeline im Detail.
+
+### Fehlende Entry Points
+| Datei | Funktion |
+|-------|----------|
+| `src/main.tsx` | React-Root, mountet `App` |
+| `src/App.tsx` | Router-Setup, definiert alle Routes (`/`, `/create`, `/w/:id`, `/teacher`, `/join`, ...) |
+| `convex/http.ts` | HTTP-Router (`/api/track/*`, Webhooks) |
+| `convex/pipeline/orchestrator.ts` | Eintrittspunkt der Welt-Generierungs-Pipeline (Spec → Renderer → Validator → Code) |
+
+### Generation-Pipeline (in `convex/pipeline/`)
+- `engines/` — 14 deterministische Engines, je `*Renderer.ts` (Codegen), `*Validator.ts`, `*Types.ts`, `*TopicRouter.ts` (Themen → Engine-Auswahl). `kidKit.ts` = geteilte UI-Fragmente, `engineRegistry.ts` = zentrale Engine-Liste.
+- `prompts/` — LLM-Prompt-Templates pro Engine.
+- `steps/` — Pipeline-Schritte (Generator pro Engine, `structuralGate.ts`, `validator.ts`, `gameplayRouter.ts`).
+- `utils/anthropicClient.ts`, `utils/falClient.ts` — LLM/Media-API-Clients.
+
+### Auth-Wiring (Clerk ↔ Convex)
+- `convex/auth.config.ts` — Convex-seitige Clerk-Konfiguration.
+- `convex/lib/auth.ts` — Helper zum Auslesen des authentifizierten Users in Convex Functions.
+
+### Styles & Config
+- `src/index.css` — globale Styles inkl. Meoluna-Theme-CSS-Variablen.
+- `tailwind.config.js`, `postcss.config.js` — Tailwind/PostCSS-Setup.
+- `vite.config.ts` — Vite-Build-Config.
+
+### Fehlende Befehle (Tests/QA/Deploy)
+```bash
+npm run golden-check          # alle Engine-Golden-Checks
+npm run playthrough-smoke     # Klick-Durchlauf-Smoke-Test (XP-Contract)
+npm run uniqueness-check      # Struktur-Signatur-Diversität der generierten Welten
+npm run visual-check          # Visual-Regression gegen Baselines
+npm run deploy:convex:prod    # Convex-Prod-Deploy (PowerShell-Script)
+```
+Weitere Engine-spezifische Golden-Checks: `npm run <engine>-golden-check` (z. B. `pattern-golden-check`, `clock-golden-check`) — vollständige Liste in `package.json`.
+
+---
+
 # Activity Log
 
 ## 2026-02-01 - PaddleOCR Integration Session
