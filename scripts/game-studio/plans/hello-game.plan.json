@@ -1,0 +1,18 @@
+{
+  "game": "hello-game",
+  "seed": "hello-seed-1",
+  "steps": [
+    { "op": "waitFor", "affordance": "hello.start" },
+    { "op": "screenshot", "name": "start" },
+    { "op": "tap", "affordance": "hello.start" },
+    { "op": "waitFor", "affordance": "hello.star-1" },
+    { "op": "tap", "affordance": "hello.star-1" },
+    { "op": "waitFor", "affordance": "hello.star-2" },
+    { "op": "tap", "affordance": "hello.star-2" },
+    { "op": "waitFor", "affordance": "hello.star-3" },
+    { "op": "tap", "affordance": "hello.star-3" },
+    { "op": "assertGoal", "goalId": "goal-demo" },
+    { "op": "assertComplete" },
+    { "op": "screenshot", "name": "done" }
+  ]
+}

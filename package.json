@@ -43,7 +43,9 @@
     "game-runtime-check": "node scripts/game-studio/phaser-runtime-check.mjs",
     "game-studio-lab-check": "node scripts/game-studio/game-studio-lab-check.mjs",
     "game-source-check": "node --import tsx/esm scripts/game-studio/source-validator-check.mjs",
-    "experience-signature-check": "node --import tsx/esm scripts/game-studio/experience-signature-check.mjs"
+    "experience-signature-check": "node --import tsx/esm scripts/game-studio/experience-signature-check.mjs",
+    "game-playthrough": "node scripts/game-studio/run-playthrough.mjs",
+    "game-studio-check": "npm run game-runtime-check && npm run game-source-check && npm run experience-signature-check && npm run game-studio-lab-check"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.60.0",
