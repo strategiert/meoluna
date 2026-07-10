@@ -690,4 +690,39 @@ Digitale PDFs (Mehrheit der Lehrer-Uploads) brauchen kein 200-DPI-Rendering + OC
 
 ---
 
-*Letztes Update: 2026-07-10*
+## 2026-07-11 - Game Studio V3: Phaser Vertical Slice (Spec 2026-07-10)
+
+### Was gebaut wurde ✅
+Parallele Phaser-4-Testumgebung neben den 14 React-Engines — kein Produktionspfad verändert. Spec: `docs/superpowers/specs/2026-07-10-generative-game-studio-design.md`, Plan: `docs/superpowers/plans/2026-07-10-game-studio-v3-vertical-slice.md`.
+
+| Komponente | Beschreibung |
+|------------|--------------|
+| `public/game-runtime/v1/` | Runtime-Shell: sandboxed iframe (`allow-scripts`, opake Origin), CSP `default-src 'none'`, Phaser 4.2.1 (exakt gepinnt), MessagePort-Bridge (kein breites postMessage) |
+| `src/components/game-runtime/` | `types.ts`, `bridge.ts` (e.source-Guard, Typ-Whitelist, Single-INIT), `PhaserPreview.tsx` (onEvent per Ref — Deps nur `[manifest]`) |
+| `src/pages/admin/GameStudioLab.tsx` + Route `/admin/game-studio` | Admin-only Lab: Spielauswahl + Event-Log. KEINE Convex-Writes, kein XP — Spiel-Events sind untrusted |
+| `convex/gameStudio/` | `sourceValidator.ts` (18 Verbots-Regeln inkl. Math.random/Date.now), `types.ts`, `originalityGate.ts` (Jaccard + 7 Dimensionen, Schwellen 0.72/0.60) — pure TS, keine Convex-Functions |
+| `scripts/game-studio/` | `lib/harness.mjs`, `run-playthrough.mjs` (generischer Executor: Affordance-Pläne, 3 Viewports mit Orientierungs-Rotation, 48px-Touch-Gate, Perf-Gate p95<33ms @ 4x CPU-Throttle), Checks, Ägypten-Learning-Model |
+| `public/game-studio/games/egypt-tomb/` | Spiel A „Das Siegel des vergessenen Schreibers": Top-down-Mystery, 3 Grabkammern, 960x960 |
+| `public/game-studio/games/egypt-city/` | Spiel B „Stadt am großen Fluss": Runden-Wirtschaftssim, 3 Jahre × 3 Nilphasen, 1280x720, Schreiber-Mechanik als System |
+
+### QA-Befehle (neu)
+`npm run game-slice-check` (alles), `game-studio-check`, `game-runtime-check`, `game-source-check`, `experience-signature-check`, `game-studio-lab-check`, `game-playthrough -- --plan <plan> --viewport all`
+
+### Gelernte Fallen
+- Headless-Chromium fällt ohne `--use-gl=angle` auf SwiftShader zurück → deterministisch 30fps → Perf-Gate-Fehlalarm. Hängende Chrome-Prozesse erzeugen dasselbe Symptom.
+- Live-Vektor-Graphics pro Frame reißen das Perf-Gate — Texturen mit `generateTexture` baken (Cache-Key = pure Funktion von Typ+Größe, PRNG-frei).
+- 960er-Basis @ 390px-Viewport: Touch-Targets brauchen ≥140 logische px (Landscape 1280er: ≥90).
+- Echte Umlaute von Anfang an — TTS liest „fuer" falsch vor; Review-Loop gekostet.
+- Executor-Playthrough testet Landscape-Spiele auf Portrait-Viewports GEDREHT — echter Portrait-Modus (Dreh-Hinweis) bleibt ungetestet, Overlay muss Input aktiv blockieren.
+
+### Status / Offen
+- Beide Spiele: Playthrough 3 Viewports grün, alle 4 Lernziele per Telemetrie, Similarity 0.0 (<0.40-Gate), completeGame session-guarded.
+- Bestands-Regression grün: tsc, golden-check 5/5, sandbox-entry, playthrough-smoke, uniqueness.
+- **Pilot-Gate (Spec 8.5) OFFEN:** Klaus' Erst-Feedback (Spiel A): „Keinerlei Erklärung, Reihenfolge unklar, Sinn unklar" → Follow-up nötig: Intro-Sequenz/Zielansage pro Spiel, geführter erster Zug, sichtbares Ziel-HUD. Erst danach Gate-Bewertung wiederholen.
+- Phase 2 (Artifact-Modell, Admin-Generierung, LLM-Pitch/GDD) NICHT begonnen — bewusst nach Gate-Entscheid.
+
+### Agent: Claude Code (Fable, Orchestrator) + 2× Opus-Implementer (Spiele) + 3× fast-worker + 1× Sonnet-Implementer + 5 Reviewer (2× Opus, 3× Sonnet), SDD-Workflow mit Fix-Loops
+
+---
+
+*Letztes Update: 2026-07-11*

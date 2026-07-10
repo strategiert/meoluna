@@ -93,7 +93,7 @@
     { "id": "hud.phase-next", "description": "Die eingestellte Phase auswerten und zum nächsten Zug gehen." },
     { "id": "advisor.next", "description": "Berater-Rat durchblättern und vorlesen lassen." },
     { "id": "event.grave-accept", "description": "Der Werkstatt Arbeiter für Grabausstattung/Kanopen zusagen." },
-    { "id": "event.grave-later", "description": "Die Bitte der Werkstatt vertagen." },
+    { "id": "event.grave-later", "description": "Die Bitte der Werkstatt dauerhaft ablehnen." },
     { "id": "ui.sound-toggle", "description": "Ton an/aus (oben rechts, startet stumm)." },
     { "id": "ui.restart", "description": "Im Finale oder Verfehlt-Screen neu starten." }
   ],

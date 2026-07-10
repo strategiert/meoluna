@@ -1,6 +1,6 @@
 # Generative Game Studio mit Phaser
 
-**Status:** Freigegeben für die Umsetzung
+**Status:** Phase 0 + Phase 1 (Vertical Slice) umgesetzt am 2026-07-11. Menschliches Pilot-Gate (8.5): offen — erstes Feedback von Klaus (Spiel A, vor Fertigstellung): Onboarding fehlt, Ziel und Reihenfolge unklar. Follow-up „Intro/Zielansage pro Spiel" vor Gate-Wiederholung nötig.
 
 **Datum:** 2026-07-10
 
