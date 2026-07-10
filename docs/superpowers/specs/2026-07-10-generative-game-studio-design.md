@@ -81,6 +81,7 @@ Quelle
   -> Art Bible + Asset Manifest
   -> Phaser Source Generator
   -> Static/Security Validation
+  -> Content-Safety + PII Gate
   -> Runtime Build
   -> Automated Playthrough
   -> Visual/Performance QA
@@ -186,6 +187,8 @@ Initiale Vergleichsregeln:
 
 Die Grenzwerte werden später anhand echter Generierungen kalibriert, aber nicht während des Vertical Slices gelockert.
 
+Das normalisierte Thema entspricht der Curriculum-Topic-ID; ohne Curriculum-Bezug wird ein Slug aus Fach und Kernbegriff gebildet. Der Ähnlichkeitscheck läuft zweimal: bei der Pitch-Auswahl und erneut unmittelbar vor dem Publish. Sonst können zwei parallel laufende Generierungen einander nicht sehen und beide passieren das Gate, obwohl sie sich zu ähnlich sind.
+
 ### 4.4 Game Design Document
 
 Der ausgewählte Pitch wird zu einem vollständigen, maschinenlesbaren `GameDesignDocument` ausgearbeitet.
@@ -193,6 +196,7 @@ Der ausgewählte Pitch wird zu einem vollständigen, maschinenlesbaren `GameDesi
 Pflichtbestandteile:
 
 - Spielerfantasie und Ziel
+- Basisauflösung und Orientierung (aus dem festen Set in Abschnitt 5.4)
 - Szenen-Graph mit Start-, Spiel-, Erfolgs- und Wiederholungszuständen
 - Kernloop und sekundäre Loops
 - Steuerung für Touch sowie Maus/Tastatur
@@ -203,9 +207,17 @@ Pflichtbestandteile:
 - audiovisuelle Feedbackregeln
 - Asset-Manifest
 - Telemetrieereignisse
+- Affordance-Liste: alle interaktiven Zonen mit stabilen IDs (Grundlage für Playthrough und QA, siehe 8.2)
 - deterministischer Playthrough-Plan für QA
 
 Das GDD darf keine allgemeinen Aussagen wie „macht Spaß“ oder „interaktiv“ enthalten. Jede Anforderung muss als beobachtbares Verhalten beschrieben werden.
+
+`GameDesignDocument` wird als TypeScript-Typ in `convex/gameStudio/types.ts` definiert. Schritte im `playthroughPlan` referenzieren ausschließlich Affordance-IDs, keine Pixel-Koordinaten — Koordinaten kennt erst die Laufzeit.
+
+### 4.5 Source-Generierung
+
+- Der Source wird szenen- bzw. modulweise generiert (ein LLM-Aufruf pro Szene plus ein geprüfter gemeinsamer Header) und von einem deterministischen Assembler zusammengefügt. Ein-Schuss-Generierung oberhalb von etwa 60 KB gilt als unzuverlässig und wird nicht versucht.
+- Bekanntes Risiko: Die Trainingsdaten aller Codegen-Modelle bestehen überwiegend aus Phaser-3-Code. Phaser 4 hält die API weitgehend kompatibel, ist aber ein Renderer-Rewrite mit offiziellem Migration Guide — Breaking Changes existieren. Der Generator-Prompt enthält deshalb ein geprüftes Phaser-4-API-Cheatsheet mit Beispiel-Snippets; der Repair-Schritt prüft gezielt auf bekannte v3-only-APIs. Steigt die Repair-Quote in der Pilotphase trotzdem deutlich wegen API-Fehlern, wird ein Downgrade auf die letzte Phaser-3-LTS-Version als Gegenmaßnahme bewertet.
 
 ## 5. Phaser-Laufzeit
 
@@ -216,6 +228,7 @@ Das GDD darf keine allgemeinen Aussagen wie „macht Spaß“ oder „interaktiv
 - Der generierte Code nutzt Phaser über `window.Phaser`; externe Imports sind verboten.
 - Ein Spiel exportiert genau eine Funktion `bootMeolunaGame(context)`.
 - Der Kontext liefert Container, Viewport, Asset-URLs, Seed und die Meoluna-Bridge.
+- Alle Zufallsentscheidungen stammen aus einem seeded PRNG über `context.seed`; `Math.random` ist verboten (gleiche Regel wie in den React-Engines). Der Seed ist im Artifact fixiert, damit QA-Playthroughs reproduzierbar sind.
 
 ```ts
 type MeolunaGameContext = {
@@ -248,12 +261,13 @@ public/game-runtime/v1/
 
 Ablauf:
 
-1. `PhaserPreview` lädt `index.html` in einem `iframe` mit `sandbox="allow-scripts"`.
+1. `PhaserPreview` lädt `index.html` in einem `iframe` mit `sandbox="allow-scripts"` (ohne `allow-same-origin` — opake Origin).
 2. Der Shell meldet `MEOLUNA_RUNTIME_READY` an das Parent-Fenster.
-3. Das Parent sendet den bereits autorisiert geladenen World-Artifact per `postMessage`.
-4. Der Shell erstellt aus dem Source einen JavaScript-Blob und lädt ihn als Modul.
-5. Das Modul exportiert `bootMeolunaGame` und erhält ausschließlich den kontrollierten Kontext.
-6. Fortschritt und Fehler gehen über typisierte Bridge-Nachrichten zurück.
+3. Das Parent beantwortet den Handshake mit einem transferierten `MessagePort` (MessageChannel). Alle weitere Kommunikation läuft ausschließlich über diesen Port — nicht über breites `window.postMessage`, das bei opaker Origin nur mit `targetOrigin: "*"` funktionieren würde.
+4. Über den Port kommen Source und Assets als `Blob`/`ArrayBuffer` (structured clone). Das Parent lädt die Assets vorher im eigenen, authentifizierten Kontext; der Shell erzeugt daraus `blob:`-URLs. So gibt es keine CORS-Probleme mit der opaken Origin, und die CSP des Shells braucht keinerlei Netzwerkfreigaben.
+5. Der Shell erstellt aus dem Source einen JavaScript-Blob und lädt ihn als Modul.
+6. Das Modul exportiert `bootMeolunaGame` und erhält ausschließlich den kontrollierten Kontext.
+7. Fortschritt und Fehler gehen über typisierte Nachrichten auf dem MessagePort zurück.
 
 Der generierte Code erhält keinen direkten Zugriff auf Convex-Tokens oder Clerk-Daten.
 
@@ -268,18 +282,31 @@ Der Source-Validator lehnt mindestens Folgendes ab:
 - DOM-Manipulation außerhalb des übergebenen Containers
 - externe Script- oder Modulimporte
 - Kamera, Mikrofon, Geolocation und Clipboard
+- `Math.random` sowie `Date.now`/`performance.now` als Eingang von Spiellogik (Zufall nur über den seeded PRNG, Spielzeit nur über die Phaser-Clock)
 - Endlosschleifen in offensichtlich statischer Form
 
 Nur die Runtime-Bridge darf Daten aus dem Spiel herausreichen.
 
+Der Validator ist Frühwarnsystem und Qualitätsgate, nicht die Sicherheitsgrenze: dynamische Konstruktionen wie `window["fe" + "tch"]` oder `[].constructor.constructor` sind statisch nicht zuverlässig erkennbar. Die harte Grenze ist die Sandbox aus Abschnitt 5.5.
+
 ### 5.4 Responsive Vertrag
 
-- Logische Basisauflösung: `1280 x 720`.
+- Logische Basisauflösung wählt das GDD aus einem festen Set: `1280 x 720` (Landscape), `720 x 1280` (Portrait) oder `960 x 960` (Quadrat). Grund: eine fixe 16:9-Basis wird per FIT auf einem Portrait-Handy (`390 x 844`) auf rund `390 x 219` verkleinert — eine unspielbare Briefmarke. Spiele für primär mobile Nutzung wählen Portrait oder Quadrat.
 - Phaser Scale Mode: `FIT`, zentriert im verfügbaren Container.
-- Touch-Ziele mindestens 48 CSS-Pixel.
-- Das Spiel muss bei `390 x 844`, `768 x 1024` und `1440 x 900` ohne abgeschnittene Pflichtaktionen funktionieren.
+- Touch-Ziele mindestens 48 CSS-Pixel **nach** FIT-Skalierung im kleinsten Ziel-Viewport; der Validator rechnet das in logische Mindestgrößen der gewählten Basisauflösung um.
+- Das Spiel muss bei `390 x 844`, `768 x 1024` und `1440 x 900` ohne abgeschnittene Pflichtaktionen funktionieren. Ein Landscape-Spiel darf auf Portrait-Viewports einen kindgerechten Dreh-Hinweis zeigen und wird dann bei `844 x 390` geprüft.
 - Steuerung darf nie ausschließlich Hover, Rechtsklick oder Tastatur voraussetzen.
+- Lernkritische Information darf nie ausschließlich über Farbe codiert sein.
 - Ton startet stumm und wird erst durch eine Nutzergeste aktiviert.
+
+### 5.5 Sicherheitsgrenze und CSP
+
+Die eigentliche Sicherheitsgrenze ist die Sandbox, nicht der Source-Validator:
+
+- `sandbox="allow-scripts"` ohne `allow-same-origin`: opake Origin, kein Storage, keine Cookies, kein Same-Origin-Zugriff auf die App.
+- `index.html` des Shells setzt eine eigene CSP per `<meta http-equiv="Content-Security-Policy">`, initial: `default-src 'none'; script-src 'self' blob:; img-src blob: data:; media-src blob:; connect-src blob:; worker-src blob:; style-src 'unsafe-inline'`. Damit sind `fetch`/XHR nach außen auch dann tot, wenn der Validator obfuskierten Code übersehen hat. Netzwerkfreigaben sind nicht nötig, weil Assets als Blobs hereingereicht werden (5.2).
+- Der Parent validiert beim einmaligen Handshake `event.source === iframe.contentWindow`; danach läuft alles über den exklusiven MessagePort. Payloads werden gegen ein Schema geprüft, unbekannte Nachrichtentypen werden verworfen.
+- Der Client bleibt untrusted — auch der Shell. `reportScore`, `completeGoal` und `completeGame` sind serverseitig idempotent pro Nutzer und Welt (kein doppeltes XP durch wiederholte Nachrichten) und rate-limitiert.
 
 ## 6. Assets und Art Direction
 
@@ -301,6 +328,7 @@ Alle Asset-Prompts werden daraus abgeleitet. Einzelne unabhängig erzeugte Bilde
 
 - KI-generierte Bitmap-Assets für Hintergrund, große Schauplätze und charakteristische Requisiten.
 - Interaktive Objekte, Hitboxen, Partikel und Statusfeedback werden zunächst mit Phaser-Geometrie und kleinen geprüften Sprites umgesetzt.
+- Soundeffekte bevorzugt als WebAudio-Synthese im Code (kein Asset — dasselbe Muster wie kidKit in den React-Engines). Generierte Audio-Dateien sind die Ausnahme, nicht der Standard.
 - Keine Emojis als zentrale Spielgrafik.
 - Keine dekorativen Bilder, die für die Spielhandlung unlesbar oder funktionslos sind.
 - Jedes Asset erhält semantische ID, Typ, Abmessungen, Dateigröße und Herkunftsprompt.
@@ -311,6 +339,7 @@ Alle Asset-Prompts werden daraus abgeleitet. Einzelne unabhängig erzeugte Bilde
 Initiale Grenzen pro Spiel:
 
 - maximal 12 persistierte Bitmap-Assets
+- maximal 2 Audio-Assets (`audio/mpeg`), enthalten im Gesamtbudget
 - maximal 5 MB gesamtes Asset-Budget
 - maximal 250 KB generierter JavaScript-Source
 - WebP für Bitmap-Assets, PNG nur bei benötigter Transparenz
@@ -339,7 +368,7 @@ type WorldArtifact = {
   schemaVersion: 1;
   runtime: "phaser-v1";
   phaserVersion: "4.2.1";
-  source: string;
+  sourceStorageId: Id<"_storage">;
   designDocument: GameDesignDocument;
   learningModel: LearningModel;
   experienceSignature: ExperienceSignature;
@@ -367,6 +396,8 @@ type WorldArtifact = {
 
 `worldArtifacts` wird über `worldId` indexiert. Abruf und Asset-URLs verwenden dieselben Eigentümer-/Öffentlichkeitsregeln wie `worlds.get`.
 
+Convex begrenzt Dokumente auf 1 MiB. Bis zu 250 KB Source plus GDD, Learning Model und Validierungs-Report in einem Dokument ist zu knapp — der Source liegt deshalb als Datei in `_storage` (`sourceStorageId`). Wächst `designDocument` in der Praxis über etwa 300 KB, wandert es ebenfalls in `_storage`.
+
 ### 7.3 Renderer-Auswahl
 
 `WorldPreview` wird zu einem kleinen Dispatcher:
@@ -389,12 +420,14 @@ Vor jedem Runtime-Test:
 - Phaser-Spiel wird genau einmal erzeugt und kann zerstört werden.
 - verbotene APIs fehlen.
 - jedes Pflichtlernziel besitzt mindestens ein Telemetrieereignis.
-- `completeGame` ist von einem erreichbaren Erfolgszustand aus aufrufbar.
+- ein `completeGame`-Aufruf existiert im Source; die tatsächliche Erreichbarkeit beweist erst der Playthrough — statisch ist Erreichbarkeit nicht entscheidbar.
 - Source- und Asset-Budgets werden eingehalten.
 
 ### 8.2 Automatischer Playthrough
 
 Das GDD liefert einen maschinenlesbaren `playthroughPlan`. Ein separater Playwright-Worker führt ihn aus.
+
+Ein Phaser-Spiel ist reines Canvas — es gibt keine DOM-Elemente, die Playwright ansteuern könnte. Deshalb registriert jedes Spiel seine interaktiven Zonen über die Bridge als Affordances (`{ id, bounds, state }`, aktualisiert bei jedem Szenen- oder Zustandswechsel). `playthroughPlan`-Schritte referenzieren Affordance-IDs; der Worker löst sie zur Laufzeit in Viewport-Koordinaten auf und sendet echte Pointer-Events. Der Playthrough läuft immer mit dem im Artifact fixierten Seed — deshalb ist Determinismus (5.1) nicht optional, sondern Voraussetzung dieses Gates.
 
 Pflichtprüfungen:
 
@@ -408,15 +441,26 @@ Pflichtprüfungen:
 
 Playwright-Screenshots werden an den drei Ziel-Viewports erzeugt und per visueller Regression verglichen. Playwright unterstützt dafür native Screenshot-Vergleiche mit `toHaveScreenshot`.
 
+Die beiden Vertical-Slice-Spiele nutzen von Anfang an dieses Plan-Format und einen generischen Executor — keine spielspezifischen Testskripte. Das automatische Durchspielen beliebiger Canvas-Spiele ist der riskanteste Teil der gesamten Pipeline; er wird damit schon im Slice bewiesen, nicht erst in Phase 3.
+
 ### 8.3 Performance
 
 - Ziel: 60 FPS auf einem durchschnittlichen aktuellen Mobilgerät.
 - Harte Untergrenze im automatischen Desktop-Test: p95 Frame-Zeit unter 33 ms.
+- Ein ungedrosselter Desktop-Test sagt wenig über Mobilgeräte. Der Test läuft deshalb zusätzlich mit 4x-CPU-Throttling (CDP `Emulation.setCPUThrottlingRate`) als Mobile-Proxy; auch dort gilt p95 unter 33 ms.
 - `GAME_READY` unter fünf Sekunden bei warmem CDN und normaler Breitbandverbindung.
-- Kein kontinuierliches Speicherwachstum über einen zehnminütigen Testlauf.
+- Kein kontinuierliches Speicherwachstum: pro Generierung ein 2-Minuten-Lauf als Gate. Der 10-Minuten-Soak-Test läuft nightly über publizierte Artifacts, nicht in der Generierungsschleife — sonst addiert jedes Spiel 10 Minuten Wartezeit auf die Generierung.
 - Runtime muss Phaser beim Unmount vollständig zerstören.
 
-### 8.4 Menschliches Pilot-Gate
+### 8.4 Inhalts- und Datenschutz-Gate
+
+Die Plattform läuft in Schulen und verarbeitet Kinderdaten. Dieses Gate ist nicht optional und wird auch hinter dem Feature-Flag nicht deaktiviert:
+
+- Alle sichtbaren Spieltexte durchlaufen eine Moderationsprüfung: altersgerecht für die `ageRange`, keine Angst- oder Gewaltinhalte über den fachlichen Kontext hinaus, Lesbarkeit gegen `constraints.readingLevel` geprüft.
+- Jedes generierte Bild durchläuft eine Bild-Moderation, bevor es in Convex Storage persistiert wird.
+- PII-Scrub vor jedem fal.ai-Aufruf: Asset-Prompts und GDD-Texte dürfen keine personenbezogenen Daten aus Quelldokumenten enthalten — hochgeladene Arbeitsblätter enthalten teils Schülernamen. Personenbezogene Daten verlassen Meoluna nicht Richtung Drittanbieter.
+
+### 8.5 Menschliches Pilot-Gate
 
 Automatische Tests können Funktion und Lernzielabdeckung prüfen, aber nicht zuverlässig feststellen, ob ein Spiel Spaß macht. Während des Piloten bewertet ein Mensch jedes neue Konzept auf einer Skala von 1 bis 5:
 
@@ -527,6 +571,7 @@ Scheitert dieser Slice, wird keine automatische Phaser-Generierung gebaut. Statt
 - statischen Source-Validator implementieren.
 - gemeinsame Ägypten-Faktenbasis und Learning Model festlegen.
 - beide Spiele als unabhängige Phaser-Projekte umsetzen.
+- Playthrough-Pläne als Daten (`plans/*.plan.json`) plus einen generischen Executor bauen — keine spielspezifischen Testskripte (siehe 8.2).
 - Playwright-Playthroughs, Viewport-Screenshots und Performance-Probe hinzufügen.
 - Auftraggeber spielt beide Welten; Ergebnis wird dokumentiert.
 
@@ -583,8 +628,9 @@ convex/gameStudio/
 scripts/game-studio/
   sandbox-entry-check.mjs
   phaser-runtime-check.mjs
-  egypt-tomb-playthrough.mjs
-  egypt-city-playthrough.mjs
+  run-playthrough.mjs
+  plans/egypt-tomb.plan.json
+  plans/egypt-city.plan.json
   experience-signature-check.mjs
 ```
 
@@ -598,7 +644,9 @@ Die bestehenden Dateien unter `convex/pipeline/engines/` werden in Phase 1 nicht
 - Pitch Set enthält fünf strukturell verschiedene Kandidaten.
 - Originality Gate akzeptiert und verwirft bekannte Signaturen korrekt.
 - Source Validator erkennt jede verbotene API.
+- CSP des Runtime-Shells blockt Netzwerkzugriffe auch bei obfuskiertem Code: ein Testspiel mit `window["fe" + "tch"]` scheitert an der CSP, nicht erst am Validator.
 - Bridge akzeptiert nur bekannte Nachrichtentypen und das zugehörige iframe.
+- `completeGame`-Doppelmeldungen erzeugen serverseitig kein doppeltes XP (Idempotenz).
 - Legacy-Welten werden weiterhin an Sandpack geroutet.
 - Phaser-Welten werden ausschließlich an PhaserPreview geroutet.
 
@@ -641,6 +689,7 @@ Personenbezogene Quelltexte, Kinderantworten und private Dokumentinhalte werden 
 - keine offene Netzwerkfähigkeit für generierten Code
 - keine Abschaffung der bestehenden Engines vor erfolgreichem Pilot
 - keine automatische Konvertierung alter React-Welten
+- kein Speichern und Fortsetzen mitten im Spiel in v1: Sessions dauern 5 bis 8 Minuten, Wiederaufnahme heißt Neustart; persistiert werden nur Abschluss, Score und Telemetrie
 - kein SEO-Rendering von Spielen auf `meoluna.com`
 - kein Versuch, „Spaß“ allein durch LLM-Scores oder Screenshots zu beweisen
 
@@ -650,3 +699,6 @@ Personenbezogene Quelltexte, Kinderantworten und private Dokumentinhalte werden 
 - Phaser Scenes bündeln unter anderem Display, Update, Kamera, Input und Loader: <https://docs.phaser.io/phaser/concepts/scenes>
 - Phaser vereinheitlicht Pointer-, Touch-, Tastatur- und Gamepad-Eingaben: <https://docs.phaser.io/phaser/concepts/input>
 - Playwright Screenshot-Vergleiche: <https://playwright.dev/docs/test-snapshots>
+- Phaser 4.0.0 Release Notes und Migration Guide v3→v4 (Renderer-Rewrite, API weitgehend kompatibel): <https://github.com/phaserjs/phaser/releases/tag/v4.0.0>
+- Convex-Limits, 1 MiB pro Dokument: <https://docs.convex.dev/production/state/limits>
+- Verifiziert am 2026-07-10: `phaser@4.2.1` ist das aktuelle `latest` auf npm; UMD-Build (`dist/phaser.js`, `window.Phaser`) existiert weiterhin.
