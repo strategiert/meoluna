@@ -35,6 +35,7 @@ import AdminHome from '@/pages/admin/AdminHome';
 import WorldsAdmin from '@/pages/admin/WorldsAdmin';
 import SiteStudio from '@/pages/admin/SiteStudio';
 import SiteStudioEditor from '@/pages/admin/SiteStudioEditor';
+import GameStudioLab from '@/pages/admin/GameStudioLab';
 import PublishedSitePage from '@/pages/site/PublishedSitePage';
 
 export default function App() {
@@ -74,6 +75,7 @@ export default function App() {
         <Route path="/admin/worlds" element={<WorldsAdmin />} />
         <Route path="/admin/site-studio" element={<SiteStudio />} />
         <Route path="/admin/site-studio/:pageId" element={<SiteStudioEditor />} />
+        <Route path="/admin/game-studio" element={<GameStudioLab />} />
         {/* Published Site Pages */}
         <Route path="/s/:projectSlug/:pageSlug" element={<PublishedSitePage />} />
         {/* Fallback */}

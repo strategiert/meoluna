@@ -1,0 +1,13 @@
+{
+  "games": [
+    {
+      "id": "hello-game",
+      "title": "Hello Game (Runtime-Test)",
+      "sourceUrl": "/game-studio/games/hello-game/game.js",
+      "width": 960,
+      "height": 960,
+      "seed": "hello-seed-1",
+      "assets": []
+    }
+  ]
+}

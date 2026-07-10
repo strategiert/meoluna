@@ -40,7 +40,8 @@
     "indexnow-submit": "node --import tsx/esm scripts/indexnow-submit-all.mjs",
     "live-sweep": "node --import tsx/esm scripts/live-sweep.mjs",
     "pdf:build": "node scripts/pdf/build-pdfs.mjs",
-    "game-runtime-check": "node scripts/game-studio/phaser-runtime-check.mjs"
+    "game-runtime-check": "node scripts/game-studio/phaser-runtime-check.mjs",
+    "game-studio-lab-check": "node scripts/game-studio/game-studio-lab-check.mjs"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.60.0",
