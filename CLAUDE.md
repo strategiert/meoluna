@@ -667,4 +667,27 @@ Alle 14 Engines: kidKit (seeded Themes, Sound stumm+Toggle, Streak), optionales 
 
 ---
 
-*Letztes Update: 2026-07-04*
+## 2026-07-10 - markitdown: PDF-Textlayer-First + Office-Upload
+
+### Implementiert ✅
+| Komponente | Beschreibung |
+|------------|--------------|
+| `paddleocr-service/main.py` | markitdown integriert (v1.1.0): digitale PDFs nutzen Textlayer statt OCR (Schwelle 200 Zeichen, sonst OCR-Fallback für Scans); neuer Endpoint `/extract-document` für DOCX/PPTX/XLSX; Response-Feld `method` (`text-layer`/`ocr`/`markitdown`, additiv) |
+| `paddleocr-service/requirements.txt` | `markitdown[pdf,docx,pptx,xlsx]>=0.1.6` |
+| `convex/documents.ts` | `extractTextFromPDF` routet nach Dateiendung: Office → `/extract-document`, PDF → `/extract-pdf` (Base64-Pfad bleibt PDF-only) |
+| `src/components/PdfUpload.tsx` | akzeptiert `.pdf/.docx/.pptx/.xlsx` |
+| `src/pages/Create.tsx` | Texte generalisiert (Dokument statt PDF) |
+
+### Effekt
+Digitale PDFs (Mehrheit der Lehrer-Uploads) brauchen kein 200-DPI-Rendering + OCR mehr — Extraktion in <1s statt zweistelliger Sekunden, exakter Text inkl. Umlaute. Word-Arbeitsblätter jetzt direkt hochladbar.
+
+### Deploy
+- Convex prod deployed (`helpful-blackbird-68`)
+- Railway Auto-Build via Push (Projekt `virtuous-compassion`)
+- Kein neues Env nötig (PADDLEOCR_URL/API_KEY unverändert)
+
+### Agent: Claude Code (Fable)
+
+---
+
+*Letztes Update: 2026-07-10*

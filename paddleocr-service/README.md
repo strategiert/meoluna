@@ -1,6 +1,9 @@
-# PaddleOCR Service for Meoluna
+# Document Extraction Service for Meoluna
 
-FastAPI-basierter OCR-Service zur Textextraktion aus PDFs.
+FastAPI-basierter Service zur Textextraktion aus Dokumenten:
+- **Digitale PDFs**: Textlayer via markitdown (schnell, exakt) — OCR nur als Fallback
+- **Scans/Bilder**: PaddleOCR
+- **Office-Dokumente** (DOCX/PPTX/XLSX): markitdown via `/extract-document`
 
 ## Deployment auf Railway (Empfohlen - Kostenlos)
 
@@ -89,6 +92,12 @@ curl -X POST "http://localhost:8001/extract-image" \
   -F "file=@bild.png"
 ```
 
+### Office-Dokument (DOCX/PPTX/XLSX)
+```bash
+curl -X POST "http://localhost:8001/extract-document" \
+  -F "file=@arbeitsblatt.docx"
+```
+
 ## Response Format
 
 ```json
@@ -99,9 +108,12 @@ curl -X POST "http://localhost:8001/extract-image" \
   "structured": [
     {"page": 1, "text": "...", "line_count": 15},
     {"page": 2, "text": "...", "line_count": 20}
-  ]
+  ],
+  "method": "text-layer"
 }
 ```
+
+`method` gibt den Extraktionsweg an: `text-layer` (digitales PDF), `ocr` (Scan) oder `markitdown` (Office-Dokument).
 
 ## Konfiguration
 
