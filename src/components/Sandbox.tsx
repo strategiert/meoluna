@@ -87,7 +87,7 @@ const INDEX_HTML = `<!DOCTYPE html>
 const INDEX_JS = `import { createRoot } from "react-dom/client";
 import React from "react";
 import p5 from "p5";
-import App from "./App";
+import App from "./App.tsx";
 
 const reportedSandboxErrors = new Set();
 
