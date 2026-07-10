@@ -1,6 +1,6 @@
 // Meoluna Game Studio — Spiel A: "Das Siegel des vergessenen Schreibers"
-// Top-down Archaeologie-Mystery, Basis 960x960. Ein ES-Modul, Phaser ueber window.Phaser.
-// Zufall NUR ueber seeded PRNG (djb2 + mulberry32), Zeit NUR ueber die Phaser-Clock/Tweens.
+// Top-down Archäologie-Mystery, Basis 960x960. Ein ES-Modul, Phaser über window.Phaser.
+// Zufall NUR über seeded PRNG (djb2 + mulberry32), Zeit NUR über die Phaser-Clock/Tweens.
 
 function djb2(str) {
   let h = 5381;
@@ -38,7 +38,7 @@ export function bootMeolunaGame(context) {
     bad: 0xb05a3a,
   };
 
-  // Zentraler Spielzustand ueber alle Kammern hinweg.
+  // Zentraler Spielzustand über alle Kammern hinweg.
   const G = {
     api: context.api,
     rnd: mulberry32(djb2(context.seed)),
@@ -46,7 +46,7 @@ export function bootMeolunaGame(context) {
     score: 0,
     journal: [],
     journalOpen: false,
-    completed: false,
+    gameCompleted: false,
     soundOn: false,
     audio: null,
     game: null,
@@ -92,28 +92,45 @@ export function bootMeolunaGame(context) {
     if (chamberAff) G.chamberAff = chamberAff;
     let list;
     if (G.journalOpen) {
-      list = [uiAff("ui.journal-close", 760, 150, 220, 120)];
+      list = [uiAff("ui.journal-close", 760, 150, 220, 140)];
     } else {
       list = G.chamberAff.slice();
-      list.push(uiAff("ui.journal", 150, 78, 220, 116));
+      list.push(uiAff("ui.journal", 150, 78, 220, 140));
     }
-    list.push(uiAff("ui.sound-toggle", 858, 78, 150, 116));
+    list.push(uiAff("ui.sound-toggle", 858, 78, 150, 140));
     G.api.setAffordances(list, { width: W, height: H });
   };
 
   // --- Piktogramme: klare Vektor-Silhouetten (Geometrie-Fallback, kein Asset noetig). ---
-  function pic(scene, type, s) {
-    const c = scene.add.container(0, 0);
-    const add = (o) => { c.add(o); return o; };
+  // drawPic zeichnet die Form mit Graphics-Fill-Befehlen; pic() backt sie EINMAL pro Typ+Größe
+  // per generateTexture in eine Textur und liefert danach nur noch ein Image. Grund: viele
+  // Vektor-Shapes erzeugen pro Frame CPU-Vertex-Arbeit — auf Geräten ohne GPU der Frame-Killer.
+  // Gebackene Images derselben Textur werden gebatcht (ein Draw-Call, keine Vertex-Neuberechnung).
+  function fillEllipse(g, x, y, rx, ry, color, alpha) {
+    g.save(); g.fillStyle(color, alpha == null ? 1 : alpha);
+    g.translateCanvas(x, y); g.scaleCanvas(rx, ry); g.fillCircle(0, 0, 1); g.restore();
+  }
+  function fillRotRect(g, x, y, w, h, rot, color) {
+    g.save(); g.fillStyle(color, 1); g.translateCanvas(x, y); g.rotateCanvas(rot);
+    g.fillRect(-w / 2, -h / 2, w, h); g.restore();
+  }
+  function starPoints(n, rInner, rOuter) {
+    const pts = [];
+    for (let i = 0; i < n * 2; i += 1) {
+      const r = i % 2 ? rInner : rOuter;
+      const a = (i / (n * 2)) * Math.PI * 2 - Math.PI / 2;
+      pts.push({ x: Math.cos(a) * r, y: Math.sin(a) * r });
+    }
+    return pts;
+  }
+  function drawPic(g, type, s) {
     if (type === "sonne") {
-      add(scene.add.star(0, 0, 12, s * 0.28, s * 0.5, COL.gold));
-      add(scene.add.circle(0, 0, s * 0.3, 0xffe08a));
+      g.fillStyle(COL.gold, 1); g.fillPoints(starPoints(12, s * 0.26, s * 0.48), true);
+      g.fillStyle(0xffe08a, 1); g.fillCircle(0, 0, s * 0.3);
     } else if (type === "wasser") {
-      const g = scene.add.graphics();
-      g.lineStyle(Math.max(4, s * 0.07), COL.water, 1);
+      g.lineStyle(Math.max(4, s * 0.08), COL.water, 1);
       for (let r = -1; r <= 1; r += 1) {
-        const y = r * s * 0.2;
-        g.beginPath();
+        const y = r * s * 0.2; g.beginPath();
         for (let i = 0; i <= 24; i += 1) {
           const x = -s * 0.42 + s * 0.84 * (i / 24);
           const yy = y + Math.sin((i / 24) * Math.PI * 3) * s * 0.09;
@@ -121,55 +138,73 @@ export function bootMeolunaGame(context) {
         }
         g.strokePath();
       }
-      add(g);
     } else if (type === "brot") {
-      add(scene.add.ellipse(0, s * 0.06, s * 0.72, s * 0.44, 0xc98a3c));
-      add(scene.add.ellipse(0, -s * 0.06, s * 0.6, s * 0.34, 0xe0a860));
+      fillEllipse(g, 0, s * 0.06, s * 0.36, s * 0.22, 0xc98a3c);
+      fillEllipse(g, 0, -s * 0.06, s * 0.3, s * 0.17, 0xe0a860);
     } else if (type === "schreiber") {
-      add(scene.add.rectangle(0, 0, s * 0.56, s * 0.7, COL.papyrus).setStrokeStyle(3, COL.stoneDark));
-      const g = scene.add.graphics();
+      g.fillStyle(COL.papyrus, 1); g.fillRect(-s * 0.28, -s * 0.35, s * 0.56, s * 0.7);
+      g.lineStyle(3, COL.stoneDark, 1); g.strokeRect(-s * 0.28, -s * 0.35, s * 0.56, s * 0.7);
       g.lineStyle(3, COL.ink, 1);
-      for (let i = -1; i <= 2; i += 1) { g.beginPath(); g.moveTo(-s * 0.2, i * s * 0.14); g.lineTo(s * 0.2, i * s * 0.14); g.strokePath(); }
-      add(g);
-      add(scene.add.rectangle(s * 0.26, -s * 0.1, s * 0.05, s * 0.5, COL.stoneDark).setRotation(0.5));
+      for (let i = -1; i <= 2; i += 1) g.lineBetween(-s * 0.2, i * s * 0.14, s * 0.2, i * s * 0.14);
+      fillRotRect(g, s * 0.28, -s * 0.08, s * 0.05, s * 0.5, 0.5, COL.stoneDark);
     } else if (type === "pharao") {
-      add(scene.add.triangle(0, -s * 0.32, 0, s * 0.24, -s * 0.16, -s * 0.28, s * 0.16, -s * 0.28, COL.gold));
-      add(scene.add.circle(0, -s * 0.05, s * 0.16, 0xdcb98c));
-      add(scene.add.circle(0, -s * 0.44, s * 0.05, COL.bad));
-      const sh = scene.add.polygon(0, s * 0.2, [-s * 0.34, s * 0.24, s * 0.34, s * 0.24, s * 0.2, -s * 0.12, -s * 0.2, -s * 0.12], 0x2f6fb0);
-      add(sh);
+      g.fillStyle(0x2f6fb0, 1);
+      g.fillPoints([{ x: -s * 0.34, y: s * 0.44 }, { x: s * 0.34, y: s * 0.44 }, { x: s * 0.2, y: s * 0.06 }, { x: -s * 0.2, y: s * 0.06 }], true);
+      g.fillStyle(0xdcb98c, 1); g.fillCircle(0, -s * 0.06, s * 0.16);
+      g.fillStyle(COL.gold, 1); g.fillTriangle(0, -s * 0.54, -s * 0.17, -s * 0.24, s * 0.17, -s * 0.24);
+      g.fillStyle(COL.bad, 1); g.fillCircle(0, -s * 0.42, s * 0.05);
     } else if (type === "kanope") {
-      add(scene.add.ellipse(0, s * 0.12, s * 0.5, s * 0.56, 0xbfa76f).setStrokeStyle(3, COL.stoneDark));
-      add(scene.add.ellipse(0, -s * 0.24, s * 0.34, s * 0.26, COL.stoneDark));
-      add(scene.add.triangle(-s * 0.12, -s * 0.36, 0, 0, -s * 0.08, -s * 0.16, s * 0.04, 0, COL.stoneDark));
-      add(scene.add.triangle(s * 0.12, -s * 0.36, 0, 0, s * 0.08, -s * 0.16, -s * 0.04, 0, COL.stoneDark));
+      fillEllipse(g, 0, s * 0.12, s * 0.25, s * 0.28, 0xbfa76f);
+      fillEllipse(g, 0, -s * 0.22, s * 0.17, s * 0.13, COL.stoneDark);
+      g.fillStyle(COL.stoneDark, 1);
+      g.fillTriangle(-s * 0.16, -s * 0.38, -s * 0.02, -s * 0.2, s * 0.02, -s * 0.34);
+      g.fillTriangle(s * 0.16, -s * 0.38, s * 0.02, -s * 0.2, -s * 0.02, -s * 0.34);
     } else if (type === "bauer") {
-      for (let i = -2; i <= 2; i += 1) {
-        add(scene.add.rectangle(i * s * 0.09, -s * 0.05, s * 0.05, s * 0.6, 0xd9a441).setRotation(i * 0.14));
-      }
-      add(scene.add.rectangle(0, s * 0.16, s * 0.5, s * 0.09, COL.stoneDark));
+      for (let i = -2; i <= 2; i += 1) fillRotRect(g, i * s * 0.09, -s * 0.05, s * 0.05, s * 0.6, i * 0.14, 0xd9a441);
+      g.fillStyle(COL.stoneDark, 1); g.fillRect(-s * 0.25, s * 0.11, s * 0.5, s * 0.09);
     } else if (type === "falle-1") {
-      add(scene.add.ellipse(0, s * 0.05, s * 0.5, s * 0.3, COL.stoneDark));
-      add(scene.add.circle(-s * 0.22, -s * 0.1, s * 0.12, COL.stoneDark));
-      add(scene.add.triangle(-s * 0.38, -s * 0.1, 0, 0, -s * 0.14, -s * 0.06, -s * 0.14, s * 0.06, COL.stoneDark));
-      add(scene.add.triangle(s * 0.05, -s * 0.02, 0, 0, s * 0.28, -s * 0.24, s * 0.32, s * 0.02, COL.stoneLight));
+      fillEllipse(g, 0, s * 0.05, s * 0.25, s * 0.15, COL.stoneDark);
+      g.fillStyle(COL.stoneDark, 1); g.fillCircle(-s * 0.22, -s * 0.1, s * 0.12);
+      g.fillTriangle(-s * 0.4, -s * 0.1, -s * 0.14, -s * 0.18, -s * 0.14, -s * 0.02);
+      g.fillStyle(COL.stoneLight, 1); g.fillTriangle(s * 0.04, -s * 0.02, s * 0.28, -s * 0.24, s * 0.32, s * 0.04);
     } else if (type === "falle-2") {
-      const g = scene.add.graphics();
-      g.lineStyle(Math.max(6, s * 0.12), COL.green, 1);
-      g.beginPath();
+      g.lineStyle(Math.max(6, s * 0.12), COL.green, 1); g.beginPath();
       for (let i = 0; i <= 24; i += 1) {
         const y = -s * 0.34 + s * 0.68 * (i / 24);
         const x = Math.sin((i / 24) * Math.PI * 3) * s * 0.22;
         if (i === 0) g.moveTo(x, y); else g.lineTo(x, y);
       }
       g.strokePath();
-      add(g);
-      add(scene.add.circle(Math.sin(0) * s * 0.22, -s * 0.34, s * 0.1, COL.green));
+      g.fillStyle(COL.green, 1); g.fillCircle(0, -s * 0.34, s * 0.1);
     }
-    return c;
   }
 
-  // Kleiner Alltags-Szenen-Marker fuer die Torschloesser (Beobachtung, kein Text).
+  // Textur-Cache pro Typ+Größe; danach ist jedes Piktogramm nur noch ein Image.
+  function pic(scene, type, s) {
+    const key = `pic:${type}:${Math.round(s)}`;
+    if (!scene.textures.exists(key)) {
+      const size = Math.ceil(s * 1.3);
+      const g = scene.make.graphics({ x: 0, y: 0, add: false });
+      g.save(); g.translateCanvas(size / 2, size / 2); drawPic(g, type, s); g.restore();
+      g.generateTexture(key, size, size);
+      g.destroy();
+    }
+    return scene.add.image(0, 0, key);
+  }
+
+  // Generischer Textur-Bake für wiederkehrende Deko (Ursprung in der Mitte). Auch diese Formen
+  // würden als Live-Shapes pro Frame Vertex-Arbeit kosten; als Image sind sie ein Draw-Call.
+  function bakeTexture(scene, key, w, h, drawFn) {
+    if (!scene.textures.exists(key)) {
+      const g = scene.make.graphics({ x: 0, y: 0, add: false });
+      g.save(); g.translateCanvas(w / 2, h / 2); drawFn(g); g.restore();
+      g.generateTexture(key, w, h);
+      g.destroy();
+    }
+    return key;
+  }
+
+  // Kleiner Alltags-Szenen-Marker für die Torschlösser (Beobachtung, kein Text).
   function sceneMarker(scene, key, s) {
     const c = scene.add.container(0, 0);
     if (key === "brot") { c.add(scene.add.circle(0, s * 0.18, s * 0.1, 0xdcb98c)); c.add(pic(scene, "brot", s * 0.8)); }
@@ -180,30 +215,44 @@ export function bootMeolunaGame(context) {
 
   // --- Basis-Kammer: Hintergrund, Fackellicht, Staub, Titel. ---
   class BaseChamber extends Ph.Scene {
+    // Statischer Backdrop (Grund, Mauerfugen, weiches Fackellicht) wird EINMAL in eine Textur
+    // gebacken und pro Frame als ein einziges Image gezeichnet — statt vieler Vollflächen-Fills.
+    // Entscheidend für Geräte ohne GPU-Beschleunigung (Schul-Tablets): Phaser zeichnet jeden
+    // Frame alles neu, also zählt Objekt- und Füllflächen-Anzahl direkt in die Frame-Zeit.
+    ensureBackdropTexture() {
+      const key = "tomb-backdrop";
+      if (this.textures.exists(key)) return key;
+      const g = this.make.graphics({ x: 0, y: 0, add: false });
+      g.fillStyle(COL.bgTop, 1); g.fillRect(0, 0, W, H);
+      g.fillStyle(COL.bgFloor, 1); g.fillRect(0, H * 0.24, W, H * 0.76);
+      g.lineStyle(2, 0x000000, 0.18);
+      for (let y = 160; y < H; y += 120) { g.lineBetween(0, y, W, y); }
+      for (let x = 0; x < W; x += 160) { g.lineBetween(x, 160, x, H); }
+      g.fillStyle(COL.torch, 0.06); g.fillCircle(W / 2, H * 0.52, W * 0.36);
+      g.fillStyle(COL.torch, 0.07); g.fillCircle(W / 2, H * 0.52, W * 0.24);
+      g.fillStyle(COL.torchSoft, 0.09); g.fillCircle(W / 2, H * 0.52, W * 0.13);
+      g.generateTexture(key, W, H);
+      g.destroy();
+      return key;
+    }
+
     buildBackdrop(titleText) {
-      this.add.rectangle(W / 2, H / 2, W, H, COL.bgTop);
-      this.add.rectangle(W / 2, H * 0.62, W, H * 0.76, COL.bgFloor);
-      const bricks = this.add.graphics();
-      bricks.lineStyle(2, 0x000000, 0.18);
-      for (let y = 160; y < H; y += 120) { bricks.beginPath(); bricks.moveTo(0, y); bricks.lineTo(W, y); bricks.strokePath(); }
-      for (let x = 0; x < W; x += 160) { bricks.beginPath(); bricks.moveTo(x, 160); bricks.lineTo(x, H); bricks.strokePath(); }
+      this.add.image(W / 2, H / 2, this.ensureBackdropTexture()).setDepth(0);
 
-      // Fackellicht als geschichtete Kreise, Flackern ueber Tween auf den Container.
-      const glow = this.add.container(W / 2, H * 0.5);
-      glow.add(this.add.circle(0, 0, W * 0.62, COL.torch, 0.05));
-      glow.add(this.add.circle(0, 0, W * 0.44, COL.torch, 0.06));
-      glow.add(this.add.circle(0, 0, W * 0.26, COL.torchSoft, 0.07));
-      glow.setDepth(2);
-      this.tweens.add({ targets: glow, alpha: { from: 0.85, to: 1 }, scale: { from: 0.97, to: 1.03 },
-        duration: 900 + Math.floor(G.rnd() * 400), yoyo: true, repeat: -1, ease: "Sine.inOut" });
+      // Ein einzelnes, kleines Fackel-Flackern als gebackenes Image (nur Alpha-Tween).
+      const lightKey = bakeTexture(this, "torch-light", Math.ceil(W * 0.34), Math.ceil(W * 0.34),
+        (g) => { g.fillStyle(COL.torchSoft, 1); g.fillCircle(0, 0, W * 0.16); });
+      const light = this.add.image(W / 2, H * 0.52, lightKey).setDepth(2).setAlpha(0.12);
+      this.tweens.add({ targets: light, alpha: { from: 0.06, to: 0.16 },
+        duration: 950 + Math.floor(G.rnd() * 350), yoyo: true, repeat: -1, ease: "Sine.inOut" });
 
-      // Staub: wenige Partikel, langsam driftend (guenstig fuer die Perf-Probe).
-      for (let i = 0; i < 6; i += 1) {
-        const dx = 120 + G.rnd() * (W - 240);
-        const dy = 220 + G.rnd() * (H - 380);
+      // Staub: drei kleine Partikel, langsam driftend.
+      for (let i = 0; i < 3; i += 1) {
+        const dx = 140 + G.rnd() * (W - 280);
+        const dy = 240 + G.rnd() * (H - 420);
         const d = this.add.circle(dx, dy, 2 + G.rnd() * 2, 0xffe9c4, 0.5).setDepth(3);
         this.tweens.add({ targets: d, y: dy - 40 - G.rnd() * 40, alpha: { from: 0.5, to: 0.1 },
-          duration: 4000 + G.rnd() * 3000, yoyo: true, repeat: -1, ease: "Sine.inOut" });
+          duration: 4200 + G.rnd() * 2800, yoyo: true, repeat: -1, ease: "Sine.inOut" });
       }
 
       this.add.text(W / 2, 178, titleText, { fontFamily: '"Trebuchet MS", sans-serif', fontSize: "34px", color: "#f2e2c2", fontStyle: "bold" }).setOrigin(0.5).setDepth(5);
@@ -223,6 +272,7 @@ export function bootMeolunaGame(context) {
       const r = this.add.rectangle(cx, cy, w, h, 0xffffff, 0.001).setInteractive({ useHandCursor: true }).setDepth(70);
       r._geo = { cx, cy, w, h };
       r.input.enabled = false;
+      r.setVisible(false);
       r.on("pointerdown", () => { if (!r.input || !r.input.enabled) return; G.click(); onTap(); });
       this._btns[id] = r;
       return r;
@@ -233,6 +283,8 @@ export function bootMeolunaGame(context) {
         const r = this._btns[id];
         const on = ids.indexOf(id) >= 0;
         r.input.enabled = on;
+        // Inaktive Treffer-Flächen ausblenden: unsichtbare Objekte werden gar nicht gerendert.
+        r.setVisible(on);
         if (on) aff.push({ id, x: r._geo.cx - r._geo.w / 2, y: r._geo.cy - r._geo.h / 2, width: r._geo.w, height: r._geo.h });
       });
       G.publish(aff);
@@ -244,10 +296,10 @@ export function bootMeolunaGame(context) {
 
   // ===================== KAMMER 1 — Kammer der Zeichen =====================
   const MURALS = [
-    { id: "c1.mural-1", type: "brot", scene: "brot", head: "Der Baecker", text: "Der Baecker formt Brot fuer die Vorratskammern. Sein Zeichen ist der Laib." },
+    { id: "c1.mural-1", type: "brot", scene: "brot", head: "Der Bäcker", text: "Der Bäcker formt Brot für die Vorratskammern. Sein Zeichen ist der Laib." },
     { id: "c1.mural-2", type: "wasser", scene: "wasser", head: "Der Fluss", text: "Der Nil bringt das Wasser. Sein Zeichen sind drei Wellen." },
-    { id: "c1.mural-3", type: "sonne", scene: "sonne", head: "Der Tag", text: "Die Sonne steht ueber dem Tag. Ihr Zeichen ist die Scheibe mit Strahlen." },
-    { id: "c1.mural-4", type: "schreiber", scene: "schreiber", head: "Der Schreiber", text: "Der Schreiber fuehrt Listen ueber Vorraete und Arbeiter. Nur wenige konnten das." },
+    { id: "c1.mural-3", type: "sonne", scene: "sonne", head: "Der Tag", text: "Die Sonne steht über dem Tag. Ihr Zeichen ist die Scheibe mit Strahlen." },
+    { id: "c1.mural-4", type: "schreiber", scene: "schreiber", head: "Der Schreiber", text: "Der Schreiber führt Listen über Vorräte und Arbeiter. Nur wenige konnten das." },
   ];
   const GATE_SLOTS = [
     { id: "c1.gate-slot-1", scene: "brot", answer: "brot", options: ["brot", "falle-1", "sonne"] },
@@ -265,7 +317,7 @@ export function bootMeolunaGame(context) {
       if (!G.uiStarted) { G.uiStarted = true; this.scene.launch("UI"); }
       this.scene.bringToTop("UI");
       G.api.emit("chamber:entered", { n: 1 });
-      speak("Willkommen im Grab des Schreibers. Sieh dir die Wandbilder an und oeffne dann das Tor.");
+      speak("Willkommen im Grab des Schreibers. Sieh dir die Wandbilder an und öffne dann das Tor.");
 
       const cxs = [150, 370, 590, 810];
       MURALS.forEach((m, i) => {
@@ -349,7 +401,7 @@ export function bootMeolunaGame(context) {
       const slot = GATE_SLOTS[i];
       const correct = chosen === slot.answer;
       G.api.emit("gate:attempt", { slot: i + 1, correct });
-      if (!correct) { this.wrong("Dieses Zeichen gehoert nicht zur Szene. Schau die Wandbilder genauer an."); this.explore(); return; }
+      if (!correct) { this.wrong("Dieses Zeichen gehört nicht zur Szene. Schau die Wandbilder genauer an."); this.explore(); return; }
       this.solved[i] = true;
       addScore(10, { slot: i + 1 });
       G.good();
@@ -377,7 +429,7 @@ export function bootMeolunaGame(context) {
 
   // ===================== KAMMER 2 — Kammer des Flusses =====================
   const PHASES = [
-    { key: "achet", name: "Achet", sub: "Ueberschwemmung", level: 0.9, col: COL.water },
+    { key: "achet", name: "Achet", sub: "Überschwemmung", level: 0.9, col: COL.water },
     { key: "peret", name: "Peret", sub: "Aussaat", level: 0.4, col: 0x6ea9c9 },
     { key: "schemu", name: "Schemu", sub: "Ernte", level: 0.12, col: 0xcbb06a },
   ];
@@ -385,7 +437,7 @@ export function bootMeolunaGame(context) {
     { id: "c2.field-1", label: "Schlamm verteilt sich", answer: "achet" },
     { id: "c2.field-2", label: "Aussaat", answer: "peret" },
     { id: "c2.field-3", label: "Ernte", answer: "schemu" },
-    { id: "c2.field-4", label: "Kanaele pruefen", answer: "achet" },
+    { id: "c2.field-4", label: "Kanäle prüfen", answer: "achet" },
   ];
 
   class Chamber2 extends BaseChamber {
@@ -422,7 +474,7 @@ export function bootMeolunaGame(context) {
       this.btn("c2.wheel", 760, 340, 240, 240, () => { this.setPhase(this.phase + 1); });
 
       this.add.rectangle(760, 560, 240, 140, COL.stoneLight).setStrokeStyle(4, COL.gold).setDepth(6);
-      this.add.text(760, 560, "Bestaetigen", { fontSize: "28px", color: "#2a1c0c", fontStyle: "bold" }).setOrigin(0.5).setDepth(7);
+      this.add.text(760, 560, "Bestätigen", { fontSize: "28px", color: "#2a1c0c", fontStyle: "bold" }).setOrigin(0.5).setDepth(7);
       this.btn("c2.wheel-confirm", 760, 560, 240, 140, () => this.confirm());
 
       this.door = this.add.rectangle(760, 770, 240, 150, 0x1c130a).setStrokeStyle(6, COL.gold).setDepth(20).setVisible(false);
@@ -457,7 +509,7 @@ export function bootMeolunaGame(context) {
 
     selectField(i) {
       this.selected = i;
-      this.setPhase(0); // Rad auf Achet zuruecksetzen, sobald eine neue Aufgabe gewaehlt wird.
+      this.setPhase(0); // Rad auf Achet zurücksetzen, sobald eine neue Aufgabe gewählt wird.
       this.render();
     }
 
@@ -470,7 +522,7 @@ export function bootMeolunaGame(context) {
       G.api.emit("nil:assigned", { field: i + 1, phase: phaseKey, correct });
       if (!correct) {
         const fo = this.fieldObjs[i];
-        const warn = this.add.text(230, fo.cy + 40, phaseKey === "schemu" ? "vertrocknet" : "ersaeuft", { fontSize: "20px", color: "#e08a5a" }).setOrigin(0.5).setDepth(8);
+        const warn = this.add.text(230, fo.cy + 40, phaseKey === "schemu" ? "vertrocknet" : "ersäuft", { fontSize: "20px", color: "#e08a5a" }).setOrigin(0.5).setDepth(8);
         this.tweens.add({ targets: warn, alpha: 0, y: fo.cy + 20, duration: 1200, onComplete: () => warn.destroy() });
         loseTorch(this); G.miss();
         speak("Zu dieser Nil-Zeit gelingt diese Arbeit nicht. Dreh das Rad weiter.");
@@ -483,7 +535,7 @@ export function bootMeolunaGame(context) {
       if (this.done.every(Boolean)) {
         addScore(25, { chamber: 2 });
         G.api.completeGoal("goal-nil-flut", { fields: 4 });
-        speak("Alle Arbeiten sitzen richtig. Der Durchgang oeffnet sich.");
+        speak("Alle Arbeiten sitzen richtig. Der Durchgang öffnet sich.");
       }
       this.render();
     }
@@ -492,8 +544,8 @@ export function bootMeolunaGame(context) {
   // ===================== KAMMER 3 — Kammer des Siegels =====================
   const RINGS = [
     { id: "c3.ring-1", q: "Wer steht an der Spitze?", answer: "pharao", order: ["bauer", "pharao", "schreiber", "kanope"] },
-    { id: "c3.ring-2", q: "Was bewahrt den Koerper fuer die Reise?", answer: "kanope", order: ["schreiber", "kanope", "pharao", "bauer"] },
-    { id: "c3.ring-3", q: "Wer zaehlt und plant?", answer: "schreiber", order: ["kanope", "schreiber", "pharao", "bauer"] },
+    { id: "c3.ring-2", q: "Was bewahrt den Körper für die Reise?", answer: "kanope", order: ["schreiber", "kanope", "pharao", "bauer"] },
+    { id: "c3.ring-3", q: "Wer zählt und plant?", answer: "schreiber", order: ["kanope", "schreiber", "pharao", "bauer"] },
   ];
 
   class Chamber3 extends BaseChamber {
@@ -506,25 +558,32 @@ export function bootMeolunaGame(context) {
       this.ringPics = [null, null, null];
       this.wrongOnce = false;
       this.finished = false;
+      this.decor = []; // Deko, die im Finale ausgeblendet wird (senkt die gerenderte Objektzahl).
       this.buildBackdrop("Kammer des Siegels");
       this.scene.bringToTop("UI");
       G.api.emit("chamber:entered", { n: 3 });
-      speak("Untersuche die Kanopenkruege und die Arbeiterliste, bevor du das Siegel stellst.");
+      speak("Untersuche die Kanopenkrüge und die Arbeiterliste, bevor du das Siegel stellst.");
 
-      this.add.rectangle(250, 330, 280, 260, COL.stoneDark, 0.5).setStrokeStyle(4, COL.stoneLight).setDepth(6);
-      pic(this, "kanope", 180).setPosition(250, 320).setDepth(7);
+      this.decor.push(this.add.rectangle(250, 330, 280, 260, COL.stoneDark, 0.5).setStrokeStyle(4, COL.stoneLight).setDepth(6));
+      this.decor.push(pic(this, "kanope", 180).setPosition(250, 320).setDepth(7));
       this.kanopenTag = this.add.text(250, 448, "untersuchen", { fontSize: "20px", color: "#c2a878" }).setOrigin(0.5).setDepth(7);
+      this.decor.push(this.kanopenTag);
       this.btn("c3.hotspot-kanopen", 250, 330, 280, 260, () => this.inspect("kanopen"));
 
-      this.add.rectangle(710, 330, 280, 260, COL.stoneDark, 0.5).setStrokeStyle(4, COL.stoneLight).setDepth(6);
-      pic(this, "schreiber", 180).setPosition(710, 320).setDepth(7);
+      this.decor.push(this.add.rectangle(710, 330, 280, 260, COL.stoneDark, 0.5).setStrokeStyle(4, COL.stoneLight).setDepth(6));
+      this.decor.push(pic(this, "schreiber", 180).setPosition(710, 320).setDepth(7));
       this.listeTag = this.add.text(710, 448, "untersuchen", { fontSize: "20px", color: "#c2a878" }).setOrigin(0.5).setDepth(7);
+      this.decor.push(this.listeTag);
       this.btn("c3.hotspot-liste", 710, 330, 280, 260, () => this.inspect("liste"));
 
       this.ringCx = [280, 480, 680];
+      const ringKey = bakeTexture(this, "seal-ring", 200, 200, (g) => {
+        g.fillStyle(0x1c130a, 0.6); g.fillCircle(0, 0, 92);
+        g.lineStyle(5, COL.stoneLight, 1); g.strokeCircle(0, 0, 92);
+      });
       RINGS.forEach((r, i) => {
-        this.add.text(this.ringCx[i], 528, r.q, { fontSize: "17px", color: "#f2e2c2", align: "center", wordWrap: { width: 190 } }).setOrigin(0.5).setDepth(7);
-        this.add.circle(this.ringCx[i], 650, 92, 0x1c130a, 0.6).setStrokeStyle(5, COL.stoneLight).setDepth(6);
+        this.decor.push(this.add.text(this.ringCx[i], 528, r.q, { fontSize: "17px", color: "#f2e2c2", align: "center", wordWrap: { width: 190 } }).setOrigin(0.5).setDepth(7));
+        this.add.image(this.ringCx[i], 650, ringKey).setDepth(6);
         this.btn(r.id, this.ringCx[i], 650, 200, 200, () => this.rotate(i));
       });
       this.sealBtn = this.add.rectangle(W / 2, 850, 320, 140, COL.stoneDark).setStrokeStyle(5, COL.gold, 0.4).setDepth(6);
@@ -565,13 +624,13 @@ export function bootMeolunaGame(context) {
       if (which === "kanopen") {
         this.inspected.kanopen = true;
         this.kanopenTag.setText("gesehen").setColor("#7bbf6a");
-        addJournal({ id: "fact-kanopen", text: "Kanopen bewahren die Organe. Der Koerper soll fuer das Jenseits erhalten bleiben." });
-        speak("In den Kanopenkruegen ruhen die Organe. So bleibt der Koerper fuer die Reise ins Jenseits bewahrt.");
+        addJournal({ id: "fact-kanopen", text: "Kanopen bewahren die Organe. Der Körper soll für das Jenseits erhalten bleiben." });
+        speak("In den Kanopenkrügen ruhen die Organe. So bleibt der Körper für die Reise ins Jenseits bewahrt.");
       } else {
         this.inspected.liste = true;
         this.listeTag.setText("gesehen").setColor("#7bbf6a");
-        addJournal({ id: "fact-gesellschaft", text: "Der Schreiber fuehrt die Arbeiterliste. An der Spitze steht der Pharao, dann Beamte und Schreiber, dann Handwerker und Bauern." });
-        speak("Die Liste zaehlt die bezahlten Arbeiter des Pyramidenbaus. Der Schreiber plant, der Pharao steht ganz oben.");
+        addJournal({ id: "fact-gesellschaft", text: "Der Schreiber führt die Arbeiterliste. An der Spitze steht der Pharao, dann Beamte und Schreiber, dann Handwerker und Bauern." });
+        speak("Die Liste zählt die bezahlten Arbeiter des Pyramidenbaus. Der Schreiber plant, der Pharao steht ganz oben.");
       }
       if (this.inspected.kanopen && this.inspected.liste && !this.active) {
         this.active = true;
@@ -601,6 +660,7 @@ export function bootMeolunaGame(context) {
         if (!this.wrongOnce) {
           this.wrongOnce = true;
           const hint = this.add.container(W / 2, 470).setDepth(9).setAlpha(0);
+          this.hintObj = hint;
           hint.add(this.add.rectangle(0, 0, 360, 90, COL.stoneDark, 0.85).setStrokeStyle(3, COL.gold));
           hint.add(pic(this, "pharao", 66).setPosition(-120, 0));
           hint.add(pic(this, "kanope", 66).setPosition(0, 0));
@@ -616,25 +676,32 @@ export function bootMeolunaGame(context) {
     finale() {
       if (this.finished) return;
       this.finished = true;
-      addScore(10, { seal: true });
-      addScore(25, { chamber: 3 });
-      G.api.completeGoal("goal-jenseits", { seal: "korrekt" });
-      G.api.completeGoal("goal-gesellschaft", { seal: "korrekt" });
+      // Abschluss-Screen erscheint bei jedem Erfolg; PROGRESS-Ziele und completeGame lösen
+      // pro Session aber nur EINMAL aus (Replay über ui.restart zeigt das Finale ohne erneutes Melden).
       this.sealBtn.setVisible(false); this.sealLbl.setVisible(false);
+      // Nicht mehr benötigte Deko ausblenden — hält die gerenderte Objektzahl im Finale niedrig.
+      this.decor.forEach((o) => o.setVisible(false));
+      if (this.hintObj) this.hintObj.setVisible(false);
       const burst = this.add.circle(W / 2, 640, 40, COL.gold, 0.8).setDepth(30);
       this.tweens.add({ targets: burst, radius: 420, alpha: 0, duration: 900, ease: "Cubic.out" });
       this.cameras.main.flash(400, 255, 220, 150);
-      this.add.text(W / 2, 470, "„Wer meine Zeichen liest, haelt mein Leben fest.“\nDer vergessene Schreiber dankt dir.", { fontFamily: '"Trebuchet MS", sans-serif', fontSize: "30px", color: "#f4c430", align: "center", wordWrap: { width: 760 } }).setOrigin(0.5).setDepth(31);
-      speak("Das Siegel oeffnet sich. Der vergessene Schreiber dankt dir. Seine Zeichen und seine Welt sind wieder lesbar.");
+      this.add.text(W / 2, 470, "„Wer meine Zeichen liest, hält mein Leben fest.“\nDer vergessene Schreiber dankt dir.", { fontFamily: '"Trebuchet MS", sans-serif', fontSize: "30px", color: "#f4c430", align: "center", wordWrap: { width: 760 } }).setOrigin(0.5).setDepth(31);
+      speak("Das Siegel öffnet sich. Der vergessene Schreiber dankt dir. Seine Zeichen und seine Welt sind wieder lesbar.");
       this.restartBox.setVisible(true); this.restartLbl.setVisible(true);
-      G.completed = true;
       G.win();
-      G.api.completeGame({ finalScore: G.score, goals: ["goal-hieroglyphen", "goal-nil-flut", "goal-jenseits", "goal-gesellschaft"] });
+      if (!G.gameCompleted) {
+        G.gameCompleted = true;
+        addScore(10, { seal: true });
+        addScore(25, { chamber: 3 });
+        G.api.completeGoal("goal-jenseits", { seal: "korrekt" });
+        G.api.completeGoal("goal-gesellschaft", { seal: "korrekt" });
+        G.api.completeGame({ finalScore: G.score, goals: ["goal-hieroglyphen", "goal-nil-flut", "goal-jenseits", "goal-gesellschaft"] });
+      }
       this.render();
     }
   }
 
-  // --- Fackel-/Reset-Logik, kammeruebergreifend. ---
+  // --- Fackel-/Reset-Logik, kammerübergreifend. ---
   function loseTorch(scene) {
     G.torch = Math.max(0, G.torch - 1);
     G.api.emit("torch:lost", { remaining: G.torch });
@@ -649,7 +716,8 @@ export function bootMeolunaGame(context) {
   }
 
   function restartGame(scene) {
-    G.torch = 3; G.score = 0; G.completed = false; G.journal = []; G.journalOpen = false;
+    // Session-Guard G.gameCompleted bleibt bewusst gesetzt: completeGame feuert nur einmal pro Session.
+    G.torch = 3; G.score = 0; G.journal = []; G.journalOpen = false;
     if (G.hudRefresh) G.hudRefresh();
     scene.scene.start("Chamber1");
     scene.scene.bringToTop("UI");
@@ -660,23 +728,22 @@ export function bootMeolunaGame(context) {
     constructor() { super({ key: "UI", active: false }); }
     create() {
       // Journal-Knopf.
-      this.add.rectangle(150, 78, 220, 116, COL.stoneDark, 0.9).setStrokeStyle(3, COL.stoneLight).setDepth(200);
+      this.add.rectangle(150, 78, 220, 140, COL.stoneDark, 0.9).setStrokeStyle(3, COL.stoneLight).setDepth(200);
       this.add.text(150, 78, "Journal", { fontSize: "26px", color: "#f2e2c2" }).setOrigin(0.5).setDepth(201);
-      this.add.rectangle(150, 78, 220, 116, 0xffffff, 0.001).setInteractive({ useHandCursor: true }).setDepth(202)
+      this.add.rectangle(150, 78, 220, 140, 0xffffff, 0.001).setInteractive({ useHandCursor: true }).setDepth(202)
         .on("pointerdown", () => { G.click(); this.toggleJournal(); });
 
       // Fackel-Anzeige (mittig oben).
-      this.flames = [0, 1, 2].map((i) => {
-        const c = this.add.container(410 + i * 70, 78).setDepth(201);
-        c.add(this.add.ellipse(0, 8, 26, 40, COL.torch));
-        c.add(this.add.ellipse(0, 2, 14, 26, COL.torchSoft));
-        return c;
+      const flameKey = bakeTexture(this, "hud-flame", 34, 52, (g) => {
+        fillEllipse(g, 0, 8, 13, 20, COL.torch);
+        fillEllipse(g, 0, 2, 7, 13, COL.torchSoft);
       });
+      this.flames = [0, 1, 2].map((i) => this.add.image(410 + i * 70, 78, flameKey).setDepth(201));
 
       // Ton-Toggle (oben rechts).
-      this.add.rectangle(858, 78, 150, 116, COL.stoneDark, 0.9).setStrokeStyle(3, COL.stoneLight).setDepth(200);
+      this.add.rectangle(858, 78, 150, 140, COL.stoneDark, 0.9).setStrokeStyle(3, COL.stoneLight).setDepth(200);
       this.soundLbl = this.add.text(858, 78, "Ton aus", { fontSize: "22px", color: "#f2e2c2" }).setOrigin(0.5).setDepth(201);
-      this.add.rectangle(858, 78, 150, 116, 0xffffff, 0.001).setInteractive({ useHandCursor: true }).setDepth(202)
+      this.add.rectangle(858, 78, 150, 140, 0xffffff, 0.001).setInteractive({ useHandCursor: true }).setDepth(202)
         .on("pointerdown", () => { this.toggleSound(); });
 
       this.journalLayer = null;
@@ -690,9 +757,15 @@ export function bootMeolunaGame(context) {
 
     toggleSound() {
       G.soundOn = !G.soundOn;
-      if (G.soundOn) ensureAudio();
+      if (G.soundOn) {
+        ensureAudio();
+        if (G.audio && G.audio.state === "suspended") G.audio.resume();
+        G.click();
+      } else if (G.audio && G.audio.state === "running") {
+        // Stumm = AudioContext anhalten: ein laufender Context kostet sonst dauerhaft Frame-Zeit.
+        G.audio.suspend();
+      }
       this.soundLbl.setText(G.soundOn ? "Ton an" : "Ton aus");
-      G.click();
     }
 
     toggleJournal() {
@@ -703,9 +776,9 @@ export function bootMeolunaGame(context) {
       layer.push(this.add.text(W / 2, 240, "Journal", { fontSize: "44px", color: "#f4c430", fontStyle: "bold" }).setOrigin(0.5).setDepth(301));
       const lines = G.journal.length ? G.journal.map((e) => "• " + e.text) : ["Noch nichts entdeckt. Untersuche die Kammer."];
       layer.push(this.add.text(140, 320, lines.join("\n\n"), { fontFamily: '"Trebuchet MS", sans-serif', fontSize: "24px", color: "#f2e2c2", wordWrap: { width: 680 }, lineSpacing: 6 }).setDepth(301));
-      layer.push(this.add.rectangle(760, 150, 220, 120, COL.stoneDark).setStrokeStyle(4, COL.gold).setDepth(301));
-      layer.push(this.add.text(760, 150, "Schliessen", { fontSize: "26px", color: "#ffffff" }).setOrigin(0.5).setDepth(302));
-      layer.push(this.add.rectangle(760, 150, 220, 120, 0xffffff, 0.001).setInteractive({ useHandCursor: true }).setDepth(303)
+      layer.push(this.add.rectangle(760, 150, 220, 140, COL.stoneDark).setStrokeStyle(4, COL.gold).setDepth(301));
+      layer.push(this.add.text(760, 150, "Schließen", { fontSize: "26px", color: "#ffffff" }).setOrigin(0.5).setDepth(302));
+      layer.push(this.add.rectangle(760, 150, 220, 140, 0xffffff, 0.001).setInteractive({ useHandCursor: true }).setDepth(303)
         .on("pointerdown", () => { G.click(); this.closeJournal(); }));
       this.journalLayer = layer;
       G.publish();

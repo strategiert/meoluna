@@ -4,6 +4,12 @@
   "steps": [
     { "op": "waitFor", "affordance": "c1.mural-1" },
     { "op": "waitTelemetry", "event": "chamber:entered" },
+    { "op": "tap", "affordance": "ui.sound-toggle" },
+    { "op": "tap", "affordance": "ui.sound-toggle" },
+    { "op": "tap", "affordance": "ui.journal" },
+    { "op": "waitFor", "affordance": "ui.journal-close" },
+    { "op": "tap", "affordance": "ui.journal-close" },
+    { "op": "waitFor", "affordance": "c1.mural-1" },
     { "op": "tap", "affordance": "c1.mural-1" },
     { "op": "waitFor", "affordance": "c1.detail-close" },
     { "op": "waitTelemetry", "event": "mural:inspected" },
