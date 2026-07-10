@@ -41,7 +41,8 @@
     "live-sweep": "node --import tsx/esm scripts/live-sweep.mjs",
     "pdf:build": "node scripts/pdf/build-pdfs.mjs",
     "game-runtime-check": "node scripts/game-studio/phaser-runtime-check.mjs",
-    "game-studio-lab-check": "node scripts/game-studio/game-studio-lab-check.mjs"
+    "game-studio-lab-check": "node scripts/game-studio/game-studio-lab-check.mjs",
+    "game-source-check": "node --import tsx/esm scripts/game-studio/source-validator-check.mjs"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.60.0",
