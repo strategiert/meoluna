@@ -1,0 +1,10 @@
+{
+  "coreVerbs": ["planen", "steuern", "verteilen", "abwägen", "bauen"],
+  "camera": "fixed-scene",
+  "worldTopology": "round-based",
+  "progressionModel": "year-cycles",
+  "controlModel": "tap-allocate",
+  "failureModel": "phase-rollback",
+  "narrativeStructure": "aufbau-chronik",
+  "systemicModel": "economy-loop"
+}

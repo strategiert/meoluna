@@ -1,0 +1,163 @@
+{
+  "fantasy": "Als Verwalterin oder Verwalter des Pharao führst du eine Flusssiedlung durch drei Jahre am großen Fluss: Du steuerst die Kanäle zur Nilflut, verteilst zwölf Arbeiter auf Felder, Schreiber, Speicher und Pyramide und hältst Nahrung, Vorrat, Bau und Vertrauen im Gleichgewicht.",
+  "baseResolution": { "width": 1280, "height": 720 },
+  "sceneGraph": {
+    "scenes": [
+      { "id": "City", "kind": "play", "description": "Ein-Screen-Aufbauspiel: HUD oben (Nahrung, Speicher, Bau, Vertrauen, Jahr/Phase), Kanäle links, Aufbau-Szene (Felder, Speicher, wachsende Pyramide, Nil) in der Mitte, Zuteilungs-Panel rechts, Berater + Phasen-Knopf unten. 3 Jahre × 3 Nilphasen = 9 Züge." },
+      { "id": "City.grave", "kind": "play", "description": "Jenseits-Ereignis in Schemu Jahr 2: die Werkstatt bittet um Arbeiter für Grabausstattung und Kanopen (event.grave-accept / event.grave-later)." },
+      { "id": "City.hunger", "kind": "retry", "description": "Nahrung unter 0: Berater erklärt die Ursache konkret, der Zug wird auf den Phasenanfang zurückgesetzt (Rollback, kein Game Over), die Zuteilung ist neu wählbar." },
+      { "id": "City.finale", "kind": "success", "description": "Jahr 3 Schemu mit Bau ≥ 60 %, Nahrung ≥ 0 und Vertrauen ≥ 40: Einweihungs-Finale der Pyramide, completeGame, Neustart-Option." },
+      { "id": "City.retry", "kind": "retry", "description": "Sieg verfehlt: Zusammenfassung, was fehlte, mit Neustart-Knopf (ui.restart)." }
+    ],
+    "transitions": [
+      { "from": "City", "to": "City.hunger", "trigger": "Nahrung < 0 nach Auswertung (rollback)" },
+      { "from": "City.hunger", "to": "City", "trigger": "korrigierte Zuteilung, hud.phase-next erneut" },
+      { "from": "City", "to": "City.grave", "trigger": "Beginn Schemu Jahr 2" },
+      { "from": "City.grave", "to": "City", "trigger": "event.grave-accept oder event.grave-later gewählt" },
+      { "from": "City", "to": "City.finale", "trigger": "Jahr 3 Schemu ausgewertet, Siegbedingungen erfüllt" },
+      { "from": "City", "to": "City.retry", "trigger": "Jahr 3 Schemu ausgewertet, Siegbedingungen verfehlt" },
+      { "from": "City.finale", "to": "City", "trigger": "ui.restart angetippt" },
+      { "from": "City.retry", "to": "City", "trigger": "ui.restart angetippt" }
+    ]
+  },
+  "coreLoop": {
+    "primary": ["Vorhersage der Priester lesen", "Kanäle zur Flut stellen", "zwölf Arbeiter verteilen", "Phase auswerten und Folgen sehen"],
+    "secondary": ["Speicher als Puffer aufbauen", "Schreiber freischalten für exakte Zahlen und Vorschau", "Berater-Rat durchblättern und anhören", "Jenseits-Ereignis abwägen"]
+  },
+  "controls": {
+    "touch": ["Kanal-Reihe antippen (offen/zu)", "Plus/Minus je Bereich antippen (Arbeiter verteilen)", "Phasen-Knopf antippen (Zug auswerten)", "Ereignis-Karte antippen"],
+    "mouseKeyboard": ["Klick auf dieselben Flächen (identisch zu Tap)"]
+  },
+  "rules": [
+    "Erster sichtbarer Screen ist Jahr 1 Achet, sofort handelbar — kein Menü, kein Hub.",
+    "Runde: 3 Jahre × 3 Nilphasen (Achet/Peret/Schemu) = 9 Züge, streng rundenbasiert.",
+    "Fluthöhe pro Jahr ist deterministisch aus dem Seed und vorher als „Nilstand-Vorhersage der Priester“ sichtbar.",
+    "Nur in Achet zählen die Kanäle: passende offene Kanäle bringen fruchtbaren Schlamm; zu viele offene Kanäle bei Hochflut machen die Siedlung nass (Vertrauensverlust).",
+    "Zwölf Arbeiter werden über vier Bereiche verteilt (Felder, Schreiber, Speicher, Pyramide); freie Arbeiter warten im Pool.",
+    "0 Schreiber: Vorrats- und Ertragsanzeigen zeigen „?“, die Zuteilungseffekte streuen deterministisch. Ab 2 Schreibern: exakte Zahlen und Vorschau der Zugfolge.",
+    "Nahrung < 0 nach Auswertung: Hunger-Runde, Berater nennt die konkrete Ursache, der Zug wird auf den Phasenanfang zurückgesetzt (kein Game Over).",
+    "Ausschließlich Antippen (tap-only); kein Drag, Hover, Rechtsklick.",
+    "Zufall nur über seeded PRNG aus context.seed; Zeit nur über die Phaser-Clock.",
+    "Auf Hochkant-Viewports blendet ein kindgerechter Dreh-Hinweis das Spiel, bis das Gerät quer liegt.",
+    "Ton startet stumm und wird über ui.sound-toggle aktiviert."
+  ],
+  "progression": {
+    "difficultyCurve": "Jahr 1 führt die vier Systeme einzeln ein (Kanal zur bekannten Flut, erste Zuteilung, Schreiber freischalten, erster Bau). Ab Jahr 2 kommen wechselnde Fluthöhen, das Jenseits-Ereignis und der Druck, Nahrung, Bau und Vertrauen zugleich zu halten. Jahr 3 verlangt die eingespielte Balance bis zum Sieg.",
+    "helpSystem": "Die Priester-Vorhersage nennt die Fluthöhe vor der Entscheidung; der Berater spricht kurze Sätze und liest per api.speak vor; ab 2 Schreibern zeigt eine Vorschau die Folgen des Zuges; nach Hunger erklärt der Berater die Ursache und der Zug ist neu spielbar."
+  },
+  "failureRecovery": {
+    "failureConditions": [
+      "Nahrung < 0 nach Auswertung (z. B. Peret ohne Feld-Arbeiter, keine Aussaat).",
+      "Sieg in Jahr 3 Schemu verfehlt (Bau < 60 % oder Nahrung < 0 oder Vertrauen < 40)."
+    ],
+    "quickResume": "Hunger setzt nur die laufende Phase auf ihren Anfang zurück (rollback), Ressourcen und Zuteilung sind neu wählbar, sofort weiterspielbar; verfehlter Sieg bietet einen Neustart mit Zusammenfassung."
+  },
+  "learningBindings": [
+    { "goalId": "goal-nil-flut", "mechanic": "Kanäle in Achet zur vorhergesagten Fluthöhe stellen und in Peret Feld-Arbeiter zur Aussaat setzen", "observedState": "Felder werden fruchtbar (grün) statt trocken; goal-nil-flut nach der ersten korrekten Achet-Bewässerung und Peret-Aussaat erfüllt." },
+    { "goalId": "goal-pyramidenbau", "mechanic": "Pyramiden-Arbeiter über mehrere Züge versorgen (Nahrung ≥ 0), während die Pyramide Ebene um Ebene wächst", "observedState": "Pyramiden-Ebenen steigen sichtbar; goal-pyramidenbau nach 3 versorgten Bau-Zügen in Folge erfüllt." },
+    { "goalId": "goal-gesellschaft", "mechanic": "alle vier Bereiche (Felder, Schreiber, Speicher, Pyramide) sinnvoll besetzen", "observedState": "jeder Bereich über mindestens zwei Züge mit ≥ 1 Arbeiter; goal-gesellschaft erfüllt, wenn die Rollen zusammen die Siedlung tragen." },
+    { "goalId": "goal-hieroglyphen", "mechanic": "Schreiber von 0 auf ≥ 2 erhöhen und die Umschaltung der Anzeige-Präzision erleben", "observedState": "„?“ und streuende Ergebnisse werden zu exakten Zahlen und Vorschau; Event scribes:unlocked, goal-hieroglyphen erfüllt." },
+    { "goalId": "goal-jenseits", "mechanic": "in Schemu Jahr 2 der Werkstatt Arbeiter für Grabausstattung und Kanopen zusagen (unterstützend)", "observedState": "Baufortschritt sinkt, Vertrauen steigt, Erklärungstext zu Kanopen und Jenseitsreise; event:grave accepted." }
+  ],
+  "avFeedback": [
+    "Jeder Tap: sofortiges visuelles Feedback in unter 100 ms (Rahmen/Wert/Ton bei aktivem Ton).",
+    "Auswertung als lesbare Sequenz: Felder wachsen oder verdorren, der Speicher füllt sich, die Pyramide wächst Ebene um Ebene.",
+    "Werte springen nie ohne sichtbare Ursache; ohne Schreiber zeigt die Anzeige „?“ und die Ergebnisse streuen spürbar.",
+    "Berater spricht kurze Sätze (api.speak); die Priester-Vorhersage erscheint als Karte vor dem Zug.",
+    "Hunger: Felder verdorren, dumpfer Ton, Berater erklärt die Ursache; Finale: Pyramiden-Einweihung mit Lichtblitz und Fanfare."
+  ],
+  "assetManifest": [
+    { "id": "bg-river", "kind": "bitmap", "description": "Optionale Flusslandschaft von schräg oben (Fallback: gebackene Geometrie-Textur)." },
+    { "id": "sprite-pyramid-stages", "kind": "bitmap", "description": "Optionale Pyramiden-Baustufen (Fallback: gebackene Stufen-Texturen)." }
+  ],
+  "telemetryEvents": [
+    "phase:resolved",
+    "canal:toggled",
+    "alloc:changed",
+    "scribes:unlocked",
+    "event:grave",
+    "rollback"
+  ],
+  "affordances": [
+    { "id": "canal-1.toggle", "description": "Kanal-Reihe 1 öffnen/schließen (zählt in Achet zur Flut)." },
+    { "id": "canal-2.toggle", "description": "Kanal-Reihe 2 öffnen/schließen." },
+    { "id": "canal-3.toggle", "description": "Kanal-Reihe 3 öffnen/schließen." },
+    { "id": "alloc.fields.plus", "description": "Einen Arbeiter den Feldern zuteilen." },
+    { "id": "alloc.fields.minus", "description": "Einen Arbeiter von den Feldern abziehen." },
+    { "id": "alloc.scribes.plus", "description": "Einen Arbeiter den Schreibern zuteilen." },
+    { "id": "alloc.scribes.minus", "description": "Einen Arbeiter von den Schreibern abziehen." },
+    { "id": "alloc.granary.plus", "description": "Einen Arbeiter dem Speicher zuteilen." },
+    { "id": "alloc.granary.minus", "description": "Einen Arbeiter vom Speicher abziehen." },
+    { "id": "alloc.pyramid.plus", "description": "Einen Arbeiter der Pyramide zuteilen." },
+    { "id": "alloc.pyramid.minus", "description": "Einen Arbeiter von der Pyramide abziehen." },
+    { "id": "hud.phase-next", "description": "Die eingestellte Phase auswerten und zum nächsten Zug gehen." },
+    { "id": "advisor.next", "description": "Berater-Rat durchblättern und vorlesen lassen." },
+    { "id": "event.grave-accept", "description": "Der Werkstatt Arbeiter für Grabausstattung/Kanopen zusagen." },
+    { "id": "event.grave-later", "description": "Die Bitte der Werkstatt vertagen." },
+    { "id": "ui.sound-toggle", "description": "Ton an/aus (oben rechts, startet stumm)." },
+    { "id": "ui.restart", "description": "Im Finale oder Verfehlt-Screen neu starten." }
+  ],
+  "playthroughPlan": {
+    "game": "egypt-city",
+    "seed": "city-v1",
+    "steps": [
+      { "op": "waitFor", "affordance": "hud.phase-next" },
+      { "op": "tap", "affordance": "canal-1.toggle" },
+      { "op": "screenshot", "name": "jahr1" },
+      { "op": "tap", "affordance": "hud.phase-next" },
+      { "op": "waitTelemetry", "event": "phase:resolved" },
+      { "op": "waitFor", "affordance": "alloc.scribes.plus" },
+      { "op": "tap", "affordance": "alloc.scribes.plus" },
+      { "op": "tap", "affordance": "alloc.scribes.plus" },
+      { "op": "waitTelemetry", "event": "scribes:unlocked" },
+      { "op": "assertGoal", "goalId": "goal-hieroglyphen" },
+      { "op": "tap", "affordance": "hud.phase-next" },
+      { "op": "waitTelemetry", "event": "phase:resolved" },
+      { "op": "assertGoal", "goalId": "goal-nil-flut" },
+      { "op": "waitFor", "affordance": "alloc.granary.plus" },
+      { "op": "tap", "affordance": "alloc.granary.plus" },
+      { "op": "tap", "affordance": "hud.phase-next" },
+      { "op": "waitTelemetry", "event": "phase:resolved" },
+      { "op": "assertGoal", "goalId": "goal-pyramidenbau" },
+      { "op": "assertGoal", "goalId": "goal-gesellschaft" },
+      { "op": "waitFor", "affordance": "canal-2.toggle" },
+      { "op": "tap", "affordance": "canal-2.toggle" },
+      { "op": "tap", "affordance": "canal-3.toggle" },
+      { "op": "tap", "affordance": "hud.phase-next" },
+      { "op": "waitTelemetry", "event": "phase:resolved" },
+      { "op": "waitFor", "affordance": "alloc.fields.minus" },
+      { "op": "tap", "affordance": "alloc.fields.minus" },
+      { "op": "tap", "affordance": "alloc.fields.minus" },
+      { "op": "tap", "affordance": "alloc.fields.minus" },
+      { "op": "tap", "affordance": "alloc.fields.minus" },
+      { "op": "tap", "affordance": "hud.phase-next" },
+      { "op": "waitTelemetry", "event": "rollback" },
+      { "op": "screenshot", "name": "rollback" },
+      { "op": "waitFor", "affordance": "alloc.fields.plus" },
+      { "op": "tap", "affordance": "alloc.fields.plus" },
+      { "op": "tap", "affordance": "alloc.fields.plus" },
+      { "op": "tap", "affordance": "alloc.fields.plus" },
+      { "op": "tap", "affordance": "alloc.fields.plus" },
+      { "op": "tap", "affordance": "hud.phase-next" },
+      { "op": "waitTelemetry", "event": "phase:resolved" },
+      { "op": "waitFor", "affordance": "event.grave-accept" },
+      { "op": "tap", "affordance": "event.grave-accept" },
+      { "op": "waitTelemetry", "event": "event:grave" },
+      { "op": "assertGoal", "goalId": "goal-jenseits" },
+      { "op": "waitFor", "affordance": "hud.phase-next" },
+      { "op": "tap", "affordance": "hud.phase-next" },
+      { "op": "waitTelemetry", "event": "phase:resolved" },
+      { "op": "waitFor", "affordance": "hud.phase-next" },
+      { "op": "tap", "affordance": "hud.phase-next" },
+      { "op": "waitTelemetry", "event": "phase:resolved" },
+      { "op": "waitFor", "affordance": "hud.phase-next" },
+      { "op": "tap", "affordance": "hud.phase-next" },
+      { "op": "waitTelemetry", "event": "phase:resolved" },
+      { "op": "waitFor", "affordance": "hud.phase-next" },
+      { "op": "tap", "affordance": "hud.phase-next" },
+      { "op": "assertComplete" },
+      { "op": "wait", "ms": 900 },
+      { "op": "screenshot", "name": "finale" }
+    ]
+  }
+}

@@ -17,6 +17,15 @@
       "height": 960,
       "seed": "tomb-v1",
       "assets": []
+    },
+    {
+      "id": "egypt-city",
+      "title": "Stadt am großen Fluss",
+      "sourceUrl": "/game-studio/games/egypt-city/game.js",
+      "width": 1280,
+      "height": 720,
+      "seed": "city-v1",
+      "assets": []
     }
   ]
 }
