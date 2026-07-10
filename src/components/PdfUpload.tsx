@@ -1,8 +1,16 @@
 /**
- * PdfUpload - PDF upload component with drag & drop
+ * PdfUpload - document upload component with drag & drop
+ * (PDF, Word, PowerPoint, Excel)
  */
 
 import { useCallback, useState } from 'react';
+
+const ACCEPTED_EXTENSIONS = ['.pdf', '.docx', '.pptx', '.xlsx'];
+
+function isSupportedFile(name: string): boolean {
+  const lower = name.toLowerCase();
+  return ACCEPTED_EXTENSIONS.some((ext) => lower.endsWith(ext));
+}
 import { FileUp, FileText, X, Loader2, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -43,7 +51,7 @@ export function PdfUpload({
       setIsDragging(false);
 
       const droppedFile = e.dataTransfer.files[0];
-      if (droppedFile && droppedFile.name.toLowerCase().endsWith('.pdf')) {
+      if (droppedFile && isSupportedFile(droppedFile.name)) {
         onFileSelect(droppedFile);
       }
     },
@@ -53,7 +61,7 @@ export function PdfUpload({
   const handleFileChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const selectedFile = e.target.files?.[0];
-      if (selectedFile && selectedFile.name.toLowerCase().endsWith('.pdf')) {
+      if (selectedFile && isSupportedFile(selectedFile.name)) {
         onFileSelect(selectedFile);
       }
     },
@@ -88,7 +96,7 @@ export function PdfUpload({
           >
             <input
               type="file"
-              accept=".pdf"
+              accept={ACCEPTED_EXTENSIONS.join(',')}
               onChange={handleFileChange}
               className="hidden"
             />
@@ -98,11 +106,11 @@ export function PdfUpload({
               }`}
             />
             <p className="text-sm text-muted-foreground">
-              PDF hochladen{' '}
+              PDF oder Word hochladen{' '}
               <span className="text-moon/70">(optional)</span>
             </p>
             <p className="text-xs text-muted-foreground/70 mt-1">
-              Arbeitsblatt, Lehrbuchseite, Skript...
+              Arbeitsblatt, Lehrbuchseite, Skript... (.pdf, .docx, .pptx, .xlsx)
             </p>
             <p className="text-xs text-muted-foreground/50 mt-2">
               Drag & Drop oder klicken

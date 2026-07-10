@@ -203,7 +203,7 @@ export default function Create() {
       setPdfError(
         err instanceof Error
           ? err.message
-          : 'Upload oder OCR-Extraktion fehlgeschlagen.'
+          : 'Upload oder Text-Extraktion fehlgeschlagen.'
       );
     } finally {
       setPdfStatus('idle');
@@ -234,7 +234,7 @@ export default function Create() {
 
     // Build message content - include PDF indicator if present
     const messageContent = pdfText
-      ? `${input.trim()}\n\n📄 PDF: ${pdfFile?.name}`
+      ? `${input.trim()}\n\n📄 ${pdfFile?.name}`
       : input.trim();
 
     const userMessage: Message = {
@@ -509,7 +509,7 @@ export default function Create() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder={pdfText ? "Beschreibe was du mit dem PDF erstellen möchtest..." : "Beschreibe deine Lernwelt..."}
+                placeholder={pdfText ? "Beschreibe was du mit dem Dokument erstellen möchtest..." : "Beschreibe deine Lernwelt..."}
                 rows={1}
                 className="flex-1 bg-secondary border border-border rounded-xl px-4 py-3 placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
               />

@@ -3,8 +3,21 @@ import { action } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { requireIdentity } from "./lib/auth";
 
-// Max. erlaubte PDF-Größe (Bytes). Schützt OCR-Service vor Missbrauch/DoS.
+// Max. erlaubte Dateigröße (Bytes). Schützt Extraktions-Service vor Missbrauch/DoS.
 const MAX_PDF_BYTES = 15 * 1024 * 1024; // 15 MB
+
+// Office-Formate laufen über markitdown (/extract-document), PDFs über
+// /extract-pdf (Textlayer zuerst, OCR-Fallback im Service).
+const DOC_EXTENSIONS: Record<string, string> = {
+  ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ".pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+};
+
+function fileExtension(name: string): string {
+  const idx = name.lastIndexOf(".");
+  return idx >= 0 ? name.slice(idx).toLowerCase() : "";
+}
 
 // Dateiname bereinigen (keine Pfade/Steuerzeichen, begrenzte Länge).
 function sanitizeFileName(name: string): string {
@@ -71,14 +84,20 @@ export const extractTextFromPDF = action({
         throw new Error("Datei ist zu groß.");
       }
 
+      // Office-Dokumente an markitdown-Endpoint, PDFs an den PDF-Pfad.
+      const ext = fileExtension(fileName);
+      const isOfficeDoc = ext in DOC_EXTENSIONS;
+      const endpoint = isOfficeDoc ? "/extract-document" : "/extract-pdf";
+      const mimeType = isOfficeDoc ? DOC_EXTENSIONS[ext] : "application/pdf";
+
       const formData = new FormData();
       formData.append(
         "file",
-        new Blob([fileBytes], { type: "application/pdf" }),
+        new Blob([fileBytes], { type: mimeType }),
         fileName,
       );
 
-      response = await fetch(`${PADDLEOCR_URL}/extract-pdf`, {
+      response = await fetch(`${PADDLEOCR_URL}${endpoint}`, {
         method: "POST",
         headers: ocrHeaders(),
         body: formData,
