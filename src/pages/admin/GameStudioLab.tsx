@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "convex/react";
 import { useUser } from "@clerk/clerk-react";
 import { ShieldCheck } from "lucide-react";
@@ -30,7 +30,7 @@ function LabShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-type LogEntry = { at: number; msg: ShellToParent };
+type LogEntry = { id: number; at: number; msg: ShellToParent };
 
 export default function GameStudioLab() {
   const { user, isLoaded } = useUser();
@@ -39,6 +39,7 @@ export default function GameStudioLab() {
   const [games, setGames] = useState<GameManifest[] | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [log, setLog] = useState<LogEntry[]>([]);
+  const logCounter = useRef(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -96,7 +97,8 @@ export default function GameStudioLab() {
   const selected = games?.find((g) => g.id === selectedId) ?? null;
 
   const handleEvent = (msg: ShellToParent) => {
-    setLog((prev) => [{ at: Date.now(), msg }, ...prev].slice(0, 50));
+    logCounter.current += 1;
+    setLog((prev) => [{ id: logCounter.current, at: Date.now(), msg }, ...prev].slice(0, 50));
   };
 
   return (
@@ -152,9 +154,9 @@ export default function GameStudioLab() {
                 {log.length === 0 && (
                   <p className="text-neutral-500">Noch keine Events empfangen.</p>
                 )}
-                {log.map((entry, i) => (
+                {log.map((entry) => (
                   <div
-                    key={i}
+                    key={entry.id}
                     className={cn(
                       "rounded px-2 py-1",
                       entry.msg.type === "GAME_ERROR" && "bg-red-950/40 text-red-200",

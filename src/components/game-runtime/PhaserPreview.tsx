@@ -9,6 +9,12 @@ export default function PhaserPreview({ manifest, onEvent }: Props) {
   const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
   const [errorText, setErrorText] = useState<string | null>(null);
 
+  // onEvent per Ref halten statt als Effekt-Dependency: eine neue Callback-Identität pro
+  // Render (z. B. inline-Handler im Parent) darf den Effekt nicht neu starten, sonst schließt
+  // dispose() den Port und die Shell sendet MEOLUNA_RUNTIME_READY nicht erneut.
+  const onEventRef = useRef(onEvent);
+  onEventRef.current = onEvent;
+
   useEffect(() => {
     const iframe = iframeRef.current;
     if (!iframe) return;
@@ -22,7 +28,7 @@ export default function PhaserPreview({ manifest, onEvent }: Props) {
       onMessage: (msg) => {
         if (msg.type === "GAME_READY") { setStatus("ready"); window.clearTimeout(watchdog); }
         if (msg.type === "GAME_ERROR") { setStatus("error"); setErrorText(msg.message); }
-        onEvent?.(msg);
+        onEventRef.current?.(msg);
       },
     });
 
@@ -48,7 +54,7 @@ export default function PhaserPreview({ manifest, onEvent }: Props) {
       window.clearTimeout(watchdog);
       bridge.dispose();
     };
-  }, [manifest, onEvent]);
+  }, [manifest]);
 
   return (
     <div className="relative w-full" style={{ aspectRatio: `${manifest.width} / ${manifest.height}`, maxHeight: "80vh" }}>
