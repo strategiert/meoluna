@@ -334,7 +334,7 @@ export function bootMeolunaGame(context) {
       const gAcc = this.add.rectangle(W / 2 - 180, 460, 300, 100, COL.stoneDark).setStrokeStyle(4, COL.good);
       const gAccL = this.add.text(W / 2 - 180, 460, "Arbeiter zusagen", { fontSize: "22px", color: "#ffffff" }).setOrigin(0.5);
       const gLat = this.add.rectangle(W / 2 + 180, 460, 300, 100, COL.stoneDark).setStrokeStyle(4, COL.stone);
-      const gLatL = this.add.text(W / 2 + 180, 460, "Später entscheiden", { fontSize: "22px", color: "#f2e2c2" }).setOrigin(0.5);
+      const gLatL = this.add.text(W / 2 + 180, 460, "Nein, weiterbauen", { fontSize: "22px", color: "#f2e2c2" }).setOrigin(0.5);
       this.graveGroup.add([gdim, gcard, ghead, gbody, gAcc, gAccL, gLat, gLatL]);
       this.btn("event.grave-accept", W / 2 - 180, 460, 300, 100, () => this.resolveGrave(true));
       this.btn("event.grave-later", W / 2 + 180, 460, 300, 100, () => this.resolveGrave(false));
@@ -352,15 +352,23 @@ export function bootMeolunaGame(context) {
 
     buildRotateHint() {
       this.rotateHint = this.add.container(0, 0).setDepth(300).setVisible(false);
+      // Interaktiver Blocker: fängt Taps ab (Depth 300, über allen Buttons), sonst fallen sie
+      // im Hochkant-Modus zu darunterliegenden Buttons durch.
       const d = this.add.rectangle(W / 2, H / 2, W, H, 0x1a120a, 0.98);
+      d.on("pointerdown", () => {}); // no-op: nur Input schlucken, nichts auslösen
       const icon = this.add.text(W / 2, H / 2 - 60, "☞", { fontSize: "90px", color: "#f4c430" }).setOrigin(0.5);
       const t = this.add.text(W / 2, H / 2 + 60, "Dreh dein Gerät quer,\ndamit die Stadt am Fluss Platz hat.", { fontSize: "34px", color: "#f2e2c2", align: "center", lineSpacing: 8 }).setOrigin(0.5);
       this.rotateHint.add([d, icon, t]);
+      this.rotateHintBlocker = d;
     }
 
     checkOrientation() {
       const portrait = window.innerHeight > window.innerWidth;
       if (this.rotateHint) this.rotateHint.setVisible(portrait);
+      if (this.rotateHintBlocker) {
+        if (portrait) this.rotateHintBlocker.setInteractive();
+        else this.rotateHintBlocker.disableInteractive();
+      }
     }
 
     // ---------- Treffer-Bereiche (persistent, nur aktiviert/deaktiviert) ----------
@@ -394,6 +402,14 @@ export function bootMeolunaGame(context) {
         if (pool() > 0) ids.push("alloc." + a.key + ".plus");
       });
       this.publishActive(ids);
+    }
+
+    // Sofort wirkende Mechaniken (Schreiber-Freischaltung, Grab-Ereignis) greifen mid-phase, VOR
+    // einem möglichen Hunger-Rollback in animateHunger(). Ohne Spiegelung auf den laufenden
+    // Snapshot würde ein Rollback diese Effekte kommentarlos rückgängig machen, obwohl
+    // completeGoal/Telemetrie schon extern gefeuert haben. No-op, wenn gerade kein Snapshot existiert.
+    applyToSnapshot(fn) {
+      if (this.snapshot) fn(this.snapshot);
     }
 
     // ---------- Phasenablauf ----------
@@ -465,6 +481,7 @@ export function bootMeolunaGame(context) {
       // Schreiber-Freischaltung: von < 2 auf ≥ 2 — einmalig, schaltet Präzision + Vorschau frei.
       if (key === "scribes" && a.scribes >= 2 && !G.s.scribesUnlocked) {
         G.s.scribesUnlocked = true;
+        this.applyToSnapshot((snap) => { snap.scribesUnlocked = true; });
         G.api.emit("scribes:unlocked", { scribes: a.scribes });
         if (!G.s.goals["goal-hieroglyphen"]) {
           G.s.goals["goal-hieroglyphen"] = true;
@@ -674,10 +691,12 @@ export function bootMeolunaGame(context) {
       const s = G.s;
       s.graveResolved = true;
       s.graveAccepted = accept;
+      this.applyToSnapshot((snap) => { snap.graveResolved = true; snap.graveAccepted = accept; });
       this.graveGroup.setVisible(false);
       if (accept) {
         s.build = Math.max(0, s.build - 10);
         s.trust = Math.min(100, s.trust + 12);
+        this.applyToSnapshot((snap) => { snap.build = Math.max(0, snap.build - 10); snap.trust = Math.min(100, snap.trust + 12); });
         G.api.emit("event:grave", { accepted: true });
         if (!G.s.goals["goal-jenseits"]) { G.s.goals["goal-jenseits"] = true; G.api.completeGoal("goal-jenseits", { kanopen: true }); }
         G.good();
@@ -686,6 +705,7 @@ export function bootMeolunaGame(context) {
         speak("In den Kanopenkrügen ruhen die Organe. So bleibt der Körper für die Reise ins Jenseits bewahrt. Das Volk fasst Vertrauen.");
       } else {
         s.trust = Math.max(0, s.trust - 10);
+        this.applyToSnapshot((snap) => { snap.trust = Math.max(0, snap.trust - 10); });
         G.api.emit("event:grave", { accepted: false });
         speak("Die Werkstatt geht leer aus. Das Volk ist enttäuscht, das Vertrauen sinkt.");
       }
