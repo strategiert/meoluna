@@ -42,7 +42,8 @@
     "pdf:build": "node scripts/pdf/build-pdfs.mjs",
     "game-runtime-check": "node scripts/game-studio/phaser-runtime-check.mjs",
     "game-studio-lab-check": "node scripts/game-studio/game-studio-lab-check.mjs",
-    "game-source-check": "node --import tsx/esm scripts/game-studio/source-validator-check.mjs"
+    "game-source-check": "node --import tsx/esm scripts/game-studio/source-validator-check.mjs",
+    "experience-signature-check": "node --import tsx/esm scripts/game-studio/experience-signature-check.mjs"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.60.0",

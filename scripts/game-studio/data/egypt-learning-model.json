@@ -1,0 +1,54 @@
+{
+  "sourceMode": "curriculum",
+  "subject": "Geschichte",
+  "gradeLevel": "5-6",
+  "ageRange": { "min": 10, "max": 12 },
+  "sourceSummary": "Das Alte Ägypten: Nil als Lebensader, Schrift und Verwaltung, Gesellschaftsordnung, Jenseitsvorstellung, Pyramidenbau.",
+  "requiredGoals": [
+    {
+      "id": "goal-nil-flut",
+      "statement": "Erklären, wie die jährliche Nilüberschwemmung Landwirtschaft und Ernte ermöglicht (Achet, Peret, Schemu).",
+      "evidenceOfMastery": "Ordnet Feldarbeiten den drei Nilphasen korrekt zu bzw. steuert Kanäle so, dass Felder ertragreich bleiben.",
+      "commonMisconceptions": ["Die Flut zerstört die Ernte, statt sie zu ermöglichen.", "Es regnet in Ägypten genug für Landwirtschaft."],
+      "importance": "core"
+    },
+    {
+      "id": "goal-hieroglyphen",
+      "statement": "Beschreiben, wozu Hieroglyphen dienten und welche Rolle Schreiber für Verwaltung und Überlieferung hatten.",
+      "evidenceOfMastery": "Erschließt Zeichenbedeutungen aus Bildkontext bzw. erlebt, dass ohne Schreiber Vorräte und Planung unlesbar werden.",
+      "commonMisconceptions": ["Hieroglyphen sind nur Deko.", "Jeder Ägypter konnte lesen und schreiben."],
+      "importance": "core"
+    },
+    {
+      "id": "goal-gesellschaft",
+      "statement": "Die Grundidee der ägyptischen Gesellschaftsordnung wiedergeben (Pharao, Beamte/Priester/Schreiber, Handwerker, Bauern).",
+      "evidenceOfMastery": "Weist Rollen ihren Aufgaben zu bzw. verteilt Arbeitskräfte rollenlogisch.",
+      "commonMisconceptions": ["Sklaven bauten allein die Pyramiden.", "Alle Ägypter waren gleichgestellt."],
+      "importance": "core"
+    },
+    {
+      "id": "goal-jenseits",
+      "statement": "Die religiöse Bedeutung von Mumifizierung und Jenseitsvorstellung erklären (Körper bewahren für das Leben nach dem Tod).",
+      "evidenceOfMastery": "Verknüpft Grabbeigaben/Kanopen mit ihrem Zweck für die Jenseitsreise.",
+      "commonMisconceptions": ["Mumifizierung war Bestrafung.", "Gräber waren nur Lagerräume."],
+      "importance": "core"
+    },
+    {
+      "id": "goal-pyramidenbau",
+      "statement": "Organisatorische und materielle Anforderungen des Pyramidenbaus benennen (Arbeitskräfte, Versorgung, Verwaltung, Rampen).",
+      "evidenceOfMastery": "Plant Bauabschnitte mit ausreichender Versorgung bzw. liest Bauorganisation aus Quellen.",
+      "commonMisconceptions": ["Pyramiden entstanden ohne Planung.", "Außerirdische/Magie statt Logistik."],
+      "importance": "core"
+    }
+  ],
+  "facts": [
+    { "id": "fact-achet", "statement": "Achet ist die Überschwemmungszeit; der Nil bringt fruchtbaren Schlamm auf die Felder.", "sourceEvidence": "Curriculum: Alte Kulturen — Ägypten, Nilzyklus" },
+    { "id": "fact-peret", "statement": "Peret ist die Zeit der Aussaat nach dem Rückgang des Wassers.", "sourceEvidence": "Curriculum: Alte Kulturen — Ägypten, Nilzyklus" },
+    { "id": "fact-schemu", "statement": "Schemu ist die Erntezeit vor der nächsten Flut.", "sourceEvidence": "Curriculum: Alte Kulturen — Ägypten, Nilzyklus" },
+    { "id": "fact-schreiber", "statement": "Schreiber führten Listen über Vorräte, Abgaben und Arbeiter; nur wenige beherrschten die Schrift.", "sourceEvidence": "Curriculum: Alte Kulturen — Ägypten, Schrift und Verwaltung" },
+    { "id": "fact-kanopen", "statement": "Bei der Mumifizierung wurden Organe in Kanopenkrügen aufbewahrt; der Körper sollte für das Jenseits erhalten bleiben.", "sourceEvidence": "Curriculum: Alte Kulturen — Ägypten, Totenkult" },
+    { "id": "fact-pyramide-arbeiter", "statement": "Pyramiden bauten bezahlte, versorgte Arbeitertrupps in Saisonarbeit — organisiert über Verwaltung und Rampen-Technik.", "sourceEvidence": "Curriculum: Alte Kulturen — Ägypten, Pyramidenbau" },
+    { "id": "fact-gesellschaft", "statement": "An der Spitze stand der Pharao; darunter Beamte, Priester und Schreiber, dann Handwerker und Bauern.", "sourceEvidence": "Curriculum: Alte Kulturen — Ägypten, Gesellschaft" }
+  ],
+  "constraints": { "sessionMinutes": 7, "readingLevel": "Klasse 5", "devices": ["touch", "mouse", "keyboard"] }
+}
