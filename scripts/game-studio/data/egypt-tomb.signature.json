@@ -1,0 +1,10 @@
+{
+  "coreVerbs": ["erkunden", "beobachten", "entschlüsseln", "kombinieren"],
+  "camera": "top-down",
+  "worldTopology": "linear",
+  "progressionModel": "gated-chambers",
+  "controlModel": "tap-explore",
+  "failureModel": "resource-soft-reset",
+  "narrativeStructure": "mystery-aufdeckung",
+  "systemicModel": null
+}

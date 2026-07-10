@@ -1,0 +1,154 @@
+{
+  "fantasy": "Als junge Archäologin oder junger Archäologe öffnest du das verschlossene Grab eines vergessenen Schreibers, indem du die Welt der alten Ägypter aus ihren Spuren erschließt.",
+  "baseResolution": { "width": 960, "height": 960 },
+  "sceneGraph": {
+    "scenes": [
+      { "id": "Chamber1", "kind": "play", "description": "Kammer der Zeichen: 4 Wandbilder untersuchen, dann 3 Torzeichen über die beobachteten Szenen zuordnen (goal-hieroglyphen)." },
+      { "id": "Chamber2", "kind": "play", "description": "Kammer des Flusses: mechanisches Nil-Rad (Achet/Peret/Schemu), 4 Feldarbeiten der richtigen Phase zuordnen (goal-nil-flut)." },
+      { "id": "Chamber3", "kind": "play", "description": "Kammer des Siegels: Kanopen und Arbeiterliste untersuchen, dann 3 Ringe des Siegels stellen (goal-jenseits, goal-gesellschaft)." },
+      { "id": "Chamber3.finale", "kind": "success", "description": "Siegel öffnet sich, Botschaft des Schreibers, completeGame, Neustart-Option." },
+      { "id": "softReset", "kind": "retry", "description": "Bei 0 Fackelstufen ordnet sich die aktuelle Kammer neu; gesammelte Journal-Erkenntnisse bleiben." }
+    ],
+    "transitions": [
+      { "from": "Chamber1", "to": "Chamber2", "trigger": "goal-hieroglyphen erfüllt, c1.door-next angetippt" },
+      { "from": "Chamber2", "to": "Chamber3", "trigger": "goal-nil-flut erfüllt, c2.door-next angetippt" },
+      { "from": "Chamber3", "to": "Chamber3.finale", "trigger": "c3.seal-confirm korrekt (goal-jenseits + goal-gesellschaft)" },
+      { "from": "Chamber3.finale", "to": "Chamber1", "trigger": "ui.restart angetippt" },
+      { "from": "Chamber1", "to": "softReset", "trigger": "torch:lost bis remaining=0" },
+      { "from": "Chamber2", "to": "softReset", "trigger": "torch:lost bis remaining=0" },
+      { "from": "Chamber3", "to": "softReset", "trigger": "torch:lost bis remaining=0" }
+    ]
+  },
+  "coreLoop": {
+    "primary": ["Spuren beobachten", "Bedeutung erschließen", "Aktion zuordnen/kombinieren", "Fortschritt sehen (Tor/Rad/Siegel)"],
+    "secondary": ["Wandbild-Detail lesen und anhören", "Journal öffnen", "Nil-Rad drehen", "Ringe rotieren"]
+  },
+  "controls": {
+    "touch": ["Hotspot/Option antippen", "Figur bewegt sich kosmetisch zum Ziel"],
+    "mouseKeyboard": ["Klick auf Hotspot/Option (identisch zu Tap)"]
+  },
+  "rules": [
+    "Erster sichtbarer Screen ist Kammer 1, sofort spielbar — kein Menü, kein Hub.",
+    "3 Kammern werden linear freigeschaltet; jede Kammer bindet mindestens ein Lernziel.",
+    "Ausschließlich Antippen (tap-only); kein Drag, Hover, Rechtsklick.",
+    "Falsche Aktion kostet 1 von 3 Fackelstufen; bei 0 Soft-Reset der Kammer, Journal bleibt, kein Game Over.",
+    "In Kammer 3 verändert eine falsche Siegel-Kombination sichtbar den Raum (Fackel flackert, zusätzliches Wandbild als Hinweis) statt eines roten „Falsch“.",
+    "Zuordnungen entstehen über beobachtete Szenen, nicht über Text-Quiz.",
+    "Zufall nur über seeded PRNG aus context.seed; Zeit nur über die Phaser-Clock.",
+    "Ton startet stumm und wird über ui.sound-toggle aktiviert."
+  ],
+  "progression": {
+    "difficultyCurve": "Kammer 1 führt Beobachtung + einfache 1:1-Zuordnung ein; Kammer 2 fügt einen Zustand (Nil-Phase) hinzu, der vor dem Bestätigen passen muss; Kammer 3 verlangt erst Untersuchen (Freischalten) und dann eine 3-teilige Kombination aus dem Gelernten.",
+    "helpSystem": "api.speak liest Kerntexte vor; Journal sammelt jede Erkenntnis; in Kammer 3 stehen die Ringfragen am Ring und im Journal; ein Fehlversuch enthüllt einen zusätzlichen Bild-Hinweis."
+  },
+  "failureRecovery": {
+    "failureConditions": [
+      "Falsches Torzeichen in Kammer 1 (gate:attempt correct=false).",
+      "Feldarbeit der falschen Nil-Phase zugeordnet (nil:assigned correct=false).",
+      "Falsche Siegel-Kombination in Kammer 3 (seal:attempt correct=false)."
+    ],
+    "quickResume": "Jeder Fehler kostet nur 1 Fackelstufe und gibt einen Hinweis; bei 0 wird die Kammer weich zurückgesetzt (Journal bleibt), sofort weiterspielbar."
+  },
+  "learningBindings": [
+    { "goalId": "goal-hieroglyphen", "mechanic": "3 beobachtete Szenen den passenden Hieroglyphen zuordnen (Tor)", "observedState": "Tor öffnet sich, wenn alle 3 Zeichen zur Szene passen." },
+    { "goalId": "goal-nil-flut", "mechanic": "4 Feldarbeiten dem Nil-Zyklus Achet/Peret/Schemu über das Drehrad zuordnen", "observedState": "Wasserstand animiert pro Phase; Feld gedeiht nur in der richtigen Zeit." },
+    { "goalId": "goal-jenseits", "mechanic": "Kanopen untersuchen und Siegelring „Was bewahrt den Körper?“ auf Kanope stellen", "observedState": "Siegel öffnet sich, wenn Jenseits-Bezug korrekt gesetzt ist." },
+    { "goalId": "goal-gesellschaft", "mechanic": "Arbeiterliste untersuchen und Ringe „Wer steht an der Spitze?“ (Pharao) und „Wer plant?“ (Schreiber) stellen", "observedState": "Siegel öffnet sich, wenn die Gesellschaftsordnung korrekt abgebildet ist." },
+    { "goalId": "goal-pyramidenbau", "mechanic": "Arbeiterliste des Schreibers zeigt bezahlte, versorgte Arbeitertrupps (unterstützend)", "observedState": "Journal-Eintrag zur Bauorganisation." }
+  ],
+  "avFeedback": [
+    "Jeder Tap: sofortiges visuelles Feedback in unter 100 ms (Rahmen/Skalierung/Ton bei aktivem Sound).",
+    "Fackellicht flackert dauerhaft; Staub driftet als Idle-Animation.",
+    "Richtige Aktion: gold aufleuchtender Rahmen + Erfolgs-Arpeggio (bei aktivem Ton).",
+    "Falsche Aktion: kurzer Screen-Shake, verwelkt/ersäuft-Miniatur bzw. Siegel bleibt zu, dumpfer Ton, Fackelstufe erlischt.",
+    "Finale: Lichtblitz + expandierender Gold-Kreis + Botschaft des Schreibers."
+  ],
+  "assetManifest": [
+    { "id": "bg-chamber-1", "kind": "bitmap", "description": "Optionaler Hintergrund Kammer der Zeichen (Fallback: Geometrie)." },
+    { "id": "bg-chamber-2", "kind": "bitmap", "description": "Optionaler Hintergrund Kammer des Flusses (Fallback: Geometrie)." },
+    { "id": "bg-chamber-3", "kind": "bitmap", "description": "Optionaler Hintergrund Kammer des Siegels (Fallback: Geometrie)." }
+  ],
+  "telemetryEvents": [
+    "chamber:entered",
+    "mural:inspected",
+    "gate:attempt",
+    "nil:assigned",
+    "hotspot:inspected",
+    "seal:attempt",
+    "torch:lost"
+  ],
+  "affordances": [
+    { "id": "c1.mural-1", "description": "Wandbild Bäcker/Brot untersuchen." },
+    { "id": "c1.mural-2", "description": "Wandbild Fluss/Wasser untersuchen." },
+    { "id": "c1.mural-3", "description": "Wandbild Sonne/Tag untersuchen." },
+    { "id": "c1.mural-4", "description": "Wandbild Schreiber/Liste untersuchen." },
+    { "id": "c1.detail-close", "description": "Wandbild-Detailansicht schließen." },
+    { "id": "c1.gate-slot-1", "description": "Erstes Torzeichen (Szene Brot) belegen." },
+    { "id": "c1.gate-slot-2", "description": "Zweites Torzeichen (Szene Wasser) belegen." },
+    { "id": "c1.gate-slot-3", "description": "Drittes Torzeichen (Szene Sonne) belegen." },
+    { "id": "c1.gate-option-brot", "description": "Zeichen-Option Brot." },
+    { "id": "c1.gate-option-wasser", "description": "Zeichen-Option Wasser." },
+    { "id": "c1.gate-option-sonne", "description": "Zeichen-Option Sonne." },
+    { "id": "c1.gate-option-schreiber", "description": "Zeichen-Option Schreiber (Distraktor je nach Slot)." },
+    { "id": "c1.gate-option-falle-1", "description": "Falsche Zeichen-Option (Vogel-Glyphe)." },
+    { "id": "c1.gate-option-falle-2", "description": "Falsche Zeichen-Option (Schlangen-Glyphe)." },
+    { "id": "c1.door-next", "description": "Geöffnetes Tor zu Kammer 2." },
+    { "id": "c2.field-1", "description": "Feldarbeit „Schlamm verteilt sich“ wählen." },
+    { "id": "c2.field-2", "description": "Feldarbeit „Aussaat“ wählen." },
+    { "id": "c2.field-3", "description": "Feldarbeit „Ernte“ wählen." },
+    { "id": "c2.field-4", "description": "Feldarbeit „Kanäle prüfen“ wählen." },
+    { "id": "c2.wheel", "description": "Nil-Rad drehen (Achet/Peret/Schemu)." },
+    { "id": "c2.wheel-confirm", "description": "Gewählte Feldarbeit der eingestellten Nil-Phase zuordnen." },
+    { "id": "c2.door-next", "description": "Durchgang zu Kammer 3." },
+    { "id": "c3.hotspot-kanopen", "description": "Kanopenkrüge untersuchen." },
+    { "id": "c3.hotspot-liste", "description": "Arbeiterliste des Schreibers untersuchen." },
+    { "id": "c3.ring-1", "description": "Siegelring 1 rotieren („Wer steht an der Spitze?“)." },
+    { "id": "c3.ring-2", "description": "Siegelring 2 rotieren („Was bewahrt den Körper?“)." },
+    { "id": "c3.ring-3", "description": "Siegelring 3 rotieren („Wer zählt und plant?“)." },
+    { "id": "c3.seal-confirm", "description": "Siegel prüfen." },
+    { "id": "ui.sound-toggle", "description": "Ton an/aus (oben rechts, startet stumm)." },
+    { "id": "ui.journal", "description": "Journal-Overlay öffnen." },
+    { "id": "ui.journal-close", "description": "Journal-Overlay schließen." },
+    { "id": "ui.restart", "description": "Im Finale das Spiel neu starten." }
+  ],
+  "playthroughPlan": {
+    "game": "egypt-tomb",
+    "seed": "tomb-v1",
+    "steps": [
+      { "op": "waitFor", "affordance": "c1.mural-1" },
+      { "op": "tap", "affordance": "c1.mural-1" },
+      { "op": "tap", "affordance": "c1.detail-close" },
+      { "op": "tap", "affordance": "c1.gate-slot-1" },
+      { "op": "tap", "affordance": "c1.gate-option-brot" },
+      { "op": "tap", "affordance": "c1.gate-slot-2" },
+      { "op": "tap", "affordance": "c1.gate-option-wasser" },
+      { "op": "tap", "affordance": "c1.gate-slot-3" },
+      { "op": "tap", "affordance": "c1.gate-option-sonne" },
+      { "op": "assertGoal", "goalId": "goal-hieroglyphen" },
+      { "op": "tap", "affordance": "c1.door-next" },
+      { "op": "tap", "affordance": "c2.field-1" },
+      { "op": "tap", "affordance": "c2.wheel-confirm" },
+      { "op": "tap", "affordance": "c2.field-2" },
+      { "op": "tap", "affordance": "c2.wheel" },
+      { "op": "tap", "affordance": "c2.wheel-confirm" },
+      { "op": "tap", "affordance": "c2.field-3" },
+      { "op": "tap", "affordance": "c2.wheel" },
+      { "op": "tap", "affordance": "c2.wheel" },
+      { "op": "tap", "affordance": "c2.wheel-confirm" },
+      { "op": "tap", "affordance": "c2.field-4" },
+      { "op": "tap", "affordance": "c2.wheel-confirm" },
+      { "op": "assertGoal", "goalId": "goal-nil-flut" },
+      { "op": "tap", "affordance": "c2.door-next" },
+      { "op": "tap", "affordance": "c3.hotspot-kanopen" },
+      { "op": "tap", "affordance": "c3.hotspot-liste" },
+      { "op": "tap", "affordance": "c3.seal-confirm" },
+      { "op": "tap", "affordance": "c3.ring-1" },
+      { "op": "tap", "affordance": "c3.ring-2" },
+      { "op": "tap", "affordance": "c3.ring-3" },
+      { "op": "tap", "affordance": "c3.seal-confirm" },
+      { "op": "assertGoal", "goalId": "goal-jenseits" },
+      { "op": "assertGoal", "goalId": "goal-gesellschaft" },
+      { "op": "assertComplete" }
+    ]
+  }
+}

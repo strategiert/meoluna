@@ -8,6 +8,15 @@
       "height": 960,
       "seed": "hello-seed-1",
       "assets": []
+    },
+    {
+      "id": "egypt-tomb",
+      "title": "Das Siegel des vergessenen Schreibers",
+      "sourceUrl": "/game-studio/games/egypt-tomb/game.js",
+      "width": 960,
+      "height": 960,
+      "seed": "tomb-v1",
+      "assets": []
     }
   ]
 }
