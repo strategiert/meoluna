@@ -39,7 +39,8 @@
     "uniqueness-check": "node --import tsx/esm scripts/uniqueness-check.mjs",
     "indexnow-submit": "node --import tsx/esm scripts/indexnow-submit-all.mjs",
     "live-sweep": "node --import tsx/esm scripts/live-sweep.mjs",
-    "pdf:build": "node scripts/pdf/build-pdfs.mjs"
+    "pdf:build": "node scripts/pdf/build-pdfs.mjs",
+    "game-runtime-check": "node scripts/game-studio/phaser-runtime-check.mjs"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.60.0",
@@ -80,6 +81,7 @@
     "lucide-react": "^0.330.0",
     "next-themes": "^0.4.6",
     "p5": "^2.2.0",
+    "phaser": "4.2.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.71.1",
