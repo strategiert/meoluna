@@ -4,7 +4,7 @@
 
 **Branch:** `feature/gold-slice`
 
-**Status:** Ready for Klaus human Gold Gate
+**Status:** Finale Retest offen
 
 **Automatische Generierung:** weiterhin blockiert
 
@@ -84,3 +84,28 @@ Der Kandidat ist deshalb ausdrücklich **nicht angenommen**. Klaus spielt ihn oh
 5. Möchtest du sehen, wie es weitergeht?
 
 Bei Nichtbestehen wird ausschließlich dieser Slice überarbeitet. Es entstehen keine weitere Welt und keine Generatorlogik.
+
+## Erster menschlicher Durchlauf
+
+Klaus testete den Slice gemeinsam mit Kindern bis zum vollständigen Erinnerungsecho.
+
+Beobachtung:
+
+- Der Ablauf war bis zum Schluss interessant.
+- Die Kinder wollten eigenständig herausfinden, wie es weitergeht.
+- Zum ersten Mal zeigten sie bei einer generierten Meoluna-Welt wahrhaftes Interesse.
+- Nach dem letzten Satz war nicht erkennbar, dass der Slice beendet war.
+
+Bewertung:
+
+- Spielinteresse und Frage 5 des Gold Gates: eindeutig positiv.
+- Abschlussklarheit: durchgefallen.
+- Gesamtstatus: noch nicht bestanden; gezielter Finale-Retest erforderlich.
+
+Korrektur:
+
+- Vollflächiges, diegetisches Papyrus-Finale ergänzt.
+- Eindeutige Anzeige `KAPITEL ABGESCHLOSSEN` und `Ende dieses Kapitels.`
+- Sichtbare Wiederholen-Aktion mit vollständigem Zustandsreset.
+- Automatischer Komplettlauf prüft genau ein `completeGame`, sichtbares Finale und erfolgreichen Neustart.
+- Prüfbild: `scripts/visual-out/game-studio/heart-of-truth-1440x900-complete.png`

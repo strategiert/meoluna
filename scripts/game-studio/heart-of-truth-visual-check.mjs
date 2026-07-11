@@ -12,7 +12,7 @@ mkdirSync(screenshotRoot, { recursive: true });
 function parseStage(argv) {
   const stageIndex = argv.indexOf("--stage");
   const stage = stageIndex >= 0 ? argv[stageIndex + 1] : "movement";
-  if (!stage || !["movement", "guided", "echo", "responsive"].includes(stage)) {
+  if (!stage || !["movement", "guided", "echo", "complete", "responsive"].includes(stage)) {
     throw new Error(`Unbekannte Stage: ${stage ?? "(fehlt)"}`);
   }
   return stage;
@@ -145,6 +145,37 @@ async function checkEcho(page) {
   await saveScreenshot(page, "echo-miss");
 }
 
+async function checkComplete(page) {
+  await checkGuided(page);
+  for (const [index, id] of ["heart", "feather", "tablet"].entries()) {
+    await waitForAffordance(page, `echo.${id}`);
+    await tapAffordance(page, `echo.${id}`);
+    await page.waitForFunction(
+      (expectedCount) =>
+        window.__gs.events.filter(
+          (event) => event.type === "TELEMETRY" && event.event === "echo.accepted",
+        ).length === expectedCount,
+      index + 1,
+      { timeout: 4000 },
+    );
+  }
+  await waitForTelemetry(page, "final.ready");
+  await waitForAffordance(page, "final.replay");
+  const completeCount = await page.evaluate(
+    () => window.__gs.events.filter((event) => event.type === "PROGRESS" && event.event === "complete").length,
+  );
+  assert.equal(completeCount, 1, "Finale muss completeGame genau einmal melden");
+  await page.waitForTimeout(1000);
+  await saveScreenshot(page, "complete");
+  await tapAffordance(page, "final.replay");
+  await waitForTelemetry(page, "final.replay");
+  await waitForAffordance(page, "move.heart");
+  const completeCountAfterReplay = await page.evaluate(
+    () => window.__gs.events.filter((event) => event.type === "PROGRESS" && event.event === "complete").length,
+  );
+  assert.equal(completeCountAfterReplay, 1, "Wiederholen darf keinen zweiten Abschluss melden");
+}
+
 async function assertCurrentTouchTargets(page) {
   const tooSmall = await page.evaluate(() =>
     window.__gs.affordances
@@ -246,6 +277,7 @@ async function main() {
     if (stage === "movement") await checkMovement(page, frame);
     if (stage === "guided") await checkGuided(page);
     if (stage === "echo") await checkEcho(page);
+    if (stage === "complete") await checkComplete(page);
     assert.deepEqual(await page.evaluate(() => window.__gs.errors), []);
     assert.deepEqual(consoleErrors, []);
     console.log(`PASS ${stage} 1440x900`);

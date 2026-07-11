@@ -88,7 +88,7 @@ export function reportJourneyCompletion(api, journey) {
 }
 
 export function bootMeolunaGame(context) {
-  const journey = createJourneyModel();
+  let journey = createJourneyModel();
   const width = context.width;
   const height = context.height;
   const random = mulberry32(djb2(context.seed));
@@ -115,6 +115,7 @@ export function bootMeolunaGame(context) {
       this.soundEnabled = false;
       this.echoMotifs = null;
       this.echoGuide = null;
+      this.finalReady = false;
     }
 
     preload() {
@@ -123,6 +124,13 @@ export function bootMeolunaGame(context) {
     }
 
     create() {
+      this.moving = false;
+      this.animationLock = false;
+      this.actionReady = false;
+      this.currentStation = "heart";
+      this.echoMotifs = null;
+      this.echoGuide = null;
+      this.finalReady = false;
       this.cameras.main.setBackgroundColor("#120d09");
       if (window.innerHeight > window.innerWidth) {
         this.buildPortraitPrompt();
@@ -141,6 +149,12 @@ export function bootMeolunaGame(context) {
       this.input.on("pointerdown", (pointer) => {
         if (this.isSoundHit(pointer.worldX, pointer.worldY)) {
           this.toggleSound();
+          return;
+        }
+        if (this.finalReady) {
+          if (window.Phaser.Math.Distance.Between(pointer.worldX, pointer.worldY, width / 2, 603) <= 72) {
+            this.restartJourney();
+          }
           return;
         }
         if (this.moving || this.animationLock) return;
@@ -170,6 +184,10 @@ export function bootMeolunaGame(context) {
         action: "SPACE",
       });
       this.input.keyboard.on("keydown-SPACE", () => {
+        if (this.finalReady) {
+          this.restartJourney();
+          return;
+        }
         if (this.moving || this.animationLock) return;
         this.emitFirstInput();
         if (journey.snapshot().phase === "echo") {
@@ -840,12 +858,75 @@ export function bootMeolunaGame(context) {
         alpha: 1,
         duration: 900,
         onComplete: () => {
-          this.showCaption("Das Herz sprach wahr. Der Weg zu Osiris ist offen.", width / 2, 635, { width: 760 });
           this.completeJourney();
           context.api.emit("echo.complete", { goals: GOAL_IDS.slice() });
           this.animationLock = false;
+          this.showFinale();
         },
       });
+    }
+
+    showFinale() {
+      if (this.caption) this.caption.destroy();
+      this.finalReady = true;
+
+      const veil = this.add.rectangle(width / 2, height / 2, width, height, 0x0c0906, 0)
+        .setDepth(40);
+      this.tweens.add({ targets: veil, alpha: 0.7, duration: 720, ease: "Sine.Out" });
+
+      const sealInk = this.add.graphics();
+      sealInk.lineStyle(6, 0xe1c46d, 0.95).strokeCircle(0, 0, 92);
+      sealInk.lineStyle(2, 0x77ddd4, 0.72).strokeCircle(0, 0, 73);
+      sealInk.fillStyle(0x7b252d, 0.96).fillCircle(-16, -12, 23).fillCircle(16, -12, 23);
+      sealInk.fillTriangle(-38, 0, 38, 0, 0, 52);
+      sealInk.lineStyle(4, 0xe1c46d, 0.9).lineBetween(0, 46, 0, -58);
+      for (let y = -48; y <= 25; y += 12) {
+        const reach = 28 - Math.abs(y + 6) * 0.18;
+        sealInk.lineBetween(0, y, -reach, y + 11).lineBetween(0, y, reach, y + 11);
+      }
+      const seal = this.add.container(width / 2, 287, [sealInk]).setDepth(43).setAlpha(0).setScale(0.72);
+      this.tweens.add({ targets: seal, alpha: 1, scale: 1, duration: 760, ease: "Back.Out" });
+
+      const heading = this.add.text(width / 2, 430, "KAPITEL ABGESCHLOSSEN", {
+        fontFamily: "Georgia, serif",
+        fontSize: "34px",
+        color: "#f0d98f",
+        align: "center",
+        shadow: { offsetX: 0, offsetY: 3, color: "#080604", blur: 8, fill: true },
+      }).setOrigin(0.5).setDepth(43).setAlpha(0);
+      const ending = this.add.text(width / 2, 483, "Das Herz hat wahr gesprochen. Ende dieses Kapitels.", {
+        fontFamily: "Arial, sans-serif",
+        fontSize: "20px",
+        color: "#c5ded4",
+        align: "center",
+      }).setOrigin(0.5).setDepth(43).setAlpha(0);
+      this.tweens.add({ targets: [heading, ending], alpha: 1, y: "-=8", duration: 620, delay: 260, ease: "Sine.Out" });
+
+      const replayBack = this.add.circle(0, 0, 48, 0x17120e, 0.74).setStrokeStyle(3, 0xd9bb6a, 0.85);
+      const replayInk = this.add.graphics();
+      replayInk.lineStyle(5, 0xe5cf89, 0.96).beginPath().arc(0, 0, 22, -2.35, 2.1).strokePath();
+      replayInk.fillStyle(0xe5cf89, 0.96).fillTriangle(-23, -18, -37, -5, -18, 0);
+      const replay = this.add.container(width / 2, 603, [replayBack, replayInk]).setDepth(45).setAlpha(0);
+      const replayLabel = this.add.text(width / 2, 666, "Noch einmal", {
+        fontFamily: "Arial, sans-serif",
+        fontSize: "18px",
+        color: "#dfc980",
+      }).setOrigin(0.5).setDepth(45).setAlpha(0);
+      this.tweens.add({ targets: [replay, replayLabel], alpha: 1, duration: 520, delay: 520 });
+
+      context.api.setAffordances(
+        this.withSoundAffordance([
+          { id: "final.replay", x: width / 2 - 56, y: 547, width: 112, height: 112 },
+        ]),
+        { width, height },
+      );
+      context.api.emit("final.ready", { chapter: "heart-of-truth", replay: true });
+    }
+
+    restartJourney() {
+      context.api.emit("final.replay", { chapter: "heart-of-truth" });
+      journey = createJourneyModel();
+      this.scene.restart();
     }
 
     completeJourney() {
