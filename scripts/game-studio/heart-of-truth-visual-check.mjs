@@ -1,10 +1,13 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { chromium } from "playwright";
 import { PNG } from "pngjs";
 import pixelmatch from "pixelmatch";
 import { ROOT, startServer, tapAffordance } from "./lib/harness.mjs";
+
+const screenshotRoot = join(ROOT, "scripts", "visual-out", "game-studio");
+mkdirSync(screenshotRoot, { recursive: true });
 
 function parseStage(argv) {
   const stageIndex = argv.indexOf("--stage");
@@ -71,6 +74,51 @@ async function checkMovement(page, frame) {
   assert.ok(pixelDifference(before, after) > 0.002, "Erster Input verändert zu wenige Canvas-Pixel");
 }
 
+async function waitForAffordance(page, id) {
+  await page.waitForFunction(
+    (affordanceId) => window.__gs.affordances.some((affordance) => affordance.id === affordanceId),
+    id,
+    { timeout: 4000 },
+  );
+}
+
+async function waitForTelemetry(page, eventName) {
+  await page.waitForFunction(
+    (expectedEvent) => window.__gs.events.some((event) => event.type === "TELEMETRY" && event.event === expectedEvent),
+    eventName,
+    { timeout: 4000 },
+  );
+}
+
+async function saveScreenshot(page, name) {
+  await page.screenshot({ path: join(screenshotRoot, `heart-of-truth-1440x900-${name}.png`) });
+}
+
+async function checkGuided(page) {
+  await saveScreenshot(page, "arrival");
+  const steps = [
+    { id: "heart", event: "heart.raised" },
+    { id: "feather", event: "scale.balanced", screenshot: "balanced" },
+    { id: "thoth", event: "thoth.recorded" },
+    { id: "gate", event: "echo.ready", screenshot: "gate-open" },
+  ];
+
+  for (const step of steps) {
+    await waitForAffordance(page, `move.${step.id}`);
+    await tapAffordance(page, `move.${step.id}`);
+    await waitForAffordance(page, `action.${step.id}`);
+    await tapAffordance(page, `action.${step.id}`);
+    await waitForTelemetry(page, step.event);
+    if (step.screenshot) await saveScreenshot(page, step.screenshot);
+  }
+
+  await saveScreenshot(page, "echo-ready");
+  const completeCount = await page.evaluate(
+    () => window.__gs.events.filter((event) => event.type === "PROGRESS" && event.event === "complete").length,
+  );
+  assert.equal(completeCount, 0, "Geführter Check darf das Erinnerungsecho nicht lösen");
+}
+
 async function main() {
   const stage = parseStage(process.argv.slice(2));
   const index = JSON.parse(readFileSync(join(ROOT, "public", "game-studio", "games", "index.json"), "utf8"));
@@ -88,7 +136,8 @@ async function main() {
 
   try {
     const frame = await loadGame(page, base, manifest);
-    await checkMovement(page, frame);
+    if (stage === "movement") await checkMovement(page, frame);
+    if (stage === "guided") await checkGuided(page);
     assert.deepEqual(await page.evaluate(() => window.__gs.errors), []);
     assert.deepEqual(consoleErrors, []);
     console.log(`PASS ${stage} 1440x900`);

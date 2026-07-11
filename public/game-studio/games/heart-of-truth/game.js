@@ -82,10 +82,10 @@ export function bootMeolunaGame(context) {
   const height = context.height;
   const random = mulberry32(djb2(context.seed));
   const station = {
-    heart: { x: 687, y: 455 },
-    feather: { x: 780, y: 446 },
-    thoth: { x: 592, y: 500 },
-    gate: { x: 1060, y: 463 },
+    heart: { x: 558, y: 526 },
+    feather: { x: 880, y: 526 },
+    thoth: { x: 620, y: 411 },
+    gate: { x: 1105, y: 510 },
   };
 
   class HeartOfTruthScene extends window.Phaser.Scene {
@@ -94,8 +94,14 @@ export function bootMeolunaGame(context) {
       this.ba = null;
       this.firstInputSent = false;
       this.moving = false;
+      this.animationLock = false;
+      this.actionReady = false;
+      this.currentStation = "heart";
       this.actionPulse = null;
       this.lightPath = null;
+      this.caption = null;
+      this.audioContext = null;
+      this.soundEnabled = true;
     }
 
     preload() {
@@ -107,14 +113,21 @@ export function bootMeolunaGame(context) {
       this.cameras.main.setBackgroundColor("#120d09");
       this.buildPapyrusWorld();
       this.buildAtmosphere();
+      this.buildInteractiveProps();
       this.ba = this.buildBa(170, 548);
       this.buildArrivalCue();
       this.publishMoveAffordance("heart");
 
       this.input.on("pointerdown", (pointer) => {
-        if (this.moving) return;
+        if (this.moving || this.animationLock) return;
         this.emitFirstInput();
-        this.moveToward(pointer.worldX, pointer.worldY, "heart");
+        const target = station[this.currentStation];
+        const nearAction = window.Phaser.Math.Distance.Between(pointer.worldX, pointer.worldY, target.x, target.y) <= 76;
+        if (this.actionReady && nearAction) {
+          this.activateStation(this.currentStation);
+          return;
+        }
+        this.moveToward(pointer.worldX, pointer.worldY, this.currentStation);
       });
 
       this.keys = this.input.keyboard.addKeys({
@@ -130,6 +143,54 @@ export function bootMeolunaGame(context) {
       });
     }
 
+    buildInteractiveProps() {
+      this.anubisGlow = this.add.ellipse(705, 530, 176, 230, 0xd9b75f, 0)
+        .setStrokeStyle(3, 0xe5c36d, 0)
+        .setDepth(8);
+
+      const heartInk = this.add.graphics();
+      heartInk.fillStyle(0x6e1f25, 1);
+      heartInk.fillCircle(-9, -5, 13);
+      heartInk.fillCircle(9, -5, 13);
+      heartInk.fillTriangle(-22, 1, 22, 1, 0, 30);
+      heartInk.lineStyle(3, 0xd9b75f, 0.9);
+      heartInk.strokeCircle(-9, -5, 13);
+      heartInk.strokeCircle(9, -5, 13);
+      heartInk.lineBetween(-21, 1, 0, 30);
+      heartInk.lineBetween(21, 1, 0, 30);
+      this.heartProp = this.add.container(558, 526, [heartInk]).setAlpha(0.12).setScale(0.58).setDepth(18);
+
+      const featherInk = this.add.graphics();
+      featherInk.lineStyle(4, 0xeadba5, 0.95).lineBetween(0, 29, 0, -34);
+      featherInk.lineStyle(2, 0xd9b75f, 0.9);
+      for (let y = -28; y <= 20; y += 8) {
+        const reach = 17 - Math.abs(y + 4) * 0.18;
+        featherInk.lineBetween(0, y, -reach, y + 7);
+        featherInk.lineBetween(0, y, reach, y + 7);
+      }
+      this.featherProp = this.add.container(880, 526, [featherInk]).setAlpha(0.1).setScale(0.62).setDepth(18);
+
+      const scaleInk = this.add.graphics();
+      scaleInk.lineStyle(3, 0xd8b45f, 0.5).lineBetween(-180, 0, 180, 0);
+      scaleInk.lineStyle(2, 0xd8b45f, 0.48);
+      scaleInk.lineBetween(-160, 1, -160, 66);
+      scaleInk.lineBetween(160, 1, 160, 66);
+      scaleInk.strokeEllipse(-160, 69, 92, 18);
+      scaleInk.strokeEllipse(160, 69, 92, 18);
+      this.scaleRig = this.add.container(720, 456, [scaleInk]).setAlpha(0.26).setDepth(12);
+
+      this.thothGlow = this.add.ellipse(620, 411, 112, 104, 0x4bdcd3, 0)
+        .setStrokeStyle(3, 0x72e8df, 0)
+        .setDepth(8);
+      this.writingLine = this.add.graphics().setDepth(17);
+
+      this.portalGlow = this.add.ellipse(1105, 505, 188, 310, 0xe5c66d, 0).setDepth(10);
+      this.portalLeft = this.add.rectangle(1062, 505, 7, 238, 0xe0bd63, 0)
+        .setDepth(13);
+      this.portalRight = this.add.rectangle(1148, 505, 7, 238, 0xe0bd63, 0)
+        .setDepth(13);
+    }
+
     buildPapyrusWorld() {
       const underlay = this.add.graphics();
       underlay.fillStyle(0x21150d, 1).fillRect(0, 0, width, height);
@@ -142,12 +203,12 @@ export function bootMeolunaGame(context) {
         .setAlpha(0.66);
       this.papyrus = this.add.image(width / 2, height / 2, "papyrus")
         .setDisplaySize(1180, 808)
-        .setTint(0x8d7756)
-        .setAlpha(0.9);
+        .setTint(0xc0aa7d)
+        .setAlpha(0.96);
 
       const glaze = this.add.graphics();
-      glaze.fillStyle(0x061317, 0.38).fillRect(0, 0, width, height);
-      glaze.fillStyle(0x07100e, 0.28).fillRoundedRect(62, 48, width - 124, height - 96, 10);
+      glaze.fillStyle(0x061317, 0.2).fillRect(0, 0, width, height);
+      glaze.fillStyle(0x07100e, 0.12).fillRoundedRect(62, 48, width - 124, height - 96, 10);
 
       this.tweens.add({
         targets: [this.papyrus, this.papyrusShadow],
@@ -209,6 +270,11 @@ export function bootMeolunaGame(context) {
       ink.fillTriangle(8, 7, 45, -18, 30, 19);
       ink.lineStyle(3, 0x74e4d9, 0.9);
       ink.strokeEllipse(0, 8, 50, 25);
+      ink.lineStyle(1, 0xd4b966, 0.7);
+      ink.lineBetween(-25, 7, -5, 10);
+      ink.lineBetween(25, 7, 5, 10);
+      ink.lineBetween(-31, 0, -12, 8);
+      ink.lineBetween(31, -2, 12, 8);
       ink.lineBetween(-6, 16, -13, 37);
       ink.lineBetween(7, 16, 13, 37);
       ink.fillStyle(0xc89f66, 1).fillCircle(0, -13, 11);
@@ -227,19 +293,62 @@ export function bootMeolunaGame(context) {
     buildArrivalCue() {
       const target = station.heart;
       this.lightPath = this.add.graphics().setDepth(14);
-      this.lightPath.lineStyle(3, 0x55e0da, 0.24);
-      this.lightPath.beginPath();
-      this.lightPath.moveTo(this.ba.x + 34, this.ba.y - 4);
-      this.lightPath.lineTo(350, 505);
-      this.lightPath.lineTo(515, 472);
-      this.lightPath.lineTo(target.x, target.y);
-      this.lightPath.strokePath();
       this.tweens.add({ targets: this.lightPath, alpha: 0.42, duration: 800, yoyo: true, repeat: -1 });
 
       this.actionPulse = this.add.circle(target.x, target.y, 15, 0x66eee3, 0.14)
         .setStrokeStyle(2, 0x84fff2, 0.7)
         .setDepth(15);
       this.tweens.add({ targets: this.actionPulse, scale: 1.75, alpha: 0.03, duration: 850, yoyo: true, repeat: -1 });
+      this.setGuide("heart");
+    }
+
+    setGuide(id) {
+      const target = station[id];
+      this.lightPath.clear();
+      this.lightPath.lineStyle(3, 0x55e0da, 0.25);
+      this.lightPath.beginPath();
+      this.lightPath.moveTo(this.ba.x + 30, this.ba.y - 4);
+      this.lightPath.lineTo((this.ba.x + target.x) / 2, this.ba.y - 20);
+      this.lightPath.lineTo(target.x, target.y);
+      this.lightPath.strokePath();
+      this.actionPulse.setPosition(target.x, target.y).setFillStyle(0x66eee3, 0.14).setStrokeStyle(2, 0x84fff2, 0.7);
+    }
+
+    showActionSymbol(id) {
+      const target = station[id];
+      this.actionPulse.setPosition(target.x, target.y).setFillStyle(0xd8b45f, 0.22).setStrokeStyle(3, 0xf5dc88, 0.95);
+      this.playTone(420, 0.07);
+    }
+
+    showCaption(text, x, y, options = {}) {
+      if (this.caption) this.caption.destroy();
+      this.caption = this.add.text(x, y, text, {
+        fontFamily: "Georgia, serif",
+        fontSize: options.size || "24px",
+        color: options.color || "#f1dfac",
+        align: options.align || "center",
+        wordWrap: { width: options.width || 540 },
+        lineSpacing: 7,
+        shadow: { offsetX: 0, offsetY: 2, color: "#080604", blur: 7, fill: true },
+      }).setOrigin(0.5).setDepth(30).setAlpha(0);
+      this.tweens.add({ targets: this.caption, alpha: 1, y: y - 8, duration: 360, ease: "Sine.Out" });
+    }
+
+    playTone(frequency, duration) {
+      if (!this.soundEnabled) return;
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) return;
+      if (!this.audioContext) this.audioContext = new AudioContextClass();
+      const oscillator = this.audioContext.createOscillator();
+      const gain = this.audioContext.createGain();
+      oscillator.type = "sine";
+      oscillator.frequency.value = frequency;
+      gain.gain.setValueAtTime(0.0001, this.audioContext.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.065, this.audioContext.currentTime + 0.018);
+      gain.gain.exponentialRampToValueAtTime(0.0001, this.audioContext.currentTime + duration);
+      oscillator.connect(gain).connect(this.audioContext.destination);
+      oscillator.start();
+      oscillator.stop(this.audioContext.currentTime + duration + 0.02);
     }
 
     emitFirstInput() {
@@ -273,6 +382,8 @@ export function bootMeolunaGame(context) {
           this.moving = false;
           this.ba.setScale(1);
           if (window.Phaser.Math.Distance.Between(this.ba.x, this.ba.y, target.x, target.y) <= 78) {
+            this.actionReady = true;
+            this.showActionSymbol(id);
             context.api.setAffordances(
               [{ id: `action.${id}`, x: target.x - 48, y: target.y - 48, width: 96, height: 96 }],
               { width, height },
@@ -280,6 +391,133 @@ export function bootMeolunaGame(context) {
           } else {
             this.publishMoveAffordance(id);
           }
+        },
+      });
+    }
+
+    activateStation(id) {
+      const result = journey.activate(id);
+      if (!result.accepted) return;
+      this.actionReady = false;
+      this.animationLock = true;
+      context.api.setAffordances([], { width, height });
+      if (id === "heart") this.animateHeart();
+      if (id === "feather") this.animateFeather();
+      if (id === "thoth") this.animateThoth();
+      if (id === "gate") this.animateGate();
+    }
+
+    unlockNext(id) {
+      const next = { heart: "feather", feather: "thoth", thoth: "gate" }[id];
+      this.animationLock = false;
+      if (!next) return;
+      this.currentStation = next;
+      this.setGuide(next);
+      this.publishMoveAffordance(next);
+    }
+
+    animateHeart() {
+      this.anubisGlow.setFillStyle(0xd9b75f, 0.08).setStrokeStyle(3, 0xe5c36d, 0.56);
+      this.tweens.add({ targets: this.anubisGlow, alpha: 1, duration: 280 });
+      this.tweens.add({
+        targets: this.heartProp,
+        x: 560,
+        y: 518,
+        scale: 0.82,
+        alpha: 1,
+        angle: -5,
+        duration: 900,
+        ease: "Back.Out",
+        onComplete: () => {
+          this.scaleRig.setAngle(-7);
+          this.showCaption("Das Herz trug die Taten eines Menschen.", 650, 633);
+          this.playTone(188, 0.24);
+          context.api.emit("heart.raised", { role: "Anubis", meaning: "deeds" });
+          this.unlockNext("heart");
+        },
+      });
+    }
+
+    animateFeather() {
+      this.tweens.add({
+        targets: this.featherProp,
+        x: 880,
+        y: 512,
+        scale: 0.9,
+        alpha: 1,
+        angle: 6,
+        duration: 820,
+        ease: "Sine.InOut",
+        onComplete: () => {
+          this.tweens.add({
+            targets: this.scaleRig,
+            angle: 7,
+            duration: 280,
+            yoyo: true,
+            repeat: 2,
+            ease: "Sine.InOut",
+            onComplete: () => {
+              this.scaleRig.setAngle(0).setAlpha(0.9);
+              this.showCaption("Ma’at stand für Wahrheit und Ordnung.", 650, 633);
+              this.playTone(294, 0.3);
+              context.api.emit("scale.balanced", { symbol: "Maat", value: "truth-order" });
+              this.unlockNext("feather");
+            },
+          });
+        },
+      });
+    }
+
+    animateThoth() {
+      this.thothGlow.setFillStyle(0x4bdcd3, 0.08).setStrokeStyle(3, 0x72e8df, 0.7);
+      this.tweens.add({ targets: this.thothGlow, alpha: 1, duration: 320 });
+      const nib = this.add.circle(583, 404, 4, 0xf1cf70, 1).setDepth(20);
+      this.writingLine.clear().lineStyle(3, 0xe3c269, 0.88).beginPath().moveTo(583, 404);
+      this.tweens.addCounter({
+        from: 0,
+        to: 1,
+        duration: 920,
+        ease: "Sine.InOut",
+        onUpdate: (tween) => {
+          const progress = tween.getValue();
+          const x = 583 + progress * 86;
+          const y = 404 + Math.sin(progress * Math.PI * 4) * 7;
+          nib.setPosition(x, y);
+          this.writingLine.lineTo(x, y).strokePath().beginPath().moveTo(x, y);
+        },
+        onComplete: () => {
+          nib.destroy();
+          this.showCaption("Thoth hielt das Urteil fest.", 650, 633);
+          this.playTone(520, 0.16);
+          context.api.emit("thoth.recorded", { role: "Thoth", action: "recorded" });
+          this.unlockNext("thoth");
+        },
+      });
+    }
+
+    animateGate() {
+      this.portalGlow.setFillStyle(0xe5c66d, 0.22);
+      this.portalLeft.setFillStyle(0xe4c46e, 0.9);
+      this.portalRight.setFillStyle(0xe4c46e, 0.9);
+      this.tweens.add({ targets: this.portalGlow, alpha: 0.7, scaleX: 1.3, duration: 720, ease: "Sine.Out" });
+      this.tweens.add({
+        targets: this.portalLeft,
+        x: 1028,
+        duration: 900,
+        ease: "Cubic.InOut",
+      });
+      this.tweens.add({
+        targets: this.portalRight,
+        x: 1182,
+        duration: 900,
+        ease: "Cubic.InOut",
+        onComplete: () => {
+          this.showCaption("Anubis wog.  Thoth schrieb.  Osiris empfing.", 650, 633, { size: "22px", width: 680 });
+          this.playTone(146, 0.42);
+          context.api.emit("echo.ready", { sequence: ["heart", "feather", "tablet"] });
+          this.animationLock = false;
+          this.lightPath.clear();
+          this.actionPulse.setVisible(false);
         },
       });
     }
@@ -296,7 +534,7 @@ export function bootMeolunaGame(context) {
     }
 
     update(_time, delta) {
-      if (!this.ba || this.moving) return;
+      if (!this.ba || this.moving || this.animationLock) return;
       const horizontal = Number(this.keys.right.isDown || this.keys.d.isDown) - Number(this.keys.left.isDown || this.keys.a.isDown);
       const vertical = Number(this.keys.down.isDown || this.keys.s.isDown) - Number(this.keys.up.isDown || this.keys.w.isDown);
       if (!horizontal && !vertical) return;
