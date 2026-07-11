@@ -76,6 +76,17 @@ export function createJourneyModel() {
   };
 }
 
+export function reportJourneyCompletion(api, journey) {
+  if (!journey.consumeCompletion()) return false;
+  api.completeGoal("goal-heart-meaning", { source: "memory-echo" });
+  api.completeGoal("goal-maat-truth", { source: "memory-echo" });
+  api.completeGoal("goal-anubis-weighs", { source: "memory-echo" });
+  api.completeGoal("goal-thoth-records", { source: "memory-echo" });
+  api.completeGoal("goal-osiris-afterlife", { source: "memory-echo" });
+  api.completeGame({ finalScore: 0, experience: "heart-of-truth" });
+  return true;
+}
+
 export function bootMeolunaGame(context) {
   const journey = createJourneyModel();
   const width = context.width;
@@ -102,6 +113,8 @@ export function bootMeolunaGame(context) {
       this.caption = null;
       this.audioContext = null;
       this.soundEnabled = true;
+      this.echoMotifs = null;
+      this.echoGuide = null;
     }
 
     preload() {
@@ -121,6 +134,10 @@ export function bootMeolunaGame(context) {
       this.input.on("pointerdown", (pointer) => {
         if (this.moving || this.animationLock) return;
         this.emitFirstInput();
+        if (journey.snapshot().phase === "echo") {
+          this.handleEchoPointer(pointer.worldX, pointer.worldY);
+          return;
+        }
         const target = station[this.currentStation];
         const nearAction = window.Phaser.Math.Distance.Between(pointer.worldX, pointer.worldY, target.x, target.y) <= 76;
         if (this.actionReady && nearAction) {
@@ -514,23 +531,204 @@ export function bootMeolunaGame(context) {
         onComplete: () => {
           this.showCaption("Anubis wog.  Thoth schrieb.  Osiris empfing.", 650, 633, { size: "22px", width: 680 });
           this.playTone(146, 0.42);
-          context.api.emit("echo.ready", { sequence: ["heart", "feather", "tablet"] });
           this.animationLock = false;
           this.lightPath.clear();
           this.actionPulse.setVisible(false);
+          this.beginEcho();
+          context.api.emit("echo.ready", { sequenceLength: 3 });
+        },
+      });
+    }
+
+    beginEcho() {
+      if (this.caption) this.caption.destroy();
+      this.guidedDecor = [
+        this.heartProp,
+        this.featherProp,
+        this.scaleRig,
+        this.anubisGlow,
+        this.thothGlow,
+        this.portalGlow,
+        this.portalLeft,
+        this.portalRight,
+        this.writingLine,
+      ];
+      this.tweens.add({ targets: this.guidedDecor, alpha: 0, duration: 420, ease: "Sine.In" });
+      const veil = this.add.rectangle(width / 2, height / 2, width, height, 0x090907, 0)
+        .setDepth(23);
+      this.tweens.add({ targets: veil, alpha: 0.72, duration: 650, ease: "Sine.Out" });
+
+      const title = this.add.text(width / 2, 172, "", {
+        fontFamily: "Georgia, serif",
+        fontSize: "20px",
+        color: "#dbc47e",
+      }).setOrigin(0.5).setDepth(29);
+      title.setText("Erinnere dich an den Weg der Wahrheit").setAlpha(0);
+      this.tweens.add({ targets: title, alpha: 0.9, y: 162, duration: 650, ease: "Sine.Out" });
+
+      const motifHeart = this.makeEchoHeart(330, 410);
+      const motifFeather = this.makeEchoFeather(640, 410);
+      const motifTablet = this.makeEchoTablet(950, 410);
+      this.echoMotifs = {
+        heart: motifHeart,
+        feather: motifFeather,
+        tablet: motifTablet,
+      };
+      this.echoVeil = veil;
+      this.echoTitle = title;
+      this.ba.setDepth(34);
+      this.echoGuide = this.add.graphics().setDepth(31);
+      this.setEchoGuide();
+      this.publishEchoAffordances();
+    }
+
+    makeEchoHeart(x, y) {
+      const glow = this.add.circle(0, 0, 86, 0x49dcd3, 0.08).setStrokeStyle(2, 0x6de9df, 0.35);
+      const ink = this.add.graphics();
+      ink.fillStyle(0x7b252d, 1).fillCircle(-20, -12, 29).fillCircle(20, -12, 29);
+      ink.fillTriangle(-48, 2, 48, 2, 0, 69);
+      ink.lineStyle(5, 0xe1c36c, 0.92).strokeCircle(-20, -12, 29).strokeCircle(20, -12, 29);
+      ink.lineBetween(-47, 2, 0, 69).lineBetween(47, 2, 0, 69);
+      const motif = this.add.container(x, y, [glow, ink]).setDepth(32).setAlpha(0);
+      this.tweens.add({ targets: motif, alpha: 1, y: y - 8, duration: 720, ease: "Back.Out" });
+      this.tweens.add({ targets: glow, scale: 1.08, alpha: 0.03, duration: 1050, yoyo: true, repeat: -1 });
+      return motif;
+    }
+
+    makeEchoFeather(x, y) {
+      const glow = this.add.circle(0, 0, 86, 0x49dcd3, 0.08).setStrokeStyle(2, 0x6de9df, 0.35);
+      const ink = this.add.graphics();
+      ink.lineStyle(8, 0xeadba5, 0.96).lineBetween(0, 71, 0, -72);
+      ink.lineStyle(4, 0xdfbd62, 0.95);
+      for (let py = -62; py <= 50; py += 15) {
+        const reach = 42 - Math.abs(py + 4) * 0.23;
+        ink.lineBetween(0, py, -reach, py + 16).lineBetween(0, py, reach, py + 16);
+      }
+      const motif = this.add.container(x, y, [glow, ink]).setDepth(32).setAlpha(0);
+      this.tweens.add({ targets: motif, alpha: 1, y: y - 8, duration: 720, delay: 110, ease: "Back.Out" });
+      this.tweens.add({ targets: glow, scale: 1.08, alpha: 0.03, duration: 1050, delay: 170, yoyo: true, repeat: -1 });
+      return motif;
+    }
+
+    makeEchoTablet(x, y) {
+      const glow = this.add.circle(0, 0, 86, 0x49dcd3, 0.08).setStrokeStyle(2, 0x6de9df, 0.35);
+      const ink = this.add.graphics();
+      ink.fillStyle(0xaa864d, 0.96).fillPoints([
+        { x: -54, y: -67 },
+        { x: 50, y: -61 },
+        { x: 57, y: 56 },
+        { x: -48, y: 69 },
+      ], true);
+      ink.lineStyle(4, 0xe0c169, 0.92).strokePoints([
+        { x: -54, y: -67 },
+        { x: 50, y: -61 },
+        { x: 57, y: 56 },
+        { x: -48, y: 69 },
+      ], true);
+      ink.lineStyle(5, 0x2d2419, 0.78);
+      ink.lineBetween(-31, -36, 30, -31).lineBetween(-29, -6, 21, -2).lineBetween(-27, 24, 35, 31);
+      const motif = this.add.container(x, y, [glow, ink]).setDepth(32).setAlpha(0);
+      this.tweens.add({ targets: motif, alpha: 1, y: y - 8, duration: 720, delay: 220, ease: "Back.Out" });
+      this.tweens.add({ targets: glow, scale: 1.08, alpha: 0.03, duration: 1050, delay: 340, yoyo: true, repeat: -1 });
+      return motif;
+    }
+
+    publishEchoAffordances() {
+      const activeIndex = journey.snapshot().echoIndex;
+      const activeId = ECHO_SEQUENCE[activeIndex];
+      context.api.setAffordances(
+        Object.entries(this.echoMotifs).map(([id, motif]) => ({
+          id: `echo.${id}`,
+          x: motif.x - 70,
+          y: motif.y - 78,
+          width: 140,
+          height: 156,
+          state: id === activeId ? "active" : "waiting",
+        })),
+        { width, height },
+      );
+    }
+
+    setEchoGuide() {
+      const activeId = ECHO_SEQUENCE[journey.snapshot().echoIndex];
+      const target = this.echoMotifs[activeId];
+      this.echoGuide.clear().lineStyle(4, 0x62e7de, 0.4).beginPath();
+      this.echoGuide.moveTo(this.ba.x, this.ba.y).lineTo((this.ba.x + target.x) / 2, target.y + 78).lineTo(target.x, target.y);
+      this.echoGuide.strokePath();
+    }
+
+    handleEchoPointer(x, y) {
+      const chosen = Object.entries(this.echoMotifs).find(([, motif]) =>
+        window.Phaser.Math.Distance.Between(x, y, motif.x, motif.y) <= 96,
+      );
+      if (!chosen) return;
+      this.chooseEcho(chosen[0]);
+    }
+
+    chooseEcho(id) {
+      const motif = this.echoMotifs[id];
+      this.animationLock = true;
+      this.echoGuide.clear();
+      this.tweens.add({
+        targets: this.ba,
+        x: motif.x,
+        y: motif.y + 112,
+        duration: 620,
+        ease: "Sine.InOut",
+        onComplete: () => {
+          const result = journey.remember(id);
+          if (!result.accepted) {
+            this.tweens.add({
+              targets: motif,
+              x: "+=9",
+              duration: 90,
+              yoyo: true,
+              repeat: 1,
+              onComplete: () => {
+                this.animationLock = false;
+                this.setEchoGuide();
+                this.publishEchoAffordances();
+                context.api.emit("echo.miss", { chosen: id, progress: journey.snapshot().echoIndex });
+              },
+            });
+            return;
+          }
+
+          this.playTone(340 + journey.snapshot().echoIndex * 80, 0.18);
+          this.tweens.add({ targets: motif, scale: 1.12, alpha: 0.48, duration: 260, yoyo: true });
+          context.api.emit("echo.accepted", { chosen: id, progress: journey.snapshot().echoIndex });
+          if (result.phase === "complete") {
+            this.finishEcho();
+            return;
+          }
+          this.animationLock = false;
+          this.setEchoGuide();
+          this.publishEchoAffordances();
+        },
+      });
+    }
+
+    finishEcho() {
+      context.api.setAffordances([], { width, height });
+      this.echoGuide.clear();
+      const motifs = Object.values(this.echoMotifs);
+      this.tweens.add({ targets: motifs, alpha: 0, y: "-=18", duration: 560, ease: "Sine.In" });
+      this.tweens.add({ targets: [this.echoVeil, this.echoTitle], alpha: 0, duration: 760, ease: "Sine.In" });
+      this.tweens.add({
+        targets: this.papyrus,
+        alpha: 1,
+        duration: 900,
+        onComplete: () => {
+          this.showCaption("Das Herz sprach wahr. Der Weg zu Osiris ist offen.", width / 2, 635, { width: 760 });
+          this.completeJourney();
+          context.api.emit("echo.complete", { goals: GOAL_IDS.slice() });
+          this.animationLock = false;
         },
       });
     }
 
     completeJourney() {
-      if (!journey.consumeCompletion()) return false;
-      context.api.completeGoal("goal-heart-meaning", { source: "memory-echo" });
-      context.api.completeGoal("goal-maat-truth", { source: "memory-echo" });
-      context.api.completeGoal("goal-anubis-weighs", { source: "memory-echo" });
-      context.api.completeGoal("goal-thoth-records", { source: "memory-echo" });
-      context.api.completeGoal("goal-osiris-afterlife", { source: "memory-echo" });
-      context.api.completeGame({ finalScore: 0, experience: "heart-of-truth" });
-      return true;
+      return reportJourneyCompletion(context.api, journey);
     }
 
     update(_time, delta) {

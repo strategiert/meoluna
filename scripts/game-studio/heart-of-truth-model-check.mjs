@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
-import { createJourneyModel } from "../../public/game-studio/games/heart-of-truth/game.js";
+import {
+  createJourneyModel,
+  reportJourneyCompletion,
+} from "../../public/game-studio/games/heart-of-truth/game.js";
 
 const journey = createJourneyModel();
 
@@ -28,5 +31,29 @@ assert.deepEqual(journey.snapshot().completedGoals, [
   "goal-thoth-records",
   "goal-osiris-afterlife",
 ]);
+
+const reportingJourney = createJourneyModel();
+for (const id of ["heart", "feather", "thoth", "gate"]) reportingJourney.activate(id);
+assert.equal(reportingJourney.remember("feather").accepted, false);
+assert.equal(reportingJourney.remember("heart").accepted, true);
+assert.equal(reportingJourney.remember("heart").accepted, false);
+assert.equal(reportingJourney.snapshot().echoIndex, 1);
+assert.equal(reportingJourney.remember("feather").accepted, true);
+assert.equal(reportingJourney.remember("tablet").accepted, true);
+
+const events = [];
+const api = {
+  completeGoal: (goalId, evidence) => events.push({ type: "goal", goalId, evidence }),
+  completeGame: (summary) => events.push({ type: "complete", summary }),
+};
+
+assert.equal(reportJourneyCompletion(api, reportingJourney), true);
+assert.equal(reportJourneyCompletion(api, reportingJourney), false);
+assert.equal(events.filter((event) => event.type === "goal").length, 5);
+assert.equal(
+  new Set(events.filter((event) => event.type === "goal").map((event) => event.goalId)).size,
+  5,
+);
+assert.equal(events.filter((event) => event.type === "complete").length, 1);
 
 console.log("OK");

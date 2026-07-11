@@ -12,7 +12,7 @@ mkdirSync(screenshotRoot, { recursive: true });
 function parseStage(argv) {
   const stageIndex = argv.indexOf("--stage");
   const stage = stageIndex >= 0 ? argv[stageIndex + 1] : "movement";
-  if (!stage || !["movement", "guided", "responsive"].includes(stage)) {
+  if (!stage || !["movement", "guided", "echo", "responsive"].includes(stage)) {
     throw new Error(`Unbekannte Stage: ${stage ?? "(fehlt)"}`);
   }
   return stage;
@@ -83,11 +83,16 @@ async function waitForAffordance(page, id) {
 }
 
 async function waitForTelemetry(page, eventName) {
-  await page.waitForFunction(
-    (expectedEvent) => window.__gs.events.some((event) => event.type === "TELEMETRY" && event.event === expectedEvent),
-    eventName,
-    { timeout: 4000 },
-  );
+  try {
+    await page.waitForFunction(
+      (expectedEvent) => window.__gs.events.some((event) => event.type === "TELEMETRY" && event.event === expectedEvent),
+      eventName,
+      { timeout: 4000 },
+    );
+  } catch (error) {
+    const runtimeErrors = await page.evaluate(() => window.__gs.errors.slice());
+    throw new Error(`Telemetry ${eventName} fehlt. Runtime: ${runtimeErrors.join(" | ") || "kein GAME_ERROR"}`, { cause: error });
+  }
 }
 
 async function saveScreenshot(page, name) {
@@ -119,6 +124,20 @@ async function checkGuided(page) {
   assert.equal(completeCount, 0, "Geführter Check darf das Erinnerungsecho nicht lösen");
 }
 
+async function checkEcho(page) {
+  await checkGuided(page);
+  for (const id of ["heart", "feather", "tablet"]) {
+    await waitForAffordance(page, `echo.${id}`);
+  }
+  await tapAffordance(page, "echo.feather");
+  await waitForTelemetry(page, "echo.miss");
+  const completeCount = await page.evaluate(
+    () => window.__gs.events.filter((event) => event.type === "PROGRESS" && event.event === "complete").length,
+  );
+  assert.equal(completeCount, 0, "Falsches Echo-Motiv darf keinen Abschluss auslösen");
+  await saveScreenshot(page, "echo-miss");
+}
+
 async function main() {
   const stage = parseStage(process.argv.slice(2));
   const index = JSON.parse(readFileSync(join(ROOT, "public", "game-studio", "games", "index.json"), "utf8"));
@@ -138,6 +157,7 @@ async function main() {
     const frame = await loadGame(page, base, manifest);
     if (stage === "movement") await checkMovement(page, frame);
     if (stage === "guided") await checkGuided(page);
+    if (stage === "echo") await checkEcho(page);
     assert.deepEqual(await page.evaluate(() => window.__gs.errors), []);
     assert.deepEqual(consoleErrors, []);
     console.log(`PASS ${stage} 1440x900`);
