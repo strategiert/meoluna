@@ -1,4 +1,4 @@
-# CLAUDE.md - Meoluna Project Briefing
+# AGENTS.md - Meoluna Project Briefing
 
 > **Neu hier?** Lies zuerst das zentrale Onboarding:
 > `C:\Users\karent\.openclaw\workspace\ONBOARDING.md`
@@ -9,7 +9,7 @@
 
 You (Fable) are the orchestrator: plan, decompose, synthesize. If a task is trivial (one file, under 5 minutes, no architectural impact), just do it yourself — no delegation overhead.
 
-Subagent definitions: `.claude/agents/deep-reasoner.md` (Opus) and `.claude/agents/fast-worker.md` (Sonnet). Kickoff prompts per track: `docs/kickoff-prompts.md`.
+Subagent definitions: `.Codex/agents/deep-reasoner.md` (Opus) and `.Codex/agents/fast-worker.md` (Sonnet). Kickoff prompts per track: `docs/kickoff-prompts.md`.
 
 ### Active tracks
 1. **Game engines** — extend the existing deterministic engines (currently 14 renderers in `convex/pipeline/engines/`): larger scope, more interactivity, higher production value and visual appeal. Every change must preserve Meoluna's core differentiator: no two generated worlds are ever structurally identical.
@@ -44,13 +44,13 @@ Summarize subagent output before acting on it. Don't mirror full subagent reason
 
 ## 🤝 KOORDINATION: Fünf Agents, ein Repo
 
-**OpenClaw + Claude Code + Goose arbeiten zusammen.**
+**OpenClaw + Codex + Goose arbeiten zusammen.**
 
 ### Die Agents (5 AIs + 1 Human)
 | Agent | Stärke | Besonderheit |
 |-------|--------|--------------|
 | **OpenClaw** | Autonomie, 24/7, Allrounder | Arbeitet via WhatsApp/Telegram, proaktiv, Memory, kann selbst Skills schreiben. |
-| **Claude Code** | Code-Tiefe, IDE-Integration | Primär Code-Experte, Skills-basiert, direkt im Terminal. |
+| **Codex** | Code-Tiefe, IDE-Integration | Primär Code-Experte, Skills-basiert, direkt im Terminal. |
 | **Goose** | Lead/Worker, Recipes, Memory | Lokal, MCP-Server, gute Memory. |
 | **Gemini/Antigravity** | Google-Integration | Neu im Team |
 | **OpenAI Codex** | Code-Generierung | Neu im Team |
@@ -58,15 +58,15 @@ Summarize subagent output before acting on it. Don't mirror full subagent reason
 ### Arbeitsaufteilung (flexibel)
 | Bereich | Primär | Auch möglich |
 |---------|--------|--------------|
-| App-Code (`src/`, `convex/`) | Claude Code | Goose, OpenClaw |
+| App-Code (`src/`, `convex/`) | Codex | Goose, OpenClaw |
 | Content, Marketing, Daten | OpenClaw | Goose |
 | Autonome Tasks (nachts/abwesend) | OpenClaw | - |
-| Komplexe Debugging-Sessions | Goose, Claude Code | - |
+| Komplexe Debugging-Sessions | Goose, Codex | - |
 | Scripts, Tooling | Alle | - |
 
 ### Regeln
-1. **Vor dem Start:** `git pull` + CLAUDE.md checken ob ein anderer Agent gerade arbeitet
-2. **Nach Abschluss:** Änderungen committen, CLAUDE.md updaten, Mission Control updaten
+1. **Vor dem Start:** `git pull` + AGENTS.md checken ob ein anderer Agent gerade arbeitet
+2. **Nach Abschluss:** Änderungen committen, AGENTS.md updaten, Mission Control updaten
 3. **Kommunikation:** Status-Updates in Activity Log + Mission Control
 4. **Konflikte:** Wenn mehrere dieselbe Datei brauchen → Klaus fragen
 
@@ -87,7 +87,7 @@ Summarize subagent output before acting on it. Don't mirror full subagent reason
 
 3. **Mission Control updaten** (Details im Abschnitt "Mission Control API" unten — Auth ist `?apiKey=`, NICHT Bearer-Token!)
 
-4. **Activity Log in CLAUDE.md updaten** mit:
+4. **Activity Log in AGENTS.md updaten** mit:
    - Was wurde implementiert
    - Welche Dateien wurden geändert
    - Aktueller Status
@@ -100,15 +100,15 @@ Summarize subagent output before acting on it. Don't mirror full subagent reason
 | Agent | Status | Working On |
 |-------|--------|------------|
 | OpenClaw | 🔄 Active | Content, Marketing |
-| Claude Code | ✅ Done | Kimi Wave 1 Import abgeschlossen |
+| Codex | ✅ Done | Kimi Wave 1 Import abgeschlossen |
 | Goose | ⏸️ Idle | - |
 | Gemini | 🆕 Neu | Onboarding |
 | Codex | 🔄 Active | Kimi Lernwelten-Generierung |
 
 ### Nächste Tasks (noch zu vergeben)
 - [ ] Blog-System mit Content verbinden
-- [x] XP-Anzeige Konsistenz Fix (Claude Code) ✅
-- [x] Kimi Wave 1 Import (Claude Code) ✅
+- [x] XP-Anzeige Konsistenz Fix (Codex) ✅
+- [x] Kimi Wave 1 Import (Codex) ✅
 - [ ] Kimi Wave 2 starten (Codex)
 
 ### 🎯 Mission Control API (für Task-Tracking)
@@ -576,7 +576,7 @@ b170dea feat: Implement Meoluna Tracking Engine (Server-Side Analytics)
 | `kimi/scripts/validate_kimi_worlds.ps1` | QA-Validator für generierte Welten |
 | `scripts/import_final_lernwelten.mjs` | Import-Script für Kimi-Welten |
 
-### Schema-Entscheidung (Konsens Claude Code + Codex)
+### Schema-Entscheidung (Konsens Codex + Codex)
 - **7 Interaction Types FEST:** multiple-choice, fill-blank, matching, sorting, true-false, short-answer, image-analysis
 - **Visuals FREI:** JSX, SVG, Tailwind, p5, Recharts, Framer Motion
 - **Metadata OPTIONAL:** variant, difficulty, visualType (für Analytics)
@@ -599,7 +599,7 @@ e4c8252 feat: Add Node.js topic import script
 8b8492f feat: Add curriculum PDF parser scripts
 ```
 
-### Agent: Claude Code
+### Agent: Codex
 
 ---
 
@@ -622,7 +622,7 @@ e4c8252 feat: Add Node.js topic import script
 ### Tests (alle grün)
 Alle 14 Golden-Checks, playthrough-smoke (Klick→XP-Contract), uniqueness-check, visual-regression (Baselines aktualisiert), tsc.
 
-### Agent: Claude Code (Fable, Orchestrator) + deep-reasoner + Codex + 2× fast-worker
+### Agent: Codex (Fable, Orchestrator) + deep-reasoner + Codex + 2× fast-worker
 
 ---
 
@@ -659,7 +659,7 @@ Alle 14 Engines: kidKit (seeded Themes, Sound stumm+Toggle, Streak), optionales 
 - Optional (bewusst vertagt): Speicherzeit-Fingerprint-Gate (structureSignature beim Speichern erzwingen)
 - Wave-2+-Ideen aus Synthese, nicht umgesetzt: sort-match conveyor, dnd-kit-Drag-Varianten
 
-### Agent: Claude Code (Fable, Orchestrator) + 5× fast-worker
+### Agent: Codex (Fable, Orchestrator) + 5× fast-worker
 
 ---
 
@@ -682,43 +682,8 @@ Digitale PDFs (Mehrheit der Lehrer-Uploads) brauchen kein 200-DPI-Rendering + OC
 - Railway Auto-Build via Push (Projekt `virtuous-compassion`)
 - Kein neues Env nötig (PADDLEOCR_URL/API_KEY unverändert)
 
-### Agent: Claude Code (Fable)
+### Agent: Codex (Fable)
 
 ---
 
-## 2026-07-11 - Game Studio V3: Phaser Vertical Slice (Spec 2026-07-10)
-
-### Was gebaut wurde ✅
-Parallele Phaser-4-Testumgebung neben den 14 React-Engines — kein Produktionspfad verändert. Spec: `docs/superpowers/specs/2026-07-10-generative-game-studio-design.md`, Plan: `docs/superpowers/plans/2026-07-10-game-studio-v3-vertical-slice.md`.
-
-| Komponente | Beschreibung |
-|------------|--------------|
-| `public/game-runtime/v1/` | Runtime-Shell: sandboxed iframe (`allow-scripts`, opake Origin), CSP `default-src 'none'`, Phaser 4.2.1 (exakt gepinnt), MessagePort-Bridge (kein breites postMessage) |
-| `src/components/game-runtime/` | `types.ts`, `bridge.ts` (e.source-Guard, Typ-Whitelist, Single-INIT), `PhaserPreview.tsx` (onEvent per Ref — Deps nur `[manifest]`) |
-| `src/pages/admin/GameStudioLab.tsx` + Route `/admin/game-studio` | Admin-only Lab: Spielauswahl + Event-Log. KEINE Convex-Writes, kein XP — Spiel-Events sind untrusted |
-| `convex/gameStudio/` | `sourceValidator.ts` (18 Verbots-Regeln inkl. Math.random/Date.now), `types.ts`, `originalityGate.ts` (Jaccard + 7 Dimensionen, Schwellen 0.72/0.60) — pure TS, keine Convex-Functions |
-| `scripts/game-studio/` | `lib/harness.mjs`, `run-playthrough.mjs` (generischer Executor: Affordance-Pläne, 3 Viewports mit Orientierungs-Rotation, 48px-Touch-Gate, Perf-Gate p95<33ms @ 4x CPU-Throttle), Checks, Ägypten-Learning-Model |
-| `public/game-studio/games/egypt-tomb/` | Spiel A „Das Siegel des vergessenen Schreibers": Top-down-Mystery, 3 Grabkammern, 960x960 |
-| `public/game-studio/games/egypt-city/` | Spiel B „Stadt am großen Fluss": Runden-Wirtschaftssim, 3 Jahre × 3 Nilphasen, 1280x720, Schreiber-Mechanik als System |
-
-### QA-Befehle (neu)
-`npm run game-slice-check` (alles), `game-studio-check`, `game-runtime-check`, `game-source-check`, `experience-signature-check`, `game-studio-lab-check`, `game-playthrough -- --plan <plan> --viewport all`
-
-### Gelernte Fallen
-- Headless-Chromium fällt ohne `--use-gl=angle` auf SwiftShader zurück → deterministisch 30fps → Perf-Gate-Fehlalarm. Hängende Chrome-Prozesse erzeugen dasselbe Symptom.
-- Live-Vektor-Graphics pro Frame reißen das Perf-Gate — Texturen mit `generateTexture` baken (Cache-Key = pure Funktion von Typ+Größe, PRNG-frei).
-- 960er-Basis @ 390px-Viewport: Touch-Targets brauchen ≥140 logische px (Landscape 1280er: ≥90).
-- Echte Umlaute von Anfang an — TTS liest „fuer" falsch vor; Review-Loop gekostet.
-- Executor-Playthrough testet Landscape-Spiele auf Portrait-Viewports GEDREHT — echter Portrait-Modus (Dreh-Hinweis) bleibt ungetestet, Overlay muss Input aktiv blockieren.
-
-### Status / Offen
-- Beide Spiele: Playthrough 3 Viewports grün, alle 4 Lernziele per Telemetrie, Similarity 0.0 (<0.40-Gate), completeGame session-guarded.
-- Bestands-Regression grün: tsc, golden-check 5/5, sandbox-entry, playthrough-smoke, uniqueness.
-- **Pilot-Gate (Spec 8.5) OFFEN:** Klaus' Erst-Feedback (Spiel A): „Keinerlei Erklärung, Reihenfolge unklar, Sinn unklar" → Follow-up nötig: Intro-Sequenz/Zielansage pro Spiel, geführter erster Zug, sichtbares Ziel-HUD. Erst danach Gate-Bewertung wiederholen.
-- Phase 2 (Artifact-Modell, Admin-Generierung, LLM-Pitch/GDD) NICHT begonnen — bewusst nach Gate-Entscheid.
-
-### Agent: Claude Code (Fable, Orchestrator) + 2× Opus-Implementer (Spiele) + 3× fast-worker + 1× Sonnet-Implementer + 5 Reviewer (2× Opus, 3× Sonnet), SDD-Workflow mit Fix-Loops
-
----
-
-*Letztes Update: 2026-07-11*
+*Letztes Update: 2026-07-10*
