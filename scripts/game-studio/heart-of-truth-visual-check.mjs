@@ -35,18 +35,19 @@ function pixelDifference(beforeBuffer, afterBuffer) {
   return changed / (before.width * before.height);
 }
 
-async function loadGame(page, base, manifest) {
+async function loadGame(page, base, manifest, device = "desktop") {
   await page.goto(`${base}/harness.html`);
   await page.waitForFunction(() => window.__gs.ready, null, { timeout: 5000 });
   await page.evaluate(
-    ({ sourceUrl, seed, width, height, assets }) =>
-      window.__loadGame(sourceUrl, seed, { width, height, device: "desktop", assets }),
+    ({ sourceUrl, seed, width, height, assets, device: targetDevice }) =>
+      window.__loadGame(sourceUrl, seed, { width, height, device: targetDevice, assets }),
     {
       sourceUrl: `${base}${manifest.sourceUrl}`,
       seed: manifest.seed,
       width: manifest.width,
       height: manifest.height,
       assets: manifest.assets,
+      device,
     },
   );
   await page.waitForFunction(() => window.__gs.gameReady, null, { timeout: 5000 });
@@ -138,6 +139,78 @@ async function checkEcho(page) {
   await saveScreenshot(page, "echo-miss");
 }
 
+async function assertCurrentTouchTargets(page) {
+  const tooSmall = await page.evaluate(() =>
+    window.__gs.affordances
+      .filter((affordance) => affordance.state !== "locked")
+      .filter((affordance) => affordance.width < 48 || affordance.height < 48)
+      .map((affordance) => `${affordance.id}:${affordance.width.toFixed(1)}x${affordance.height.toFixed(1)}`),
+  );
+  assert.deepEqual(tooSmall, [], `Touch-Ziele zu klein: ${tooSmall.join(", ")}`);
+}
+
+async function checkResponsive(browser, base, manifest) {
+  const viewports = [
+    { label: "844x390", width: 844, height: 390, device: "touch" },
+    { label: "1024x768", width: 1024, height: 768, device: "touch" },
+    { label: "1440x900", width: 1440, height: 900, device: "desktop" },
+  ];
+
+  for (const viewport of viewports) {
+    const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height } });
+    const consoleErrors = [];
+    page.on("console", (message) => {
+      if (message.type() === "error") consoleErrors.push(message.text());
+    });
+    try {
+      const frame = await loadGame(page, base, manifest, viewport.device);
+      await waitForAffordance(page, "ui.sound");
+      await waitForAffordance(page, "move.heart");
+      await assertCurrentTouchTargets(page);
+
+      if (viewport.device === "desktop") {
+        const before = await frame.locator("canvas").screenshot();
+        await page.keyboard.down("ArrowRight");
+        await page.waitForTimeout(260);
+        await page.keyboard.up("ArrowRight");
+        const after = await frame.locator("canvas").screenshot();
+        assert.ok(pixelDifference(before, after) > 0.0005, "Pfeiltaste bewegt die Ba-Figur nicht sichtbar");
+      }
+
+      await tapAffordance(page, "move.heart");
+      await waitForAffordance(page, "action.heart");
+      await assertCurrentTouchTargets(page);
+      if (viewport.device === "desktop") {
+        await page.keyboard.press("Space");
+      } else {
+        await tapAffordance(page, "action.heart");
+      }
+      await waitForTelemetry(page, "heart.raised");
+      assert.deepEqual(await page.evaluate(() => window.__gs.errors), []);
+      assert.deepEqual(consoleErrors, []);
+      console.log(`PASS responsive ${viewport.label}`);
+    } finally {
+      await page.close();
+    }
+  }
+
+  const portraitPage = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  try {
+    const frame = await loadGame(portraitPage, base, manifest, "touch");
+    await waitForTelemetry(portraitPage, "orientation.rotate");
+    const worldActions = await portraitPage.evaluate(() =>
+      window.__gs.affordances.filter((affordance) => !affordance.id.startsWith("ui.")).map((affordance) => affordance.id),
+    );
+    assert.deepEqual(worldActions, [], "Portrait darf keine verkleinerte Weltaktion anbieten");
+    await frame.locator("canvas").screenshot({
+      path: join(screenshotRoot, "heart-of-truth-390x844-rotate.png"),
+    });
+    console.log("PASS responsive 390x844 rotate");
+  } finally {
+    await portraitPage.close();
+  }
+}
+
 async function main() {
   const stage = parseStage(process.argv.slice(2));
   const index = JSON.parse(readFileSync(join(ROOT, "public", "game-studio", "games", "index.json"), "utf8"));
@@ -147,6 +220,15 @@ async function main() {
   const server = await startServer();
   const base = `http://127.0.0.1:${server.address().port}`;
   const browser = await chromium.launch({ args: ["--use-gl=angle"] });
+  if (stage === "responsive") {
+    try {
+      await checkResponsive(browser, base, manifest);
+    } finally {
+      await browser.close();
+      server.close();
+    }
+    return;
+  }
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   const consoleErrors = [];
   page.on("console", (message) => {

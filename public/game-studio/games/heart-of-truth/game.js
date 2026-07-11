@@ -112,7 +112,7 @@ export function bootMeolunaGame(context) {
       this.lightPath = null;
       this.caption = null;
       this.audioContext = null;
-      this.soundEnabled = true;
+      this.soundEnabled = false;
       this.echoMotifs = null;
       this.echoGuide = null;
     }
@@ -124,14 +124,25 @@ export function bootMeolunaGame(context) {
 
     create() {
       this.cameras.main.setBackgroundColor("#120d09");
+      if (window.innerHeight > window.innerWidth) {
+        this.buildPortraitPrompt();
+        context.api.setAffordances([], { width, height });
+        context.api.emit("orientation.rotate", { requested: "landscape" });
+        return;
+      }
       this.buildPapyrusWorld();
       this.buildAtmosphere();
       this.buildInteractiveProps();
+      this.buildSoundControl();
       this.ba = this.buildBa(170, 548);
       this.buildArrivalCue();
       this.publishMoveAffordance("heart");
 
       this.input.on("pointerdown", (pointer) => {
+        if (this.isSoundHit(pointer.worldX, pointer.worldY)) {
+          this.toggleSound();
+          return;
+        }
         if (this.moving || this.animationLock) return;
         this.emitFirstInput();
         if (journey.snapshot().phase === "echo") {
@@ -158,6 +169,92 @@ export function bootMeolunaGame(context) {
         d: "D",
         action: "SPACE",
       });
+      this.input.keyboard.on("keydown-SPACE", () => {
+        if (this.moving || this.animationLock || !this.actionReady) return;
+        this.emitFirstInput();
+        this.activateStation(this.currentStation);
+      });
+    }
+
+    buildPortraitPrompt() {
+      this.add.image(width / 2, height / 2, "papyrus")
+        .setDisplaySize(width, 880)
+        .setTint(0x8f774f)
+        .setAlpha(0.9);
+      this.add.rectangle(width / 2, height / 2, width, height, 0x0e0b08, 0.62);
+
+      const phoneInk = this.add.graphics();
+      phoneInk.lineStyle(8, 0xe1c46e, 0.96).strokeRoundedRect(-78, -126, 156, 252, 20);
+      phoneInk.fillStyle(0xe1c46e, 0.9).fillCircle(0, 100, 7);
+      phoneInk.lineStyle(7, 0x63e4dc, 0.9);
+      phoneInk.beginPath().arc(0, 0, 158, -0.72, 0.72).strokePath();
+      phoneInk.fillStyle(0x63e4dc, 0.95).fillTriangle(116, 106, 178, 91, 151, 145);
+      this.add.container(width / 2, 315, [phoneInk]).setAngle(-90);
+
+      this.add.text(width / 2, 534, "Drehe dein Gerät", {
+        fontFamily: "Georgia, serif",
+        fontSize: "54px",
+        color: "#f0dd9e",
+        align: "center",
+        shadow: { offsetX: 0, offsetY: 3, color: "#080604", blur: 8, fill: true },
+      }).setOrigin(0.5);
+      this.add.text(width / 2, 597, "Diese Papyruswelt öffnet sich im Querformat.", {
+        fontFamily: "Arial, sans-serif",
+        fontSize: "27px",
+        color: "#b7d9cf",
+        align: "center",
+      }).setOrigin(0.5);
+    }
+
+    buildSoundControl() {
+      const back = this.add.circle(0, 0, 33, 0x17120e, 0.62).setStrokeStyle(2, 0xd8b96d, 0.55);
+      this.soundGlyph = this.add.graphics();
+      this.soundControl = this.add.container(width - 62, 60, [back, this.soundGlyph]).setDepth(50);
+      this.redrawSoundIcon();
+    }
+
+    redrawSoundIcon() {
+      const glyph = this.soundGlyph;
+      glyph.clear();
+      glyph.fillStyle(0xe4ce8b, 0.95);
+      glyph.fillRect(-17, -8, 8, 16);
+      glyph.fillPoints([
+        { x: -9, y: -8 },
+        { x: 3, y: -17 },
+        { x: 3, y: 17 },
+        { x: -9, y: 8 },
+      ], true);
+      glyph.lineStyle(3, 0xe4ce8b, 0.92);
+      if (this.soundEnabled) {
+        glyph.beginPath().arc(4, 0, 13, -0.85, 0.85).strokePath();
+        glyph.beginPath().arc(4, 0, 22, -0.78, 0.78).strokePath();
+      } else {
+        glyph.lineStyle(4, 0xc9a75e, 0.95).lineBetween(8, -13, 24, 13);
+      }
+    }
+
+    isSoundHit(x, y) {
+      return window.Phaser.Math.Distance.Between(x, y, this.soundControl.x, this.soundControl.y) <= 50;
+    }
+
+    toggleSound() {
+      this.soundEnabled = !this.soundEnabled;
+      if (this.soundEnabled) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass && !this.audioContext) this.audioContext = new AudioContextClass();
+        if (this.audioContext && this.audioContext.state === "suspended") this.audioContext.resume();
+      }
+      this.redrawSoundIcon();
+      context.api.emit("sound.changed", { enabled: this.soundEnabled });
+      if (this.soundEnabled) this.playTone(392, 0.1);
+    }
+
+    soundAffordance() {
+      return { id: "ui.sound", x: width - 112, y: 10, width: 100, height: 100, state: this.soundEnabled ? "on" : "muted" };
+    }
+
+    withSoundAffordance(list) {
+      return [...list, this.soundAffordance()];
     }
 
     buildInteractiveProps() {
@@ -377,7 +474,9 @@ export function bootMeolunaGame(context) {
     publishMoveAffordance(id) {
       const target = station[id];
       context.api.setAffordances(
-        [{ id: `move.${id}`, x: target.x - 50, y: target.y - 50, width: 100, height: 100 }],
+        this.withSoundAffordance([
+          { id: `move.${id}`, x: target.x - 50, y: target.y - 50, width: 100, height: 100 },
+        ]),
         { width, height },
       );
     }
@@ -402,7 +501,9 @@ export function bootMeolunaGame(context) {
             this.actionReady = true;
             this.showActionSymbol(id);
             context.api.setAffordances(
-              [{ id: `action.${id}`, x: target.x - 48, y: target.y - 48, width: 96, height: 96 }],
+              this.withSoundAffordance([
+                { id: `action.${id}`, x: target.x - 48, y: target.y - 48, width: 96, height: 96 },
+              ]),
               { width, height },
             );
           } else {
@@ -417,7 +518,7 @@ export function bootMeolunaGame(context) {
       if (!result.accepted) return;
       this.actionReady = false;
       this.animationLock = true;
-      context.api.setAffordances([], { width, height });
+      context.api.setAffordances(this.withSoundAffordance([]), { width, height });
       if (id === "heart") this.animateHeart();
       if (id === "feather") this.animateFeather();
       if (id === "thoth") this.animateThoth();
@@ -637,14 +738,16 @@ export function bootMeolunaGame(context) {
       const activeIndex = journey.snapshot().echoIndex;
       const activeId = ECHO_SEQUENCE[activeIndex];
       context.api.setAffordances(
-        Object.entries(this.echoMotifs).map(([id, motif]) => ({
-          id: `echo.${id}`,
-          x: motif.x - 70,
-          y: motif.y - 78,
-          width: 140,
-          height: 156,
-          state: id === activeId ? "active" : "waiting",
-        })),
+        this.withSoundAffordance(
+          Object.entries(this.echoMotifs).map(([id, motif]) => ({
+            id: `echo.${id}`,
+            x: motif.x - 70,
+            y: motif.y - 78,
+            width: 140,
+            height: 156,
+            state: id === activeId ? "active" : "waiting",
+          })),
+        ),
         { width, height },
       );
     }
@@ -709,7 +812,7 @@ export function bootMeolunaGame(context) {
     }
 
     finishEcho() {
-      context.api.setAffordances([], { width, height });
+      context.api.setAffordances(this.withSoundAffordance([]), { width, height });
       this.echoGuide.clear();
       const motifs = Object.values(this.echoMotifs);
       this.tweens.add({ targets: motifs, alpha: 0, y: "-=18", duration: 560, ease: "Sine.In" });
