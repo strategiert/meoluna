@@ -26,6 +26,20 @@
       "height": 720,
       "seed": "city-v1",
       "assets": []
+    },
+    {
+      "id": "heart-of-truth",
+      "title": "Das Herz der Wahrheit",
+      "sourceUrl": "/game-studio/games/heart-of-truth/game.js",
+      "width": 1280,
+      "height": 720,
+      "seed": "heart-of-truth-v1",
+      "assets": [
+        {
+          "id": "papyrus",
+          "url": "/game-studio/games/heart-of-truth/assets/papyrus-nauny.jpg"
+        }
+      ]
     }
   ]
 }
