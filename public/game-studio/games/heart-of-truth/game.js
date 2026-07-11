@@ -170,8 +170,14 @@ export function bootMeolunaGame(context) {
         action: "SPACE",
       });
       this.input.keyboard.on("keydown-SPACE", () => {
-        if (this.moving || this.animationLock || !this.actionReady) return;
+        if (this.moving || this.animationLock) return;
         this.emitFirstInput();
+        if (journey.snapshot().phase === "echo") {
+          const nearbyMotif = this.echoMotifNearBa();
+          if (nearbyMotif) this.chooseEcho(nearbyMotif);
+          return;
+        }
+        if (!this.actionReady) return;
         this.activateStation(this.currentStation);
       });
     }
@@ -766,6 +772,18 @@ export function bootMeolunaGame(context) {
       );
       if (!chosen) return;
       this.chooseEcho(chosen[0]);
+    }
+
+    echoMotifNearBa() {
+      if (!this.echoMotifs) return null;
+      const nearby = Object.entries(this.echoMotifs)
+        .map(([id, motif]) => ({
+          id,
+          distance: window.Phaser.Math.Distance.Between(this.ba.x, this.ba.y, motif.x, motif.y),
+        }))
+        .filter((entry) => entry.distance <= 180)
+        .sort((left, right) => left.distance - right.distance);
+      return nearby[0]?.id || null;
     }
 
     chooseEcho(id) {

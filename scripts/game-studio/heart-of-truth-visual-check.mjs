@@ -132,6 +132,12 @@ async function checkEcho(page) {
   }
   await tapAffordance(page, "echo.feather");
   await waitForTelemetry(page, "echo.miss");
+  await page.keyboard.press("Space");
+  await page.waitForFunction(
+    () => window.__gs.events.filter((event) => event.type === "TELEMETRY" && event.event === "echo.miss").length === 2,
+    null,
+    { timeout: 3000 },
+  );
   const completeCount = await page.evaluate(
     () => window.__gs.events.filter((event) => event.type === "PROGRESS" && event.event === "complete").length,
   );
