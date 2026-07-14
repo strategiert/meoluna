@@ -19,6 +19,12 @@
       // Schema/Playbook: ANALYTICS-ROLLOUT.md im Shared Workspace.
       (function () {
         try {
+          var nt = new URLSearchParams(location.search).get('notrack');
+          if (nt === '1') localStorage.setItem('notrack', '1');
+          if (nt === '0') localStorage.removeItem('notrack');
+          if (localStorage.getItem('notrack') === '1') return;
+        } catch (e) {}
+        try {
           if (!/(^|\.)meoluna\.(com|de)$/.test(location.hostname)) return;
           var EP = 'https://a.meoluna.com/ev';
           var CK = 'ml_consent', PK = 'ml_pid';
